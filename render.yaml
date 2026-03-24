@@ -5,19 +5,20 @@ services:
     region: oregon
     plan: starter
     rootDir: rulegpt-api
-    buildCommand: pip install -r requirements.txt && alembic upgrade head
+    buildCommand: pip install -r requirements.txt
+    preDeployCommand: alembic upgrade head
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
-    autoDeploy: true
+    autoDeployTrigger: commit
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.10
       - key: ENVIRONMENT
         value: production
       - key: API_PREFIX
         value: /api
       - key: CORS_ORIGINS
         value: '["http://localhost:5173","https://your-frontend.vercel.app"]'
-      - key: PYTHON_VERSION
-        value: 3.11.10
       - key: RULEGPT_EMBEDDING_MODEL
         value: text-embedding-3-small
       - key: RULEGPT_FALLBACK_MODEL
@@ -30,3 +31,33 @@ services:
         value: claude-sonnet-4-6
       - key: RULHUB_API_URL
         value: https://api.rulhub.com
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_ISSUER
+        sync: false
+      - key: SUPABASE_JWKS_URL
+        sync: false
+      - key: SUPABASE_JWT_AUDIENCE
+        sync: false
+      - key: RULHUB_API_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRO_MONTHLY_PRICE_ID
+        sync: false
+      - key: STRIPE_PRO_ANNUAL_PRICE_ID
+        sync: false

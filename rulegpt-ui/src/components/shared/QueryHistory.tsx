@@ -4,9 +4,10 @@ import type { HistoryItem } from '@/types'
 interface QueryHistoryProps {
   items: HistoryItem[]
   onPick: (value: string) => void
+  disabled?: boolean
 }
 
-export function QueryHistory({ items, onPick }: QueryHistoryProps) {
+export function QueryHistory({ items, onPick, disabled }: QueryHistoryProps) {
   const grouped = groupedByDate(items)
   return (
     <div className="space-y-4">
@@ -18,8 +19,9 @@ export function QueryHistory({ items, onPick }: QueryHistoryProps) {
               <button
                 key={item.query_id}
                 type="button"
+                disabled={disabled}
                 onClick={() => onPick(item.query_text)}
-                className="w-full rounded-md border border-border/60 bg-secondary/50 px-2 py-1 text-left text-xs text-foreground/90 transition hover:border-primary/40 hover:bg-secondary"
+                className="w-full rounded-md border border-border/60 bg-secondary/50 px-2 py-1 text-left text-xs text-foreground/90 transition hover:border-primary/40 hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {item.query_text}
               </button>

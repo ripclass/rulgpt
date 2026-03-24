@@ -11,6 +11,7 @@ interface MobileDrawerProps {
   mode: 'history' | 'saved'
   history: HistoryItem[]
   savedAnswers: SavedAnswer[]
+  previewMode?: boolean
   onOpenChange: (open: boolean) => void
   onPickHistory: (value: string) => void
   onDeleteSaved: (savedId: string) => void
@@ -22,6 +23,7 @@ export function MobileDrawer({
   mode,
   history,
   savedAnswers,
+  previewMode,
   onOpenChange,
   onPickHistory,
   onDeleteSaved,
@@ -36,6 +38,7 @@ export function MobileDrawer({
           {mode === 'history' ? (
             <QueryHistory
               items={history}
+              disabled={previewMode}
               onPick={(value) => {
                 onPickHistory(value)
                 onOpenChange(false)

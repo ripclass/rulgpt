@@ -35,6 +35,7 @@ npm run dev
 ```
 
 The UI defaults to `http://localhost:8000` for the API if `VITE_API_BASE_URL` is not set.
+`VITE_PREVIEW_MODE=true` keeps the landing/chat shell live while backend querying is intentionally paused.
 
 ## Environment Files
 
@@ -53,7 +54,9 @@ Run the SQL in `deploy/pgvector_setup.sql` once in the Supabase SQL editor, then
 
 ### Render backend
 
-Use `render.yaml` as the blueprint for the API service. Set the secret environment variables in Render:
+Use [render.yaml](J:/Enso%20Intelligence/rulgpt/render.yaml) as the blueprint for the API service. The blueprint installs dependencies in `buildCommand`, runs `alembic upgrade head` in `preDeployCommand`, and starts FastAPI with Uvicorn.
+
+Set or confirm these secret environment variables in Render:
 
 - `DATABASE_URL`
 - `SECRET_KEY`
@@ -68,13 +71,14 @@ Use `render.yaml` as the blueprint for the API service. Set the secret environme
 - `STRIPE_PRO_MONTHLY_PRICE_ID`
 - `STRIPE_PRO_ANNUAL_PRICE_ID`
 
-Set `CORS_ORIGINS` to include the Vercel URL for the frontend.
+Set `CORS_ORIGINS` to include the exact Vercel URL for the frontend instead of the placeholder value in the blueprint.
 
 ### Vercel frontend
 
 Set the Vercel project root directory to `rulegpt-ui` and use `rulegpt-ui/vercel.json` for the SPA fallback. Set these build-time env vars in Vercel:
 
 - `VITE_API_BASE_URL`
+- `VITE_PREVIEW_MODE`
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 - `VITE_SUPABASE_GOOGLE_OAUTH_ENABLED`

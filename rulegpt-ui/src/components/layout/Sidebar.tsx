@@ -12,6 +12,7 @@ interface SidebarProps {
   savedAnswers: SavedAnswer[]
   tier: SessionTier
   isAuthenticated: boolean
+  previewMode?: boolean
   usedCount: number
   remaining: number
   limitValue: number
@@ -37,6 +38,7 @@ export function Sidebar({
   savedAnswers,
   tier,
   isAuthenticated,
+  previewMode,
   usedCount,
   remaining,
   limitValue,
@@ -70,7 +72,8 @@ export function Sidebar({
           <button
             key={category}
             type="button"
-            className="w-full rounded-md border border-border/60 bg-secondary/50 px-2 py-1 text-left text-xs transition hover:border-primary/40"
+            disabled={previewMode}
+            className="w-full rounded-md border border-border/60 bg-secondary/50 px-2 py-1 text-left text-xs transition hover:border-primary/40 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={() => onPickHistory(category)}
           >
             {category}
@@ -80,7 +83,7 @@ export function Sidebar({
 
       <div className="mt-4 overflow-y-auto pr-1">
         <p className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">Query history</p>
-        <QueryHistory items={history} onPick={onPickHistory} />
+        <QueryHistory items={history} onPick={onPickHistory} disabled={previewMode} />
         <p className="mb-2 mt-5 text-xs uppercase tracking-wide text-muted-foreground">Saved answers</p>
         <SavedAnswers items={savedAnswers} onDelete={onDeleteSaved} />
       </div>

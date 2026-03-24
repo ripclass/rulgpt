@@ -15,6 +15,7 @@ import { useHistory } from '@/hooks/useHistory'
 import { useQuery } from '@/hooks/useQuery'
 import { useSession } from '@/hooks/useSession'
 import { useTierLimit } from '@/hooks/useTierLimit'
+import { isPreviewModeEnabled } from '@/lib/config'
 import type { Citation, RuleDetails } from '@/types'
 
 export function Home() {
@@ -28,6 +29,7 @@ export function Home() {
 
   const auth = useAuth()
   const { sessionToken, resetSession } = useSession()
+  const previewMode = isPreviewModeEnabled()
 
   const query = useQuery({
     sessionToken,
@@ -39,14 +41,15 @@ export function Home() {
   const suggestions = useRQQuery({
     queryKey: ['suggestions'],
     queryFn: api.getSuggestions,
+    enabled: !previewMode,
     staleTime: 15 * 60 * 1000,
   })
 
-  const history = useHistory(auth.user?.id, auth.tier, auth.accessToken)
+  const history = useHistory(auth.user?.id, auth.tier, auth.accessToken, !previewMode)
   const savedAnswers = useRQQuery({
     queryKey: ['saved', auth.user?.id, auth.tier, auth.accessToken ?? null],
     queryFn: () => api.listSaved({ userId: auth.user?.id, tier: auth.tier, accessToken: auth.accessToken }),
-    enabled: Boolean(auth.user?.id),
+    enabled: Boolean(auth.user?.id) && !previewMode,
   })
 
   const tierLimit = useTierLimit({
@@ -64,6 +67,10 @@ export function Home() {
   )
 
   const submitQuery = async (value: string) => {
+    if (previewMode) {
+      toast.message('Preview mode is active. Live queries will return when the RulHub API is ready.')
+      return
+    }
     const response = await query.submitQuery(value)
     if (!response) return
     if (response.show_trdr_cta) {
@@ -122,6 +129,7 @@ export function Home() {
         savedAnswers={savedAnswers.data ?? []}
         tier={auth.tier}
         isAuthenticated={auth.isAuthenticated}
+        previewMode={previewMode}
         usedCount={tierLimit.usedCount}
         remaining={tierLimit.remaining}
         limitValue={tierLimit.limitValue}
@@ -145,6 +153,7 @@ export function Home() {
         isLoading={query.isLoading}
         error={query.error}
         canSave={auth.isAuthenticated}
+        previewMode={previewMode}
         onSubmitQuery={submitQuery}
         onPickSuggestion={(value) => {
           void submitQuery(value)
@@ -170,6 +179,7 @@ export function Home() {
         mode="history"
         history={history.data ?? []}
         savedAnswers={savedAnswers.data ?? []}
+        previewMode={previewMode}
         onOpenChange={setHistoryDrawerOpen}
         onPickHistory={(value) => {
           void submitQuery(value)
@@ -185,6 +195,7 @@ export function Home() {
         mode="saved"
         history={history.data ?? []}
         savedAnswers={savedAnswers.data ?? []}
+        previewMode={previewMode}
         onOpenChange={setSavedDrawerOpen}
         onPickHistory={(value) => {
           void submitQuery(value)
