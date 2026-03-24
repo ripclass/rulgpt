@@ -56,7 +56,7 @@ export function useAuth() {
   }, [accessToken])
 
   useEffect(() => {
-    if (!supabaseEnabled) return
+    if (!supabaseEnabled || !supabase) return
     let mounted = true
 
     void supabase.auth
@@ -109,7 +109,7 @@ export function useAuth() {
   const login = async (email: string, password: string) => {
     setIsLoading(true)
     try {
-      if (supabaseEnabled) {
+      if (supabaseEnabled && supabase) {
         const hadBearerToken = Boolean(getApiAccessToken())
         const { data, error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
@@ -145,7 +145,7 @@ export function useAuth() {
   const signup = async (email: string, password: string) => {
     setIsLoading(true)
     try {
-      if (supabaseEnabled) {
+      if (supabaseEnabled && supabase) {
         const hadBearerToken = Boolean(getApiAccessToken())
         const { data, error } = await supabase.auth.signUp({ email, password })
         if (error) throw error
@@ -176,7 +176,7 @@ export function useAuth() {
   }
 
   const logout = async () => {
-    if (supabaseEnabled) {
+    if (supabaseEnabled && supabase) {
       await supabase.auth.signOut()
     }
     setUser(null)
@@ -186,7 +186,7 @@ export function useAuth() {
   }
 
   const loginWithOAuth = async (provider: 'google' | 'linkedin_oidc') => {
-    if (!supabaseEnabled) {
+    if (!supabaseEnabled || !supabase) {
       throw new Error('Supabase environment is not configured for OAuth.')
     }
     if (provider === 'google' && !googleEnabled) {

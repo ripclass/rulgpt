@@ -9,9 +9,11 @@ if (!supabaseEnabled) {
   console.warn('Supabase env vars missing; auth modals will run in local fallback mode.')
 }
 
-export const supabase = createClient(supabaseUrl ?? '', supabaseAnonKey ?? '', {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-})
+export const supabase = supabaseEnabled
+  ? createClient(supabaseUrl!, supabaseAnonKey!, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+      },
+    })
+  : null
