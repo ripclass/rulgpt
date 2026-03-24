@@ -49,13 +49,37 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.window_seconds = window_seconds
         self.exempt_paths = {"/health", "/docs", "/openapi.json"}
 
+    @staticmethod
+    def _resolve_tier(request: Request) -> str:
+        tier = request.state.user_tier if hasattr(request.state, "user_tier") else None
+        if tier in {"anonymous", "free", "pro"}:
+            return tier
+
+        raw_tier = (request.headers.get("x-user-tier") or "anonymous").lower().strip()
+        if raw_tier not in {"anonymous", "free", "pro"}:
+            raw_tier = "anonymous"
+
+        # Match TierCheck placeholder behavior when a user id is present.
+        raw_user_id = request.headers.get("x-user-id")
+        if raw_user_id and raw_tier == "anonymous":
+            return "free"
+        return raw_tier
+
+    @staticmethod
+    def _resolve_fingerprint(request: Request) -> str:
+        if hasattr(request.state, "client_fingerprint"):
+            value = request.state.client_fingerprint
+            if isinstance(value, str):
+                return value
+        return (request.headers.get("x-client-fingerprint") or "").strip()
+
     async def dispatch(self, request: Request, call_next) -> Response:
         if request.url.path in self.exempt_paths:
             return await call_next(request)
 
         ip = request.client.host if request.client else "unknown"
-        fingerprint = request.state.client_fingerprint if hasattr(request.state, "client_fingerprint") else ""
-        tier = request.state.user_tier if hasattr(request.state, "user_tier") else "anonymous"
+        fingerprint = self._resolve_fingerprint(request)
+        tier = self._resolve_tier(request)
         identifier = f"{ip}:{fingerprint}:{tier}:{request.url.path}"
         limit = (
             settings.RATE_LIMIT_PER_MIN_AUTH
@@ -72,4 +96,3 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                 },
             )
         return await call_next(request)
-

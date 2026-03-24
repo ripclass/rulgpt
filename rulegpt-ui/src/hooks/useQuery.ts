@@ -6,6 +6,7 @@ interface UseQueryOptions {
   sessionToken: string
   tier: SessionTier
   userId?: string
+  accessToken?: string | null
 }
 
 function userMessage(query: string): Message {
@@ -57,7 +58,7 @@ function assistantMessage(response: QueryResponse): Message {
   }
 }
 
-export function useQuery({ sessionToken, tier, userId }: UseQueryOptions) {
+export function useQuery({ sessionToken, tier, userId, accessToken }: UseQueryOptions) {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -71,12 +72,12 @@ export function useQuery({ sessionToken, tier, userId }: UseQueryOptions) {
     setMessages((prev) => [...prev, userMessage(trimmed)])
     try {
       const response = await api.submitQuery(
-        {
-          query: trimmed,
-          session_token: sessionToken,
-          language: 'en',
-        },
-        { userId, tier },
+      {
+        query: trimmed,
+        session_token: sessionToken,
+        language: 'en',
+      },
+        { userId, tier, accessToken },
       )
       setMessages((prev) => [...prev, assistantMessage(response)])
       setQueriesRemaining(response.queries_remaining)

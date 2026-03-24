@@ -3,6 +3,7 @@ export type ConfidenceBand = 'high' | 'medium' | 'low'
 export type LanguageCode = 'en' | 'bn' | 'hi'
 export type MessageRole = 'user' | 'assistant'
 export type DomainType = 'icc' | 'sanctions' | 'fta' | 'customs' | 'bank_specific' | 'other'
+export type BillingInterval = 'monthly' | 'annual'
 
 export interface QueryRequest {
   query: string
@@ -30,6 +31,29 @@ export interface QueryResponse {
   disclaimer: string
   queries_remaining: number
   tier: SessionTier
+}
+
+export interface BillingCheckoutResponse {
+  checkout_url?: string | null
+  redirect_url?: string | null
+  url?: string | null
+  message?: string | null
+  tier?: SessionTier
+  subscription_status?: string | null
+}
+
+export interface BillingCheckoutRequest {
+  interval: BillingInterval
+  success_url: string
+  cancel_url: string
+  customer_email?: string | null
+}
+
+export interface BillingSubscriptionResponse {
+  status: string
+  tier?: SessionTier | string | null
+  current_period_end?: string | null
+  cancel_at_period_end?: boolean | null
 }
 
 export interface QuerySuggestion {

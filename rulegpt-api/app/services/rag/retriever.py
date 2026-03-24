@@ -10,6 +10,27 @@ from sqlalchemy import text
 
 from .models import ClassifierOutput, RetrievedRule
 
+_COUNTRY_ALIASES: dict[str, tuple[str, ...]] = {
+    "bd": ("bangladesh",),
+    "in": ("india",),
+    "us": ("united states", "usa", "us"),
+    "ae": ("uae", "united arab emirates"),
+    "uk": ("united kingdom", "uk"),
+    "eu": ("european union", "eu"),
+    "sg": ("singapore",),
+    "cn": ("china",),
+    "sa": ("saudi", "saudi arabia"),
+    "ir": ("iran",),
+}
+
+_BANK_ALIASES: dict[str, tuple[str, ...]] = {
+    "hdfc": ("hdfc", "hdfc bank"),
+    "hsbc": ("hsbc",),
+    "citibank": ("citibank", "citi"),
+    "jpmorgan": ("jpmorgan", "jp morgan", "jpm"),
+    "icbc": ("icbc",),
+}
+
 
 async def _maybe_await(value: Any) -> Any:
     if hasattr(value, "__await__"):
@@ -42,17 +63,80 @@ def _lexical_score(query: str, candidate_text: str) -> float:
 
 
 def _candidate_text(rule: Mapping[str, Any]) -> str:
+    extra = rule.get("extra")
+    bank_name = ""
+    if isinstance(extra, Mapping):
+        bank_name = str(extra.get("bank_name") or "")
     parts = [
         str(rule.get("rulebook") or rule.get("source") or ""),
         str(rule.get("reference") or rule.get("article") or ""),
         str(rule.get("title") or ""),
         str(rule.get("text") or rule.get("description") or ""),
         " ".join(str(tag) for tag in rule.get("tags", []) if isinstance(tag, str)),
+        bank_name,
+        str(rule.get("jurisdiction") or ""),
     ]
     return " ".join(part for part in parts if part).strip()
 
 
-def _fallback_score(query: str, rule: Mapping[str, Any]) -> float:
+def _extract_query_countries(query: str) -> set[str]:
+    lowered = query.lower()
+    codes: set[str] = set()
+    for code, aliases in _COUNTRY_ALIASES.items():
+        if any(_contains_alias(lowered, alias) for alias in aliases):
+            codes.add(code)
+    return codes
+
+
+def _extract_specific_bank(query: str) -> str | None:
+    lowered = query.lower()
+    for bank_key, aliases in _BANK_ALIASES.items():
+        if any(alias in lowered for alias in aliases):
+            return bank_key
+    return None
+
+
+def _contains_alias(text: str, alias: str) -> bool:
+    if not alias:
+        return False
+    if len(alias) <= 2:
+        return re.search(rf"\b{re.escape(alias)}\b", text) is not None
+    return alias in text
+
+
+def _rule_mentions_bank(rule: Mapping[str, Any], bank_key: str) -> bool:
+    haystack = _candidate_text(rule).lower()
+    aliases = _BANK_ALIASES.get(bank_key, ())
+    return any(alias in haystack for alias in aliases)
+
+
+def _rule_matches_countries(rule: Mapping[str, Any], countries: set[str]) -> bool:
+    if not countries:
+        return True
+    jurisdiction = str(rule.get("jurisdiction") or "").lower().strip()
+    if jurisdiction in {"", "global", "regional"}:
+        return True
+    if jurisdiction in countries:
+        return True
+    haystack = _candidate_text(rule).lower()
+    for code in countries:
+        aliases = _COUNTRY_ALIASES.get(code, ())
+        if any(_contains_alias(haystack, alias) for alias in aliases):
+            return True
+    return False
+
+
+def _is_license_intent(query: str) -> bool:
+    lowered = query.lower()
+    return "export license" in lowered or "import license" in lowered
+
+
+def _fallback_score(
+    query: str,
+    rule: Mapping[str, Any],
+    required_bank: str | None = None,
+    countries: set[str] | None = None,
+) -> float:
     combined = _candidate_text(rule)
     title = str(rule.get("title") or "")
     reference = str(rule.get("reference") or rule.get("article") or "")
@@ -64,6 +148,27 @@ def _fallback_score(query: str, rule: Mapping[str, Any]) -> float:
     score += _lexical_score(query, f"{reference} {tags}") * 0.1
     if rulebook and rulebook.lower() in query.lower():
         score += 0.15
+    if _is_license_intent(query):
+        lowered = combined.lower()
+        license_markers = ("license", "licensing", "dual-use", "export control", "ear", "itar", "bis", "bafa")
+        if not any(marker in lowered for marker in license_markers):
+            return 0.0
+        if any(marker in lowered for marker in (" swift", "letter of credit", "lc requirement")):
+            return 0.0
+        if str(rule.get("domain") or "").lower() == "bank_specific":
+            return 0.0
+    if required_bank:
+        if not _rule_mentions_bank(rule, required_bank):
+            return 0.0
+        score += 0.12
+    if countries:
+        if not _rule_matches_countries(rule, countries):
+            return 0.0
+        jurisdiction = str(rule.get("jurisdiction") or "").lower().strip()
+        if jurisdiction in countries:
+            score += 0.08
+        elif jurisdiction in {"global", "regional"}:
+            score *= 0.9
     return min(score, 1.0)
 
 
@@ -187,14 +292,29 @@ class RuleRetriever:
         domain = None if classification.domain == "other" else classification.domain
         jurisdiction = None if classification.jurisdiction == "global" else classification.jurisdiction
         document_type = None if classification.document_type == "other" else classification.document_type
+        query_countries = _extract_query_countries(query)
+        required_bank = _extract_specific_bank(query)
+        minimum_score = 0.2
+        if query_countries:
+            minimum_score = max(minimum_score, 0.24)
+        if required_bank:
+            minimum_score = max(minimum_score, 0.27)
 
-        filter_attempts = [
-            (domain, jurisdiction, document_type),
-            (domain, jurisdiction, None),
-            (domain, None, document_type),
-            (domain, None, None),
-            (None, None, None),
-        ]
+        if domain is None:
+            filter_attempts = [
+                (None, jurisdiction, document_type),
+                (None, jurisdiction, None),
+                (None, None, document_type),
+                (None, None, None),
+            ]
+        else:
+            # Keep fallback within the classified domain to avoid cross-domain noise.
+            filter_attempts = [
+                (domain, jurisdiction, document_type),
+                (domain, jurisdiction, None),
+                (domain, None, document_type),
+                (domain, None, None),
+            ]
 
         seen_rule_ids: set[str] = set()
         candidates: list[tuple[float, Mapping[str, Any]]] = []
@@ -213,16 +333,30 @@ class RuleRetriever:
                 if not rule_id or rule_id in seen_rule_ids:
                     continue
                 seen_rule_ids.add(rule_id)
-                score = _fallback_score(query, rule)
-                if score <= 0:
+                score = _fallback_score(
+                    query=query,
+                    rule=rule,
+                    required_bank=required_bank,
+                    countries=query_countries,
+                )
+                if score < minimum_score:
                     continue
                 candidates.append((score, rule))
             if len(candidates) >= top_k:
                 break
 
         candidates.sort(key=lambda item: item[0], reverse=True)
+        if not candidates:
+            return []
+        best_score = candidates[0][0]
+        if best_score < minimum_score:
+            return []
+
+        cutoff_score = max(minimum_score, best_score * 0.6)
         out: List[RetrievedRule] = []
-        for score, rule in candidates[:top_k]:
+        for score, rule in candidates:
+            if score < cutoff_score:
+                continue
             out.append(
                 RetrievedRule(
                     rule_id=str(rule.get("rule_id") or ""),
@@ -238,6 +372,8 @@ class RuleRetriever:
                     metadata={"raw_detail": dict(rule)},
                 )
             )
+            if len(out) >= top_k:
+                break
         return out
 
     async def retrieve(

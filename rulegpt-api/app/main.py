@@ -19,7 +19,7 @@ from app.exceptions import (
 )
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.middleware.tier_check import TierCheckMiddleware
-from app.routers import admin, api_access, export, feedback, history, query, rules, saved, suggestions
+from app.routers import admin, api_access, billing, export, feedback, history, query, rules, saved, suggestions
 
 
 @asynccontextmanager
@@ -40,8 +40,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.add_middleware(TierCheckMiddleware)
+# Middleware execution order in Starlette runs last-added first.
+# Add rate limit first so tier extraction runs before it.
 app.add_middleware(RateLimitMiddleware)
+app.add_middleware(TierCheckMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS or ["*"],
@@ -61,6 +63,7 @@ app.include_router(history.router)
 app.include_router(saved.router)
 app.include_router(export.router)
 app.include_router(api_access.router)
+app.include_router(billing.router)
 app.include_router(admin.router)
 app.include_router(feedback.router)
 
@@ -68,4 +71,3 @@ app.include_router(feedback.router)
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "rulegpt-api"}
-

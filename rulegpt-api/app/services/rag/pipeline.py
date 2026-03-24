@@ -27,11 +27,28 @@ def _query_needs_trdr_cta(query: str) -> bool:
     return any(
         marker in lowered
         for marker in (
+            "discrepanc",
             "lc discrepanc",
             "document validation",
             "review my lc",
             "is this lc compliant",
             "validate document",
+        )
+    )
+
+
+def _query_needs_lcopilot_redirect(query: str) -> bool:
+    lowered = query.lower()
+    return any(
+        marker in lowered
+        for marker in (
+            "is this lc compliant",
+            "is this l/c compliant",
+            "review my lc",
+            "validate my lc",
+            "check my lc",
+            "document validation",
+            "validate this document",
         )
     )
 
@@ -99,6 +116,30 @@ class RAGPipeline:
                     "Should I help with trade documentation requirements?",
                 ],
                 show_trdr_cta=False,
+                disclaimer=DISCLAIMER_TEXT,
+                classifier_output=classifier_output,
+                retrieved_rule_ids=[],
+                model_used="none",
+                classifier_model=classifier_model,
+                latency_ms=latency_ms,
+                stage_latency_ms=stage_latency,
+            )
+
+        if _query_needs_lcopilot_redirect(query):
+            latency_ms = int((time.perf_counter() - start_total) * 1000)
+            return QueryResult(
+                answer=(
+                    "I explain published trade finance rules, but I do not validate actual LC documents here. "
+                    "For document-level compliance checks, use LCopilot on TRDR Hub."
+                ),
+                citations=[],
+                confidence_band="low",
+                suggested_followups=[
+                    "Do you want the UCP600/ISBP745 rules to review before validation?",
+                    "Which document type are you checking first (BL, invoice, insurance)?",
+                    "Do you want a discrepancy checklist before you run LCopilot?",
+                ],
+                show_trdr_cta=True,
                 disclaimer=DISCLAIMER_TEXT,
                 classifier_output=classifier_output,
                 retrieved_rule_ids=[],

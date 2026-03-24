@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
+import type { Session } from '@supabase/supabase-js'
+import { getApiAccessToken, setApiAccessToken } from '@/lib/api'
 import { supabase, supabaseEnabled } from '@/lib/supabase'
 import type { AuthUser, SessionTier } from '@/types'
 
 const AUTH_KEY = 'rulegpt_auth_user'
 
 function parseSavedAuth(): AuthUser | null {
+  if (typeof localStorage === 'undefined') return null
   const raw = localStorage.getItem(AUTH_KEY)
   if (!raw) return null
   try {
@@ -14,54 +17,115 @@ function parseSavedAuth(): AuthUser | null {
   }
 }
 
+function persistAuth(user: AuthUser | null) {
+  try {
+    if (user) {
+      localStorage.setItem(AUTH_KEY, JSON.stringify(user))
+    } else {
+      localStorage.removeItem(AUTH_KEY)
+    }
+  } catch {
+    // Ignore storage failures in tests/private browsing.
+  }
+}
+
 function envFlag(name: string): string | undefined {
   const value = import.meta.env[name] as string | undefined
   return value?.toLowerCase()
 }
 
+function deriveSessionUser(session: Session, fallbackUser: AuthUser | null, preserveTier: boolean): AuthUser | null {
+  const email = session.user.email ?? fallbackUser?.email
+  if (!email) return null
+  return {
+    id: session.user.id,
+    email,
+    tier: preserveTier ? fallbackUser?.tier ?? 'free' : 'free',
+  }
+}
+
 export function useAuth() {
   const [user, setUser] = useState<AuthUser | null>(parseSavedAuth())
+  const [accessToken, setAccessTokenState] = useState<string | null>(getApiAccessToken())
   const [isLoading, setIsLoading] = useState(false)
   const googleEnabled = supabaseEnabled && envFlag('VITE_SUPABASE_GOOGLE_OAUTH_ENABLED') !== 'false'
   const linkedinEnabled = supabaseEnabled && envFlag('VITE_SUPABASE_LINKEDIN_OAUTH_ENABLED') !== 'false'
 
   useEffect(() => {
+    setApiAccessToken(accessToken)
+  }, [accessToken])
+
+  useEffect(() => {
     if (!supabaseEnabled) return
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session?.user?.email) {
+    let mounted = true
+
+    void supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (!mounted) return
+        const session = data.session
+        if (!session?.user) return
+        const preserveTier = Boolean(getApiAccessToken())
+        const nextUser = deriveSessionUser(session, parseSavedAuth(), preserveTier)
+        if (nextUser) {
+          setUser(nextUser)
+          persistAuth(nextUser)
+          setAccessTokenState(session.access_token ?? null)
+          setApiAccessToken(session.access_token ?? null)
+        }
+      })
+      .catch(() => undefined)
+
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setUser(null)
+        setAccessTokenState(null)
+        persistAuth(null)
         return
       }
-      const nextUser: AuthUser = {
-        id: session.user.id,
-        email: session.user.email,
-        tier: user?.tier ?? 'free',
-      }
+      if (!session?.user) return
+      const preserveTier = Boolean(getApiAccessToken())
+      const nextUser = deriveSessionUser(session, parseSavedAuth(), preserveTier)
+      if (!nextUser) return
       setUser(nextUser)
-      localStorage.setItem(AUTH_KEY, JSON.stringify(nextUser))
+      persistAuth(nextUser)
+      setAccessTokenState(session.access_token ?? null)
+      setApiAccessToken(session.access_token ?? null)
     })
-    return () => data.subscription.unsubscribe()
-  }, [user?.tier])
+
+    return () => {
+      mounted = false
+      data.subscription.unsubscribe()
+    }
+  }, [])
 
   const setTier = (tier: SessionTier) => {
     if (!user) return
     const nextUser = { ...user, tier }
     setUser(nextUser)
-    localStorage.setItem(AUTH_KEY, JSON.stringify(nextUser))
+    persistAuth(nextUser)
   }
 
   const login = async (email: string, password: string) => {
     setIsLoading(true)
     try {
       if (supabaseEnabled) {
+        const hadBearerToken = Boolean(getApiAccessToken())
         const { data, error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
-        const nextUser: AuthUser = {
-          id: data.user.id,
-          email: data.user.email ?? email,
-          tier: user?.tier ?? 'free',
-        }
+        const nextUser: AuthUser | null = data.user
+          ? {
+              id: data.user.id,
+              email: data.user.email ?? email,
+              tier: hadBearerToken ? user?.tier ?? 'free' : 'free',
+            }
+          : null
+        if (!nextUser) return
         setUser(nextUser)
-        localStorage.setItem(AUTH_KEY, JSON.stringify(nextUser))
+        persistAuth(nextUser)
+        const nextAccessToken = data.session?.access_token ?? null
+        setAccessTokenState(nextAccessToken)
+        setApiAccessToken(nextAccessToken)
         return
       }
       const nextUser: AuthUser = {
@@ -70,7 +134,9 @@ export function useAuth() {
         tier: 'free',
       }
       setUser(nextUser)
-      localStorage.setItem(AUTH_KEY, JSON.stringify(nextUser))
+      persistAuth(nextUser)
+      setAccessTokenState(null)
+      setApiAccessToken(null)
     } finally {
       setIsLoading(false)
     }
@@ -80,15 +146,19 @@ export function useAuth() {
     setIsLoading(true)
     try {
       if (supabaseEnabled) {
+        const hadBearerToken = Boolean(getApiAccessToken())
         const { data, error } = await supabase.auth.signUp({ email, password })
         if (error) throw error
         const nextUser: AuthUser = {
           id: data.user?.id ?? `local_${Date.now()}`,
-          email,
-          tier: 'free',
+          email: data.user?.email ?? email,
+          tier: hadBearerToken ? user?.tier ?? 'free' : 'free',
         }
         setUser(nextUser)
-        localStorage.setItem(AUTH_KEY, JSON.stringify(nextUser))
+        persistAuth(nextUser)
+        const nextAccessToken = data.session?.access_token ?? null
+        setAccessTokenState(nextAccessToken)
+        setApiAccessToken(nextAccessToken)
         return
       }
       const nextUser: AuthUser = {
@@ -97,7 +167,9 @@ export function useAuth() {
         tier: 'free',
       }
       setUser(nextUser)
-      localStorage.setItem(AUTH_KEY, JSON.stringify(nextUser))
+      persistAuth(nextUser)
+      setAccessTokenState(null)
+      setApiAccessToken(null)
     } finally {
       setIsLoading(false)
     }
@@ -108,7 +180,9 @@ export function useAuth() {
       await supabase.auth.signOut()
     }
     setUser(null)
-    localStorage.removeItem(AUTH_KEY)
+    setAccessTokenState(null)
+    setApiAccessToken(null)
+    persistAuth(null)
   }
 
   const loginWithOAuth = async (provider: 'google' | 'linkedin_oidc') => {
@@ -136,6 +210,9 @@ export function useAuth() {
   return {
     user,
     tier: user?.tier ?? 'anonymous',
+    currentTier: user?.tier ?? 'anonymous',
+    accessToken,
+    hasBearerToken: Boolean(accessToken),
     isAuthenticated: Boolean(user),
     isLoading,
     login,

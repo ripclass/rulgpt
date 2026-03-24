@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     SUPABASE_URL: str | None = None
     SUPABASE_ANON_KEY: str | None = None
     SUPABASE_SERVICE_ROLE_KEY: str | None = None
+    SUPABASE_ISSUER: str | None = None
+    SUPABASE_JWKS_URL: str | None = None
+    SUPABASE_JWT_AUDIENCE: str | None = None
 
     RULHUB_API_URL: str = "https://api.rulhub.com"
     RULHUB_API_KEY: str | None = None
@@ -104,4 +107,3 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
-

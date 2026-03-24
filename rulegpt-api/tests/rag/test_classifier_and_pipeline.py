@@ -15,6 +15,13 @@ async def test_classifier_out_of_scope_heuristic():
     assert result.domain == "other"
 
 
+@pytest.mark.asyncio
+async def test_classifier_marks_general_tax_filing_out_of_scope():
+    classifier = QueryClassifier(anthropic_client=None)
+    result = await classifier.classify("How do I file my taxes?")
+    assert result.in_scope is False
+
+
 class _FakeClassifier:
     async def classify(self, query: str) -> ClassifierOutput:
         return ClassifierOutput(
@@ -57,3 +64,34 @@ async def test_pipeline_no_rules_graceful_empty_result():
     assert result.confidence_band == "low"
     assert result.retrieved_rule_ids == []
 
+
+@pytest.mark.asyncio
+async def test_pipeline_lc_compliance_query_redirects_to_lcopilot():
+    pipeline = RAGPipeline(
+        classifier=_FakeClassifier(),
+        retriever=_FakeRetriever(),
+        generator=_FakeGenerator(),
+    )
+    result = await pipeline.process_query(
+        query="Is this LC compliant?",
+        session=None,
+        language="en",
+    )
+    assert "do not validate actual LC documents" in result.answer
+    assert result.show_trdr_cta is True
+    assert result.retrieved_rule_ids == []
+
+
+@pytest.mark.asyncio
+async def test_pipeline_discrepancy_query_sets_trdr_cta():
+    pipeline = RAGPipeline(
+        classifier=_FakeClassifier(),
+        retriever=_FakeRetriever(),
+        generator=_FakeGenerator(),
+    )
+    result = await pipeline.process_query(
+        query="How does UCP600 handle discrepancies?",
+        session=None,
+        language="en",
+    )
+    assert result.show_trdr_cta is True

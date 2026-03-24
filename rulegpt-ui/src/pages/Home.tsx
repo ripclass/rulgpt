@@ -33,6 +33,7 @@ export function Home() {
     sessionToken,
     tier: auth.tier,
     userId: auth.user?.id,
+    accessToken: auth.accessToken,
   })
 
   const suggestions = useRQQuery({
@@ -41,10 +42,10 @@ export function Home() {
     staleTime: 15 * 60 * 1000,
   })
 
-  const history = useHistory(auth.user?.id, auth.tier)
+  const history = useHistory(auth.user?.id, auth.tier, auth.accessToken)
   const savedAnswers = useRQQuery({
-    queryKey: ['saved', auth.user?.id],
-    queryFn: () => api.listSaved({ userId: auth.user?.id, tier: auth.tier }),
+    queryKey: ['saved', auth.user?.id, auth.tier, auth.accessToken ?? null],
+    queryFn: () => api.listSaved({ userId: auth.user?.id, tier: auth.tier, accessToken: auth.accessToken }),
     enabled: Boolean(auth.user?.id),
   })
 
@@ -96,7 +97,7 @@ export function Home() {
       return
     }
     try {
-      await api.saveAnswer(queryId, null, { userId: auth.user.id, tier: auth.tier })
+      await api.saveAnswer(queryId, null, { userId: auth.user.id, tier: auth.tier, accessToken: auth.accessToken })
       void savedAnswers.refetch()
       toast.success('Saved to your account.')
     } catch (error) {
@@ -107,7 +108,7 @@ export function Home() {
   const deleteSaved = async (savedId: string) => {
     if (!auth.user) return
     try {
-      await api.deleteSaved(savedId, { userId: auth.user.id, tier: auth.tier })
+      await api.deleteSaved(savedId, { userId: auth.user.id, tier: auth.tier, accessToken: auth.accessToken })
       void savedAnswers.refetch()
     } catch {
       toast.error('Delete failed.')
@@ -260,9 +261,8 @@ export function Home() {
                 type="button"
                 className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground"
                 onClick={() => {
-                  auth.setTier('pro')
                   resetSession()
-                  toast.success('Pro preview enabled locally.')
+                  navigate('/upgrade')
                 }}
               >
                 Upgrade to Pro

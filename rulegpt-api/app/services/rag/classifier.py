@@ -40,10 +40,26 @@ _OUT_OF_SCOPE_MARKERS = (
     "bitcoin",
     "crypto price",
     "tax return",
+    "file my taxes",
+    "file taxes",
+    "income tax filing",
     "movie",
     "sports",
     "recipe",
     "dating",
+)
+
+_TRADE_TAX_CONTEXT_MARKERS = (
+    "import",
+    "export",
+    "customs",
+    "tariff",
+    "duty",
+    "vat",
+    "trade",
+    "shipment",
+    "consignment",
+    "origin",
 )
 
 _CLASSIFIER_SYSTEM_PROMPT = """Classify this trade finance compliance query.
@@ -110,7 +126,10 @@ def _pick_commodity(query: str) -> Optional[str]:
 
 
 def _heuristic_classify(query: str) -> ClassifierOutput:
-    in_scope = not any(marker in query.lower() for marker in _OUT_OF_SCOPE_MARKERS)
+    lowered = query.lower()
+    in_scope = not any(marker in lowered for marker in _OUT_OF_SCOPE_MARKERS)
+    if in_scope and "tax" in lowered and not any(marker in lowered for marker in _TRADE_TAX_CONTEXT_MARKERS):
+        in_scope = False
     return ClassifierOutput(
         domain=_pick_domain(query),
         jurisdiction=_pick_jurisdiction(query),

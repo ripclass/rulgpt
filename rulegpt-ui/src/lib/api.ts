@@ -1,4 +1,7 @@
 import type {
+  BillingCheckoutRequest,
+  BillingCheckoutResponse,
+  BillingSubscriptionResponse,
   HistoryItem,
   QueryRequest,
   QueryResponse,
@@ -8,6 +11,9 @@ import type {
 } from '@/types'
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ?? 'http://localhost:8000'
+const AUTH_ACCESS_TOKEN_KEY = 'rulegpt_auth_access_token'
+
+let currentAccessToken: string | null = readStoredAccessToken()
 
 export class ApiError extends Error {
   status: number
@@ -24,14 +30,73 @@ interface RequestOptions {
   headers?: Record<string, string>
 }
 
+function readStoredAccessToken() {
+  try {
+    return localStorage.getItem(AUTH_ACCESS_TOKEN_KEY)
+  } catch {
+    return null
+  }
+}
+
+export function getApiAccessToken() {
+  return currentAccessToken ?? readStoredAccessToken()
+}
+
+export function setApiAccessToken(accessToken: string | null) {
+  currentAccessToken = accessToken
+  try {
+    if (accessToken) {
+      localStorage.setItem(AUTH_ACCESS_TOKEN_KEY, accessToken)
+    } else {
+      localStorage.removeItem(AUTH_ACCESS_TOKEN_KEY)
+    }
+  } catch {
+    // Ignore storage failures in private browsing or test environments.
+  }
+}
+
+function buildHeaders(headers: HeadersInit | undefined, accessToken?: string | null) {
+  const nextHeaders = new Headers(headers)
+  const token = accessToken ?? getApiAccessToken()
+  if (token && !nextHeaders.has('Authorization')) {
+    nextHeaders.set('Authorization', `Bearer ${token}`)
+  }
+  return nextHeaders
+}
+
+function shouldAttachAuth(url: string) {
+  return url.startsWith(API_BASE_URL)
+}
+
+function patchFetch() {
+  const globalScope = globalThis as typeof globalThis & { __rulegptFetchPatched__?: boolean }
+  if (globalScope.__rulegptFetchPatched__ || typeof fetch !== 'function') return
+
+  const nativeFetch = fetch.bind(globalThis)
+  globalScope.__rulegptFetchPatched__ = true
+  globalThis.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' || input instanceof URL ? input.toString() : input.url
+    if (!shouldAttachAuth(url)) {
+      return nativeFetch(input, init)
+    }
+    const headers = buildHeaders(init?.headers ?? (input instanceof Request ? input.headers : undefined))
+    return nativeFetch(input, {
+      ...init,
+      headers,
+    })
+  }) as typeof fetch
+}
+
+patchFetch()
+
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: options.method ?? 'GET',
-    headers: {
+    headers: buildHeaders({
       'Content-Type': 'application/json',
       ...(options.headers ?? {}),
-    },
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    }),
+    body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
   })
 
   if (!response.ok) {
@@ -48,10 +113,12 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 export interface RequestIdentity {
   userId?: string
   tier?: 'anonymous' | 'free' | 'pro'
+  accessToken?: string | null
 }
 
 function identityHeaders(identity?: RequestIdentity) {
   return {
+    ...(identity?.accessToken ? { Authorization: `Bearer ${identity.accessToken}` } : {}),
     ...(identity?.userId ? { 'x-user-id': identity.userId } : {}),
     ...(identity?.tier ? { 'x-user-tier': identity.tier } : {}),
   }
@@ -83,6 +150,16 @@ export const api = {
   deleteSaved: (savedId: string, identity: RequestIdentity) =>
     request<void>(`/api/saved/${savedId}`, {
       method: 'DELETE',
+      headers: identityHeaders(identity),
+    }),
+  createBillingCheckout: (payload: BillingCheckoutRequest, identity: RequestIdentity) =>
+    request<BillingCheckoutResponse>('/api/billing/checkout', {
+      method: 'POST',
+      body: payload,
+      headers: identityHeaders(identity),
+    }),
+  getBillingSubscription: (identity: RequestIdentity) =>
+    request<BillingSubscriptionResponse>('/api/billing/subscription', {
       headers: identityHeaders(identity),
     }),
 }
