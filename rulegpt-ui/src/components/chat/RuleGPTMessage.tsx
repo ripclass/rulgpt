@@ -16,15 +16,15 @@ interface RuleGPTMessageProps {
 export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: RuleGPTMessageProps) {
   return (
     <div className="flex justify-start">
-      <article className="max-w-[92%] rounded-2xl rounded-bl-md border border-border bg-card/90 px-4 py-3 text-sm shadow-xl shadow-black/20">
-        <div className="mb-2 flex items-center gap-2">
+      <article className="max-w-[92%] rounded-2xl border border-black/10 bg-white px-5 py-5 text-sm shadow-[0_16px_36px_rgba(17,24,39,0.05)]">
+        <div className="mb-3 flex flex-wrap items-center gap-2">
           {message.confidence ? <ConfidenceBadge confidence={message.confidence} /> : null}
           {message.domainTags?.map((domain) => (
             <DomainTag key={domain} domain={domain} />
           ))}
         </div>
 
-        <p className="whitespace-pre-wrap leading-relaxed">{message.text}</p>
+        <p className="whitespace-pre-wrap leading-7 text-[#0c111d]">{message.text}</p>
 
         {message.citations && message.citations.length > 0 ? (
           <div className="mt-3 flex flex-wrap gap-2">
@@ -35,7 +35,7 @@ export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: Ru
         ) : null}
 
         {message.suggestedFollowups && message.suggestedFollowups.length > 0 ? (
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-xs text-muted-foreground">
+          <ul className="mt-4 list-disc space-y-1 pl-5 text-xs leading-6 text-muted-foreground">
             {message.suggestedFollowups.map((item) => (
               <li key={item}>{item}</li>
             ))}
@@ -59,7 +59,11 @@ export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: Ru
           }}
         />
 
-        {message.disclaimer ? <p className="mt-2 text-[10px] text-muted-foreground">{message.disclaimer}</p> : null}
+        {message.disclaimer ? (
+          <p className="mt-3 border-t border-black/8 pt-3 text-[10px] leading-5 text-muted-foreground">
+            {message.disclaimer}
+          </p>
+        ) : null}
       </article>
     </div>
   )

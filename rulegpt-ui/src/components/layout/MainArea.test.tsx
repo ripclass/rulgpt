@@ -3,7 +3,7 @@ import { vi } from 'vitest'
 import { MainArea } from '@/components/layout/MainArea'
 
 describe('MainArea', () => {
-  it('renders the preview shell and keeps example prompts inert', () => {
+  it('renders a centered empty-state composer in preview mode', () => {
     const onPickSuggestion = vi.fn()
 
     render(
@@ -15,6 +15,7 @@ describe('MainArea', () => {
         canSave={false}
         previewMode
         onSubmitQuery={async () => undefined}
+        onNewQuery={() => undefined}
         onPickSuggestion={onPickSuggestion}
         onCitationClick={() => undefined}
         onSaveMessage={() => undefined}
@@ -22,10 +23,8 @@ describe('MainArea', () => {
     )
 
     expect(screen.getByText('Preview mode')).toBeInTheDocument()
-    expect(
-      screen.getByText('RuleGPT is ready for preview, and live answers will unlock when the RulHub API is connected.'),
-    ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'What documents are required for a CIF shipment under UCP600?' })).toBeDisabled()
-    expect(screen.getByRole('button', { name: 'Preview only' })).toBeInTheDocument()
+    expect(screen.getByText('Ask the rule.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'What documents are required for a CIF shipment under UCP600?' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: /send/i })).toBeInTheDocument()
   })
 })

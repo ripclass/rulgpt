@@ -17,6 +17,7 @@ interface MainAreaProps {
   onPickSuggestion: (value: string) => void
   onCitationClick: (citation: Citation) => void
   onSaveMessage: (queryId: string) => void
+  onNewQuery?: () => void
 }
 
 export function MainArea({
@@ -30,96 +31,119 @@ export function MainArea({
   onPickSuggestion,
   onCitationClick,
   onSaveMessage,
+  onNewQuery,
 }: MainAreaProps) {
   const isEmpty = messages.length === 0
 
   return (
     <main className="flex min-h-screen flex-1 flex-col">
-      <header className="border-b border-border px-4 py-4 md:px-8">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-xl font-semibold md:text-2xl">RuleGPT</h1>
-          {previewMode ? (
-            <Badge variant="outline" className="border-primary/40 bg-primary/10 text-primary">
-              Preview mode
-            </Badge>
+      <header className="border-b border-black/10 bg-background/85 px-4 py-4 backdrop-blur-xl md:px-8">
+        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#111827] font-mono text-xs font-bold tracking-[0.26em] text-white">
+              RG
+            </div>
+            <div>
+              <h1 className="font-display text-lg font-semibold tracking-[-0.03em] text-[#0c111d] md:text-xl">
+                RuleGPT
+              </h1>
+              <p className="text-xs text-muted-foreground">
+                {previewMode
+                  ? 'Preview conversation shell'
+                  : 'Grounded answers from published trade rules'}
+              </p>
+            </div>
+            {previewMode ? (
+              <Badge variant="outline" className="border-primary/30 bg-[#f7d9cb] text-primary">
+                Preview mode
+              </Badge>
+            ) : null}
+          </div>
+
+          {!isEmpty && onNewQuery ? (
+            <button
+              type="button"
+              onClick={onNewQuery}
+              className="rounded-none border border-black/10 bg-white px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#0c111d] transition hover:bg-[#faf7f2]"
+            >
+              New chat
+            </button>
           ) : null}
         </div>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {previewMode
-            ? 'A branded shell is live while the RulHub API is being prepared.'
-            : 'Grounded answers from trade finance rulesets. No legal advice.'}
-        </p>
       </header>
 
-      <section className="flex-1 space-y-4 overflow-y-auto px-4 py-5 md:px-8 md:py-6">
-        {error ? (
-          <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-300">
-            <AlertTriangle className="h-4 w-4" /> {error}
-          </div>
-        ) : null}
-
-        {isEmpty ? (
-          <div className="glass-panel rounded-2xl p-5 md:p-7">
-            {previewMode ? (
-              <div className="grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <p className="text-xs uppercase tracking-[0.25em] text-primary">Coming soon</p>
-                    <h2 className="max-w-xl text-2xl font-semibold leading-tight md:text-3xl">
-                      RuleGPT is ready for preview, and live answers will unlock when the RulHub API is connected.
-                    </h2>
-                    <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                      Use this shell to review the branded experience, test auth surfaces, and see where citations,
-                      TRDR Hub routing, and example prompts will land in the full product.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                    <span className="rounded-full border border-border bg-secondary/50 px-3 py-1">Preview shell</span>
-                    <span className="rounded-full border border-border bg-secondary/50 px-3 py-1">Waitlist-ready</span>
-                    <span className="rounded-full border border-border bg-secondary/50 px-3 py-1">Mobile + desktop</span>
-                  </div>
-
-                  <TRDRHubCTA />
-                </div>
-
-                <div className="rounded-2xl border border-border/70 bg-background/60 p-4">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Example questions</p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    These prompts are visible for product review, but they will not call the backend until preview mode
-                    is turned off.
-                  </p>
-                  <div className="mt-4">
-                    <SuggestedQueries suggestions={suggestions} onPick={onPickSuggestion} disabled />
-                  </div>
-                </div>
+      {isEmpty ? (
+        <section className="flex flex-1 items-center px-4 py-10 md:px-8">
+          <div className="mx-auto flex w-full max-w-3xl flex-col items-center">
+            {error ? (
+              <div className="mb-6 flex w-full items-center gap-2 border border-red-500/20 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <AlertTriangle className="h-4 w-4" /> {error}
               </div>
-            ) : (
-              <>
-                <p className="text-lg font-medium">Start with a suggested compliance question</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Answers are grounded in RulHub rulesets with citations.
-                </p>
-                <div className="mt-4">
-                  <SuggestedQueries suggestions={suggestions} onPick={onPickSuggestion} />
-                </div>
-              </>
-            )}
-          </div>
-        ) : (
-          <ChatThread
-            messages={messages}
-            isLoading={isLoading}
-            canSave={canSave}
-            onCitationClick={onCitationClick}
-            onSave={onSaveMessage}
-          />
-        )}
-      </section>
+            ) : null}
 
-      <div className="px-4 pb-24 md:px-8 md:pb-6">
-        <QueryInput disabled={isLoading} previewMode={previewMode} onSubmit={onSubmitQuery} />
-      </div>
+            <div className="w-full text-center">
+              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                {previewMode ? 'Public preview' : 'Trade finance compliance assistant'}
+              </p>
+              <h2 className="mt-4 font-display text-4xl font-medium tracking-[-0.05em] text-[#0c111d] md:text-6xl">
+                Ask the rule.
+              </h2>
+              <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-muted-foreground md:text-[15px]">
+                Start with a trade finance question. RuleGPT is designed to answer with citations, clear confidence,
+                and explicit uncertainty when a rule is missing.
+              </p>
+            </div>
+
+            <div className="mt-8 w-full">
+              <QueryInput
+                layout="centered"
+                disabled={isLoading}
+                previewMode={previewMode}
+                onSubmit={onSubmitQuery}
+              />
+            </div>
+
+            <div className="mt-6 w-full">
+              <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                Suggested prompts
+              </p>
+              <SuggestedQueries suggestions={suggestions} onPick={onPickSuggestion} />
+            </div>
+
+            {previewMode ? (
+              <div className="mt-8 w-full">
+                <TRDRHubCTA />
+              </div>
+            ) : null}
+          </div>
+        </section>
+      ) : (
+        <>
+          <section className="flex-1 overflow-y-auto px-4 py-6 md:px-8 md:py-8">
+            <div className="mx-auto max-w-3xl space-y-5">
+              {error ? (
+                <div className="flex items-center gap-2 border border-red-500/20 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <AlertTriangle className="h-4 w-4" /> {error}
+                </div>
+              ) : null}
+
+              <ChatThread
+                messages={messages}
+                isLoading={isLoading}
+                canSave={canSave}
+                onCitationClick={onCitationClick}
+                onSave={onSaveMessage}
+              />
+            </div>
+          </section>
+
+          <div className="border-t border-black/10 bg-background/92 px-4 py-4 backdrop-blur-xl md:px-8">
+            <div className="mx-auto max-w-3xl">
+              <QueryInput disabled={isLoading} previewMode={previewMode} onSubmit={onSubmitQuery} />
+            </div>
+          </div>
+        </>
+      )}
     </main>
   )
 }

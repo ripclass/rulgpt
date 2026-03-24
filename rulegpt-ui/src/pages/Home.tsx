@@ -9,7 +9,6 @@ import { MobileDrawer } from '@/components/layout/MobileDrawer'
 import { CitationPanel } from '@/components/chat/CitationPanel'
 import { LoginModal } from '@/components/auth/LoginModal'
 import { SignupModal } from '@/components/auth/SignupModal'
-import { PreviewLanding } from '@/components/preview/PreviewLanding'
 import { api } from '@/lib/api'
 import { useAuth } from '@/hooks/useAuth'
 import { useHistory } from '@/hooks/useHistory'
@@ -17,7 +16,7 @@ import { useQuery } from '@/hooks/useQuery'
 import { useSession } from '@/hooks/useSession'
 import { useTierLimit } from '@/hooks/useTierLimit'
 import { isPreviewModeEnabled } from '@/lib/config'
-import type { Citation, RuleDetails } from '@/types'
+import type { Citation, Message, RuleDetails } from '@/types'
 
 export function Home() {
   const navigate = useNavigate()
@@ -69,7 +68,36 @@ export function Home() {
 
   const submitQuery = async (value: string) => {
     if (previewMode) {
-      toast.message('Preview mode is active. Live queries will return when the RulHub API is ready.')
+      const createdAt = new Date().toISOString()
+      const previewMessages: Message[] = [
+        {
+          id: crypto.randomUUID(),
+          role: 'user',
+          text: value,
+          createdAt,
+        },
+        {
+          id: `preview-${crypto.randomUUID()}`,
+          queryId: `preview-${Date.now()}`,
+          role: 'assistant',
+          text: 'Preview mode is active, so RuleGPT is not calling the live rules engine yet. Once RulHub is connected, this space will return a citation-grounded answer in this same chat flow.',
+          createdAt: new Date().toISOString(),
+          confidence: 'low',
+          citations: [],
+          showTRDRCTA: value.toLowerCase().includes('document') || value.toLowerCase().includes('lc'),
+          trdrCtaText: null,
+          trdrCtaUrl: null,
+          disclaimer:
+            'Preview mode only. Based on published trade finance rules and standards once the live engine is connected. Not legal advice.',
+          suggestedFollowups: [
+            'Which rulebook or jurisdiction should this answer search first?',
+            'Do you need a rule explanation or actual document validation?',
+            'Should this answer prioritize ICC rules, sanctions, or customs guidance?',
+          ],
+          domainTags: [],
+        },
+      ]
+      query.setMessages((prev) => [...prev, ...previewMessages])
       return
     }
     const response = await query.submitQuery(value)
@@ -123,100 +151,42 @@ export function Home() {
     }
   }
 
-  if (previewMode) {
-    return (
-      <>
-        <PreviewLanding
-          suggestions={suggestionTexts}
-          isAuthenticated={auth.isAuthenticated}
-          tier={auth.tier}
-          onOpenLogin={() => setLoginOpen(true)}
-          onOpenSignup={() => setSignupOpen(true)}
-          onSubmitPreview={submitQuery}
-        />
-
-        <LoginModal
-          open={loginOpen}
-          isLoading={auth.isLoading}
-          oauth={auth.oauth}
-          onOpenChange={setLoginOpen}
-          onSubmit={async (email, password) => {
-            try {
-              await auth.login(email, password)
-              toast.success('Signed in.')
-              setLoginOpen(false)
-            } catch (error) {
-              toast.error(`Login failed: ${String(error)}`)
-            }
-          }}
-          onOAuth={async (provider) => {
-            try {
-              await auth.loginWithOAuth(provider)
-            } catch (error) {
-              toast.error(`OAuth unavailable: ${String(error)}`)
-            }
-          }}
-        />
-
-        <SignupModal
-          open={signupOpen}
-          isLoading={auth.isLoading}
-          oauth={auth.oauth}
-          onOpenChange={setSignupOpen}
-          onSubmit={async (email, password) => {
-            try {
-              await auth.signup(email, password)
-              toast.success('Account created.')
-              setSignupOpen(false)
-            } catch (error) {
-              toast.error(`Signup failed: ${String(error)}`)
-            }
-          }}
-          onOAuth={async (provider) => {
-            try {
-              await auth.loginWithOAuth(provider)
-            } catch (error) {
-              toast.error(`OAuth unavailable: ${String(error)}`)
-            }
-          }}
-        />
-      </>
-    )
-  }
-
   return (
     <div className="min-h-screen md:flex">
-      <Sidebar
-        history={history.data ?? []}
-        savedAnswers={savedAnswers.data ?? []}
-        tier={auth.tier}
-        isAuthenticated={auth.isAuthenticated}
-        previewMode={previewMode}
-        usedCount={tierLimit.usedCount}
-        remaining={tierLimit.remaining}
-        limitValue={tierLimit.limitValue}
-        onNewQuery={() => query.clearMessages()}
-        onPickHistory={(value) => {
-          void submitQuery(value)
-        }}
-        onDeleteSaved={(savedId) => {
-          void deleteSaved(savedId)
-        }}
-        onOpenLogin={() => setLoginOpen(true)}
-        onOpenSignup={() => setSignupOpen(true)}
-        onLogout={() => {
-          void auth.logout()
-        }}
-      />
+      {!previewMode ? (
+        <Sidebar
+          history={history.data ?? []}
+          savedAnswers={savedAnswers.data ?? []}
+          tier={auth.tier}
+          isAuthenticated={auth.isAuthenticated}
+          previewMode={previewMode}
+          usedCount={tierLimit.usedCount}
+          remaining={tierLimit.remaining}
+          limitValue={tierLimit.limitValue}
+          onNewQuery={() => query.clearMessages()}
+          onPickHistory={(value) => {
+            void submitQuery(value)
+          }}
+          onDeleteSaved={(savedId) => {
+            void deleteSaved(savedId)
+          }}
+          onOpenLogin={() => setLoginOpen(true)}
+          onOpenSignup={() => setSignupOpen(true)}
+          onLogout={() => {
+            void auth.logout()
+          }}
+        />
+      ) : null}
 
       <MainArea
         messages={query.messages}
         suggestions={suggestionTexts}
         isLoading={query.isLoading}
         error={query.error}
-        canSave={auth.isAuthenticated}
+        canSave={!previewMode && auth.isAuthenticated}
         previewMode={previewMode}
         onSubmitQuery={submitQuery}
+        onNewQuery={query.clearMessages}
         onPickSuggestion={(value) => {
           void submitQuery(value)
         }}
@@ -228,44 +198,50 @@ export function Home() {
         }}
       />
 
-      <MobileNav
-        onNewQuery={query.clearMessages}
-        onHistory={() => setHistoryDrawerOpen(true)}
-        onSaved={() => setSavedDrawerOpen(true)}
-        onPro={() => navigate('/upgrade')}
-      />
+      {!previewMode ? (
+        <MobileNav
+          onNewQuery={query.clearMessages}
+          onHistory={() => setHistoryDrawerOpen(true)}
+          onSaved={() => setSavedDrawerOpen(true)}
+          onPro={() => navigate('/upgrade')}
+        />
+      ) : null}
 
-      <MobileDrawer
-        open={historyDrawerOpen}
-        title="Query history"
-        mode="history"
-        history={history.data ?? []}
-        savedAnswers={savedAnswers.data ?? []}
-        previewMode={previewMode}
-        onOpenChange={setHistoryDrawerOpen}
-        onPickHistory={(value) => {
-          void submitQuery(value)
-        }}
-        onDeleteSaved={(savedId) => {
-          void deleteSaved(savedId)
-        }}
-      />
+      {!previewMode ? (
+        <MobileDrawer
+          open={historyDrawerOpen}
+          title="Query history"
+          mode="history"
+          history={history.data ?? []}
+          savedAnswers={savedAnswers.data ?? []}
+          previewMode={previewMode}
+          onOpenChange={setHistoryDrawerOpen}
+          onPickHistory={(value) => {
+            void submitQuery(value)
+          }}
+          onDeleteSaved={(savedId) => {
+            void deleteSaved(savedId)
+          }}
+        />
+      ) : null}
 
-      <MobileDrawer
-        open={savedDrawerOpen}
-        title="Saved answers"
-        mode="saved"
-        history={history.data ?? []}
-        savedAnswers={savedAnswers.data ?? []}
-        previewMode={previewMode}
-        onOpenChange={setSavedDrawerOpen}
-        onPickHistory={(value) => {
-          void submitQuery(value)
-        }}
-        onDeleteSaved={(savedId) => {
-          void deleteSaved(savedId)
-        }}
-      />
+      {!previewMode ? (
+        <MobileDrawer
+          open={savedDrawerOpen}
+          title="Saved answers"
+          mode="saved"
+          history={history.data ?? []}
+          savedAnswers={savedAnswers.data ?? []}
+          previewMode={previewMode}
+          onOpenChange={setSavedDrawerOpen}
+          onPickHistory={(value) => {
+            void submitQuery(value)
+          }}
+          onDeleteSaved={(savedId) => {
+            void deleteSaved(savedId)
+          }}
+        />
+      ) : null}
 
       <CitationPanel open={citationPanelOpen} rule={selectedRule} onClose={() => setCitationPanelOpen(false)} />
 
