@@ -25,7 +25,7 @@ describe('MainArea', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByText('Preview mode')).toBeInTheDocument()
+    expect(screen.getByText('Preview')).toBeInTheDocument()
     expect(screen.getByText('Ask the rule.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'What documents are required for a CIF shipment under UCP600?' })).toBeEnabled()
     expect(screen.getByRole('button', { name: /send/i })).toBeInTheDocument()

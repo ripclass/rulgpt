@@ -16,20 +16,29 @@ interface RuleGPTMessageProps {
 export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: RuleGPTMessageProps) {
   return (
     <div className="flex justify-start">
-      <article className="max-w-[92%] rounded-2xl border border-black/10 bg-white px-5 py-5 text-sm shadow-[0_16px_36px_rgba(17,24,39,0.05)]">
-        <div className="mb-3 flex flex-wrap items-center gap-2">
-          {message.confidence ? <ConfidenceBadge confidence={message.confidence} /> : null}
-          {message.domainTags?.map((domain) => (
-            <DomainTag key={domain} domain={domain} />
-          ))}
+      <article className="w-full border border-black/10 bg-white px-5 py-5 text-sm">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">RuleGPT</p>
+          <div className="flex flex-wrap items-center gap-2">
+            {message.confidence ? <ConfidenceBadge confidence={message.confidence} /> : null}
+            {message.domainTags?.map((domain) => (
+              <DomainTag key={domain} domain={domain} />
+            ))}
+          </div>
         </div>
 
-        <p className="whitespace-pre-wrap leading-7 text-[#0c111d]">{message.text}</p>
+        <div className="border-t border-black/8 pt-4">
+          <p className="whitespace-pre-wrap leading-7 text-[#0c111d]">{message.text}</p>
+        </div>
 
         {message.citations && message.citations.length > 0 ? (
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             {message.citations.map((citation) => (
-              <CitationChip key={`${citation.rule_id}-${citation.reference}`} citation={citation} onClick={onCitationClick} />
+              <CitationChip
+                key={`${citation.rule_id}-${citation.reference}`}
+                citation={citation}
+                onClick={onCitationClick}
+              />
             ))}
           </div>
         ) : null}
