@@ -1,0 +1,201 @@
+"""Query classifier for the RuleGPT RAG pipeline."""
+
+from __future__ import annotations
+
+import json
+import re
+from typing import Any, Dict, Optional
+
+from .models import ClassifierOutput
+
+_DOMAIN_KEYWORDS = {
+    "icc": ("ucp", "isbp", "isp98", "urdg", "urc", "incoterms", "eucp", "trade finance"),
+    "fta": ("fta", "rcep", "cptpp", "usmca", "rules of origin", "origin criteria", "tariff preference"),
+    "sanctions": ("sanction", "ofac", "embargo", "sdn", "restricted party", "eu sanctions", "uk sanctions", "un sanctions"),
+    "customs": ("customs", "import license", "export license", "duty", "clearance", "hs code", "classification"),
+    "bank_specific": ("bank requirement", "swift code", "issuing bank", "confirming bank", "hdfc", "hsbc", "citibank"),
+}
+
+_DOC_TYPE_KEYWORDS = {
+    "lc": ("lc", "letter of credit"),
+    "bill_of_lading": ("bill of lading", "b/l", "bl "),
+    "invoice": ("invoice", "commercial invoice"),
+    "certificate": ("certificate", "coo", "certificate of origin"),
+}
+
+_COUNTRY_ALIASES = {
+    "bd": ("bangladesh",),
+    "in": ("india",),
+    "us": ("united states", "usa", "us "),
+    "ae": ("uae", "united arab emirates"),
+    "uk": ("united kingdom", "uk "),
+    "eu": ("european union", "eu "),
+    "sg": ("singapore",),
+    "cn": ("china",),
+    "sa": ("saudi", "saudi arabia"),
+    "ir": ("iran",),
+}
+
+_OUT_OF_SCOPE_MARKERS = (
+    "bitcoin",
+    "crypto price",
+    "tax return",
+    "movie",
+    "sports",
+    "recipe",
+    "dating",
+)
+
+_CLASSIFIER_SYSTEM_PROMPT = """Classify this trade finance compliance query.
+Return JSON only with these keys:
+- domain: one of icc, fta, sanctions, customs, bank_specific, other
+- jurisdiction: lowercase country code or global
+- document_type: one of lc, bill_of_lading, invoice, certificate, other
+- commodity: string or null
+- complexity: one of simple, interpretation, complex
+- in_scope: boolean
+- reason: short string
+
+Mark out-of-scope for general business law, accounting, crypto, tax, sports, recipes, and unrelated topics.
+Never return prose outside JSON."""
+
+
+async def _maybe_await(value: Any) -> Any:
+    if hasattr(value, "__await__"):
+        return await value
+    return value
+
+
+def _pick_domain(query: str) -> str:
+    lowered = query.lower()
+    for domain, keywords in _DOMAIN_KEYWORDS.items():
+        if any(keyword in lowered for keyword in keywords):
+            return domain
+    return "other"
+
+
+def _pick_document_type(query: str) -> str:
+    lowered = query.lower()
+    for doc_type, keywords in _DOC_TYPE_KEYWORDS.items():
+        if any(keyword in lowered for keyword in keywords):
+            return doc_type
+    return "other"
+
+
+def _pick_jurisdiction(query: str) -> str:
+    lowered = query.lower() + " "
+    for code, aliases in _COUNTRY_ALIASES.items():
+        if any(alias in lowered for alias in aliases):
+            return code
+    return "global"
+
+
+def _pick_complexity(query: str) -> str:
+    lowered = query.lower()
+    if any(token in lowered for token in ("tbml", "fraud", "multi-jurisdiction", "multiple jurisdictions")):
+        return "complex"
+    if len(re.findall(r"\band\b|\bor\b|\bdifference\b|\bcompare\b", lowered)) >= 2:
+        return "interpretation"
+    if len(lowered) > 300:
+        return "interpretation"
+    return "simple"
+
+
+def _pick_commodity(query: str) -> Optional[str]:
+    lowered = query.lower()
+    for commodity in ("garment", "textile", "electronics", "agriculture", "steel", "oil", "food"):
+        if commodity in lowered:
+            return commodity
+    return None
+
+
+def _heuristic_classify(query: str) -> ClassifierOutput:
+    in_scope = not any(marker in query.lower() for marker in _OUT_OF_SCOPE_MARKERS)
+    return ClassifierOutput(
+        domain=_pick_domain(query),
+        jurisdiction=_pick_jurisdiction(query),
+        document_type=_pick_document_type(query),
+        commodity=_pick_commodity(query),
+        complexity=_pick_complexity(query),  # type: ignore[arg-type]
+        in_scope=in_scope,
+        reason="heuristic" if in_scope else "Query appears outside trade finance compliance scope.",
+    )
+
+
+def _parse_classifier_payload(payload: Any) -> Optional[Dict[str, Any]]:
+    if isinstance(payload, dict):
+        return payload
+    if not isinstance(payload, str):
+        return None
+    text = payload.strip()
+    if not text:
+        return None
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.IGNORECASE | re.DOTALL).strip()
+    try:
+        parsed = json.loads(text)
+        return parsed if isinstance(parsed, dict) else None
+    except json.JSONDecodeError:
+        match = re.search(r"\{.*\}", text, flags=re.DOTALL)
+        if not match:
+            return None
+        try:
+            parsed = json.loads(match.group(0))
+            return parsed if isinstance(parsed, dict) else None
+        except json.JSONDecodeError:
+            return None
+
+
+class QueryClassifier:
+    """Classifier with Anthropic primary and heuristic fallback."""
+
+    def __init__(self, anthropic_client: Optional[Any] = None) -> None:
+        self.anthropic_client = anthropic_client
+
+    async def _get_client(self) -> Optional[Any]:
+        if self.anthropic_client is not None:
+            return self.anthropic_client
+        try:
+            from app.services.integrations.anthropic_client import AnthropicClient  # type: ignore
+
+            self.anthropic_client = AnthropicClient()
+            return self.anthropic_client
+        except Exception:
+            return None
+
+    async def _classify_with_llm(self, client: Any, query: str) -> Optional[ClassifierOutput]:
+        payload: Optional[Dict[str, Any]] = None
+        if hasattr(client, "classify_query"):
+            payload = await _maybe_await(client.classify_query(query=query))
+        elif hasattr(client, "classify"):
+            raw = await _maybe_await(
+                client.classify(
+                    query=query,
+                    system_prompt=_CLASSIFIER_SYSTEM_PROMPT,
+                    max_tokens=256,
+                    temperature=0.0,
+                )
+            )
+            payload = _parse_classifier_payload(raw)
+        if not isinstance(payload, dict):
+            return None
+        return ClassifierOutput(
+            domain=str(payload.get("domain", "other")).lower(),
+            jurisdiction=str(payload.get("jurisdiction", "global")).lower(),
+            document_type=str(payload.get("document_type", "other")).lower(),
+            commodity=(str(payload["commodity"]) if payload.get("commodity") else None),
+            complexity=str(payload.get("complexity", "simple")).lower(),  # type: ignore[arg-type]
+            in_scope=bool(payload.get("in_scope", True)),
+            reason=(str(payload["reason"]) if payload.get("reason") else None),
+        )
+
+    async def classify(self, query: str) -> ClassifierOutput:
+        client = await self._get_client()
+        if client is not None:
+            try:
+                llm_output = await self._classify_with_llm(client, query)
+                if llm_output is not None:
+                    return llm_output
+            except Exception:
+                pass
+        return _heuristic_classify(query)
