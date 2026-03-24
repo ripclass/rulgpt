@@ -1,7 +1,7 @@
 import { AlertTriangle } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { ChatThread } from '@/components/chat/ChatThread'
-import { TRDRHubCTA } from '@/components/conversion/TRDRHubCTA'
 import { QueryInput } from '@/components/input/QueryInput'
 import { SuggestedQueries } from '@/components/input/SuggestedQueries'
 import type { Citation, Message } from '@/types'
@@ -13,11 +13,14 @@ interface MainAreaProps {
   error: string | null
   canSave: boolean
   previewMode?: boolean
+  isAuthenticated?: boolean
   onSubmitQuery: (query: string) => Promise<void>
   onPickSuggestion: (value: string) => void
   onCitationClick: (citation: Citation) => void
   onSaveMessage: (queryId: string) => void
   onNewQuery?: () => void
+  onOpenLogin?: () => void
+  onOpenSignup?: () => void
 }
 
 export function MainArea({
@@ -27,11 +30,14 @@ export function MainArea({
   error,
   canSave,
   previewMode,
+  isAuthenticated,
   onSubmitQuery,
   onPickSuggestion,
   onCitationClick,
   onSaveMessage,
   onNewQuery,
+  onOpenLogin,
+  onOpenSignup,
 }: MainAreaProps) {
   const isEmpty = messages.length === 0
 
@@ -40,10 +46,8 @@ export function MainArea({
       <header className="border-b border-black/10 bg-background/85 px-4 py-4 backdrop-blur-xl md:px-8">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#111827] font-mono text-xs font-bold tracking-[0.26em] text-white">
-              RG
-            </div>
             <div>
+              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">RuleGPT</p>
               <h1 className="font-display text-lg font-semibold tracking-[-0.03em] text-[#0c111d] md:text-xl">
                 RuleGPT
               </h1>
@@ -60,15 +64,46 @@ export function MainArea({
             ) : null}
           </div>
 
-          {!isEmpty && onNewQuery ? (
-            <button
-              type="button"
-              onClick={onNewQuery}
-              className="rounded-none border border-black/10 bg-white px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#0c111d] transition hover:bg-[#faf7f2]"
-            >
-              New chat
-            </button>
-          ) : null}
+          <div className="flex items-center gap-2">
+            {previewMode ? (
+              <Link
+                to="/landing"
+                className="rounded-none border border-black/10 bg-white px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#0c111d] transition hover:bg-[#faf7f2]"
+              >
+                Landing
+              </Link>
+            ) : null}
+
+            {!previewMode && !isAuthenticated && onOpenLogin ? (
+              <button
+                type="button"
+                onClick={onOpenLogin}
+                className="rounded-none border border-black/10 bg-white px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#0c111d] transition hover:bg-[#faf7f2]"
+              >
+                Sign in
+              </button>
+            ) : null}
+
+            {!previewMode && !isAuthenticated && onOpenSignup ? (
+              <button
+                type="button"
+                onClick={onOpenSignup}
+                className="rounded-none bg-[#111827] px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-white transition hover:bg-primary"
+              >
+                Create account
+              </button>
+            ) : null}
+
+            {!isEmpty && onNewQuery ? (
+              <button
+                type="button"
+                onClick={onNewQuery}
+                className="rounded-none border border-black/10 bg-white px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#0c111d] transition hover:bg-[#faf7f2]"
+              >
+                New chat
+              </button>
+            ) : null}
+          </div>
         </div>
       </header>
 
@@ -82,9 +117,7 @@ export function MainArea({
             ) : null}
 
             <div className="w-full text-center">
-              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                {previewMode ? 'Public preview' : 'Trade finance compliance assistant'}
-              </p>
+              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Trade finance compliance assistant</p>
               <h2 className="mt-4 font-display text-4xl font-medium tracking-[-0.05em] text-[#0c111d] md:text-6xl">
                 Ask the rule.
               </h2>
@@ -109,12 +142,6 @@ export function MainArea({
               </p>
               <SuggestedQueries suggestions={suggestions} onPick={onPickSuggestion} />
             </div>
-
-            {previewMode ? (
-              <div className="mt-8 w-full">
-                <TRDRHubCTA />
-              </div>
-            ) : null}
           </div>
         </section>
       ) : (

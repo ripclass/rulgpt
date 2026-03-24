@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { vi } from 'vitest'
 import { MainArea } from '@/components/layout/MainArea'
 
@@ -7,19 +8,21 @@ describe('MainArea', () => {
     const onPickSuggestion = vi.fn()
 
     render(
-      <MainArea
-        messages={[]}
-        suggestions={['What documents are required for a CIF shipment under UCP600?']}
-        isLoading={false}
-        error={null}
-        canSave={false}
-        previewMode
-        onSubmitQuery={async () => undefined}
-        onNewQuery={() => undefined}
-        onPickSuggestion={onPickSuggestion}
-        onCitationClick={() => undefined}
-        onSaveMessage={() => undefined}
-      />,
+      <MemoryRouter>
+        <MainArea
+          messages={[]}
+          suggestions={['What documents are required for a CIF shipment under UCP600?']}
+          isLoading={false}
+          error={null}
+          canSave={false}
+          previewMode
+          onSubmitQuery={async () => undefined}
+          onNewQuery={() => undefined}
+          onPickSuggestion={onPickSuggestion}
+          onCitationClick={() => undefined}
+          onSaveMessage={() => undefined}
+        />
+      </MemoryRouter>,
     )
 
     expect(screen.getByText('Preview mode')).toBeInTheDocument()

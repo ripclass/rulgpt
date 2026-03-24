@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery as useRQQuery } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { MainArea } from '@/components/layout/MainArea'
@@ -20,12 +20,14 @@ import type { Citation, Message, RuleDetails } from '@/types'
 
 export function Home() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [loginOpen, setLoginOpen] = useState(false)
   const [signupOpen, setSignupOpen] = useState(false)
   const [citationPanelOpen, setCitationPanelOpen] = useState(false)
   const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false)
   const [savedDrawerOpen, setSavedDrawerOpen] = useState(false)
   const [selectedRule, setSelectedRule] = useState<RuleDetails | null>(null)
+  const seededQueryRef = useRef<string | null>(null)
 
   const auth = useAuth()
   const { sessionToken, resetSession } = useSession()
@@ -151,6 +153,15 @@ export function Home() {
     }
   }
 
+  useEffect(() => {
+    const initialQuery = (location.state as { initialQuery?: string } | null)?.initialQuery
+    if (!initialQuery || seededQueryRef.current === initialQuery) return
+
+    seededQueryRef.current = initialQuery
+    void submitQuery(initialQuery)
+    navigate(location.pathname, { replace: true, state: null })
+  }, [location.pathname, location.state, navigate])
+
   return (
     <div className="min-h-screen md:flex">
       {!previewMode ? (
@@ -185,8 +196,11 @@ export function Home() {
         error={query.error}
         canSave={!previewMode && auth.isAuthenticated}
         previewMode={previewMode}
+        isAuthenticated={auth.isAuthenticated}
         onSubmitQuery={submitQuery}
         onNewQuery={query.clearMessages}
+        onOpenLogin={() => setLoginOpen(true)}
+        onOpenSignup={() => setSignupOpen(true)}
         onPickSuggestion={(value) => {
           void submitQuery(value)
         }}

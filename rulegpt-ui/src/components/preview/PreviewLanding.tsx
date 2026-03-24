@@ -21,6 +21,7 @@ interface PreviewLandingProps {
   tier: SessionTier
   onOpenLogin: () => void
   onOpenSignup: () => void
+  onOpenChat: () => void
   onSubmitPreview: (query: string) => Promise<void>
 }
 
@@ -85,6 +86,7 @@ export function PreviewLanding({
   tier,
   onOpenLogin,
   onOpenSignup,
+  onOpenChat,
   onSubmitPreview,
 }: PreviewLandingProps) {
   const promptSuggestions = useMemo(
@@ -137,6 +139,9 @@ export function PreviewLanding({
                 </Button>
               </>
             )}
+            <Button variant="ghost" className="font-mono text-xs uppercase tracking-[0.16em]" onClick={onOpenChat}>
+              Open chat
+            </Button>
             <Button asChild variant="ghost" className="font-mono text-xs uppercase tracking-[0.16em]">
               <Link to="/upgrade">Upgrade</Link>
             </Button>
@@ -177,10 +182,17 @@ export function PreviewLanding({
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button className="h-12 rounded-none bg-[#111827] px-5 font-mono text-xs uppercase tracking-[0.18em] text-white hover:bg-primary" onClick={scrollToWorkbench}>
-                Review product shell <ArrowRight className="ml-2 h-4 w-4" />
+              <Button
+                className="h-12 rounded-none bg-[#111827] px-5 font-mono text-xs uppercase tracking-[0.18em] text-white hover:bg-primary"
+                onClick={onOpenChat}
+              >
+                Open conversation <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              <Button asChild variant="outline" className="h-12 rounded-none border-black/10 bg-white px-5 font-mono text-xs uppercase tracking-[0.18em] text-[#0c111d] hover:bg-[#faf7f2]">
+              <Button
+                asChild
+                variant="outline"
+                className="h-12 rounded-none border-black/10 bg-white px-5 font-mono text-xs uppercase tracking-[0.18em] text-[#0c111d] hover:bg-[#faf7f2]"
+              >
                 <a href="https://trdrhub.com" target="_blank" rel="noreferrer">
                   Open TRDR Hub <ArrowUpRight className="ml-2 h-4 w-4" />
                 </a>
@@ -220,11 +232,15 @@ export function PreviewLanding({
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="border border-black/10 px-5 py-4">
                 <p className="font-mono text-2xl font-semibold text-[#0c111d]">Citation-led</p>
-                <p className="mt-2 text-sm text-muted-foreground">Answers are designed to show the exact article, paragraph, or rule reference.</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Answers are designed to show the exact article, paragraph, or rule reference.
+                </p>
               </div>
               <div className="border border-black/10 px-5 py-4">
                 <p className="font-mono text-2xl font-semibold text-[#0c111d]">ICE-ready</p>
-                <p className="mt-2 text-sm text-muted-foreground">Stored query and answer pairs can feed the future Enso compliance model stack.</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Stored query and answer pairs can feed the future Enso compliance model stack.
+                </p>
               </div>
             </div>
 
@@ -334,7 +350,7 @@ export function PreviewLanding({
                   void handlePreviewSubmit()
                 }}
               >
-                Review this query in preview <ArrowRight className="ml-2 h-4 w-4" />
+                Start from this question <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
 
               <TRDRHubCTA />
@@ -346,7 +362,10 @@ export function PreviewLanding({
           {capabilityCards.map((item) => {
             const Icon = item.icon
             return (
-              <article key={item.title} className="border border-black/10 bg-white px-5 py-5 shadow-[0_16px_36px_rgba(17,24,39,0.05)]">
+              <article
+                key={item.title}
+                className="border border-black/10 bg-white px-5 py-5 shadow-[0_16px_36px_rgba(17,24,39,0.05)]"
+              >
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#f7d9cb] text-primary">
                   <Icon className="h-5 w-5" />
                 </div>
@@ -369,7 +388,10 @@ export function PreviewLanding({
                 RuleGPT sits between the rules engine and the transaction workflow.
               </h2>
             </div>
-            <Button asChild className="h-12 rounded-none bg-[#111827] px-5 font-mono text-xs uppercase tracking-[0.18em] text-white hover:bg-primary">
+            <Button
+              asChild
+              className="h-12 rounded-none bg-[#111827] px-5 font-mono text-xs uppercase tracking-[0.18em] text-white hover:bg-primary"
+            >
               <a href="https://trdrhub.com" target="_blank" rel="noreferrer">
                 View TRDR Hub <ArrowUpRight className="ml-2 h-4 w-4" />
               </a>
@@ -379,17 +401,23 @@ export function PreviewLanding({
             <div className="border border-black/10 px-4 py-4">
               <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Layer 1</p>
               <p className="mt-2 text-lg font-semibold text-[#0c111d]">RulHub</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">Structured and auditable trade rules infrastructure.</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Structured and auditable trade rules infrastructure.
+              </p>
             </div>
             <div className="border border-black/10 px-4 py-4">
               <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Layer 2</p>
               <p className="mt-2 text-lg font-semibold text-[#0c111d]">RuleGPT</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">Public-facing rule explanation and conversion surface.</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Public-facing rule explanation and conversion surface.
+              </p>
             </div>
             <div className="border border-black/10 px-4 py-4">
               <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Layer 3</p>
               <p className="mt-2 text-lg font-semibold text-[#0c111d]">TRDR Hub</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">Transaction review and document validation when users need operational help.</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Transaction review and document validation when users need operational help.
+              </p>
             </div>
           </div>
         </section>
