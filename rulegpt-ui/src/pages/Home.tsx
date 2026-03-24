@@ -9,6 +9,7 @@ import { MobileDrawer } from '@/components/layout/MobileDrawer'
 import { CitationPanel } from '@/components/chat/CitationPanel'
 import { LoginModal } from '@/components/auth/LoginModal'
 import { SignupModal } from '@/components/auth/SignupModal'
+import { PreviewLanding } from '@/components/preview/PreviewLanding'
 import { api } from '@/lib/api'
 import { useAuth } from '@/hooks/useAuth'
 import { useHistory } from '@/hooks/useHistory'
@@ -120,6 +121,67 @@ export function Home() {
     } catch {
       toast.error('Delete failed.')
     }
+  }
+
+  if (previewMode) {
+    return (
+      <>
+        <PreviewLanding
+          suggestions={suggestionTexts}
+          isAuthenticated={auth.isAuthenticated}
+          tier={auth.tier}
+          onOpenLogin={() => setLoginOpen(true)}
+          onOpenSignup={() => setSignupOpen(true)}
+          onSubmitPreview={submitQuery}
+        />
+
+        <LoginModal
+          open={loginOpen}
+          isLoading={auth.isLoading}
+          oauth={auth.oauth}
+          onOpenChange={setLoginOpen}
+          onSubmit={async (email, password) => {
+            try {
+              await auth.login(email, password)
+              toast.success('Signed in.')
+              setLoginOpen(false)
+            } catch (error) {
+              toast.error(`Login failed: ${String(error)}`)
+            }
+          }}
+          onOAuth={async (provider) => {
+            try {
+              await auth.loginWithOAuth(provider)
+            } catch (error) {
+              toast.error(`OAuth unavailable: ${String(error)}`)
+            }
+          }}
+        />
+
+        <SignupModal
+          open={signupOpen}
+          isLoading={auth.isLoading}
+          oauth={auth.oauth}
+          onOpenChange={setSignupOpen}
+          onSubmit={async (email, password) => {
+            try {
+              await auth.signup(email, password)
+              toast.success('Account created.')
+              setSignupOpen(false)
+            } catch (error) {
+              toast.error(`Signup failed: ${String(error)}`)
+            }
+          }}
+          onOAuth={async (provider) => {
+            try {
+              await auth.loginWithOAuth(provider)
+            } catch (error) {
+              toast.error(`OAuth unavailable: ${String(error)}`)
+            }
+          }}
+        />
+      </>
+    )
   }
 
   return (

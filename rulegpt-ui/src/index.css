@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,23 +6,23 @@
 
 @layer base {
   :root {
-    --background: 0 0% 4%;
-    --foreground: 0 0% 98%;
-    --card: 240 4% 9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 4% 10%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 38 92% 50%;
-    --primary-foreground: 0 0% 8%;
-    --secondary: 0 0% 14%;
-    --secondary-foreground: 0 0% 96%;
-    --muted: 0 0% 16%;
-    --muted-foreground: 0 0% 71%;
-    --accent: 38 92% 50%;
-    --accent-foreground: 0 0% 8%;
-    --border: 0 0% 16%;
-    --input: 0 0% 16%;
-    --ring: 38 92% 50%;
+    --background: 36 50% 98%;
+    --foreground: 221 37% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 221 37% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 221 37% 11%;
+    --primary: 16 72% 46%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 33% 96%;
+    --secondary-foreground: 221 37% 11%;
+    --muted: 35 26% 95%;
+    --muted-foreground: 217 14% 42%;
+    --accent: 16 72% 46%;
+    --accent-foreground: 0 0% 100%;
+    --border: 220 20% 89%;
+    --input: 220 20% 91%;
+    --ring: 16 72% 46%;
     --radius: 0.75rem;
   }
 
@@ -33,10 +33,14 @@
   body {
     @apply bg-background text-foreground antialiased;
     background-image:
-      radial-gradient(circle at 12% 18%, rgba(245, 158, 11, 0.14), transparent 30%),
-      radial-gradient(circle at 86% 84%, rgba(245, 158, 11, 0.08), transparent 28%),
-      linear-gradient(to bottom, #0a0a0a, #080808 50%, #0a0a0a);
+      radial-gradient(circle at 12% 18%, rgba(201, 75, 34, 0.11), transparent 22%),
+      radial-gradient(circle at 85% 84%, rgba(201, 75, 34, 0.06), transparent 26%),
+      linear-gradient(rgba(12, 17, 29, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(12, 17, 29, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, #fffdf8, #ffffff 55%, #fffcf6);
+    background-size: auto, auto, 28px 28px, 28px 28px, auto;
     min-height: 100vh;
+    font-family: 'Inter', sans-serif;
   }
 
   #root {
@@ -46,6 +50,24 @@
 
 @layer components {
   .glass-panel {
-    @apply border border-border/80 bg-card/80 backdrop-blur;
+    @apply border border-border/90 bg-card/90 backdrop-blur;
+    box-shadow: 0 25px 60px rgba(17, 24, 39, 0.06);
+  }
+
+  .ops-hero-art {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.18)),
+      linear-gradient(90deg, rgba(12, 17, 29, 0.08) 1px, transparent 1px),
+      linear-gradient(0deg, rgba(12, 17, 29, 0.05) 1px, transparent 1px),
+      repeating-linear-gradient(
+        90deg,
+        rgba(12, 17, 29, 0.12) 0,
+        rgba(12, 17, 29, 0.12) 2px,
+        transparent 2px,
+        transparent 11px
+      ),
+      radial-gradient(circle at 65% 38%, rgba(201, 75, 34, 0.16), transparent 28%);
+    background-size: auto, 18px 18px, 18px 18px, 11px 100%, auto;
+    filter: grayscale(1);
   }
 }

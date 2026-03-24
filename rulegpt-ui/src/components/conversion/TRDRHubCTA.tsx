@@ -14,9 +14,9 @@ export function TRDRHubCTA({ text, url }: TRDRHubCTAProps) {
       href={url ?? 'https://trdrhub.com'}
       target="_blank"
       rel="noreferrer"
-      className="mt-3 flex items-center justify-between rounded-lg border border-primary/40 bg-primary/10 px-3 py-2 text-xs text-primary transition hover:bg-primary/15"
+      className="mt-3 flex items-center justify-between border border-primary/20 bg-[#fff7f1] px-4 py-3 text-left text-xs text-primary transition hover:border-primary/40 hover:bg-[#ffefe6]"
     >
-      <span>{text ?? DEFAULT_TEXT}</span>
+      <span className="pr-3 leading-6">{text ?? DEFAULT_TEXT}</span>
       <ArrowUpRight className="ml-2 h-4 w-4 shrink-0" />
     </a>
   )
