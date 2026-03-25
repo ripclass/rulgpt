@@ -2,16 +2,12 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery as useRQQuery } from '@tanstack/react-query'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { Sidebar } from '@/components/layout/Sidebar'
 import { MainArea } from '@/components/layout/MainArea'
-import { MobileNav } from '@/components/layout/MobileNav'
-import { MobileDrawer } from '@/components/layout/MobileDrawer'
 import { CitationPanel } from '@/components/chat/CitationPanel'
 import { LoginModal } from '@/components/auth/LoginModal'
 import { SignupModal } from '@/components/auth/SignupModal'
 import { api } from '@/lib/api'
 import { useAuth } from '@/hooks/useAuth'
-import { useHistory } from '@/hooks/useHistory'
 import { useQuery } from '@/hooks/useQuery'
 import { useSession } from '@/hooks/useSession'
 import { useTierLimit } from '@/hooks/useTierLimit'
@@ -24,8 +20,6 @@ export function Home() {
   const [loginOpen, setLoginOpen] = useState(false)
   const [signupOpen, setSignupOpen] = useState(false)
   const [citationPanelOpen, setCitationPanelOpen] = useState(false)
-  const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false)
-  const [savedDrawerOpen, setSavedDrawerOpen] = useState(false)
   const [selectedRule, setSelectedRule] = useState<RuleDetails | null>(null)
   const seededQueryRef = useRef<string | null>(null)
 
@@ -45,13 +39,6 @@ export function Home() {
     queryFn: api.getSuggestions,
     enabled: !previewMode,
     staleTime: 15 * 60 * 1000,
-  })
-
-  const history = useHistory(auth.user?.id, auth.tier, auth.accessToken, !previewMode)
-  const savedAnswers = useRQQuery({
-    queryKey: ['saved', auth.user?.id, auth.tier, auth.accessToken ?? null],
-    queryFn: () => api.listSaved({ userId: auth.user?.id, tier: auth.tier, accessToken: auth.accessToken }),
-    enabled: Boolean(auth.user?.id) && !previewMode,
   })
 
   const tierLimit = useTierLimit({
@@ -136,20 +123,9 @@ export function Home() {
     }
     try {
       await api.saveAnswer(queryId, null, { userId: auth.user.id, tier: auth.tier, accessToken: auth.accessToken })
-      void savedAnswers.refetch()
       toast.success('Saved to your account.')
     } catch (error) {
       toast.error(`Save failed: ${String(error)}`)
-    }
-  }
-
-  const deleteSaved = async (savedId: string) => {
-    if (!auth.user) return
-    try {
-      await api.deleteSaved(savedId, { userId: auth.user.id, tier: auth.tier, accessToken: auth.accessToken })
-      void savedAnswers.refetch()
-    } catch {
-      toast.error('Delete failed.')
     }
   }
 
@@ -164,31 +140,6 @@ export function Home() {
 
   return (
     <div className="min-h-screen md:flex">
-      {!previewMode ? (
-        <Sidebar
-          history={history.data ?? []}
-          savedAnswers={savedAnswers.data ?? []}
-          tier={auth.tier}
-          isAuthenticated={auth.isAuthenticated}
-          previewMode={previewMode}
-          usedCount={tierLimit.usedCount}
-          remaining={tierLimit.remaining}
-          limitValue={tierLimit.limitValue}
-          onNewQuery={() => query.clearMessages()}
-          onPickHistory={(value) => {
-            void submitQuery(value)
-          }}
-          onDeleteSaved={(savedId) => {
-            void deleteSaved(savedId)
-          }}
-          onOpenLogin={() => setLoginOpen(true)}
-          onOpenSignup={() => setSignupOpen(true)}
-          onLogout={() => {
-            void auth.logout()
-          }}
-        />
-      ) : null}
-
       <MainArea
         messages={query.messages}
         suggestions={suggestionTexts}
@@ -196,11 +147,8 @@ export function Home() {
         error={query.error}
         canSave={!previewMode && auth.isAuthenticated}
         previewMode={previewMode}
-        isAuthenticated={auth.isAuthenticated}
         onSubmitQuery={submitQuery}
         onNewQuery={query.clearMessages}
-        onOpenLogin={() => setLoginOpen(true)}
-        onOpenSignup={() => setSignupOpen(true)}
         onPickSuggestion={(value) => {
           void submitQuery(value)
         }}
@@ -211,51 +159,6 @@ export function Home() {
           void saveMessage(queryId)
         }}
       />
-
-      {!previewMode ? (
-        <MobileNav
-          onNewQuery={query.clearMessages}
-          onHistory={() => setHistoryDrawerOpen(true)}
-          onSaved={() => setSavedDrawerOpen(true)}
-          onPro={() => navigate('/upgrade')}
-        />
-      ) : null}
-
-      {!previewMode ? (
-        <MobileDrawer
-          open={historyDrawerOpen}
-          title="Query history"
-          mode="history"
-          history={history.data ?? []}
-          savedAnswers={savedAnswers.data ?? []}
-          previewMode={previewMode}
-          onOpenChange={setHistoryDrawerOpen}
-          onPickHistory={(value) => {
-            void submitQuery(value)
-          }}
-          onDeleteSaved={(savedId) => {
-            void deleteSaved(savedId)
-          }}
-        />
-      ) : null}
-
-      {!previewMode ? (
-        <MobileDrawer
-          open={savedDrawerOpen}
-          title="Saved answers"
-          mode="saved"
-          history={history.data ?? []}
-          savedAnswers={savedAnswers.data ?? []}
-          previewMode={previewMode}
-          onOpenChange={setSavedDrawerOpen}
-          onPickHistory={(value) => {
-            void submitQuery(value)
-          }}
-          onDeleteSaved={(savedId) => {
-            void deleteSaved(savedId)
-          }}
-        />
-      ) : null}
 
       <CitationPanel open={citationPanelOpen} rule={selectedRule} onClose={() => setCitationPanelOpen(false)} />
 

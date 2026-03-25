@@ -13,14 +13,11 @@ interface MainAreaProps {
   error: string | null
   canSave: boolean
   previewMode?: boolean
-  isAuthenticated?: boolean
   onSubmitQuery: (query: string) => Promise<void>
   onPickSuggestion: (value: string) => void
   onCitationClick: (citation: Citation) => void
   onSaveMessage: (queryId: string) => void
   onNewQuery?: () => void
-  onOpenLogin?: () => void
-  onOpenSignup?: () => void
 }
 
 export function MainArea({
@@ -30,14 +27,11 @@ export function MainArea({
   error,
   canSave,
   previewMode,
-  isAuthenticated,
   onSubmitQuery,
   onPickSuggestion,
   onCitationClick,
   onSaveMessage,
   onNewQuery,
-  onOpenLogin,
-  onOpenSignup,
 }: MainAreaProps) {
   const isEmpty = messages.length === 0
 
@@ -54,42 +48,21 @@ export function MainArea({
                 {previewMode ? 'Miro-style preview workspace' : 'Grounded answers from published trade rules'}
               </p>
             </div>
-            {previewMode ? (
-              <Badge variant="outline" className="border-primary/25 bg-[#f7d9cb] text-primary">
-                Preview
-              </Badge>
-            ) : null}
+            <Badge
+              variant="outline"
+              className={previewMode ? 'border-primary/25 bg-[#f7d9cb] text-primary' : 'border-emerald-600/20 bg-emerald-50 text-emerald-700'}
+            >
+              {previewMode ? 'Preview' : 'Live'}
+            </Badge>
           </div>
 
           <div className="flex items-center gap-2">
-            {previewMode ? (
-              <Link
-                to="/landing"
-                className="rounded-none border border-black/10 bg-white px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#0c111d] transition hover:bg-[#faf7f2]"
-              >
-                Landing
-              </Link>
-            ) : null}
-
-            {!previewMode && !isAuthenticated && onOpenLogin ? (
-              <button
-                type="button"
-                onClick={onOpenLogin}
-                className="rounded-none border border-black/10 bg-white px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#0c111d] transition hover:bg-[#faf7f2]"
-              >
-                Sign in
-              </button>
-            ) : null}
-
-            {!previewMode && !isAuthenticated && onOpenSignup ? (
-              <button
-                type="button"
-                onClick={onOpenSignup}
-                className="rounded-none bg-[#111827] px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-white transition hover:bg-primary"
-              >
-                Create account
-              </button>
-            ) : null}
+            <Link
+              to="/landing"
+              className="rounded-none border border-black/10 bg-white px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#0c111d] transition hover:bg-[#faf7f2]"
+            >
+              Landing
+            </Link>
 
             {!isEmpty && onNewQuery ? (
               <button
