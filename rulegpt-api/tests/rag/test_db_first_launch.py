@@ -280,6 +280,68 @@ async def test_retriever_broadens_document_set_queries_and_merges_families(monke
 
 
 @pytest.mark.asyncio
+async def test_retriever_does_not_filter_fta_rules_by_country_code(monkeypatch):
+    retriever = RuleRetriever(openai_client=object(), rulhub_client=object())
+
+    async def _fake_embed_query(query: str):
+        return [0.4] * 1536
+
+    async def _fake_semantic_search(session, query_embedding, classification, semantic_limit):
+        assert classification.domain == "fta"
+        assert classification.jurisdiction == "global"
+        return [
+            {
+                "rule_id": "RCEP-SCOPE-001",
+                "rulebook": "RCEP",
+                "domain": "fta",
+                "jurisdiction": "rcep",
+                "document_type": "other",
+                "distance": 0.09,
+            }
+        ]
+
+    async def _fake_detail(session, rule_id: str):
+        return {
+            "rule_id": "RCEP-SCOPE-001",
+            "rulebook": "RCEP",
+            "reference": "RCEP Agreement, Chapter 3",
+            "title": "RCEP Membership and Scope",
+            "text": "Trade between RCEP members may qualify for preferential treatment.",
+            "domain": "fta",
+            "jurisdiction": "rcep",
+            "document_type": "other",
+            "tags": ["fta", "rcep"],
+            "metadata": {
+                "members": [
+                    {"country": "Australia", "code": "AU"},
+                    {"country": "China", "code": "CN"},
+                    {"country": "Japan", "code": "JP"},
+                ]
+            },
+        }
+
+    monkeypatch.setattr(retriever, "_embed_query", _fake_embed_query)
+    monkeypatch.setattr(retriever, "_semantic_search", _fake_semantic_search)
+    monkeypatch.setattr(retriever, "_fetch_rule_detail", _fake_detail)
+
+    result = await retriever.retrieve(
+        session=object(),
+        query="Does my garment qualify for RCEP preferential tariff from Bangladesh?",
+        classification=ClassifierOutput(
+            domain="fta",
+            jurisdiction="bd",
+            document_type="other",
+            complexity="simple",
+            in_scope=True,
+        ),
+        top_k=5,
+    )
+
+    assert result
+    assert result[0].rule_id == "RCEP-SCOPE-001"
+
+
+@pytest.mark.asyncio
 async def test_embed_sync_deduplicates_repeated_rule_ids(monkeypatch):
     rule = normalize_rule_record(
         {

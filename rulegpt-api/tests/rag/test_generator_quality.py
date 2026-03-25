@@ -37,6 +37,48 @@ def _insurance_rule() -> RetrievedRule:
     )
 
 
+def _rcep_scope_rule() -> RetrievedRule:
+    return RetrievedRule(
+        rule_id="RCEP-SCOPE-001",
+        rulebook="RCEP",
+        reference="RCEP Agreement, Chapter 3",
+        title="RCEP Membership and Scope",
+        excerpt="RCEP includes 15 Asia-Pacific countries and trade between RCEP members may qualify for preferential treatment.",
+        domain="fta",
+        jurisdiction="rcep",
+        document_type="other",
+        similarity_score=0.87,
+        rerank_score=0.85,
+        metadata={
+            "raw_detail": {
+                "metadata": {
+                    "members": [
+                        {"country": "Australia", "code": "AU"},
+                        {"country": "China", "code": "CN"},
+                        {"country": "Japan", "code": "JP"},
+                        {"country": "Vietnam", "code": "VN"},
+                    ]
+                }
+            }
+        },
+    )
+
+
+def _rcep_origin_rule() -> RetrievedRule:
+    return RetrievedRule(
+        rule_id="RCEP-ORIGIN-001",
+        rulebook="RCEP",
+        reference="RCEP Chapter 3, Article 3.2",
+        title="RCEP Rules of Origin - General",
+        excerpt="Goods qualify as originating if wholly obtained, produced exclusively from originating materials, or satisfy product-specific rules.",
+        domain="fta",
+        jurisdiction="rcep",
+        document_type="other",
+        similarity_score=0.83,
+        rerank_score=0.8,
+    )
+
+
 @pytest.mark.asyncio
 async def test_generator_rejects_unknown_article_and_uses_grounded_fallback():
     generator = AnswerGenerator(anthropic_client=_FakeAnthropicClient(), openai_client=object())
@@ -86,3 +128,16 @@ def test_normalize_generated_answer_strips_markdown_and_followup_block():
     assert "Follow-up questions" not in normalized
     assert "Do you want more detail?" not in normalized
     assert "[UCP600 Article 28]" in normalized
+
+
+def test_compose_grounded_answer_surfaces_fta_scope_before_origin_mechanics():
+    answer = compose_grounded_answer(
+        query="Does my garment qualify for RCEP preferential tariff from Bangladesh?",
+        rules=[_rcep_scope_rule(), _rcep_origin_rule()],
+        partial_coverage=False,
+    )
+
+    assert "answer is no" in answer.lower()
+    assert "Bangladesh" in answer
+    assert "[RCEP RCEP Agreement, Chapter 3]" in answer
+    assert "What the retrieved rules clearly say:" in answer

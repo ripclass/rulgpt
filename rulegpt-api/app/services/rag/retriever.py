@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence
 from sqlalchemy import text
 
 from .models import ClassifierOutput, RetrievedRule
-from .query_intent import expected_document_families, requires_document_breadth
+from .query_intent import expected_document_families, extract_fta_agreement, requires_document_breadth
 from .rule_store import get_rule_details, load_rules_for_retrieval
 
 _COUNTRY_ALIASES: dict[str, tuple[str, ...]] = {
@@ -154,6 +154,7 @@ def _fallback_score(
     document_breadth: bool = False,
 ) -> float:
     combined = _candidate_text(rule)
+    lowered_query = query.lower()
     title = str(rule.get("title") or "")
     reference = str(rule.get("reference") or rule.get("article") or "")
     rulebook = str(rule.get("rulebook") or rule.get("source") or "")
@@ -164,6 +165,11 @@ def _fallback_score(
     score += _lexical_score(query, f"{reference} {tags}") * 0.1
     if rulebook and rulebook.lower() in query.lower():
         score += 0.15
+    if extract_fta_agreement(query):
+        if any(token in combined.lower() for token in ("membership", "scope", "origin", "tariff reduction", "certificate of origin")):
+            score += 0.08
+    if "preferential tariff" in lowered_query and any(token in combined.lower() for token in ("tariff", "origin", "membership", "scope")):
+        score += 0.07
     if _is_license_intent(query):
         lowered = combined.lower()
         license_markers = ("license", "licensing", "dual-use", "export control", "ear", "itar", "bis", "bafa")
@@ -399,7 +405,10 @@ class RuleRetriever:
         document_type_override: str | None = None,
     ) -> List[RetrievedRule]:
         domain = None if classification.domain == "other" else classification.domain
-        jurisdiction = None if classification.jurisdiction == "global" else classification.jurisdiction
+        if classification.domain == "fta":
+            jurisdiction = None
+        else:
+            jurisdiction = None if classification.jurisdiction == "global" else classification.jurisdiction
         document_breadth = requires_document_breadth(query)
         if document_type_override is not None:
             document_type = document_type_override
@@ -515,6 +524,10 @@ class RuleRetriever:
         top_k = max(3, min(8, top_k))
         target_top_k = max(top_k, 6) if document_breadth else top_k
         document_type_filter = None if classification.document_type == "other" or document_breadth else classification.document_type
+        if classification.domain == "fta":
+            effective_jurisdiction = "global"
+        else:
+            effective_jurisdiction = classification.jurisdiction
         rows: List[Dict[str, Any]] = []
         try:
             query_embedding = await self._embed_query(query)
@@ -523,7 +536,7 @@ class RuleRetriever:
                 query_embedding,
                 ClassifierOutput(
                     domain=classification.domain,
-                    jurisdiction=classification.jurisdiction,
+                    jurisdiction=effective_jurisdiction,
                     document_type=document_type_filter or "other",
                     commodity=classification.commodity,
                     complexity=classification.complexity,

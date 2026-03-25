@@ -7,7 +7,13 @@ import re
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from .models import ClassifierOutput, RetrievedRule
-from .query_intent import expected_document_families, has_partial_coverage_language, requires_document_breadth
+from .query_intent import (
+    expected_document_families,
+    extract_countries,
+    extract_fta_agreement,
+    has_partial_coverage_language,
+    requires_document_breadth,
+)
 
 RULEGPT_SYSTEM_PROMPT_TEMPLATE = """You are RuleGPT, a senior trade finance documentary and compliance specialist built by Enso Intelligence.
 
@@ -31,7 +37,7 @@ Non-negotiable rules:
    - what still depends on transaction facts, LC wording, jurisdiction, bank practice, shipment mode, or missing rules
 4. Do not present a partial rule set as a complete answer.
 5. Never say a transaction is definitely compliant. You explain rules; you do not approve transactions or validate actual documents.
-6. If the user appears to need document validation, redirect them to LCopilot on TRDR Hub.
+6. If the user appears to need document validation, say that document-level validation is outside this chat and keep the response product-neutral.
 7. Write like a first-rate trade finance specialist, not a generic chatbot.
    Be direct, specific, calm, and commercially useful.
 8. No markdown headings. No legalese. No fluffy filler. No follow-up question section inside the answer body.
@@ -143,6 +149,114 @@ def _identify_context_gaps(query: str, classifier_output: ClassifierOutput) -> l
     return gaps
 
 
+def _rule_metadata(rule: RetrievedRule) -> dict[str, Any]:
+    raw_detail = rule.metadata.get("raw_detail")
+    if isinstance(raw_detail, dict):
+        metadata = raw_detail.get("metadata")
+        if isinstance(metadata, dict):
+            return metadata
+    return {}
+
+
+def _find_fta_scope_rule(rules: Sequence[RetrievedRule], agreement: str | None) -> RetrievedRule | None:
+    if agreement is None:
+        return None
+    for rule in rules:
+        haystack = f"{rule.rulebook} {rule.title} {rule.reference}".lower()
+        if agreement in haystack and ("membership" in haystack or "scope" in haystack):
+            return rule
+        metadata = _rule_metadata(rule)
+        members = metadata.get("members")
+        if isinstance(members, list) and ("membership" in haystack or "scope" in haystack):
+            return rule
+    return None
+
+
+def _fta_member_countries(rule: RetrievedRule) -> set[str]:
+    metadata = _rule_metadata(rule)
+    members = metadata.get("members")
+    out: set[str] = set()
+    if not isinstance(members, list):
+        return out
+    for item in members:
+        if isinstance(item, dict):
+            country = item.get("country")
+            if isinstance(country, str) and country.strip():
+                out.add(country.strip().lower())
+        elif isinstance(item, str) and item.strip():
+            out.add(item.strip().lower())
+    return out
+
+
+def _compose_fta_answer(query: str, rules: Sequence[RetrievedRule], partial_coverage: bool) -> str:
+    agreement = extract_fta_agreement(query)
+    mentioned_countries = extract_countries(query)
+    scope_rule = _find_fta_scope_rule(rules, agreement)
+    origin_rule = next((rule for rule in rules if "origin" in f"{rule.title} {rule.reference}".lower()), None)
+    proof_rule = next(
+        (
+            rule
+            for rule in rules
+            if any(token in f"{rule.title} {rule.reference} {rule.excerpt}".lower() for token in ("certificate of origin", "declaration of origin", "coo"))
+        ),
+        None,
+    )
+
+    if scope_rule is None:
+        return _compose_generic_grounded_answer(rules, partial_coverage=partial_coverage)
+
+    member_countries = _fta_member_countries(scope_rule)
+    non_member_countries = sorted(country for country in mentioned_countries if member_countries and country not in member_countries)
+    lines: List[str] = []
+
+    if non_member_countries and agreement:
+        country_name = non_member_countries[0].title()
+        lines.append(
+            f"On the retrieved {agreement.upper()} scope rule, the answer is no for {country_name} as stated: [{scope_rule.rulebook} {scope_rule.reference}] does not list {country_name} as an {agreement.upper()} member, so goods exported from {country_name} do not qualify for {agreement.upper()} preferential treatment on that basis alone."
+        )
+    else:
+        lines.append("The retrieved rules support the agreement scope and origin framework, but eligibility still depends on the origin rule and proof for the specific product.")
+
+    lines.append("What the retrieved rules clearly say:")
+    lines.append(f"- Agreement scope: [{scope_rule.rulebook} {scope_rule.reference}] {_first_sentence(scope_rule.excerpt)}")
+    if origin_rule is not None:
+        lines.append(f"- Origin rule: [{origin_rule.rulebook} {origin_rule.reference}] {_first_sentence(origin_rule.excerpt)}")
+    if proof_rule is not None:
+        lines.append(f"- Proof requirement: [{proof_rule.rulebook} {proof_rule.reference}] {_first_sentence(proof_rule.excerpt)}")
+
+    dependency_parts: List[str] = []
+    if non_member_countries:
+        dependency_parts.append("whether you meant another FTA, another production country, or processing in a qualifying member state")
+    else:
+        dependency_parts.append("the product-specific rule for the garment HS code")
+        dependency_parts.append("where the fabric, yarn, and processing steps originate")
+    if proof_rule is not None:
+        dependency_parts.append("whether the required proof of origin can be issued correctly")
+
+    if dependency_parts:
+        lines.append("What still depends on your transaction: " + "; ".join(dependency_parts) + ".")
+    elif partial_coverage:
+        lines.append("What still depends on your transaction: the retrieved rules only cover part of the agreement analysis.")
+
+    return "\n\n".join(lines).strip()
+
+
+def _compose_generic_grounded_answer(rules: Sequence[RetrievedRule], partial_coverage: bool = False) -> str:
+    top = rules[:3]
+    lead_rule = top[0]
+    lead_summary = _first_sentence(lead_rule.excerpt) or "Relevant guidance is available in this rule."
+    lines: List[str] = []
+    lines.append(f"Based on the retrieved rules, the clearest supported point is [{lead_rule.rulebook} {lead_rule.reference}] {lead_summary}")
+    lines.append("What the retrieved rules clearly say:")
+    for rule in top:
+        ref = f"{rule.rulebook} {rule.reference}".strip()
+        excerpt = _first_sentence(rule.excerpt) or "Relevant guidance is available in this rule."
+        lines.append(f"- [{ref}] {excerpt}")
+    if partial_coverage:
+        lines.append("What still depends on your transaction: the retrieved rules only cover part of the question, so I would not treat this as complete coverage.")
+    return "\n\n".join(lines).strip()
+
+
 def _normalize_citation_token(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", (value or "").lower()).strip()
 
@@ -236,22 +350,13 @@ def compose_grounded_answer(query: str, rules: Sequence[RetrievedRule], partial_
             "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
         )
 
+    if extract_fta_agreement(query):
+        return _compose_fta_answer(query, rules, partial_coverage)
+
     if requires_document_breadth(query):
         return _compose_document_breadth_answer(query, rules, partial_coverage)
 
-    top = rules[:3]
-    lines: List[str] = []
-    lead_rule = top[0]
-    lead_summary = _first_sentence(lead_rule.excerpt) or "Relevant guidance is available in this rule."
-    lines.append(f"Based on the retrieved rules, the clearest supported point is [{lead_rule.rulebook} {lead_rule.reference}] {lead_summary}")
-    lines.append("What the retrieved rules clearly say:")
-    for rule in top:
-        ref = f"{rule.rulebook} {rule.reference}".strip()
-        excerpt = _first_sentence(rule.excerpt) or "Relevant guidance is available in this rule."
-        lines.append(f"- [{ref}] {excerpt}")
-    if partial_coverage:
-        lines.append("What still depends on your transaction: the retrieved rules only cover part of the question, so I would not treat this as complete coverage.")
-    return "\n\n".join(lines).strip()
+    return _compose_generic_grounded_answer(rules, partial_coverage=partial_coverage)
 
 
 def _strip_markdown(answer: str) -> str:
@@ -521,15 +626,15 @@ class AnswerGenerator:
             ]
         if classifier.domain == "fta":
             return [
-                "Which product and origin criterion are you working with?",
-                "Do you want the proof-of-origin document checklist?",
-                "Should I compare this FTA route with another market option?",
+                "Which country pair and HS classification are you testing under this FTA?",
+                "Do you want the proof-of-origin and document checklist?",
+                "Should I separate agreement scope from product-specific origin rules?",
             ]
         if _rule_cta_trigger(query):
             return [
                 "Do you want the discrepancy points mapped article by article?",
                 "Should I translate this into likely bank examination points?",
-                "Do you need document-level validation in LCopilot?",
+                "Do you want the document-level issues separated from the rule explanation?",
             ]
         if classifier.domain == "icc":
             return [

@@ -13,31 +13,12 @@ from .query_intent import has_partial_coverage_language, requires_document_bread
 from .retriever import RuleRetriever
 
 
-OUT_OF_SCOPE_MESSAGE = (
-    "I specialize in trade finance compliance rules. For that you'll need a different resource."
-)
+OUT_OF_SCOPE_MESSAGE = "I specialize in trade finance compliance rules. That question sits outside this product's scope."
 
 NO_RULE_MESSAGE = (
     "I don't have a specific rule covering that. Here's what related rules say: "
     "no closely matching rule was found in the current ruleset."
 )
-
-
-def _query_needs_trdr_cta(query: str) -> bool:
-    lowered = query.lower()
-    return any(
-        marker in lowered
-        for marker in (
-            "discrepanc",
-            "lc discrepanc",
-            "document validation",
-            "review my lc",
-            "is this lc compliant",
-            "validate document",
-        )
-    )
-
-
 def _query_needs_lcopilot_redirect(query: str) -> bool:
     lowered = query.lower()
     return any(
@@ -148,17 +129,17 @@ class RAGPipeline:
             latency_ms = int((time.perf_counter() - start_total) * 1000)
             return QueryResult(
                 answer=(
-                    "I explain published trade finance rules, but I do not validate actual LC documents here. "
-                    "For document-level compliance checks, use LCopilot on TRDR Hub."
+                    "I explain published trade finance rules here, but I do not validate actual LC documents inside this chat. "
+                    "If you need document-level validation, that requires a separate document-review workflow."
                 ),
                 citations=[],
                 confidence_band="low",
                 suggested_followups=[
                     "Do you want the UCP600/ISBP745 rules to review before validation?",
                     "Which document type are you checking first (BL, invoice, insurance)?",
-                    "Do you want a discrepancy checklist before you run LCopilot?",
+                    "Do you want a discrepancy checklist before you review the documents?",
                 ],
-                show_trdr_cta=True,
+                show_trdr_cta=False,
                 disclaimer=DISCLAIMER_TEXT,
                 classifier_output=classifier_output,
                 retrieved_rule_ids=[],
@@ -221,7 +202,7 @@ class RAGPipeline:
             citations=citations,
             confidence_band=confidence_band,  # type: ignore[arg-type]
             suggested_followups=suggested_followups[:3],
-            show_trdr_cta=_query_needs_trdr_cta(query),
+            show_trdr_cta=False,
             disclaimer=DISCLAIMER_TEXT,
             classifier_output=classifier_output,
             retrieved_rule_ids=[rule.rule_id for rule in retrieved_rules],

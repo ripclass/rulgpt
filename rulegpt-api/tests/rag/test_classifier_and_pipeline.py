@@ -66,7 +66,7 @@ async def test_pipeline_no_rules_graceful_empty_result():
 
 
 @pytest.mark.asyncio
-async def test_pipeline_lc_compliance_query_redirects_to_lcopilot():
+async def test_pipeline_lc_compliance_query_stays_product_neutral():
     pipeline = RAGPipeline(
         classifier=_FakeClassifier(),
         retriever=_FakeRetriever(),
@@ -78,12 +78,13 @@ async def test_pipeline_lc_compliance_query_redirects_to_lcopilot():
         language="en",
     )
     assert "do not validate actual LC documents" in result.answer
-    assert result.show_trdr_cta is True
+    assert "separate document-review workflow" in result.answer
+    assert result.show_trdr_cta is False
     assert result.retrieved_rule_ids == []
 
 
 @pytest.mark.asyncio
-async def test_pipeline_discrepancy_query_sets_trdr_cta():
+async def test_pipeline_discrepancy_query_does_not_show_brand_cta():
     pipeline = RAGPipeline(
         classifier=_FakeClassifier(),
         retriever=_FakeRetriever(),
@@ -94,7 +95,7 @@ async def test_pipeline_discrepancy_query_sets_trdr_cta():
         session=None,
         language="en",
     )
-    assert result.show_trdr_cta is True
+    assert result.show_trdr_cta is False
 
 
 class _PartialCoverageRetriever:

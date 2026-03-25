@@ -69,18 +69,18 @@ export function Home() {
           id: `preview-${crypto.randomUUID()}`,
           queryId: `preview-${Date.now()}`,
           role: 'assistant',
-          text: 'Preview mode is active, so RuleGPT is not calling the live rules engine yet. Once RulHub is connected, this space will return a citation-grounded answer in this same chat flow.',
+          text: 'Preview mode is active, so RuleGPT is showing the chat experience without calling the live rules engine yet. Once the live backend is enabled, this same flow will return citation-grounded answers.',
           createdAt: new Date().toISOString(),
           confidence: 'low',
           citations: [],
-          showTRDRCTA: value.toLowerCase().includes('document') || value.toLowerCase().includes('lc'),
+          showTRDRCTA: false,
           trdrCtaText: null,
           trdrCtaUrl: null,
           disclaimer:
             'Preview mode only. Based on published trade finance rules and standards once the live engine is connected. Not legal advice.',
           suggestedFollowups: [
             'Which rulebook or jurisdiction should this answer search first?',
-            'Do you need a rule explanation or actual document validation?',
+            'Do you need a rule explanation or a document checklist?',
             'Should this answer prioritize ICC rules, sanctions, or customs guidance?',
           ],
           domainTags: [],
@@ -91,9 +91,6 @@ export function Home() {
     }
     const response = await query.submitQuery(value)
     if (!response) return
-    if (response.show_trdr_cta) {
-      toast.message('RuleGPT detected a document-validation use case. TRDR Hub CTA is shown.')
-    }
   }
 
   const openCitation = async (citation: Citation) => {

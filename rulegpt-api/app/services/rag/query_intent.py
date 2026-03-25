@@ -29,6 +29,40 @@ _PARTIAL_COVERAGE_MARKERS = (
     "i can only confirm part",
 )
 
+_COUNTRY_ALIASES: dict[str, tuple[str, ...]] = {
+    "bangladesh": ("bangladesh", "bd"),
+    "australia": ("australia", "au"),
+    "brunei": ("brunei", "bn"),
+    "cambodia": ("cambodia", "kh"),
+    "china": ("china", "cn"),
+    "indonesia": ("indonesia", "id"),
+    "japan": ("japan", "jp"),
+    "south korea": ("south korea", "korea", "kr"),
+    "laos": ("laos", "la"),
+    "malaysia": ("malaysia", "my"),
+    "myanmar": ("myanmar", "mm"),
+    "new zealand": ("new zealand", "nz"),
+    "philippines": ("philippines", "ph"),
+    "singapore": ("singapore", "sg"),
+    "thailand": ("thailand", "th"),
+    "vietnam": ("vietnam", "vn"),
+    "india": ("india", "in"),
+    "uae": ("uae", "united arab emirates", "ae"),
+    "iran": ("iran", "ir"),
+    "russia": ("russia", "ru"),
+    "united states": ("united states", "usa", "us"),
+}
+
+_FTA_AGREEMENT_MARKERS: dict[str, tuple[str, ...]] = {
+    "rcep": ("rcep",),
+    "cptpp": ("cptpp",),
+    "usmca": ("usmca",),
+    "afcfta": ("afcfta",),
+    "mercosur": ("mercosur",),
+    "eu_uk_tca": ("eu-uk", "eu uk", "tca"),
+    "asean_china": ("asean china", "acfta"),
+}
+
 
 def _normalize(value: str) -> str:
     return " ".join((value or "").lower().split())
@@ -45,6 +79,30 @@ def requires_document_breadth(query: str) -> bool:
     if "documents" in lowered and any(token in lowered for token in ("required", "need", "needed", "checklist", "set", "package")):
         return True
     return False
+
+
+def extract_fta_agreement(query: str) -> str | None:
+    lowered = _normalize(query)
+    for agreement, markers in _FTA_AGREEMENT_MARKERS.items():
+        if any(marker in lowered for marker in markers):
+            return agreement
+    return None
+
+
+def extract_countries(query: str) -> set[str]:
+    lowered = f" {_normalize(query)} "
+    found: set[str] = set()
+    for country, aliases in _COUNTRY_ALIASES.items():
+        for alias in aliases:
+            token = alias.lower()
+            if len(token) <= 2:
+                if f" {token} " in lowered:
+                    found.add(country)
+                    break
+            elif token in lowered:
+                found.add(country)
+                break
+    return found
 
 
 def expected_document_families(query: str) -> set[str]:

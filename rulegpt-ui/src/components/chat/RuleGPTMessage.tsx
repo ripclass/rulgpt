@@ -3,7 +3,6 @@ import { CitationChip } from '@/components/chat/CitationChip'
 import { ConfidenceBadge } from '@/components/chat/ConfidenceBadge'
 import { DomainTag } from '@/components/chat/DomainTag'
 import { MessageActions } from '@/components/chat/MessageActions'
-import { TRDRHubCTA } from '@/components/conversion/TRDRHubCTA'
 import type { Citation, Message } from '@/types'
 
 interface RuleGPTMessageProps {
@@ -50,8 +49,6 @@ export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: Ru
             ))}
           </ul>
         ) : null}
-
-        {message.showTRDRCTA ? <TRDRHubCTA text={message.trdrCtaText} url={message.trdrCtaUrl} /> : null}
 
         <MessageActions
           canSave={canSave}

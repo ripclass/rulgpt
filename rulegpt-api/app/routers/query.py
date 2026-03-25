@@ -14,14 +14,7 @@ from app.config import settings
 from app.database import get_db
 from app.models.query import RuleGPTQuery
 from app.models.session import RuleGPTSession
-from app.schemas.query import (
-    DISCLAIMER_TEXT,
-    TRDR_CTA_TEXT,
-    TRDR_CTA_URL,
-    CitationItem,
-    QueryRequest,
-    QueryResponse,
-)
+from app.schemas.query import DISCLAIMER_TEXT, CitationItem, QueryRequest, QueryResponse
 
 router = APIRouter(prefix="/api", tags=["query"])
 
@@ -86,20 +79,6 @@ def _anonymous_queries_this_month(db: Session, session_id) -> int:
         )
     )
     return int(total or 0)
-
-
-def _should_show_trdr_cta(query_text: str, current_count: int) -> bool:
-    text = query_text.lower()
-    trigger_terms = [
-        "discrepanc",
-        "document validation",
-        "validate document",
-        "review lc",
-        "lc compliant",
-    ]
-    if any(term in text for term in trigger_terms):
-        return True
-    return current_count >= 5
 
 
 async def _maybe_await(result):
@@ -195,9 +174,7 @@ async def process_query_request(
     ]
 
     session_obj.query_count += 1
-    show_trdr_cta = bool((rag or {}).get("show_trdr_cta"))
-    if not show_trdr_cta:
-        show_trdr_cta = _should_show_trdr_cta(payload.query, session_obj.query_count)
+    show_trdr_cta = False
 
     elapsed_ms = int((_utc_now() - started).total_seconds() * 1000)
     query_row = RuleGPTQuery(
@@ -236,8 +213,8 @@ async def process_query_request(
         confidence_band=query_row.confidence_band,  # type: ignore[arg-type]
         suggested_followups=query_row.suggested_followups or [],
         show_trdr_cta=query_row.show_trdr_cta,
-        trdr_cta_text=TRDR_CTA_TEXT if query_row.show_trdr_cta else None,
-        trdr_cta_url=TRDR_CTA_URL if query_row.show_trdr_cta else None,
+        trdr_cta_text=None,
+        trdr_cta_url=None,
         disclaimer=DISCLAIMER_TEXT,
         queries_remaining=queries_remaining,
         tier=tier,  # type: ignore[arg-type]
