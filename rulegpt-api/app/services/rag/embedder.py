@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from contextlib import nullcontext
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
@@ -90,6 +91,16 @@ async def _maybe_await(value: Any) -> Any:
     if hasattr(value, "__await__"):
         return await value
     return value
+
+
+def _maybe_nested_transaction(session: Any):
+    begin_nested = getattr(session, "begin_nested", None)
+    if begin_nested is None:
+        return nullcontext()
+    try:
+        return begin_nested()
+    except Exception:
+        return nullcontext()
 
 
 def _safe_json(value: Any) -> str:
@@ -518,11 +529,15 @@ class RuleEmbedder:
         report = EmbeddingSyncReport()
         await self._ensure_pgvector_enabled(session)
 
-        rule_list = list(rules) if rules is not None else await self.collect_rules(
+        loaded_rules = list(rules) if rules is not None else await self.collect_rules(
             include_api=include_api,
             include_local=include_local,
             local_data_path=local_data_path,
         )
+        deduped_rules: Dict[str, NormalizedRule] = {}
+        for rule in loaded_rules:
+            deduped_rules.setdefault(rule.rule_id, rule)
+        rule_list = list(deduped_rules.values())
         report.processed = len(rule_list)
         if not rule_list:
             return report
@@ -532,7 +547,11 @@ class RuleEmbedder:
         pending: List[Tuple[NormalizedRule, str]] = []
         for rule in rule_list:
             try:
-                rule_action = await _maybe_await(self._upsert_rule_record(session, rule))
+                with _maybe_nested_transaction(session):
+                    rule_action = await _maybe_await(self._upsert_rule_record(session, rule))
+                    flush = getattr(session, "flush", None)
+                    if flush is not None:
+                        await _maybe_await(flush())
                 if rule_action == "inserted":
                     report.rules_inserted += 1
                 else:
@@ -559,7 +578,8 @@ class RuleEmbedder:
             for (rule, content), embedding in zip(batch, vectors):
                 payload = _RulePayload(normalized=rule, content=content, embedding=embedding)
                 try:
-                    action = await self._upsert_payload(session, payload)
+                    with _maybe_nested_transaction(session):
+                        action = await self._upsert_payload(session, payload)
                     if action == "inserted":
                         report.embedded += 1
                     else:

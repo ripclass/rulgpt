@@ -191,3 +191,43 @@ async def test_retriever_falls_back_to_semantic_row_when_detail_lookup_is_empty(
     assert result[0].rule_id == "HDFC_LC_REQ_1"
     assert result[0].rulebook == "HDFC Bank"
     assert result[0].title == "HDFC_LC_REQ_1"
+
+
+@pytest.mark.asyncio
+async def test_embed_sync_deduplicates_repeated_rule_ids(monkeypatch):
+    rule = normalize_rule_record(
+        {
+            "rule_id": "UCP600_14D",
+            "source": "UCP600",
+            "reference": "Article 14(d)",
+            "text": "Banks must examine transport documents within five banking days.",
+        },
+        source_hint="icc_core/ucp600.json",
+    )
+    fake_session = _FakeSession()
+    embedder = RuleEmbedder(openai_client=object())
+    seen_rule_ids: list[str] = []
+
+    async def _noop_pgvector(session):
+        return None
+
+    async def _fake_hashes(session):
+        return {}
+
+    async def _fake_embed_texts(texts):
+        return [[0.1] * 1536 for _ in texts]
+
+    async def _fake_upsert_rule_record(session, current_rule):
+        seen_rule_ids.append(current_rule.rule_id)
+        return "inserted"
+
+    monkeypatch.setattr(embedder, "_ensure_pgvector_enabled", _noop_pgvector)
+    monkeypatch.setattr(embedder, "_fetch_existing_hashes", _fake_hashes)
+    monkeypatch.setattr(embedder, "_embed_texts", _fake_embed_texts)
+    monkeypatch.setattr(embedder, "_upsert_rule_record", _fake_upsert_rule_record)
+
+    report = await embedder.sync_embeddings(fake_session, rules=[rule, rule])
+
+    assert report.processed == 1
+    assert seen_rule_ids == ["UCP600_14D"]
+    assert report.embedded == 1
