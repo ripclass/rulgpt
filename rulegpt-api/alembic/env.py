@@ -9,13 +9,15 @@ from sqlalchemy import engine_from_config, pool
 
 from app.config import settings
 from app.database import Base
-from app.models import embedding, feedback, query, saved, session  # noqa: F401
+from app.models import embedding, feedback, query, rule, saved, session  # noqa: F401
 
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# Alembic routes this through configparser, so URL-encoded passwords like `%40`
+# must escape `%` to avoid interpolation errors.
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL.replace("%", "%%"))
 target_metadata = Base.metadata
 
 
@@ -50,4 +52,3 @@ if context.is_offline_mode():
     run_migrations_offline()
 else:
     run_migrations_online()
-
