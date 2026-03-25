@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import uuid
 from contextlib import nullcontext
 from dataclasses import dataclass
 from pathlib import Path
@@ -448,13 +449,14 @@ class RuleEmbedder:
                 text(
                     """
                     INSERT INTO rulegpt_rule_embeddings (
-                        rule_id, rulebook, jurisdiction, document_type, domain, embedding, content_hash, embedded_at
+                        id, rule_id, rulebook, jurisdiction, document_type, domain, embedding, content_hash, embedded_at
                     ) VALUES (
-                        :rule_id, :rulebook, :jurisdiction, :document_type, :domain, CAST(:embedding AS vector), :content_hash, NOW()
+                        :id, :rule_id, :rulebook, :jurisdiction, :document_type, :domain, CAST(:embedding AS vector), :content_hash, NOW()
                     )
                     """
                 ),
                 {
+                    "id": str(uuid.uuid4()),
                     "rule_id": payload.normalized.rule_id,
                     "rulebook": payload.normalized.rulebook,
                     "jurisdiction": payload.normalized.jurisdiction,
