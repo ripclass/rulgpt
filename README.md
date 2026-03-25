@@ -92,6 +92,14 @@ After the backend is deployed and the database is migrated, run the first embedd
 
 See `deploy/initial_embedding_sync.md` for the exact bootstrap command and options for API-only vs local rule files.
 
+For the current DB-first launch path, the simplest local bootstrap command is:
+
+```powershell
+cd rulegpt-api
+$env:RULEGPT_LOCAL_RULES_ROOT="J:\Enso Intelligence\trdrhub.com\Data"
+py scripts\sync_local_rules.py --local-only
+```
+
 ## Launch Checklist
 
 See `deploy/launch_checklist.md` for the short go-live sequence.

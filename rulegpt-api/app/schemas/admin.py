@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from pydantic import BaseModel
 
 
 class EmbedStatusResponse(BaseModel):
     status: str
     detail: str | None = None
+    report: dict[str, Any] | None = None
 
 
 class AnalyticsQueriesResponse(BaseModel):
@@ -27,4 +30,3 @@ class UsageResponse(BaseModel):
     tier: str
     api_queries_used: int
     api_queries_limit: int
-

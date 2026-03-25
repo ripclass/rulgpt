@@ -52,6 +52,7 @@ class Settings(BaseSettings):
 
     RULHUB_API_URL: str = "https://api.rulhub.com"
     RULHUB_API_KEY: str | None = None
+    RULEGPT_LOCAL_RULES_ROOT: str | None = None
 
     STRIPE_SECRET_KEY: str | None = None
     STRIPE_WEBHOOK_SECRET: str | None = None

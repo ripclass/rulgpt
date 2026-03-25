@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence
 from sqlalchemy import text
 
 from .models import ClassifierOutput, RetrievedRule
+from .rule_store import get_rule_details, load_rules_for_retrieval
 
 _COUNTRY_ALIASES: dict[str, tuple[str, ...]] = {
     "bd": ("bangladesh",),
@@ -267,7 +268,19 @@ class RuleRetriever:
             )
         return rows
 
-    async def _fetch_rule_detail(self, rule_id: str) -> Dict[str, Any]:
+    async def _fetch_rule_detail_from_db(self, session: Any, rule_id: str) -> Dict[str, Any]:
+        if session is None:
+            return {}
+        try:
+            detail = get_rule_details(session, rule_id)
+            return detail or {}
+        except Exception:
+            return {}
+
+    async def _fetch_rule_detail(self, session: Any, rule_id: str) -> Dict[str, Any]:
+        detail = await self._fetch_rule_detail_from_db(session, rule_id)
+        if detail:
+            return detail
         client = await self._get_rulhub_client()
         if client is None:
             return {}
@@ -279,71 +292,51 @@ class RuleRetriever:
                 return {}
         return {}
 
-    async def _fallback_retrieve(
+    async def _load_rules_from_db(
         self,
-        query: str,
-        classification: ClassifierOutput,
-        top_k: int,
-    ) -> List[RetrievedRule]:
-        client = await self._get_rulhub_client()
-        if client is None:
+        session: Any,
+        domain: str | None,
+        jurisdiction: str | None,
+        document_type: str | None,
+    ) -> list[dict[str, Any]]:
+        if session is None:
+            return []
+        try:
+            return load_rules_for_retrieval(
+                session,
+                domain=domain,
+                jurisdiction=jurisdiction,
+                document_type=document_type,
+                limit=500,
+            )
+        except Exception:
             return []
 
-        domain = None if classification.domain == "other" else classification.domain
-        jurisdiction = None if classification.jurisdiction == "global" else classification.jurisdiction
-        document_type = None if classification.document_type == "other" else classification.document_type
-        query_countries = _extract_query_countries(query)
-        required_bank = _extract_specific_bank(query)
-        minimum_score = 0.2
-        if query_countries:
-            minimum_score = max(minimum_score, 0.24)
-        if required_bank:
-            minimum_score = max(minimum_score, 0.27)
-
-        if domain is None:
-            filter_attempts = [
-                (None, jurisdiction, document_type),
-                (None, jurisdiction, None),
-                (None, None, document_type),
-                (None, None, None),
-            ]
-        else:
-            # Keep fallback within the classified domain to avoid cross-domain noise.
-            filter_attempts = [
-                (domain, jurisdiction, document_type),
-                (domain, jurisdiction, None),
-                (domain, None, document_type),
-                (domain, None, None),
-            ]
-
-        seen_rule_ids: set[str] = set()
+    def _rank_fallback_candidates(
+        self,
+        query: str,
+        rules: Sequence[Mapping[str, Any]],
+        top_k: int,
+        minimum_score: float,
+        required_bank: str | None,
+        query_countries: set[str],
+    ) -> list[RetrievedRule]:
         candidates: list[tuple[float, Mapping[str, Any]]] = []
-        for attempt_domain, attempt_jurisdiction, attempt_document_type in filter_attempts:
-            try:
-                rules = client.load_rules_from_filesystem(
-                    domain=attempt_domain,
-                    jurisdiction=attempt_jurisdiction,
-                    document_type=attempt_document_type,
-                    limit=None,
-                )
-            except Exception:
-                rules = []
-            for rule in rules:
-                rule_id = str(rule.get("rule_id") or "")
-                if not rule_id or rule_id in seen_rule_ids:
-                    continue
-                seen_rule_ids.add(rule_id)
-                score = _fallback_score(
-                    query=query,
-                    rule=rule,
-                    required_bank=required_bank,
-                    countries=query_countries,
-                )
-                if score < minimum_score:
-                    continue
-                candidates.append((score, rule))
-            if len(candidates) >= top_k:
-                break
+        seen_rule_ids: set[str] = set()
+        for rule in rules:
+            rule_id = str(rule.get("rule_id") or "")
+            if not rule_id or rule_id in seen_rule_ids:
+                continue
+            seen_rule_ids.add(rule_id)
+            score = _fallback_score(
+                query=query,
+                rule=rule,
+                required_bank=required_bank,
+                countries=query_countries,
+            )
+            if score < minimum_score:
+                continue
+            candidates.append((score, rule))
 
         candidates.sort(key=lambda item: item[0], reverse=True)
         if not candidates:
@@ -376,6 +369,83 @@ class RuleRetriever:
                 break
         return out
 
+    async def _fallback_retrieve(
+        self,
+        session: Any,
+        query: str,
+        classification: ClassifierOutput,
+        top_k: int,
+    ) -> List[RetrievedRule]:
+        domain = None if classification.domain == "other" else classification.domain
+        jurisdiction = None if classification.jurisdiction == "global" else classification.jurisdiction
+        document_type = None if classification.document_type == "other" else classification.document_type
+        query_countries = _extract_query_countries(query)
+        required_bank = _extract_specific_bank(query)
+        minimum_score = 0.2
+        if query_countries:
+            minimum_score = max(minimum_score, 0.24)
+        if required_bank:
+            minimum_score = max(minimum_score, 0.27)
+
+        if domain is None:
+            filter_attempts = [
+                (None, jurisdiction, document_type),
+                (None, jurisdiction, None),
+                (None, None, document_type),
+                (None, None, None),
+            ]
+        else:
+            # Keep fallback within the classified domain to avoid cross-domain noise.
+            filter_attempts = [
+                (domain, jurisdiction, document_type),
+                (domain, jurisdiction, None),
+                (domain, None, document_type),
+                (domain, None, None),
+            ]
+
+        client = await self._get_rulhub_client()
+        for attempt_domain, attempt_jurisdiction, attempt_document_type in filter_attempts:
+            db_rules = await self._load_rules_from_db(
+                session=session,
+                domain=attempt_domain,
+                jurisdiction=attempt_jurisdiction,
+                document_type=attempt_document_type,
+            )
+            ranked = self._rank_fallback_candidates(
+                query=query,
+                rules=db_rules,
+                top_k=top_k,
+                minimum_score=minimum_score,
+                required_bank=required_bank,
+                query_countries=query_countries,
+            )
+            if ranked:
+                return ranked
+
+            if client is None:
+                continue
+            try:
+                file_rules = client.load_rules_from_filesystem(
+                    domain=attempt_domain,
+                    jurisdiction=attempt_jurisdiction,
+                    document_type=attempt_document_type,
+                    limit=None,
+                )
+            except Exception:
+                file_rules = []
+            ranked = self._rank_fallback_candidates(
+                query=query,
+                rules=file_rules,
+                top_k=top_k,
+                minimum_score=minimum_score,
+                required_bank=required_bank,
+                query_countries=query_countries,
+            )
+            if ranked:
+                return ranked
+
+        return []
+
     async def retrieve(
         self,
         session: Any,
@@ -396,11 +466,11 @@ class RuleRetriever:
         except Exception:
             rows = []
         if not rows:
-            return await self._fallback_retrieve(query, classification, top_k)
+            return await self._fallback_retrieve(session, query, classification, top_k)
 
         candidates: List[RetrievedRule] = []
         for row in rows:
-            detail = await self._fetch_rule_detail(row["rule_id"])
+            detail = await self._fetch_rule_detail(session, row["rule_id"])
             reference = str(detail.get("reference") or detail.get("article") or "n/a")
             title = str(detail.get("title") or row["rule_id"])
             excerpt = str(detail.get("text") or detail.get("description") or "")
@@ -425,5 +495,5 @@ class RuleRetriever:
 
         candidates.sort(key=lambda item: item.rerank_score, reverse=True)
         if not candidates:
-            return await self._fallback_retrieve(query, classification, top_k)
+            return await self._fallback_retrieve(session, query, classification, top_k)
         return candidates[:top_k]

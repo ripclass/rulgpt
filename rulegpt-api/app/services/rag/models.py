@@ -81,9 +81,10 @@ class QueryResult(BaseModel):
 
 class EmbeddingSyncReport(BaseModel):
     processed: int = 0
+    rules_inserted: int = 0
+    rules_updated: int = 0
     embedded: int = 0
     updated: int = 0
     skipped_unchanged: int = 0
     failed: int = 0
     errors: List[str] = Field(default_factory=list)
-

@@ -108,14 +108,14 @@ async def _maybe_await(result):
     return result
 
 
-async def _call_rag_pipeline(query_text: str, session_obj: RuleGPTSession, language: str) -> dict | None:
+async def _call_rag_pipeline(query_text: str, db_session: Session, language: str) -> dict | None:
     try:
         from app.services.rag.pipeline import process_query
     except Exception:
         return None
 
     try:
-        raw = await _maybe_await(process_query(query=query_text, session=session_obj, language=language))
+        raw = await _maybe_await(process_query(query=query_text, session=db_session, language=language))
     except Exception:
         return None
 
@@ -171,7 +171,7 @@ async def process_query_request(
             )
 
     started = _utc_now()
-    rag = await _call_rag_pipeline(payload.query, session_obj, payload.language)
+    rag = await _call_rag_pipeline(payload.query, db, payload.language)
     citations = _coerce_citations((rag or {}).get("citations"))
 
     answer = (rag or {}).get("answer")

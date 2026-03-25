@@ -11,9 +11,14 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 from sqlalchemy import text
 
-from .models import EmbeddingSyncReport, NormalizedRule
+from app.config import settings
 
-DEFAULT_RULE_DATA_PATH = Path(r"J:\Enso Intelligence\trdrhub.com\Data")
+from .models import EmbeddingSyncReport, NormalizedRule
+from .rule_store import upsert_rule_record
+
+DEFAULT_RULE_DATA_PATH = Path(
+    settings.RULEGPT_LOCAL_RULES_ROOT or r"J:\Enso Intelligence\trdrhub.com\Data"
+)
 
 _CANONICAL_RULE_KEYS = {
     "id",
@@ -248,6 +253,8 @@ def normalize_rule_record(record: Dict[str, Any], source_hint: Optional[str] = N
     for key in ("members", "origin_criteria", "calculation", "bank_name", "swift_code", "trade_finance_characteristics"):
         if key in record and key not in metadata:
             metadata[key] = record[key]
+    if source_hint and "source_hint" not in metadata:
+        metadata["source_hint"] = source_hint
 
     canonical_for_hash = {
         "rule_id": rule_id,
@@ -391,6 +398,9 @@ class RuleEmbedder:
         )
         return {str(row.rule_id): str(row.content_hash) for row in result.fetchall()}
 
+    async def _upsert_rule_record(self, session: Any, rule: NormalizedRule) -> str:
+        return upsert_rule_record(session, rule)
+
     async def _upsert_payload(self, session: Any, payload: _RulePayload) -> str:
         embedding_literal = "[" + ",".join(f"{x:.8f}" for x in payload.embedding) + "]"
         update_result = await _maybe_await(
@@ -521,6 +531,16 @@ class RuleEmbedder:
 
         pending: List[Tuple[NormalizedRule, str]] = []
         for rule in rule_list:
+            try:
+                rule_action = await _maybe_await(self._upsert_rule_record(session, rule))
+                if rule_action == "inserted":
+                    report.rules_inserted += 1
+                else:
+                    report.rules_updated += 1
+            except Exception as exc:
+                report.failed += 1
+                report.errors.append(f"{rule.rule_id} rule record sync failed: {exc}")
+                continue
             if existing_hashes.get(rule.rule_id) == rule.content_hash:
                 report.skipped_unchanged += 1
                 continue

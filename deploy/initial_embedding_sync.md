@@ -38,27 +38,15 @@ Use this only if the backend environment has a mounted rule file tree and `RULEG
 ```powershell
 cd rulegpt-api
 $env:RULEGPT_LOCAL_RULES_ROOT="D:\path\to\rules"
-@'
-import asyncio
-from app.database import SessionLocal
-from app.services.rag.embedder import RuleEmbedder
+py scripts\sync_local_rules.py --local-only
+```
 
+If you also want to merge any available RulHub API rules during the same run:
 
-async def main() -> None:
-    db = SessionLocal()
-    try:
-        report = await RuleEmbedder().sync_embeddings(
-            db,
-            include_api=False,
-            include_local=True,
-        )
-        print(report.model_dump_json(indent=2))
-    finally:
-        db.close()
-
-
-asyncio.run(main())
-'@ | python -
+```powershell
+cd rulegpt-api
+$env:RULEGPT_LOCAL_RULES_ROOT="D:\path\to\rules"
+py scripts\sync_local_rules.py --include-api
 ```
 
 If the report shows `failed > 0`, resolve the missing API keys or pgvector setup before retrying.

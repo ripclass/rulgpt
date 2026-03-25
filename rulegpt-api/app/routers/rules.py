@@ -2,16 +2,23 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
+from app.database import get_db
 from app.schemas.query import RuleDetailsResponse
+from app.services.rag.rule_store import get_rule_details
 
 router = APIRouter(prefix="/api", tags=["rules"])
 
 
 @router.get("/rules/{rule_id}", response_model=RuleDetailsResponse)
-async def get_rule(rule_id: str) -> RuleDetailsResponse:
-    # Prefer integration client if available.
+async def get_rule(rule_id: str, db: Session = Depends(get_db)) -> RuleDetailsResponse:
+    db_rule = get_rule_details(db, rule_id)
+    if db_rule is not None:
+        return RuleDetailsResponse.model_validate(db_rule)
+
+    # Fallback to integration client if available.
     try:
         from app.services.integrations.rulhub_client import get_rulhub_client
 
