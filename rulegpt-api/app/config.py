@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     RULEGPT_COMPLEX_MODEL: str = "claude-sonnet-4-6"
 
     OPENAI_API_KEY: str | None = None
+    OPENROUTER_API_KEY: str | None = None
+    OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
+    OPENROUTER_HTTP_REFERER: str | None = None
+    OPENROUTER_APP_TITLE: str | None = None
     RULEGPT_EMBEDDING_MODEL: str = "text-embedding-3-small"
     RULEGPT_FALLBACK_MODEL: str = "gpt-4.1"
 

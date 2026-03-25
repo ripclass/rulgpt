@@ -21,6 +21,14 @@ except ImportError:  # pragma: no cover - dependency may not exist in all enviro
     RateLimitError = Exception  # type: ignore
     AsyncOpenAI = None  # type: ignore
 
+from .openrouter import (
+    build_openrouter_headers,
+    get_openrouter_api_key,
+    get_openrouter_base_url,
+    is_openrouter_enabled,
+    normalize_openrouter_model,
+)
+
 
 class OpenAIClientError(RuntimeError):
     """Raised for OpenAI client errors."""
@@ -39,7 +47,12 @@ class OpenAIClient:
         backoff_seconds: float = 0.5,
         client: Any | None = None,
     ) -> None:
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        self.use_openrouter = is_openrouter_enabled()
+        self.api_key = api_key or (
+            get_openrouter_api_key() if self.use_openrouter else os.getenv("OPENAI_API_KEY")
+        )
+        self.base_url = get_openrouter_base_url() if self.use_openrouter else None
+        self.default_headers = build_openrouter_headers() if self.use_openrouter else {}
         self.embedding_model = embedding_model or os.getenv("RULEGPT_EMBEDDING_MODEL", "text-embedding-3-small")
         self.fallback_model = fallback_model or os.getenv("RULEGPT_FALLBACK_MODEL", "gpt-4.1")
         self.timeout_seconds = timeout_seconds
@@ -52,6 +65,8 @@ class OpenAIClient:
             return []
         openai_client = self._get_or_create_client()
         target_model = model or self.embedding_model
+        if self.use_openrouter:
+            target_model = normalize_openrouter_model(target_model, purpose="embedding")
 
         async def _op() -> Any:
             return await openai_client.embeddings.create(model=target_model, input=list(texts))
@@ -78,6 +93,8 @@ class OpenAIClient:
     ) -> str:
         openai_client = self._get_or_create_client()
         target_model = model or self.fallback_model
+        if self.use_openrouter:
+            target_model = normalize_openrouter_model(target_model, purpose="chat")
         messages: list[dict[str, str]] = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
@@ -105,8 +122,18 @@ class OpenAIClient:
         if AsyncOpenAI is None:
             raise OpenAIClientError("openai package is not installed")
         if not self.api_key:
+            if self.use_openrouter:
+                raise OpenAIClientError("OPENROUTER_API_KEY is not configured")
             raise OpenAIClientError("OPENAI_API_KEY is not configured")
-        self._client = AsyncOpenAI(api_key=self.api_key, timeout=self.timeout_seconds)
+        kwargs: dict[str, Any] = {
+            "api_key": self.api_key,
+            "timeout": self.timeout_seconds,
+        }
+        if self.base_url:
+            kwargs["base_url"] = self.base_url
+        if self.default_headers:
+            kwargs["default_headers"] = self.default_headers
+        self._client = AsyncOpenAI(**kwargs)
         return self._client
 
     async def _retry(self, operation: Callable[[], Awaitable[Any]]) -> Any:
@@ -129,4 +156,3 @@ class OpenAIClient:
             status_code = getattr(error, "status_code", None)
             return bool(status_code and (status_code >= 500 or status_code == 429))
         return False
-

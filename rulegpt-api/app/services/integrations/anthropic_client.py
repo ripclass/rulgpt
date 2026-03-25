@@ -6,6 +6,8 @@ import asyncio
 import os
 from typing import Any, Awaitable, Callable
 
+import httpx
+
 try:
     from anthropic import (  # type: ignore
         APIConnectionError,
@@ -20,6 +22,14 @@ except ImportError:  # pragma: no cover - dependency may not exist in all enviro
     APITimeoutError = Exception  # type: ignore
     RateLimitError = Exception  # type: ignore
     AsyncAnthropic = None  # type: ignore
+
+from .openrouter import (
+    build_openrouter_headers,
+    get_openrouter_api_key,
+    get_openrouter_base_url,
+    is_openrouter_enabled,
+    normalize_openrouter_model,
+)
 
 
 class AnthropicClientError(RuntimeError):
@@ -40,7 +50,12 @@ class AnthropicClient:
         backoff_seconds: float = 0.5,
         client: Any | None = None,
     ) -> None:
-        self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
+        self.use_openrouter = is_openrouter_enabled()
+        self.api_key = api_key or (
+            get_openrouter_api_key() if self.use_openrouter else os.getenv("ANTHROPIC_API_KEY")
+        )
+        self.openrouter_base_url = get_openrouter_base_url() if self.use_openrouter else None
+        self.openrouter_headers = build_openrouter_headers() if self.use_openrouter else {}
         self.classifier_model = classifier_model or os.getenv("RULEGPT_CLASSIFIER_MODEL", "claude-haiku-4-5-20251001")
         self.generator_model = generator_model or os.getenv("RULEGPT_GENERATOR_MODEL", "claude-sonnet-4-6")
         self.complex_model = complex_model or os.getenv("RULEGPT_COMPLEX_MODEL", "claude-sonnet-4-6")
@@ -65,6 +80,8 @@ class AnthropicClient:
             max_tokens=max_tokens,
             temperature=temperature,
         )
+        if isinstance(response, str):
+            return response
         return _extract_text(response)
 
     async def generate_answer(
@@ -85,6 +102,8 @@ class AnthropicClient:
             max_tokens=token_budget,
             temperature=temperature,
         )
+        if isinstance(response, str):
+            return response
         return _extract_text(response)
 
     async def _messages_create(
@@ -95,6 +114,14 @@ class AnthropicClient:
         max_tokens: int,
         temperature: float,
     ) -> Any:
+        if self.use_openrouter:
+            return await self._openrouter_messages_create(
+                model=model,
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                max_tokens=max_tokens,
+                temperature=temperature,
+            )
         client = self._get_or_create_client()
 
         async def _op() -> Any:
@@ -107,6 +134,54 @@ class AnthropicClient:
             )
 
         return await self._retry(_op)
+
+    async def _openrouter_messages_create(
+        self,
+        model: str,
+        system_prompt: str,
+        user_prompt: str,
+        max_tokens: int,
+        temperature: float,
+    ) -> str:
+        if not self.api_key:
+            raise AnthropicClientError("OPENROUTER_API_KEY is not configured")
+        endpoint = f"{self.openrouter_base_url}/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+            **self.openrouter_headers,
+        }
+        payload = {
+            "model": normalize_openrouter_model(model, purpose="chat"),
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+        }
+
+        async def _op() -> str:
+            async with httpx.AsyncClient(timeout=self.timeout_seconds) as client:
+                response = await client.post(endpoint, headers=headers, json=payload)
+                response.raise_for_status()
+                data = response.json()
+            choices = data.get("choices") if isinstance(data, dict) else None
+            if not isinstance(choices, list) or not choices:
+                return ""
+            message = choices[0].get("message") if isinstance(choices[0], dict) else None
+            content = message.get("content") if isinstance(message, dict) else ""
+            if isinstance(content, str):
+                return content
+            if isinstance(content, list):
+                parts: list[str] = []
+                for item in content:
+                    if isinstance(item, dict) and item.get("type") == "text" and item.get("text"):
+                        parts.append(str(item["text"]))
+                return "\n".join(parts).strip()
+            return ""
+
+        return await self._retry_openrouter(_op)
 
     def _get_or_create_client(self) -> Any:
         if self._client is not None:
@@ -132,6 +207,28 @@ class AnthropicClient:
                 await asyncio.sleep(self.backoff_seconds * (2 ** (attempt - 1)))
         raise AnthropicClientError(f"Anthropic request failed: {last_error}") from last_error
 
+    async def _retry_openrouter(self, operation: Callable[[], Awaitable[str]]) -> str:
+        last_error: Exception | None = None
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                return await operation()
+            except Exception as exc:
+                if not self._should_retry_openrouter(exc) or attempt >= self.max_retries:
+                    raise AnthropicClientError(
+                        f"OpenRouter request failed after {attempt} attempt(s): {exc}"
+                    ) from exc
+                last_error = exc
+                await asyncio.sleep(self.backoff_seconds * (2 ** (attempt - 1)))
+        raise AnthropicClientError(f"OpenRouter request failed: {last_error}") from last_error
+
+    @staticmethod
+    def _should_retry_openrouter(error: Exception) -> bool:
+        if isinstance(error, (httpx.TimeoutException, httpx.TransportError)):
+            return True
+        if isinstance(error, httpx.HTTPStatusError):
+            return error.response.status_code >= 500 or error.response.status_code == 429
+        return False
+
     @staticmethod
     def _should_retry(error: Exception) -> bool:
         if isinstance(error, (RateLimitError, APIConnectionError, APITimeoutError)):
@@ -150,4 +247,3 @@ def _extract_text(response: Any) -> str:
             if text:
                 parts.append(text)
     return "\n".join(parts).strip()
-

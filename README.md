@@ -60,6 +60,10 @@ Set or confirm these secret environment variables in Render:
 
 - `DATABASE_URL`
 - `SECRET_KEY`
+- `OPENROUTER_API_KEY`
+- `OPENROUTER_BASE_URL`
+- `OPENROUTER_HTTP_REFERER`
+- `OPENROUTER_APP_TITLE`
 - `OPENAI_API_KEY`
 - `ANTHROPIC_API_KEY`
 - `SUPABASE_URL`
@@ -72,6 +76,16 @@ Set or confirm these secret environment variables in Render:
 - `STRIPE_PRO_ANNUAL_PRICE_ID`
 
 Set `CORS_ORIGINS` to include the exact Vercel URL for the frontend instead of the placeholder value in the blueprint.
+
+If `OPENROUTER_API_KEY` is set, the backend prefers OpenRouter for Claude, GPT, and embedding calls. In that mode:
+
+- `RULEGPT_CLASSIFIER_MODEL` should be an OpenRouter Claude slug such as `anthropic/claude-haiku-4.5`
+- `RULEGPT_GENERATOR_MODEL` should be `anthropic/claude-sonnet-4.6`
+- `RULEGPT_COMPLEX_MODEL` should be `anthropic/claude-sonnet-4.6`
+- `RULEGPT_FALLBACK_MODEL` should be `openai/gpt-4.1`
+- `RULEGPT_EMBEDDING_MODEL` should be `openai/text-embedding-3-small`
+
+The integration layer also normalizes the older local defaults (`claude-sonnet-4-6`, `gpt-4.1`, `text-embedding-3-small`) if you leave them unchanged.
 
 ### Vercel frontend
 
