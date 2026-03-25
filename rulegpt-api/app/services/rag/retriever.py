@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence
 from sqlalchemy import text
 
 from .models import ClassifierOutput, RetrievedRule
+from .query_intent import expected_document_families, requires_document_breadth
 from .rule_store import get_rule_details, load_rules_for_retrieval
 
 _COUNTRY_ALIASES: dict[str, tuple[str, ...]] = {
@@ -80,6 +81,19 @@ def _candidate_text(rule: Mapping[str, Any]) -> str:
     return " ".join(part for part in parts if part).strip()
 
 
+def _rule_family_from_text(value: str) -> str:
+    lowered = value.lower()
+    if "insurance" in lowered or "policy" in lowered:
+        return "insurance"
+    if "invoice" in lowered:
+        return "invoice"
+    if "bill of lading" in lowered or "transport document" in lowered or "b/l" in lowered:
+        return "transport"
+    if "discrep" in lowered:
+        return "discrepancy"
+    return "general"
+
+
 def _extract_query_countries(query: str) -> set[str]:
     lowered = query.lower()
     codes: set[str] = set()
@@ -137,6 +151,7 @@ def _fallback_score(
     rule: Mapping[str, Any],
     required_bank: str | None = None,
     countries: set[str] | None = None,
+    document_breadth: bool = False,
 ) -> float:
     combined = _candidate_text(rule)
     title = str(rule.get("title") or "")
@@ -170,6 +185,10 @@ def _fallback_score(
             score += 0.08
         elif jurisdiction in {"global", "regional"}:
             score *= 0.9
+    if document_breadth:
+        family = _rule_family_from_text(combined)
+        if family in expected_document_families(query):
+            score += 0.12
     return min(score, 1.0)
 
 
@@ -320,6 +339,7 @@ class RuleRetriever:
         minimum_score: float,
         required_bank: str | None,
         query_countries: set[str],
+        document_breadth: bool,
     ) -> list[RetrievedRule]:
         candidates: list[tuple[float, Mapping[str, Any]]] = []
         seen_rule_ids: set[str] = set()
@@ -333,6 +353,7 @@ class RuleRetriever:
                 rule=rule,
                 required_bank=required_bank,
                 countries=query_countries,
+                document_breadth=document_breadth,
             )
             if score < minimum_score:
                 continue
@@ -375,10 +396,15 @@ class RuleRetriever:
         query: str,
         classification: ClassifierOutput,
         top_k: int,
+        document_type_override: str | None = None,
     ) -> List[RetrievedRule]:
         domain = None if classification.domain == "other" else classification.domain
         jurisdiction = None if classification.jurisdiction == "global" else classification.jurisdiction
-        document_type = None if classification.document_type == "other" else classification.document_type
+        document_breadth = requires_document_breadth(query)
+        if document_type_override is not None:
+            document_type = document_type_override
+        else:
+            document_type = None if classification.document_type == "other" or document_breadth else classification.document_type
         query_countries = _extract_query_countries(query)
         required_bank = _extract_specific_bank(query)
         minimum_score = 0.2
@@ -386,6 +412,8 @@ class RuleRetriever:
             minimum_score = max(minimum_score, 0.24)
         if required_bank:
             minimum_score = max(minimum_score, 0.27)
+        if document_breadth:
+            minimum_score = max(minimum_score, 0.18)
 
         if domain is None:
             filter_attempts = [
@@ -418,6 +446,7 @@ class RuleRetriever:
                 minimum_score=minimum_score,
                 required_bank=required_bank,
                 query_countries=query_countries,
+                document_breadth=document_breadth,
             )
             if ranked:
                 return ranked
@@ -440,11 +469,40 @@ class RuleRetriever:
                 minimum_score=minimum_score,
                 required_bank=required_bank,
                 query_countries=query_countries,
+                document_breadth=document_breadth,
             )
             if ranked:
                 return ranked
 
         return []
+
+    @staticmethod
+    def _rule_family(rule: RetrievedRule) -> str:
+        return _rule_family_from_text(f"{rule.title} {rule.reference} {rule.excerpt}")
+
+    def _select_results(self, candidates: Sequence[RetrievedRule], top_k: int, document_breadth: bool) -> List[RetrievedRule]:
+        if not document_breadth:
+            return list(candidates[:top_k])
+
+        selected: List[RetrievedRule] = []
+        seen_rule_ids: set[str] = set()
+        family_limits = (1, 2, 99)
+        family_counts: dict[str, int] = {}
+
+        for limit in family_limits:
+            for candidate in candidates:
+                if candidate.rule_id in seen_rule_ids:
+                    continue
+                family = self._rule_family(candidate)
+                if family_counts.get(family, 0) >= limit:
+                    continue
+                selected.append(candidate)
+                seen_rule_ids.add(candidate.rule_id)
+                family_counts[family] = family_counts.get(family, 0) + 1
+                if len(selected) >= top_k:
+                    return selected
+
+        return selected
 
     async def retrieve(
         self,
@@ -453,20 +511,37 @@ class RuleRetriever:
         classification: ClassifierOutput,
         top_k: int = 5,
     ) -> List[RetrievedRule]:
+        document_breadth = requires_document_breadth(query)
         top_k = max(3, min(8, top_k))
+        target_top_k = max(top_k, 6) if document_breadth else top_k
+        document_type_filter = None if classification.document_type == "other" or document_breadth else classification.document_type
         rows: List[Dict[str, Any]] = []
         try:
             query_embedding = await self._embed_query(query)
             rows = await self._semantic_search(
                 session,
                 query_embedding,
-                classification,
-                semantic_limit=max(20, top_k * 4),
+                ClassifierOutput(
+                    domain=classification.domain,
+                    jurisdiction=classification.jurisdiction,
+                    document_type=document_type_filter or "other",
+                    commodity=classification.commodity,
+                    complexity=classification.complexity,
+                    in_scope=classification.in_scope,
+                    reason=classification.reason,
+                ),
+                semantic_limit=max(24, target_top_k * 4),
             )
         except Exception:
             rows = []
         if not rows:
-            return await self._fallback_retrieve(session, query, classification, top_k)
+            return await self._fallback_retrieve(
+                session,
+                query,
+                classification,
+                target_top_k,
+                document_type_override=document_type_filter,
+            )
 
         candidates: List[RetrievedRule] = []
         for row in rows:
@@ -493,7 +568,30 @@ class RuleRetriever:
                 )
             )
 
-        candidates.sort(key=lambda item: item.rerank_score, reverse=True)
-        if not candidates:
-            return await self._fallback_retrieve(session, query, classification, top_k)
-        return candidates[:top_k]
+        supplemental_candidates: List[RetrievedRule] = []
+        if document_breadth or len(candidates) < target_top_k:
+            supplemental_candidates = await self._fallback_retrieve(
+                session,
+                query,
+                classification,
+                target_top_k,
+                document_type_override=document_type_filter,
+            )
+
+        merged_candidates: List[RetrievedRule] = []
+        seen_rule_ids: set[str] = set()
+        for candidate in sorted(candidates + supplemental_candidates, key=lambda item: item.rerank_score, reverse=True):
+            if candidate.rule_id in seen_rule_ids:
+                continue
+            seen_rule_ids.add(candidate.rule_id)
+            merged_candidates.append(candidate)
+
+        if not merged_candidates:
+            return await self._fallback_retrieve(
+                session,
+                query,
+                classification,
+                target_top_k,
+                document_type_override=document_type_filter,
+            )
+        return self._select_results(merged_candidates, target_top_k, document_breadth)

@@ -22,8 +22,21 @@ def build_citations(answer: str, retrieved_rules: Sequence[RetrievedRule], max_i
     Current implementation uses retrieval/rerank confidence and ensures output
     is deterministic and bounded even when generation text is not easily parseable.
     """
+    lowered_answer = (answer or "").lower()
+    mentioned_rules: List[RetrievedRule] = []
+    remaining_rules: List[RetrievedRule] = []
+
+    for rule in retrieved_rules:
+        reference_token = f"[{rule.rulebook} {rule.reference}]".lower()
+        short_token = f"[{rule.reference}]".lower()
+        if reference_token in lowered_answer or short_token in lowered_answer:
+            mentioned_rules.append(rule)
+        else:
+            remaining_rules.append(rule)
+
     citations: List[Citation] = []
-    for rule in retrieved_rules[: max(1, min(max_items, 8))]:
+    ordered_rules = mentioned_rules + remaining_rules
+    for rule in ordered_rules[: max(1, min(max_items, 8))]:
         excerpt = rule.excerpt[:400] if rule.excerpt else ""
         citations.append(
             Citation(
@@ -49,4 +62,3 @@ def validate_citations(citations: Sequence[Citation], retrieved_rules: Sequence[
         if not citation.reference:
             return False
     return True
-

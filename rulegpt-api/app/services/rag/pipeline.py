@@ -9,6 +9,7 @@ from .citations import build_citations, validate_citations
 from .classifier import QueryClassifier
 from .generator import AnswerGenerator, DISCLAIMER_TEXT
 from .models import ClassifierOutput, QueryResult, RetrievedRule
+from .query_intent import has_partial_coverage_language, requires_document_breadth
 from .retriever import RuleRetriever
 
 
@@ -53,13 +54,31 @@ def _query_needs_lcopilot_redirect(query: str) -> bool:
     )
 
 
-def _confidence_from_rules(rules: List[RetrievedRule], citation_count: int) -> str:
+def _confidence_from_rules(
+    query: str,
+    rules: List[RetrievedRule],
+    citation_count: int,
+    partial_coverage: bool,
+    answer: str,
+) -> str:
+    if partial_coverage or has_partial_coverage_language(answer):
+        return "low"
     if not rules or citation_count == 0:
         return "low"
     best = max(rule.rerank_score for rule in rules)
-    if best >= 0.8 and citation_count >= 1:
+    average = sum(rule.rerank_score for rule in rules[: min(3, len(rules))]) / min(3, len(rules))
+    unique_references = len({rule.reference for rule in rules if rule.reference})
+    if requires_document_breadth(query):
+        if unique_references < 2:
+            return "low"
+        if best >= 0.8 and average >= 0.6 and citation_count >= min(3, unique_references):
+            return "high"
+        if best >= 0.6 and average >= 0.45:
+            return "medium"
+        return "low"
+    if best >= 0.8 and average >= 0.6 and citation_count >= 1:
         return "high"
-    if best >= 0.5:
+    if best >= 0.5 and average >= 0.4:
         return "medium"
     return "low"
 
@@ -156,7 +175,7 @@ class RAGPipeline:
                 session=session,
                 query=query,
                 classification=classifier_output,
-                top_k=5,
+                top_k=8 if requires_document_breadth(query) else 5,
             )
         except Exception:
             retrieved_rules = []
@@ -173,9 +192,11 @@ class RAGPipeline:
             )
             answer = str(generation.get("answer", "")).strip() or NO_RULE_MESSAGE
             model_used = str(generation.get("model_used", "fallback"))
+            partial_coverage = bool(generation.get("partial_coverage"))
         else:
             answer = NO_RULE_MESSAGE
             model_used = "fallback"
+            partial_coverage = True
         stage_latency["generator"] = int((time.perf_counter() - start) * 1000)
 
         # Stage 4: citations
@@ -185,7 +206,13 @@ class RAGPipeline:
             citations = []
         stage_latency["citations"] = int((time.perf_counter() - start) * 1000)
 
-        confidence_band = _confidence_from_rules(retrieved_rules, len(citations))
+        confidence_band = _confidence_from_rules(
+            query=query,
+            rules=retrieved_rules,
+            citation_count=len(citations),
+            partial_coverage=partial_coverage,
+            answer=answer,
+        )
         suggested_followups = self.generator.suggested_followups(query, classifier_output)
         latency_ms = int((time.perf_counter() - start_total) * 1000)
 

@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import pytest
 
 from app.services.rag.embedder import RuleEmbedder, build_embedding_content, normalize_rule_record
-from app.services.rag.models import ClassifierOutput
+from app.services.rag.models import ClassifierOutput, RetrievedRule
 from app.services.rag.retriever import RuleRetriever
 
 
@@ -191,6 +191,92 @@ async def test_retriever_falls_back_to_semantic_row_when_detail_lookup_is_empty(
     assert result[0].rule_id == "HDFC_LC_REQ_1"
     assert result[0].rulebook == "HDFC Bank"
     assert result[0].title == "HDFC_LC_REQ_1"
+
+
+@pytest.mark.asyncio
+async def test_retriever_broadens_document_set_queries_and_merges_families(monkeypatch):
+    retriever = RuleRetriever(openai_client=object(), rulhub_client=object())
+
+    async def _fake_embed_query(query: str):
+        return [0.3] * 1536
+
+    async def _fake_semantic_search(session, query_embedding, classification, semantic_limit):
+        assert classification.document_type == "other"
+        return [
+            {
+                "rule_id": "UCP600-28",
+                "rulebook": "UCP600",
+                "domain": "icc",
+                "jurisdiction": "global",
+                "document_type": "other",
+                "distance": 0.11,
+            }
+        ]
+
+    async def _fake_detail(session, rule_id: str):
+        details = {
+            "UCP600-28": {
+                "rule_id": "UCP600-28",
+                "rulebook": "UCP600",
+                "reference": "Article 28",
+                "title": "Insurance Document and Coverage",
+                "text": "Insurance documents must be issued and signed by an insurance company.",
+                "domain": "icc",
+                "jurisdiction": "global",
+                "document_type": "other",
+                "tags": ["icc", "insurance"],
+            }
+        }
+        return details.get(rule_id, {})
+
+    async def _fake_fallback_retrieve(session, query, classification, top_k, document_type_override=None):
+        return [
+            RetrievedRule(
+                rule_id="UCP600-18",
+                rulebook="UCP600",
+                reference="Article 18",
+                title="Commercial Invoice",
+                excerpt="A commercial invoice must appear to have been issued by the beneficiary.",
+                domain="icc",
+                jurisdiction="global",
+                document_type="invoice",
+                similarity_score=0.61,
+                rerank_score=0.61,
+            ),
+            RetrievedRule(
+                rule_id="UCP600-20",
+                rulebook="UCP600",
+                reference="Article 20",
+                title="Bill of Lading",
+                excerpt="A bill of lading must indicate shipment on board the vessel at the port of loading.",
+                domain="icc",
+                jurisdiction="global",
+                document_type="bill_of_lading",
+                similarity_score=0.63,
+                rerank_score=0.63,
+            ),
+        ]
+
+    monkeypatch.setattr(retriever, "_embed_query", _fake_embed_query)
+    monkeypatch.setattr(retriever, "_semantic_search", _fake_semantic_search)
+    monkeypatch.setattr(retriever, "_fetch_rule_detail", _fake_detail)
+    monkeypatch.setattr(retriever, "_fallback_retrieve", _fake_fallback_retrieve)
+
+    result = await retriever.retrieve(
+        session=object(),
+        query="What documents are required for a CIF shipment under UCP600?",
+        classification=ClassifierOutput(
+            domain="icc",
+            jurisdiction="global",
+            document_type="lc",
+            complexity="simple",
+            in_scope=True,
+        ),
+        top_k=5,
+    )
+
+    references = {rule.reference for rule in result}
+    assert {"Article 18", "Article 20", "Article 28"}.issubset(references)
 
 
 @pytest.mark.asyncio
