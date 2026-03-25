@@ -27,6 +27,7 @@ class Settings(BaseSettings):
 
     API_PREFIX: str = "/api"
     CORS_ORIGINS: List[str] = Field(default_factory=lambda: ["http://localhost:5173"])
+    CORS_ORIGIN_REGEX: str | None = r"^https://.*\.vercel\.app$"
 
     FREE_TIER_MONTHLY_LIMIT: int = 10
     PRO_TIER_API_LIMIT: int = 10000

@@ -76,6 +76,7 @@ Set or confirm these secret environment variables in Render:
 - `STRIPE_PRO_ANNUAL_PRICE_ID`
 
 Set `CORS_ORIGINS` to include the exact Vercel URL for the frontend instead of the placeholder value in the blueprint.
+For Vercel preview/production deploys, `CORS_ORIGIN_REGEX=^https://.*\.vercel\.app$` is also supported to avoid preflight failures on changing Vercel hostnames.
 
 If `OPENROUTER_API_KEY` is set, the backend prefers OpenRouter for Claude, GPT, and embedding calls. In that mode:
 
