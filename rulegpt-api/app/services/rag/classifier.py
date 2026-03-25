@@ -10,9 +10,9 @@ from .models import ClassifierOutput
 
 _DOMAIN_KEYWORDS = {
     "icc": ("ucp", "isbp", "isp98", "urdg", "urc", "incoterms", "eucp", "trade finance"),
-    "fta": ("fta", "rcep", "cptpp", "usmca", "rules of origin", "origin criteria", "tariff preference"),
+    "fta": ("fta", "rcep", "cptpp", "usmca", "rules of origin", "origin criteria", "tariff preference", "preferential tariff", "country pair"),
     "sanctions": ("sanction", "ofac", "embargo", "sdn", "restricted party", "eu sanctions", "uk sanctions", "un sanctions"),
-    "customs": ("customs", "import license", "export license", "duty", "clearance", "hs code", "classification"),
+    "customs": ("customs", "import license", "export license", "duty", "clearance", "hs code", "hs classification", "classification"),
     "bank_specific": ("bank requirement", "swift code", "issuing bank", "confirming bank", "hdfc", "hsbc", "citibank"),
 }
 
@@ -141,6 +141,26 @@ def _heuristic_classify(query: str) -> ClassifierOutput:
     )
 
 
+def _reconcile_llm_output(query: str, llm_output: ClassifierOutput) -> ClassifierOutput:
+    heuristic = _heuristic_classify(query)
+
+    if not llm_output.in_scope and heuristic.in_scope and heuristic.domain != "other":
+        heuristic.reason = "heuristic_scope_override"
+        return heuristic
+
+    if llm_output.in_scope and llm_output.domain == "other" and heuristic.domain != "other":
+        llm_output.domain = heuristic.domain
+        if llm_output.document_type == "other" and heuristic.document_type != "other":
+            llm_output.document_type = heuristic.document_type
+        if llm_output.jurisdiction == "global" and heuristic.jurisdiction != "global":
+            llm_output.jurisdiction = heuristic.jurisdiction
+        if llm_output.commodity is None and heuristic.commodity is not None:
+            llm_output.commodity = heuristic.commodity
+        llm_output.reason = "llm_domain_reconciled"
+
+    return llm_output
+
+
 def _parse_classifier_payload(payload: Any) -> Optional[Dict[str, Any]]:
     if isinstance(payload, dict):
         return payload
@@ -214,7 +234,7 @@ class QueryClassifier:
             try:
                 llm_output = await self._classify_with_llm(client, query)
                 if llm_output is not None:
-                    return llm_output
+                    return _reconcile_llm_output(query, llm_output)
             except Exception:
                 pass
         return _heuristic_classify(query)

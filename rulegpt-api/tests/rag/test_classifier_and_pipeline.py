@@ -22,6 +22,22 @@ async def test_classifier_marks_general_tax_filing_out_of_scope():
     assert result.in_scope is False
 
 
+class _OutOfScopeAnthropicClassifier:
+    async def classify(self, query: str, system_prompt: str, max_tokens: int = 256, temperature: float = 0.0):
+        return (
+            '{"domain":"other","jurisdiction":"global","document_type":"other","commodity":null,'
+            '"complexity":"simple","in_scope":false,"reason":"generic"}'
+        )
+
+
+@pytest.mark.asyncio
+async def test_classifier_overrides_llm_out_of_scope_for_trade_followup_question():
+    classifier = QueryClassifier(anthropic_client=_OutOfScopeAnthropicClassifier())
+    result = await classifier.classify("Which country pair and HS classification are you testing under this FTA?")
+    assert result.in_scope is True
+    assert result.domain in {"fta", "customs"}
+
+
 class _FakeClassifier:
     async def classify(self, query: str) -> ClassifierOutput:
         return ClassifierOutput(
