@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { ApiError, api } from '@/lib/api'
+import { track } from '@/lib/analytics'
 import { useAuth } from '@/hooks/useAuth'
 import type { BillingInterval } from '@/types'
 
@@ -29,6 +30,12 @@ export function Upgrade() {
   }, [])
 
   const startCheckout = async () => {
+    track('upgrade_checkout_attempted', {
+      interval: billingInterval,
+      authenticated: auth.isAuthenticated,
+      checkout_ready: billingStatus.data?.checkout_ready ?? false,
+    })
+
     if (!auth.isAuthenticated || !hasBearerToken) {
       setCheckoutMessage('Sign in with Supabase to use the hosted checkout flow.')
       return

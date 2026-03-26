@@ -10,6 +10,7 @@ import { CitationPanel } from '@/components/chat/CitationPanel'
 import { LoginModal } from '@/components/auth/LoginModal'
 import { SignupModal } from '@/components/auth/SignupModal'
 import { api } from '@/lib/api'
+import { track } from '@/lib/analytics'
 import { useAuth } from '@/hooks/useAuth'
 import { useQuery } from '@/hooks/useQuery'
 import { useSession } from '@/hooks/useSession'
@@ -148,6 +149,13 @@ export function Home() {
   }
 
   const submitQuery = async (value: string) => {
+    track('chat_query_submitted', {
+      preview_mode: previewMode,
+      authenticated: auth.isAuthenticated,
+      tier: auth.tier,
+      length: value.length,
+    })
+
     if (previewMode) {
       const createdAt = new Date().toISOString()
       const previewQueryId = `preview-${Date.now()}`
@@ -257,6 +265,10 @@ export function Home() {
   }
 
   const openHistoryItem = (item: HistoryItem) => {
+    track('chat_history_opened', {
+      query_id: item.query_id,
+      created_at: item.created_at,
+    })
     query.setMessages(buildHistoryMessages(item))
   }
 

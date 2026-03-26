@@ -19,7 +19,7 @@ from app.exceptions import (
 )
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.middleware.tier_check import TierCheckMiddleware
-from app.routers import admin, api_access, billing, export, feedback, history, query, rules, saved, suggestions
+from app.routers import admin, api_access, billing, export, feedback, history, query, rules, saved, suggestions, telemetry
 
 
 @asynccontextmanager
@@ -67,6 +67,7 @@ app.include_router(api_access.router)
 app.include_router(billing.router)
 app.include_router(admin.router)
 app.include_router(feedback.router)
+app.include_router(telemetry.router)
 
 
 @app.get("/health")

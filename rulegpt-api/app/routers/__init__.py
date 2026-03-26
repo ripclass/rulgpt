@@ -11,4 +11,5 @@ __all__ = [
     "rules",
     "saved",
     "suggestions",
+    "telemetry",
 ]

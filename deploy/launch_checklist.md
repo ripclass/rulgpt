@@ -5,6 +5,7 @@
 3. Set backend env vars in Render, especially `DATABASE_URL`, `SECRET_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, and `CORS_ORIGINS`.
 4. Deploy the backend from `render.yaml` and confirm `GET /health` returns `{"status":"ok","service":"rulegpt-api"}`.
 5. Set frontend env vars in Vercel, especially `VITE_API_BASE_URL`, `VITE_SUPABASE_URL`, and `VITE_SUPABASE_ANON_KEY`.
+6. Optional but recommended: set `VITE_ANALYTICS_ENDPOINT` and `VITE_ERROR_REPORTING_ENDPOINT` if you want to route frontend telemetry somewhere other than the backend defaults.
 6. Deploy the frontend and confirm it loads against the Render backend.
 7. Run the initial embedding sync from `deploy/initial_embedding_sync.md`.
 8. Smoke test a query, a history fetch, and the admin embedding-status route.

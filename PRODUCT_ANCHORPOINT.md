@@ -76,13 +76,12 @@ Working today:
 - shorter answer contract
 
 Still prototype-level:
-- landing copy
+- FAQ depth and pricing detail
 - polished chat UX
-- history UX
+- live provider verification
 - onboarding
-- billing
-- trust and support surfaces
-- analytics and ops
+- billing production validation
+- analytics and ops hardening
 - admin review loop
 
 ## 5. V1 Product Definition
@@ -249,15 +248,15 @@ Recommended stack:
 
 Do these first:
 
-- [ ] finalize domain decision
-- [ ] write final homepage copy
-- [ ] split routes cleanly: landing vs chat
-- [ ] implement GPT-style history rail
-- [ ] wire auth
-- [ ] wire Stripe
-- [ ] add legal pages
-- [ ] add analytics + monitoring
-- [ ] add contact/support surfaces
+- [x] finalize domain decision
+- [x] write final homepage copy
+- [x] split routes cleanly: landing vs chat
+- [x] implement GPT-style history rail
+- [x] wire auth
+- [x] wire Stripe
+- [x] add legal pages
+- [x] add analytics + monitoring
+- [x] add contact/support surfaces
 - [ ] add blog scaffold
 
 ## 9. Product Rules
@@ -343,11 +342,11 @@ Definition of done for Phase 1:
 - [x] blocked provider/env gaps documented precisely
 
 5. Trust and launch essentials
-- [ ] privacy page
-- [ ] terms page
-- [ ] support/contact page
-- [ ] basic analytics
-- [ ] basic error monitoring
+- [x] privacy page
+- [x] terms page
+- [x] support/contact page
+- [x] basic analytics
+- [x] basic error monitoring
 
 ### 11.3 Acceptance Criteria By Workstream
 
@@ -377,10 +376,9 @@ In progress now:
 - [x] auth/billing cleanup
 
 Queued next:
-- [ ] legal pages
-- [ ] support/contact
 - [ ] blog scaffold
-- [ ] analytics + monitoring
+- [ ] live Supabase auth verification
+- [ ] live Stripe checkout verification
 
 ### 11.5 Working Rule
 

@@ -94,12 +94,15 @@ Set the Vercel project root directory to `rulegpt-ui` and use `rulegpt-ui/vercel
 
 - `VITE_API_BASE_URL`
 - `VITE_PREVIEW_MODE`
+- `VITE_ANALYTICS_ENDPOINT`
+- `VITE_ERROR_REPORTING_ENDPOINT`
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 - `VITE_SUPABASE_GOOGLE_OAUTH_ENABLED`
 - `VITE_SUPABASE_LINKEDIN_OAUTH_ENABLED`
 
 Point `VITE_API_BASE_URL` at the Render backend URL.
+If you leave `VITE_ANALYTICS_ENDPOINT` and `VITE_ERROR_REPORTING_ENDPOINT` empty, the frontend defaults to the backend telemetry endpoints under the same API base URL.
 
 ## Initial Embedding Sync
 

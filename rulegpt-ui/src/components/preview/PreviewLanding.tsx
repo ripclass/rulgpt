@@ -141,7 +141,7 @@ export function PreviewLanding({
               Open chat
             </Button>
             <Button asChild variant="ghost" className="font-mono text-xs uppercase tracking-[0.16em]">
-              <Link to="/upgrade">Upgrade</Link>
+              <Link to="/pricing">Pricing</Link>
             </Button>
           </div>
         </div>
@@ -193,7 +193,7 @@ export function PreviewLanding({
                 variant="outline"
                 className="h-12 rounded-none border-black/10 bg-white px-5 font-mono text-xs uppercase tracking-[0.18em] text-[#0c111d] hover:bg-[#faf7f2]"
               >
-                <Link to="/upgrade">See pricing</Link>
+                <Link to="/pricing">See pricing</Link>
               </Button>
             </div>
           </div>
@@ -412,9 +412,23 @@ export function PreviewLanding({
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-black/10 py-6 text-sm text-muted-foreground">
           <p>RuleGPT is designed to make trade finance rules more usable without pretending the rules are simpler than they are.</p>
-          <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em]">
-            <Sparkles className="h-4 w-4 text-primary" />
-            RuleGPT by Enso Intelligence
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em]">
+              <Sparkles className="h-4 w-4 text-primary" />
+              RuleGPT by Enso Intelligence
+            </div>
+            <Link to="/faq" className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#243042] hover:text-primary">
+              FAQ
+            </Link>
+            <Link to="/contact" className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#243042] hover:text-primary">
+              Contact
+            </Link>
+            <Link to="/privacy" className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#243042] hover:text-primary">
+              Privacy
+            </Link>
+            <Link to="/terms" className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#243042] hover:text-primary">
+              Terms
+            </Link>
           </div>
         </div>
       </main>
