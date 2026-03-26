@@ -30,3 +30,18 @@ class UsageResponse(BaseModel):
     tier: str
     api_queries_used: int
     api_queries_limit: int
+
+
+class AuthStatusResponse(BaseModel):
+    supabase_url_configured: bool
+    issuer_configured: bool
+    jwks_configured: bool
+    service_role_configured: bool
+    jwt_verification_ready: bool
+    admin_user_sync_ready: bool
+    authenticated: bool
+    tier: str
+    user_id: str | None = None
+    auth_issuer: str | None = None
+    auth_error: str | None = None
+    blockers: list[str]

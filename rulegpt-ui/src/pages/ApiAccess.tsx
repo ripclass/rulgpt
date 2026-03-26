@@ -56,7 +56,7 @@ export function ApiAccess() {
         </div>
 
         <Button asChild variant="outline" className="mt-5">
-          <Link to="/">Back to chat</Link>
+          <Link to="/chat">Back to chat</Link>
         </Button>
       </div>
     </main>

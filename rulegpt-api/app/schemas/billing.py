@@ -40,3 +40,15 @@ class BillingSubscriptionResponse(BaseModel):
     tier: Literal["free", "pro"]
     current_period_end: datetime | None = None
     cancel_at_period_end: bool | None = None
+
+
+class BillingConfigStatusResponse(BaseModel):
+    stripe_configured: bool
+    secret_key_configured: bool
+    webhook_secret_configured: bool
+    monthly_price_configured: bool
+    annual_price_configured: bool
+    checkout_ready: bool
+    webhook_ready: bool
+    supported_intervals: list[BillingInterval]
+    blockers: list[str]

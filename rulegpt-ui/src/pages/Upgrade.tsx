@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { ApiError, api } from '@/lib/api'
@@ -13,8 +14,12 @@ export function Upgrade() {
   const [billingInterval, setBillingInterval] = useState<BillingInterval>('monthly')
 
   const hasBearerToken = Boolean(auth.accessToken)
-  const canCheckout = auth.isAuthenticated && hasBearerToken
-  const showLocalPreviewFallback = !auth.oauth.supabaseEnabled || !hasBearerToken
+  const billingStatus = useQuery({
+    queryKey: ['billing-status'],
+    queryFn: api.getBillingStatus,
+    staleTime: 5 * 60 * 1000,
+  })
+  const canCheckout = auth.isAuthenticated && hasBearerToken && (billingStatus.data?.checkout_ready ?? false)
   const checkoutPaths = useMemo(() => {
     const origin = window.location.origin
     return {
@@ -24,8 +29,12 @@ export function Upgrade() {
   }, [])
 
   const startCheckout = async () => {
-    if (!canCheckout) {
+    if (!auth.isAuthenticated || !hasBearerToken) {
       setCheckoutMessage('Sign in with Supabase to use the hosted checkout flow.')
+      return
+    }
+    if (!billingStatus.data?.checkout_ready) {
+      setCheckoutMessage('Stripe checkout is not configured yet. See the blockers below.')
       return
     }
 
@@ -67,26 +76,32 @@ export function Upgrade() {
     }
   }
 
-  const enableLocalPreview = () => {
-    auth.setTier('pro')
-    setCheckoutMessage('Local Pro preview enabled in this browser.')
-    setCheckoutUrl(null)
-  }
-
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center px-4 py-10">
       <div className="glass-panel rounded-2xl p-6 md:p-8">
         <p className="text-sm uppercase tracking-wide text-primary">RuleGPT Pro</p>
         <h1 className="mt-2 text-3xl font-semibold">Upgrade for teams and daily workflows</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          {canCheckout
-            ? 'Your account is ready for the hosted Stripe checkout.'
-            : 'Hosted checkout needs a Supabase access token. You can still use the local preview in demo mode.'}
+          {billingStatus.isLoading
+            ? 'Checking billing configuration...'
+            : canCheckout
+              ? 'Your account is ready for the hosted Stripe checkout.'
+              : 'Hosted checkout is waiting on the current billing configuration.'}
         </p>
+        {billingStatus.data?.blockers?.length ? (
+          <div className="mt-4 rounded-lg border border-border/60 bg-secondary/30 p-3">
+            <p className="text-sm font-medium">Billing blockers</p>
+            <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+              {billingStatus.data.blockers.map((blocker) => (
+                <li key={blocker}>{blocker}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
         <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
           <li>Formatted compliance reports</li>
           <li>Bulk export (session PDF/JSON)</li>
-          <li>API access up to 10,000 queries/month</li>
+          <li>API access with fair-use limits</li>
           <li>Priority routing for model generation</li>
         </ul>
         <div className="mt-5 flex flex-wrap gap-2">
@@ -95,14 +110,14 @@ export function Upgrade() {
             variant={billingInterval === 'monthly' ? 'default' : 'outline'}
             onClick={() => setBillingInterval('monthly')}
           >
-            Monthly - $15
+            Monthly - $20
           </Button>
           <Button
             type="button"
             variant={billingInterval === 'annual' ? 'default' : 'outline'}
             onClick={() => setBillingInterval('annual')}
           >
-            Annual - $120
+            Annual - $200
           </Button>
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
@@ -112,7 +127,13 @@ export function Upgrade() {
             }}
             disabled={!canCheckout || isCheckingOut}
           >
-            {isCheckingOut ? 'Starting checkout...' : canCheckout ? 'Start Stripe checkout' : 'Sign in from chat first'}
+            {isCheckingOut
+              ? 'Starting checkout...'
+              : canCheckout
+                ? 'Start Stripe checkout'
+                : billingStatus.data?.checkout_ready
+                  ? 'Sign in from chat first'
+                  : 'Checkout not configured yet'}
           </Button>
           {checkoutUrl ? (
             <Button asChild variant="outline">
@@ -122,25 +143,14 @@ export function Upgrade() {
             </Button>
           ) : null}
           <Button asChild variant="outline">
-            <Link to="/">Back to chat</Link>
+            <Link to="/chat">Back to chat</Link>
           </Button>
         </div>
         {checkoutMessage ? (
           <p className="mt-3 text-sm text-muted-foreground">{checkoutMessage}</p>
         ) : null}
-        {showLocalPreviewFallback ? (
-          <div className="mt-4 rounded-lg border border-border/60 bg-secondary/30 p-3">
-            <p className="text-sm font-medium">Need a browser-only demo?</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              This keeps the existing local preview path for environments without Supabase config or live billing.
-            </p>
-            <Button className="mt-3" variant="outline" onClick={enableLocalPreview}>
-              Enable local Pro preview
-            </Button>
-          </div>
-        ) : null}
         <p className="mt-3 text-xs text-muted-foreground">
-          The checkout call targets backend billing handlers with hosted Stripe success and cancel URLs. If that endpoint is not available yet, use the local preview fallback above.
+          Hosted checkout depends on the backend billing handlers and the Stripe configuration listed above. If the blockers are empty, this page should be ready for live checkout.
         </p>
       </div>
     </main>

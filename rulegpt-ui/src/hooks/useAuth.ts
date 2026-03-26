@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { getApiAccessToken, setApiAccessToken } from '@/lib/api'
+import { api, getApiAccessToken, setApiAccessToken } from '@/lib/api'
 import { supabase, supabaseEnabled } from '@/lib/supabase'
 import type { AuthUser, SessionTier } from '@/types'
+import type { AuthStatusResponse } from '@/lib/api'
 
 const AUTH_KEY = 'rulegpt_auth_user'
 
@@ -48,6 +49,7 @@ export function useAuth() {
   const [user, setUser] = useState<AuthUser | null>(parseSavedAuth())
   const [accessToken, setAccessTokenState] = useState<string | null>(getApiAccessToken())
   const [isLoading, setIsLoading] = useState(false)
+  const [authStatus, setAuthStatus] = useState<AuthStatusResponse | null>(null)
   const googleEnabled = supabaseEnabled && envFlag('VITE_SUPABASE_GOOGLE_OAUTH_ENABLED') !== 'false'
   const linkedinEnabled = supabaseEnabled && envFlag('VITE_SUPABASE_LINKEDIN_OAUTH_ENABLED') !== 'false'
 
@@ -96,6 +98,25 @@ export function useAuth() {
     return () => {
       mounted = false
       data.subscription.unsubscribe()
+    }
+  }, [])
+
+  useEffect(() => {
+    let mounted = true
+    void api
+      .getAuthStatus()
+      .then((status) => {
+        if (mounted) {
+          setAuthStatus(status)
+        }
+      })
+      .catch(() => {
+        if (mounted) {
+          setAuthStatus(null)
+        }
+      })
+    return () => {
+      mounted = false
     }
   }, [])
 
@@ -223,6 +244,7 @@ export function useAuth() {
       linkedinEnabled,
       supabaseEnabled,
     },
+    authStatus,
     logout,
     setTier,
   }

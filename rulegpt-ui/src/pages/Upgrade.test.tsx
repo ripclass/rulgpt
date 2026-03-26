@@ -1,11 +1,13 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Upgrade } from '@/pages/Upgrade'
 
-const { mockUseAuth, createBillingCheckout, setTier } = vi.hoisted(() => ({
+const { mockUseAuth, createBillingCheckout, getBillingStatus, setTier } = vi.hoisted(() => ({
   mockUseAuth: vi.fn(),
   createBillingCheckout: vi.fn(),
+  getBillingStatus: vi.fn(),
   setTier: vi.fn(),
 }))
 
@@ -23,11 +25,30 @@ vi.mock('@/lib/api', () => ({
     }
   },
   api: {
+    getBillingStatus,
     createBillingCheckout,
   },
 }))
 
 describe('Upgrade', () => {
+  const renderPage = () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    })
+
+    return render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <Upgrade />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    )
+  }
+
   beforeEach(() => {
     mockUseAuth.mockReset()
     createBillingCheckout.mockReset()
@@ -35,6 +56,17 @@ describe('Upgrade', () => {
   })
 
   it('uses the hosted checkout flow when a bearer token is available', async () => {
+    getBillingStatus.mockResolvedValue({
+      stripe_configured: true,
+      secret_key_configured: true,
+      webhook_secret_configured: true,
+      monthly_price_configured: true,
+      annual_price_configured: true,
+      checkout_ready: true,
+      webhook_ready: true,
+      supported_intervals: ['monthly', 'annual'],
+      blockers: [],
+    })
     createBillingCheckout.mockResolvedValue({
       message: 'Checkout session created.',
     })
@@ -47,13 +79,9 @@ describe('Upgrade', () => {
       setTier,
     })
 
-    render(
-      <MemoryRouter>
-        <Upgrade />
-      </MemoryRouter>,
-    )
+    renderPage()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Start Stripe checkout' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Start Stripe checkout' }))
 
     await waitFor(() => {
       expect(createBillingCheckout).toHaveBeenCalledTimes(1)
@@ -73,7 +101,18 @@ describe('Upgrade', () => {
     expect(setTier).not.toHaveBeenCalled()
   })
 
-  it('keeps the local preview path when hosted billing is unavailable', async () => {
+  it('shows the configured billing fallback when checkout is unavailable', async () => {
+    getBillingStatus.mockResolvedValue({
+      stripe_configured: false,
+      secret_key_configured: false,
+      webhook_secret_configured: false,
+      monthly_price_configured: false,
+      annual_price_configured: false,
+      checkout_ready: false,
+      webhook_ready: false,
+      supported_intervals: ['monthly', 'annual'],
+      blockers: ['Stripe is not configured.'],
+    })
     mockUseAuth.mockReturnValue({
       accessToken: null,
       currentTier: 'free',
@@ -83,15 +122,10 @@ describe('Upgrade', () => {
       setTier,
     })
 
-    render(
-      <MemoryRouter>
-        <Upgrade />
-      </MemoryRouter>,
-    )
+    renderPage()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Enable local Pro preview' }))
-
-    expect(setTier).toHaveBeenCalledWith('pro')
-    expect(await screen.findByText('Local Pro preview enabled in this browser.')).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Checkout not configured yet' })).toBeDisabled()
+    expect(await screen.findByText('Stripe is not configured.')).toBeInTheDocument()
+    expect(setTier).not.toHaveBeenCalled()
   })
 })

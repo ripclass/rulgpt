@@ -30,6 +30,33 @@ interface RequestOptions {
   headers?: Record<string, string>
 }
 
+export interface AuthStatusResponse {
+  supabase_url_configured: boolean
+  issuer_configured: boolean
+  jwks_configured: boolean
+  service_role_configured: boolean
+  jwt_verification_ready: boolean
+  admin_user_sync_ready: boolean
+  authenticated: boolean
+  tier: 'anonymous' | 'free' | 'pro'
+  user_id: string | null
+  auth_issuer: string | null
+  auth_error: string | null
+  blockers: string[]
+}
+
+export interface BillingConfigStatusResponse {
+  stripe_configured: boolean
+  secret_key_configured: boolean
+  webhook_secret_configured: boolean
+  monthly_price_configured: boolean
+  annual_price_configured: boolean
+  checkout_ready: boolean
+  webhook_ready: boolean
+  supported_intervals: Array<'monthly' | 'annual'>
+  blockers: string[]
+}
+
 function readStoredAccessToken() {
   try {
     return localStorage.getItem(AUTH_ACCESS_TOKEN_KEY)
@@ -152,6 +179,8 @@ export const api = {
       method: 'DELETE',
       headers: identityHeaders(identity),
     }),
+  getAuthStatus: () => request<AuthStatusResponse>('/api/auth/status'),
+  getBillingStatus: () => request<BillingConfigStatusResponse>('/api/billing/status'),
   createBillingCheckout: (payload: BillingCheckoutRequest, identity: RequestIdentity) =>
     request<BillingCheckoutResponse>('/api/billing/checkout', {
       method: 'POST',

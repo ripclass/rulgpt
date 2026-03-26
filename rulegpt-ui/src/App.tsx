@@ -7,8 +7,9 @@ import { ApiAccess } from '@/pages/ApiAccess'
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/landing" element={<Landing />} />
+      <Route path="/" element={<Landing />} />
+      <Route path="/chat" element={<Home />} />
+      <Route path="/landing" element={<Navigate to="/" replace />} />
       <Route path="/upgrade" element={<Upgrade />} />
       <Route path="/api-access" element={<ApiAccess />} />
       <Route path="*" element={<Navigate to="/" replace />} />

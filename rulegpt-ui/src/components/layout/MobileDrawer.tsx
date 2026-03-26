@@ -13,7 +13,7 @@ interface MobileDrawerProps {
   savedAnswers: SavedAnswer[]
   previewMode?: boolean
   onOpenChange: (open: boolean) => void
-  onPickHistory: (value: string) => void
+  onPickHistory: (item: HistoryItem) => void
   onDeleteSaved: (savedId: string) => void
 }
 
@@ -30,7 +30,7 @@ export function MobileDrawer({
 }: MobileDrawerProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[70vh] overflow-hidden border-border bg-[#0b0b0b] px-4 pb-8 pt-6 md:hidden">
+      <SheetContent side="bottom" className="h-[70vh] overflow-hidden border-black/10 bg-[#f7f3ec] px-4 pb-8 pt-6 md:hidden">
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
         </SheetHeader>
@@ -39,8 +39,8 @@ export function MobileDrawer({
             <QueryHistory
               items={history}
               disabled={previewMode}
-              onPick={(value) => {
-                onPickHistory(value)
+              onPick={(item) => {
+                onPickHistory(item)
                 onOpenChange(false)
               }}
             />
@@ -49,12 +49,12 @@ export function MobileDrawer({
           )}
         </div>
         <div className="mt-3 flex gap-2">
-          <Button asChild variant="outline" className="w-full">
+          <Button asChild variant="outline" className="w-full rounded-none border-black/10 bg-white hover:bg-[#faf7f2]">
             <Link to="/api-access" onClick={() => onOpenChange(false)}>
               API Access
             </Link>
           </Button>
-          <Button asChild className="w-full">
+          <Button asChild className="w-full rounded-none bg-[#111827] text-white hover:bg-primary">
             <Link to="/upgrade" onClick={() => onOpenChange(false)}>
               Upgrade
             </Link>

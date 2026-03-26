@@ -3,7 +3,7 @@ import type { HistoryItem } from '@/types'
 
 interface QueryHistoryProps {
   items: HistoryItem[]
-  onPick: (value: string) => void
+  onPick: (item: HistoryItem) => void
   disabled?: boolean
 }
 
@@ -19,9 +19,10 @@ export function QueryHistory({ items, onPick, disabled }: QueryHistoryProps) {
               <button
                 key={item.query_id}
                 type="button"
+                title={item.query_text}
                 disabled={disabled}
-                onClick={() => onPick(item.query_text)}
-                className="w-full rounded-md border border-border/60 bg-secondary/50 px-2 py-1 text-left text-xs text-foreground/90 transition hover:border-primary/40 hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={() => onPick(item)}
+                className="w-full truncate rounded-none border border-black/10 bg-white px-3 py-2 text-left text-xs text-[#243042] transition hover:border-primary hover:bg-[#fff7f1] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {item.query_text}
               </button>

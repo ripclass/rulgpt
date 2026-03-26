@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
 import { PreviewLanding } from '@/components/preview/PreviewLanding'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -12,17 +11,11 @@ export function Landing() {
       suggestions={[]}
       isAuthenticated={auth.isAuthenticated}
       tier={auth.tier}
-      onOpenLogin={() => {
-        toast.message('Conversation auth is available in the chat workspace.')
-        navigate('/')
-      }}
-      onOpenSignup={() => {
-        toast.message('Account creation is available in the chat workspace.')
-        navigate('/')
-      }}
-      onOpenChat={() => navigate('/')}
+      onOpenLogin={() => navigate('/chat', { state: { authMode: 'login' } })}
+      onOpenSignup={() => navigate('/chat', { state: { authMode: 'signup' } })}
+      onOpenChat={() => navigate('/chat')}
       onSubmitPreview={async (query) => {
-        navigate('/', { state: { initialQuery: query } })
+        navigate('/chat', { state: { initialQuery: query } })
       }}
     />
   )

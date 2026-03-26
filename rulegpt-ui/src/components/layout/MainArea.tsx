@@ -36,16 +36,16 @@ export function MainArea({
   const isEmpty = messages.length === 0
 
   return (
-    <main className="flex min-h-screen flex-1 flex-col">
+    <main className="flex min-h-screen flex-1 flex-col pb-28 md:pb-0">
       <header className="border-b border-black/10 bg-background/85 px-4 py-4 backdrop-blur-xl md:px-8">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <div>
               <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                RuleGPT / Conversation
+                RuleGPT / Chat
               </p>
               <p className="mt-1 text-sm text-[#0c111d]">
-                {previewMode ? 'Miro-style preview workspace' : 'Grounded answers from published trade rules'}
+                {previewMode ? 'Preview workspace' : 'Short answers grounded in published trade rules'}
               </p>
             </div>
             <Badge
@@ -58,10 +58,10 @@ export function MainArea({
 
           <div className="flex items-center gap-2">
             <Link
-              to="/landing"
+              to="/"
               className="rounded-none border border-black/10 bg-white px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#0c111d] transition hover:bg-[#faf7f2]"
             >
-              Landing
+              Public site
             </Link>
 
             {!isEmpty && onNewQuery ? (
@@ -94,8 +94,7 @@ export function MainArea({
                 Ask the rule.
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-muted-foreground md:text-[15px]">
-                Start with a trade finance question. The workspace stays minimal, but the answer flow is designed for
-                citations, confidence, and explicit uncertainty.
+                Ask in plain English. Get the rule first, the explanation second, and no memo-style blob.
               </p>
             </div>
 

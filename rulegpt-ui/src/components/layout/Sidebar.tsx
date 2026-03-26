@@ -17,7 +17,8 @@ interface SidebarProps {
   remaining: number
   limitValue: number
   onNewQuery: () => void
-  onPickHistory: (value: string) => void
+  onPickHistory: (item: HistoryItem) => void
+  onQuickCategory: (value: string) => void
   onDeleteSaved: (savedId: string) => void
   onOpenLogin: () => void
   onOpenSignup: () => void
@@ -44,20 +45,21 @@ export function Sidebar({
   limitValue,
   onNewQuery,
   onPickHistory,
+  onQuickCategory,
   onDeleteSaved,
   onOpenLogin,
   onOpenSignup,
   onLogout,
 }: SidebarProps) {
   return (
-    <aside className="hidden h-screen w-[280px] shrink-0 border-r border-border bg-[#0b0b0b] p-4 md:flex md:flex-col">
-      <div>
-        <p className="text-xl font-semibold tracking-tight">RuleGPT</p>
-        <p className="mt-1 text-xs text-muted-foreground">Trade finance compliance assistant</p>
+    <aside className="hidden h-screen w-[308px] shrink-0 border-r border-black/10 bg-[#f7f3ec] px-4 py-5 md:flex md:flex-col">
+      <div className="border-b border-black/10 pb-4">
+        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">RuleGPT / Chat</p>
+        <p className="mt-2 text-xl font-semibold tracking-tight text-[#0c111d]">Trade rules, without the memo.</p>
       </div>
 
-      <Button className="mt-4 w-full" onClick={onNewQuery}>
-        <Plus className="mr-2 h-4 w-4" /> New Query
+      <Button className="mt-4 h-11 w-full rounded-none bg-[#111827] font-mono text-xs uppercase tracking-[0.16em] text-white hover:bg-primary" onClick={onNewQuery}>
+        <Plus className="mr-2 h-4 w-4" /> New chat
       </Button>
 
       {tier === 'anonymous' ? (
@@ -73,46 +75,38 @@ export function Sidebar({
             key={category}
             type="button"
             disabled={previewMode}
-            className="w-full rounded-md border border-border/60 bg-secondary/50 px-2 py-1 text-left text-xs transition hover:border-primary/40 disabled:cursor-not-allowed disabled:opacity-50"
-            onClick={() => onPickHistory(category)}
+            className="w-full rounded-none border border-black/10 bg-white px-3 py-2 text-left text-xs text-[#0c111d] transition hover:border-primary hover:bg-[#fff7f1] disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={() => onQuickCategory(category)}
           >
             {category}
           </button>
         ))}
       </div>
 
-      <div className="mt-4 overflow-y-auto pr-1">
-        <p className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">Query history</p>
+      <div className="mt-5 min-h-0 flex-1 overflow-y-auto pr-1">
+        <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">History</p>
         <QueryHistory items={history} onPick={onPickHistory} disabled={previewMode} />
-        <p className="mb-2 mt-5 text-xs uppercase tracking-wide text-muted-foreground">Saved answers</p>
+        <p className="mb-2 mt-5 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Saved</p>
         <SavedAnswers items={savedAnswers} onDelete={onDeleteSaved} />
       </div>
 
       <div className="mt-4 space-y-3">
         <UpgradeCTA tier={tier} />
-        <a
-          href="https://trdrhub.com"
-          target="_blank"
-          rel="noreferrer"
-          className="block rounded-md border border-border px-3 py-2 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-primary"
-        >
-          Validate documents to TRDR Hub
-        </a>
         {isAuthenticated ? (
-          <Button variant="ghost" className="w-full justify-start" onClick={onLogout}>
+          <Button variant="ghost" className="w-full justify-start rounded-none border border-black/10 bg-white text-[#0c111d] hover:bg-[#faf7f2]" onClick={onLogout}>
             <LogOut className="mr-2 h-4 w-4" /> Logout
           </Button>
         ) : (
           <div className="flex gap-2">
-            <Button variant="outline" className="w-full" onClick={onOpenLogin}>
+            <Button variant="outline" className="w-full rounded-none border-black/10 bg-white hover:bg-[#faf7f2]" onClick={onOpenLogin}>
               Sign in
             </Button>
-            <Button className="w-full" onClick={onOpenSignup}>
+            <Button className="w-full rounded-none bg-primary text-primary-foreground hover:bg-primary/90" onClick={onOpenSignup}>
               Sign up
             </Button>
           </div>
         )}
-        <Button asChild variant="ghost" className="w-full justify-start text-xs">
+        <Button asChild variant="ghost" className="w-full justify-start rounded-none text-xs text-[#0c111d] hover:bg-[#faf7f2]">
           <Link to="/api-access">API access</Link>
         </Button>
       </div>

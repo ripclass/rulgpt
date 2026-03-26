@@ -7,6 +7,7 @@ from urllib.parse import urlsplit, urlunsplit
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from app.schemas.billing import (
+    BillingConfigStatusResponse,
     BillingSubscriptionResponse,
     BillingWebhookResponse,
     CheckoutSessionCreateRequest,
@@ -18,6 +19,38 @@ from .deps import require_authenticated_user
 
 router = APIRouter(prefix="/api/billing", tags=["billing"])
 billing_client = StripeClient()
+
+
+@router.get("/status", response_model=BillingConfigStatusResponse)
+async def billing_status() -> BillingConfigStatusResponse:
+    stripe_configured = bool(billing_client.secret_key)
+    monthly_price_configured = bool(billing_client.monthly_price_id)
+    annual_price_configured = bool(billing_client.annual_price_id)
+    webhook_secret_configured = bool(billing_client.webhook_secret)
+    checkout_ready = stripe_configured and monthly_price_configured and annual_price_configured
+    webhook_ready = stripe_configured and webhook_secret_configured
+
+    blockers: list[str] = []
+    if not stripe_configured:
+        blockers.append("Stripe secret key is missing.")
+    if not monthly_price_configured:
+        blockers.append("Monthly Stripe price ID is missing.")
+    if not annual_price_configured:
+        blockers.append("Annual Stripe price ID is missing.")
+    if not webhook_secret_configured:
+        blockers.append("Stripe webhook secret is missing.")
+
+    return BillingConfigStatusResponse(
+        stripe_configured=stripe_configured,
+        secret_key_configured=stripe_configured,
+        webhook_secret_configured=webhook_secret_configured,
+        monthly_price_configured=monthly_price_configured,
+        annual_price_configured=annual_price_configured,
+        checkout_ready=checkout_ready,
+        webhook_ready=webhook_ready,
+        supported_intervals=["monthly", "annual"],
+        blockers=blockers,
+    )
 
 
 def _frontend_base_url(request: Request) -> str:
