@@ -38,15 +38,18 @@ Non-negotiable rules:
 4. Do not present a partial rule set as a complete answer.
 5. Never say a transaction is definitely compliant. You explain rules; you do not approve transactions or validate actual documents.
 6. If the user appears to need document validation, say that document-level validation is outside this chat and keep the response product-neutral.
-7. Write like a first-rate trade finance specialist, not a generic chatbot.
+7. Write like a first-rate trade finance specialist speaking to a busy operator, not to another expert and not like a generic chatbot.
    Be direct, specific, calm, and commercially useful.
 8. No markdown headings. No legalese. No fluffy filler. No follow-up question section inside the answer body.
+9. Do not sound like an AI report. Avoid preambles such as "Based on the retrieved rules" or "The retrieved rules clearly support" unless they are strictly needed for safety.
 
 Output style:
-- Start with a one- or two-sentence direct answer.
-- Then, if needed, use short bullets for distinct rule points.
+- Start with a one- or two-sentence direct answer in plain spoken English.
+- Then, if needed, use up to 3 short bullets for distinct rule points.
 - If important context is missing, include a short line beginning exactly with:
   What still depends on your transaction:
+- For simple and interpretation questions, aim for roughly 60 to 140 words.
+- For complex questions, stay under roughly 220 words unless the rules genuinely require more.
 - Keep it concise but complete.
 
 Current date: {current_date}
@@ -87,7 +90,10 @@ def _build_user_prompt(
         "Use only the retrieved rules below. Cite each substantive claim inline using "
         "rulebook name + article/paragraph.\n"
         "Do not mention any article, paragraph, rulebook, or requirement that is not present in the retrieved rules.\n"
+        "Write like a capable trade operations person talking to a user. Do not sound like a report, memo, or AI essay.\n"
         "Write plain chat prose. Do not use markdown headings. Do not add a follow-up questions section in the answer body.\n"
+        "Open with the answer immediately. Do not start with phrases like 'Based on the retrieved rules' or 'The retrieved rules show'.\n"
+        "Keep the answer tight: 1 short opening paragraph, then at most 3 short bullets only if they add real value.\n"
         "If the rules only cover part of the question, say exactly which part is grounded and which part is not covered.\n"
         "If precision depends on missing facts, state them under a line that starts with 'What still depends on your transaction:'.\n"
         "If the user asked a broad trade question, narrow it intelligently into the document, rule, jurisdiction, bank, or shipment facts that matter most.\n\n"
@@ -212,17 +218,19 @@ def _compose_fta_answer(query: str, rules: Sequence[RetrievedRule], partial_cove
     if non_member_countries and agreement:
         country_name = non_member_countries[0].title()
         lines.append(
-            f"On the retrieved {agreement.upper()} scope rule, the answer is no for {country_name} as stated: [{scope_rule.rulebook} {scope_rule.reference}] does not list {country_name} as an {agreement.upper()} member, so goods exported from {country_name} do not qualify for {agreement.upper()} preferential treatment on that basis alone."
+            f"No. {country_name} is not an {agreement.upper()} member, so goods exported from {country_name} cannot claim {agreement.upper()} preferential treatment on that basis. [{scope_rule.rulebook} {scope_rule.reference}]"
         )
     else:
-        lines.append("The retrieved rules support the agreement scope and origin framework, but eligibility still depends on the origin rule and proof for the specific product.")
+        lines.append(
+            f"Maybe, but only if the product meets the {agreement.upper() if agreement else 'FTA'} origin rule and the proof-of-origin requirements. "
+            f"[{scope_rule.rulebook} {scope_rule.reference}]"
+        )
 
-    lines.append("What the retrieved rules clearly say:")
-    lines.append(f"- Agreement scope: [{scope_rule.rulebook} {scope_rule.reference}] {_first_sentence(scope_rule.excerpt)}")
+    lines.append(f"- Scope: [{scope_rule.rulebook} {scope_rule.reference}] {_first_sentence(scope_rule.excerpt)}")
     if origin_rule is not None:
         lines.append(f"- Origin rule: [{origin_rule.rulebook} {origin_rule.reference}] {_first_sentence(origin_rule.excerpt)}")
     if proof_rule is not None:
-        lines.append(f"- Proof requirement: [{proof_rule.rulebook} {proof_rule.reference}] {_first_sentence(proof_rule.excerpt)}")
+        lines.append(f"- Proof: [{proof_rule.rulebook} {proof_rule.reference}] {_first_sentence(proof_rule.excerpt)}")
 
     dependency_parts: List[str] = []
     if non_member_countries:
@@ -246,9 +254,8 @@ def _compose_generic_grounded_answer(rules: Sequence[RetrievedRule], partial_cov
     lead_rule = top[0]
     lead_summary = _first_sentence(lead_rule.excerpt) or "Relevant guidance is available in this rule."
     lines: List[str] = []
-    lines.append(f"Based on the retrieved rules, the clearest supported point is [{lead_rule.rulebook} {lead_rule.reference}] {lead_summary}")
-    lines.append("What the retrieved rules clearly say:")
-    for rule in top:
+    lines.append(f"{lead_summary} [{lead_rule.rulebook} {lead_rule.reference}]")
+    for rule in top[1:]:
         ref = f"{rule.rulebook} {rule.reference}".strip()
         excerpt = _first_sentence(rule.excerpt) or "Relevant guidance is available in this rule."
         lines.append(f"- [{ref}] {excerpt}")
@@ -313,9 +320,9 @@ def _compose_document_breadth_answer(query: str, rules: Sequence[RetrievedRule],
 
     lines: List[str] = []
     if partial_coverage:
-        lines.append("Based on the retrieved rules, I can only confirm part of the document set for this CIF/UCP600-style question.")
+        lines.append("I can only confirm part of the document set for this CIF/UCP600-style question.")
     else:
-        lines.append("Based on the retrieved rules, these are the document requirements clearly supported in context.")
+        lines.append("Here is the document set I can clearly support from the rules I retrieved.")
 
     supported_lines: List[str] = []
     for family in ("invoice", "transport", "insurance"):
@@ -330,7 +337,6 @@ def _compose_document_breadth_answer(query: str, rules: Sequence[RetrievedRule],
         supported_lines.append(f"- [{rule.rulebook} {rule.reference}] {summary}")
 
     if supported_lines:
-        lines.append("What the retrieved rules clearly support:")
         lines.extend(supported_lines)
 
     missing = [family_labels[family].lower() for family in ("invoice", "transport", "insurance") if family in expected and family not in representative_rules]
@@ -432,6 +438,15 @@ def _collapse_whitespace(answer: str) -> str:
     return "\n".join(compacted).strip()
 
 
+def _tighten_answer_voice(answer: str) -> str:
+    tightened = answer.strip()
+    tightened = re.sub(r"^Based on the retrieved rules,\s*", "", tightened, flags=re.IGNORECASE)
+    tightened = re.sub(r"^The retrieved rules (?:clearly )?(?:say|show|support) that\s*", "", tightened, flags=re.IGNORECASE)
+    tightened = re.sub(r"^What the retrieved rules clearly (?:say|support):\s*", "", tightened, flags=re.IGNORECASE)
+    tightened = re.sub(r"\n{3,}", "\n\n", tightened)
+    return tightened.strip()
+
+
 def _allowed_reference_tokens(rules: Sequence[RetrievedRule]) -> tuple[set[str], set[str]]:
     allowed_citations: set[str] = set()
     allowed_articles: set[str] = set()
@@ -459,7 +474,17 @@ def answer_mentions_unknown_references(answer: str, rules: Sequence[RetrievedRul
 
 
 def normalize_generated_answer(answer: str) -> str:
-    return _collapse_whitespace(_strip_followup_block(_strip_markdown(answer)))
+    return _tighten_answer_voice(_collapse_whitespace(_strip_followup_block(_strip_markdown(answer))))
+
+
+def _generation_token_budget(complexity: str, partial_coverage: bool) -> int:
+    if complexity == "complex":
+        return 520
+    if complexity == "interpretation":
+        return 340
+    if partial_coverage:
+        return 260
+    return 220
 
 
 class AnswerGenerator:
@@ -499,6 +524,7 @@ class AnswerGenerator:
         retrieved_rules: Sequence[RetrievedRule],
         complexity: str,
         classifier_output: ClassifierOutput,
+        max_tokens: int,
     ) -> Optional[str]:
         prompt = _build_user_prompt(query, retrieved_rules, complexity, classifier_output)
         if hasattr(client, "generate_answer"):
@@ -506,6 +532,8 @@ class AnswerGenerator:
                 client.generate_answer(
                     prompt=prompt,
                     system_prompt=system_prompt,
+                    max_tokens=max_tokens,
+                    temperature=0.1,
                     extended_thinking=complexity == "complex",
                 )
             )
@@ -515,6 +543,8 @@ class AnswerGenerator:
                 client.generate_fallback(
                     prompt=prompt,
                     system_prompt=system_prompt,
+                    max_tokens=max_tokens,
+                    temperature=0.1,
                 )
             )
             return str(output) if output else None
@@ -543,6 +573,8 @@ class AnswerGenerator:
                 "partial_coverage": partial_coverage,
             }
 
+        token_budget = _generation_token_budget(classifier_output.complexity, partial_coverage)
+
         system_prompt = RULEGPT_SYSTEM_PROMPT_TEMPLATE.format(
             current_date=date.today().isoformat(),
             user_tier=user_tier,
@@ -559,6 +591,7 @@ class AnswerGenerator:
                     retrieved_rules=retrieved_rules,
                     complexity=classifier_output.complexity,
                     classifier_output=classifier_output,
+                    max_tokens=token_budget,
                 )
                 if answer:
                     normalized = normalize_generated_answer(answer)
@@ -588,6 +621,7 @@ class AnswerGenerator:
                     retrieved_rules=retrieved_rules,
                     complexity=classifier_output.complexity,
                     classifier_output=classifier_output,
+                    max_tokens=token_budget,
                 )
                 if answer:
                     normalized = normalize_generated_answer(answer)

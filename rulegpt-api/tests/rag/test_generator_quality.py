@@ -12,7 +12,14 @@ from app.services.rag.models import ClassifierOutput, RetrievedRule
 
 
 class _FakeAnthropicClient:
-    async def generate_answer(self, prompt: str, system_prompt: str, extended_thinking: bool = False):
+    async def generate_answer(
+        self,
+        prompt: str,
+        system_prompt: str,
+        extended_thinking: bool = False,
+        max_tokens: int = 0,
+        temperature: float = 0.0,
+    ):
         return (
             "## Insurance documents under UCP600\n\n"
             "According to [UCP600 Article 18], insurance cover notes are not accepted.\n\n"
@@ -20,6 +27,22 @@ class _FakeAnthropicClient:
             "1. Do you want more detail?\n"
             "2. Should I compare this with CIP?\n"
         )
+
+
+class _BudgetCaptureAnthropicClient:
+    def __init__(self) -> None:
+        self.max_tokens: int | None = None
+
+    async def generate_answer(
+        self,
+        prompt: str,
+        system_prompt: str,
+        extended_thinking: bool = False,
+        max_tokens: int = 0,
+        temperature: float = 0.0,
+    ):
+        self.max_tokens = max_tokens
+        return "Cover notes are not accepted. [UCP600 Article 28]"
 
 
 def _insurance_rule() -> RetrievedRule:
@@ -115,7 +138,7 @@ def test_compose_grounded_answer_for_partial_cif_query_is_explicit():
 def test_normalize_generated_answer_strips_markdown_and_followup_block():
     raw = (
         "## Heading\n\n"
-        "According to [UCP600 Article 28], cover notes are not accepted.\n\n"
+        "Based on the retrieved rules, cover notes are not accepted. [UCP600 Article 28]\n\n"
         "---\n\n"
         "Follow-up questions you might have:\n"
         "1. Do you want more detail?\n"
@@ -128,6 +151,7 @@ def test_normalize_generated_answer_strips_markdown_and_followup_block():
     assert "Follow-up questions" not in normalized
     assert "Do you want more detail?" not in normalized
     assert "[UCP600 Article 28]" in normalized
+    assert not normalized.startswith("Based on the retrieved rules")
 
 
 def test_compose_grounded_answer_surfaces_fta_scope_before_origin_mechanics():
@@ -137,7 +161,22 @@ def test_compose_grounded_answer_surfaces_fta_scope_before_origin_mechanics():
         partial_coverage=False,
     )
 
-    assert "answer is no" in answer.lower()
+    assert answer.startswith("No.")
     assert "Bangladesh" in answer
     assert "[RCEP RCEP Agreement, Chapter 3]" in answer
-    assert "What the retrieved rules clearly say:" in answer
+    assert "- Scope:" in answer
+
+
+@pytest.mark.asyncio
+async def test_generator_uses_shorter_token_budget_for_simple_queries():
+    client = _BudgetCaptureAnthropicClient()
+    generator = AnswerGenerator(anthropic_client=client, openai_client=object())
+
+    result = await generator.generate(
+        query="How does UCP600 handle insurance documents?",
+        retrieved_rules=[_insurance_rule()],
+        classifier_output=ClassifierOutput(domain="icc", jurisdiction="global", document_type="other", complexity="simple"),
+    )
+
+    assert result["answer"]
+    assert client.max_tokens == 220
