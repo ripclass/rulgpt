@@ -194,7 +194,14 @@ class RAGPipeline:
             partial_coverage=partial_coverage,
             answer=answer,
         )
-        suggested_followups = self.generator.suggested_followups(query, classifier_output)
+        try:
+            suggested_followups = self.generator.suggested_followups(
+                query,
+                classifier_output,
+                partial_coverage=partial_coverage,
+            )
+        except TypeError:
+            suggested_followups = self.generator.suggested_followups(query, classifier_output)
         latency_ms = int((time.perf_counter() - start_total) * 1000)
 
         return QueryResult(

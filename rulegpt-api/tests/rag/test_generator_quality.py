@@ -179,4 +179,37 @@ async def test_generator_uses_shorter_token_budget_for_simple_queries():
     )
 
     assert result["answer"]
-    assert client.max_tokens == 220
+    assert client.max_tokens == 180
+
+
+@pytest.mark.asyncio
+async def test_generator_allows_longer_budget_when_query_needs_more_detail():
+    client = _BudgetCaptureAnthropicClient()
+    generator = AnswerGenerator(anthropic_client=client, openai_client=object())
+
+    result = await generator.generate(
+        query="What are OFAC requirements for trading with UAE counterparties?",
+        retrieved_rules=[_insurance_rule()] * 6,
+        classifier_output=ClassifierOutput(domain="sanctions", jurisdiction="global", document_type="other", complexity="simple"),
+    )
+
+    assert result["answer"]
+    assert client.max_tokens == 360
+
+
+def test_suggested_followups_default_to_one_for_simple_queries():
+    followups = AnswerGenerator.suggested_followups(
+        "How does UCP600 handle insurance documents?",
+        ClassifierOutput(domain="icc", jurisdiction="global", document_type="other", complexity="simple"),
+    )
+
+    assert len(followups) == 1
+
+
+def test_suggested_followups_expand_for_fta_queries():
+    followups = AnswerGenerator.suggested_followups(
+        "Does my garment qualify for RCEP preferential tariff from Bangladesh?",
+        ClassifierOutput(domain="fta", jurisdiction="rcep", document_type="other", complexity="simple"),
+    )
+
+    assert len(followups) == 2

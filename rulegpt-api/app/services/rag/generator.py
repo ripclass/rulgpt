@@ -48,8 +48,9 @@ Output style:
 - Then, if needed, use up to 3 short bullets for distinct rule points.
 - If important context is missing, include a short line beginning exactly with:
   What still depends on your transaction:
-- For simple and interpretation questions, aim for roughly 60 to 140 words.
-- For complex questions, stay under roughly 220 words unless the rules genuinely require more.
+- Default answer length should usually stay around 150 to 220 words.
+- Only go longer when the question genuinely needs multiple rule points, multiple jurisdictions, or multiple conditions to avoid being misleading.
+- For complex questions, you may go longer, but only when the extra detail materially improves correctness.
 - Keep it concise but complete.
 
 Current date: {current_date}
@@ -93,7 +94,8 @@ def _build_user_prompt(
         "Write like a capable trade operations person talking to a user. Do not sound like a report, memo, or AI essay.\n"
         "Write plain chat prose. Do not use markdown headings. Do not add a follow-up questions section in the answer body.\n"
         "Open with the answer immediately. Do not start with phrases like 'Based on the retrieved rules' or 'The retrieved rules show'.\n"
-        "Keep the answer tight: 1 short opening paragraph, then at most 3 short bullets only if they add real value.\n"
+        "Keep the answer tight: default to about 150 to 220 words, with 1 short opening paragraph and at most 3 short bullets only if they add real value.\n"
+        "Go longer only when the question genuinely needs more detail to stay correct.\n"
         "If the rules only cover part of the question, say exactly which part is grounded and which part is not covered.\n"
         "If precision depends on missing facts, state them under a line that starts with 'What still depends on your transaction:'.\n"
         "If the user asked a broad trade question, narrow it intelligently into the document, rule, jurisdiction, bank, or shipment facts that matter most.\n\n"
@@ -479,12 +481,38 @@ def normalize_generated_answer(answer: str) -> str:
 
 def _generation_token_budget(complexity: str, partial_coverage: bool) -> int:
     if complexity == "complex":
-        return 520
-    if complexity == "interpretation":
-        return 340
+        return 560
     if partial_coverage:
-        return 260
-    return 220
+        return 220
+    return 220 if complexity == "interpretation" else 180
+
+
+def _query_deserves_long_form(
+    query: str,
+    rules: Sequence[RetrievedRule],
+    classifier_output: ClassifierOutput,
+) -> bool:
+    lowered = query.lower()
+    if classifier_output.complexity == "complex":
+        return True
+    if len(rules) >= 6:
+        return True
+    long_markers = (
+        "compare",
+        "difference",
+        "versus",
+        " vs ",
+        "step by step",
+        "checklist",
+        "article by article",
+        "country pair",
+        "beneficial owner",
+        "secondary sanctions",
+        "all documents",
+        "full document set",
+        "requirements for trading",
+    )
+    return any(marker in lowered for marker in long_markers)
 
 
 class AnswerGenerator:
@@ -574,6 +602,8 @@ class AnswerGenerator:
             }
 
         token_budget = _generation_token_budget(classifier_output.complexity, partial_coverage)
+        if _query_deserves_long_form(query, retrieved_rules, classifier_output):
+            token_budget = max(token_budget, 360 if classifier_output.complexity != "complex" else 560)
 
         system_prompt = RULEGPT_SYSTEM_PROMPT_TEMPLATE.format(
             current_date=date.today().isoformat(),
@@ -645,39 +675,55 @@ class AnswerGenerator:
         return {"answer": answer, "model_used": "fallback", "partial_coverage": partial_coverage}
 
     @staticmethod
-    def suggested_followups(query: str, classifier: ClassifierOutput) -> List[str]:
+    def suggested_followups(query: str, classifier: ClassifierOutput, partial_coverage: bool = False) -> List[str]:
+        lowered = query.lower()
+        if partial_coverage or classifier.complexity == "complex":
+            limit = 3
+        elif requires_document_breadth(query) or classifier.domain in {"sanctions", "fta"}:
+            limit = 2
+        elif any(marker in lowered for marker in ("difference", "compare", "requirements", "qualify")):
+            limit = 2
+        else:
+            limit = 1
+
         if requires_document_breadth(query):
-            return [
-                "Do you want each document requirement mapped article by article?",
-                "Should I separate UCP600 requirements from Incoterms-only obligations?",
-                "Do you want the missing document types flagged explicitly if coverage is partial?",
+            options = [
+                "Want this mapped document by document?",
+                "Should I separate UCP600 from Incoterms obligations?",
+                "Do you want the missing document types flagged clearly?",
             ]
+            return options[:limit]
         if classifier.domain == "sanctions":
-            return [
-                "Which sanctions regime matters most here: OFAC, EU, UN, or UK?",
-                "Do you want a screening checklist for counterparties, banks, and vessels?",
-                "Should I compare how this issue is treated across multiple sanctions regimes?",
+            options = [
+                "Which regime matters most here: OFAC, EU, UN, or UK?",
+                "Do you want a screening checklist for parties, banks, and vessels?",
+                "Should I compare this across sanctions regimes?",
             ]
+            return options[:limit]
         if classifier.domain == "fta":
-            return [
-                "Which country pair and HS classification are you testing under this FTA?",
-                "Do you want the proof-of-origin and document checklist?",
+            options = [
+                "Which country pair and HS code are you testing?",
+                "Do you want the proof-of-origin checklist?",
                 "Should I separate agreement scope from product-specific origin rules?",
             ]
+            return options[:limit]
         if _rule_cta_trigger(query):
-            return [
+            options = [
                 "Do you want the discrepancy points mapped article by article?",
-                "Should I translate this into likely bank examination points?",
-                "Do you want the document-level issues separated from the rule explanation?",
+                "Should I turn this into likely bank examination points?",
+                "Do you want document issues separated from the rule explanation?",
             ]
+            return options[:limit]
         if classifier.domain == "icc":
-            return [
-                "Which document are you checking first: invoice, bill of lading, or insurance?",
-                "Is this under a specific LC, or are you asking about the rule generally?",
-                "Should I separate mandatory rule requirements from bank-practice issues?",
+            options = [
+                "Which document are you checking first: invoice, BL, or insurance?",
+                "Is this under a specific LC or just the general rule?",
+                "Should I separate hard rule requirements from bank-practice issues?",
             ]
-        return [
-            "Which jurisdiction or country does this transaction involve?",
-            "Should I break this down into an operational checklist?",
-            "Do you want the closest related rules if the coverage is only partial?",
+            return options[:limit]
+        options = [
+            "Which country or jurisdiction does this involve?",
+            "Should I break this into an operational checklist?",
+            "Do you want the closest related rules if coverage is partial?",
         ]
+        return options[:limit]
