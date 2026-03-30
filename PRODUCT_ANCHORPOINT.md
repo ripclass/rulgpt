@@ -400,6 +400,14 @@ Before the next build block, decide:
 
 This file is the anchor document.
 
+Execution workflow lives in:
+- `RULEGPT_WORKFLOW.md`
+
+Execution docs:
+- `PHASE_1_CHECKLIST.md`
+- `GOLDEN_QUERIES.md`
+- `LAUNCH_RUNBOOK.md`
+
 Any new feature should answer:
 - does it improve trust?
 - does it improve usability?

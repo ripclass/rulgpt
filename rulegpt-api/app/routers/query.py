@@ -194,6 +194,7 @@ async def process_query_request(
         latency_ms=elapsed_ms,
         show_trdr_cta=show_trdr_cta,
         ice_training_eligible=False,
+        routing_tier=(rag or {}).get("routing_tier"),
     )
     db.add(query_row)
     db.add(session_obj)

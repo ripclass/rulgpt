@@ -40,6 +40,11 @@ class Settings(BaseSettings):
     RULEGPT_GENERATOR_MODEL: str = "claude-sonnet-4-6"
     RULEGPT_COMPLEX_MODEL: str = "claude-sonnet-4-6"
 
+    RULEGPT_ENABLE_SMART_ROUTING: bool = True
+    RULEGPT_TEMPLATE_ENGINE_ENABLED: bool = True
+    RULEGPT_HAIKU_MODEL: str = "claude-haiku-4-5-20251001"
+    RULEGPT_OPUS_MODEL: str = "claude-opus-4-6"
+
     OPENAI_API_KEY: str | None = None
     OPENROUTER_API_KEY: str | None = None
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"

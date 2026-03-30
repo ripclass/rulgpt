@@ -77,6 +77,7 @@ class QueryResult(BaseModel):
     classifier_model: str = "heuristic"
     latency_ms: int = 0
     stage_latency_ms: Dict[str, int] = Field(default_factory=dict)
+    routing_tier: str = "sonnet"
 
 
 class EmbeddingSyncReport(BaseModel):

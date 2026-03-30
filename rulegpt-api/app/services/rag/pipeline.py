@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import re
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Literal
 
 from .citations import build_citations, validate_citations
 from .classifier import QueryClassifier
@@ -19,6 +20,103 @@ NO_RULE_MESSAGE = (
     "I don't have a specific rule covering that. Here's what related rules say: "
     "no closely matching rule was found in the current ruleset."
 )
+
+# ---------------------------------------------------------------------------
+# Smart routing — deterministic complexity classifier (no LLM call)
+# ---------------------------------------------------------------------------
+
+RoutingTier = Literal["template", "haiku", "sonnet", "opus", "fallback", "grounded"]
+
+_DIRECT_LOOKUP_RE = re.compile(
+    r"(?:what\s+(?:does|is)|explain|show\s+me)\s+"
+    r"(?:ucp\s*600|isbp\s*745|isp\s*98|urdg\s*758|urc\s*522|urr\s*725|eucp|incoterms)"
+    r"\s+(?:article|paragraph|para|section)\s+\w+",
+    re.IGNORECASE,
+)
+
+_FRAUD_TBML_MARKERS = (
+    "tbml",
+    "money laundering",
+    "over invoicing",
+    "under invoicing",
+    "shell company",
+    "beneficial owner",
+    "trade based money",
+    "pricing pattern",
+    "market rate",
+)
+
+_TIER_ORDER: list[str] = ["template", "haiku", "sonnet", "opus"]
+
+
+def _upgrade_tier(tier: str) -> str:
+    idx = _TIER_ORDER.index(tier) if tier in _TIER_ORDER else 2
+    return _TIER_ORDER[min(idx + 1, len(_TIER_ORDER) - 1)]
+
+
+def _pre_generation_confidence(rules: List[RetrievedRule]) -> str:
+    """Estimate confidence from retrieval scores only (before citations exist)."""
+    if not rules:
+        return "low"
+    best = max(rule.rerank_score for rule in rules)
+    top3 = rules[: min(3, len(rules))]
+    avg = sum(rule.rerank_score for rule in top3) / len(top3)
+    if best >= 0.8 and avg >= 0.6:
+        return "high"
+    if best >= 0.5 and avg >= 0.4:
+        return "medium"
+    return "low"
+
+
+def _classify_complexity(
+    query: str,
+    intent: ClassifierOutput,
+    retrieved_rules: List[RetrievedRule],
+    confidence_band: str,
+) -> RoutingTier:
+    """Select the cheapest model tier capable of answering the query."""
+    if not retrieved_rules:
+        return "fallback"
+
+    lowered = query.lower()
+    rule_count = len(retrieved_rules)
+
+    # Gate 1: Opus — fraud/TBML requires BOTH keyword match AND complex/interpretation
+    has_fraud_signal = any(marker in lowered for marker in _FRAUD_TBML_MARKERS)
+    is_complex_enough = intent.complexity in ("complex", "interpretation")
+    if has_fraud_signal and is_complex_enough:
+        return "opus"
+    # Sanctions domain alone does NOT trigger opus — only fraud/TBML keywords do
+
+    # Gate 2: Template — direct article lookup with single high-confidence rule
+    if (
+        _DIRECT_LOOKUP_RE.search(query)
+        and rule_count == 1
+        and confidence_band == "high"
+    ):
+        return "template"
+
+    # Gate 3: Rule count + confidence matrix
+    if rule_count == 1:
+        tier: str = "template" if confidence_band == "high" else "haiku"
+    elif rule_count <= 4:
+        tier = "haiku"
+    else:
+        tier = "sonnet"
+
+    # Gate 4: Domain/jurisdiction diversity upgrades
+    unique_domains = {rule.domain for rule in retrieved_rules if rule.domain and rule.domain != "other"}
+    unique_jurisdictions = {rule.jurisdiction for rule in retrieved_rules if rule.jurisdiction and rule.jurisdiction != "global"}
+    if len(unique_domains) >= 2:
+        tier = _upgrade_tier(tier)
+    if len(unique_jurisdictions) >= 2:
+        tier = _upgrade_tier(tier)
+
+    # Gate 5: Low confidence upgrade
+    if confidence_band == "low":
+        tier = _upgrade_tier(tier)
+
+    return tier  # type: ignore[return-value]
 def _query_needs_lcopilot_redirect(query: str) -> bool:
     lowered = query.lower()
     return any(
@@ -162,22 +260,41 @@ class RAGPipeline:
             retrieved_rules = []
         stage_latency["retriever"] = int((time.perf_counter() - start) * 1000)
 
+        # Stage 2.5: smart routing
+        from app.config import settings as _settings
+        if _settings.RULEGPT_ENABLE_SMART_ROUTING and retrieved_rules:
+            pre_confidence = _pre_generation_confidence(retrieved_rules)
+            routing_tier = _classify_complexity(query, classifier_output, retrieved_rules, pre_confidence)
+        else:
+            routing_tier = "sonnet"
+
         # Stage 3: generation
         start = time.perf_counter()
         if retrieved_rules:
-            generation = await self.generator.generate(
-                query=query,
-                retrieved_rules=retrieved_rules,
-                classifier_output=classifier_output,
-                user_tier="anonymous",
-            )
+            try:
+                generation = await self.generator.generate(
+                    query=query,
+                    retrieved_rules=retrieved_rules,
+                    classifier_output=classifier_output,
+                    user_tier="anonymous",
+                    routing_tier=routing_tier,
+                )
+            except TypeError:
+                generation = await self.generator.generate(
+                    query=query,
+                    retrieved_rules=retrieved_rules,
+                    classifier_output=classifier_output,
+                    user_tier="anonymous",
+                )
             answer = str(generation.get("answer", "")).strip() or NO_RULE_MESSAGE
             model_used = str(generation.get("model_used", "fallback"))
             partial_coverage = bool(generation.get("partial_coverage"))
+            routing_tier = str(generation.get("routing_tier", routing_tier))
         else:
             answer = NO_RULE_MESSAGE
             model_used = "fallback"
             partial_coverage = True
+            routing_tier = "fallback"
         stage_latency["generator"] = int((time.perf_counter() - start) * 1000)
 
         # Stage 4: citations
@@ -217,6 +334,7 @@ class RAGPipeline:
             classifier_model=classifier_model,
             latency_ms=latency_ms,
             stage_latency_ms=stage_latency,
+            routing_tier=routing_tier,
         )
 
 

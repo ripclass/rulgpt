@@ -37,6 +37,7 @@ class RuleGPTQuery(Base):
     latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
     show_trdr_cta: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     ice_training_eligible: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    routing_tier: Mapped[str | None] = mapped_column(String(16), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now(), index=True
     )

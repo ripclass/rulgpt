@@ -46,6 +46,8 @@ def normalize_openrouter_model(model: str | None, purpose: str = "chat") -> str:
         "claude-haiku-4.5": "anthropic/claude-haiku-4.5",
         "claude-sonnet-4-6": "anthropic/claude-sonnet-4.6",
         "claude-sonnet-4.6": "anthropic/claude-sonnet-4.6",
+        "claude-opus-4-6": "anthropic/claude-opus-4.6",
+        "claude-opus-4.6": "anthropic/claude-opus-4.6",
     }
     lowered = raw.lower()
     if lowered in exact_map:

@@ -479,6 +479,39 @@ def normalize_generated_answer(answer: str) -> str:
     return _tighten_answer_voice(_collapse_whitespace(_strip_followup_block(_strip_markdown(answer))))
 
 
+def _template_answer(query: str, rules: Sequence[RetrievedRule]) -> Dict[str, Any]:
+    """Format a single retrieved rule as a direct answer — no LLM call."""
+    rule = rules[0]
+    title = rule.title or "Untitled"
+    rulebook = rule.rulebook or "unknown"
+    reference = rule.reference or "n/a"
+    excerpt = rule.excerpt.strip() if rule.excerpt else ""
+
+    # Extract conditions and severity from raw rule metadata if available
+    raw_detail = rule.metadata.get("raw_detail", {}) if rule.metadata else {}
+    conditions = raw_detail.get("conditions") or raw_detail.get("condition")
+    severity = str(raw_detail.get("severity") or "").lower()
+
+    parts: List[str] = []
+    parts.append(f"{title} ({rulebook} {reference}): {excerpt}")
+    if conditions:
+        if isinstance(conditions, list):
+            conditions_text = "; ".join(str(c) for c in conditions if c)
+        else:
+            conditions_text = str(conditions)
+        if conditions_text.strip():
+            parts.append(f"This applies when: {conditions_text}.")
+    if severity == "critical":
+        parts.append("Note: this is a hard requirement with no exceptions.")
+
+    return {
+        "answer": "\n\n".join(parts),
+        "model_used": "template-engine",
+        "partial_coverage": False,
+        "routing_tier": "template",
+    }
+
+
 def _generation_token_budget(complexity: str, partial_coverage: bool) -> int:
     if complexity == "complex":
         return 560
@@ -553,28 +586,52 @@ class AnswerGenerator:
         complexity: str,
         classifier_output: ClassifierOutput,
         max_tokens: int,
+        model: str | None = None,
     ) -> Optional[str]:
         prompt = _build_user_prompt(query, retrieved_rules, complexity, classifier_output)
         if hasattr(client, "generate_answer"):
-            output = await _maybe_await(
-                client.generate_answer(
-                    prompt=prompt,
-                    system_prompt=system_prompt,
-                    max_tokens=max_tokens,
-                    temperature=0.1,
-                    extended_thinking=complexity == "complex",
+            try:
+                output = await _maybe_await(
+                    client.generate_answer(
+                        prompt=prompt,
+                        system_prompt=system_prompt,
+                        max_tokens=max_tokens,
+                        temperature=0.1,
+                        extended_thinking=complexity == "complex",
+                        model=model,
+                    )
                 )
-            )
+            except TypeError:
+                output = await _maybe_await(
+                    client.generate_answer(
+                        prompt=prompt,
+                        system_prompt=system_prompt,
+                        max_tokens=max_tokens,
+                        temperature=0.1,
+                        extended_thinking=complexity == "complex",
+                    )
+                )
             return str(output) if output else None
         if hasattr(client, "generate_fallback"):
-            output = await _maybe_await(
-                client.generate_fallback(
-                    prompt=prompt,
-                    system_prompt=system_prompt,
-                    max_tokens=max_tokens,
-                    temperature=0.1,
+            try:
+                output = await _maybe_await(
+                    client.generate_fallback(
+                        prompt=prompt,
+                        system_prompt=system_prompt,
+                        max_tokens=max_tokens,
+                        temperature=0.1,
+                        model=model,
+                    )
                 )
-            )
+            except TypeError:
+                output = await _maybe_await(
+                    client.generate_fallback(
+                        prompt=prompt,
+                        system_prompt=system_prompt,
+                        max_tokens=max_tokens,
+                        temperature=0.1,
+                    )
+                )
             return str(output) if output else None
         if hasattr(client, "generate"):
             output = await _maybe_await(
@@ -592,6 +649,7 @@ class AnswerGenerator:
         retrieved_rules: Sequence[RetrievedRule],
         classifier_output: ClassifierOutput,
         user_tier: str = "anonymous",
+        routing_tier: str = "sonnet",
     ) -> Dict[str, Any]:
         partial_coverage = assess_partial_coverage(query, retrieved_rules)
         if requires_document_breadth(query):
@@ -599,11 +657,30 @@ class AnswerGenerator:
                 "answer": compose_grounded_answer(query, retrieved_rules, partial_coverage=partial_coverage),
                 "model_used": "grounded_fallback",
                 "partial_coverage": partial_coverage,
+                "routing_tier": "grounded",
             }
+
+        # Smart routing: template tier — no LLM call
+        if routing_tier == "template":
+            from app.config import settings as _settings
+            if _settings.RULEGPT_TEMPLATE_ENGINE_ENABLED:
+                return _template_answer(query, retrieved_rules)
+            routing_tier = "haiku"  # fallback if template engine is disabled
+
+        # Resolve model string for the selected tier
+        from app.config import settings as _settings
+        model_for_tier = {
+            "haiku": _settings.RULEGPT_HAIKU_MODEL,
+            "sonnet": _settings.RULEGPT_GENERATOR_MODEL,
+            "opus": _settings.RULEGPT_OPUS_MODEL,
+        }.get(routing_tier, _settings.RULEGPT_GENERATOR_MODEL)
 
         token_budget = _generation_token_budget(classifier_output.complexity, partial_coverage)
         if _query_deserves_long_form(query, retrieved_rules, classifier_output):
             token_budget = max(token_budget, 360 if classifier_output.complexity != "complex" else 560)
+        # Opus gets a larger budget for complex analytical queries
+        if routing_tier == "opus":
+            token_budget = max(token_budget, 560)
 
         system_prompt = RULEGPT_SYSTEM_PROMPT_TEMPLATE.format(
             current_date=date.today().isoformat(),
@@ -622,6 +699,7 @@ class AnswerGenerator:
                     complexity=classifier_output.complexity,
                     classifier_output=classifier_output,
                     max_tokens=token_budget,
+                    model=model_for_tier,
                 )
                 if answer:
                     normalized = normalize_generated_answer(answer)
@@ -632,11 +710,13 @@ class AnswerGenerator:
                                 "answer": normalized,
                                 "model_used": "grounded_fallback",
                                 "partial_coverage": True,
+                                "routing_tier": routing_tier,
                             }
                         return {
                             "answer": normalized,
-                            "model_used": "claude-sonnet-4-6",
+                            "model_used": model_for_tier,
                             "partial_coverage": partial_coverage,
+                            "routing_tier": routing_tier,
                         }
             except Exception:
                 pass
@@ -652,6 +732,7 @@ class AnswerGenerator:
                     complexity=classifier_output.complexity,
                     classifier_output=classifier_output,
                     max_tokens=token_budget,
+                    model=model_for_tier,
                 )
                 if answer:
                     normalized = normalize_generated_answer(answer)
@@ -662,17 +743,19 @@ class AnswerGenerator:
                                 "answer": normalized,
                                 "model_used": "grounded_fallback",
                                 "partial_coverage": True,
+                                "routing_tier": routing_tier,
                             }
                         return {
                             "answer": normalized,
                             "model_used": "gpt-4.1",
                             "partial_coverage": partial_coverage,
+                            "routing_tier": routing_tier,
                         }
             except Exception:
                 pass
 
         answer = compose_grounded_answer(query, retrieved_rules, partial_coverage=partial_coverage)
-        return {"answer": answer, "model_used": "fallback", "partial_coverage": partial_coverage}
+        return {"answer": answer, "model_used": "fallback", "partial_coverage": partial_coverage, "routing_tier": routing_tier}
 
     @staticmethod
     def suggested_followups(query: str, classifier: ClassifierOutput, partial_coverage: bool = False) -> List[str]:
