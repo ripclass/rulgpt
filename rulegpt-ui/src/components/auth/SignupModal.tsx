@@ -45,6 +45,9 @@ export function SignupModal({
           <DialogTitle>Create account</DialogTitle>
           <DialogDescription>Free account unlocks synced history, saved answers, and smoother upgrades.</DialogDescription>
         </DialogHeader>
+        <p className="text-xs text-muted-foreground">
+          If you already have an account, use <span className="font-medium text-foreground">Sign in</span> instead of creating a new one.
+        </p>
         {blockers.length > 0 ? (
           <div className="rounded-lg border border-border/60 bg-secondary/30 p-3 text-xs text-muted-foreground">
             <p className="font-medium text-foreground">Auth blockers</p>

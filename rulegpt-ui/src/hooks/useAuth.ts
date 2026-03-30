@@ -30,6 +30,17 @@ function persistAuth(user: AuthUser | null) {
   }
 }
 
+function clearAuthCallbackHash() {
+  if (typeof window === 'undefined') return
+  const hash = window.location.hash.replace(/^#/, '')
+  if (!hash) return
+  const params = new URLSearchParams(hash)
+  const authKeys = ['access_token', 'refresh_token', 'expires_at', 'expires_in', 'token_type', 'type']
+  if (!authKeys.some((key) => params.has(key))) return
+  const nextUrl = `${window.location.pathname}${window.location.search}`
+  window.history.replaceState({}, document.title, nextUrl)
+}
+
 function envFlag(name: string): string | undefined {
   const value = import.meta.env[name] as string | undefined
   return value?.toLowerCase()
@@ -43,6 +54,10 @@ function deriveSessionUser(session: Session, fallbackUser: AuthUser | null, pres
     email,
     tier: preserveTier ? fallbackUser?.tier ?? 'free' : 'free',
   }
+}
+
+export interface SignupResult {
+  status: 'signed_in' | 'confirmation_sent' | 'existing_account'
 }
 
 export function useAuth() {
@@ -74,6 +89,7 @@ export function useAuth() {
           persistAuth(nextUser)
           setAccessTokenState(session.access_token ?? null)
           setApiAccessToken(session.access_token ?? null)
+          clearAuthCallbackHash()
         }
       })
       .catch(() => undefined)
@@ -93,6 +109,7 @@ export function useAuth() {
       persistAuth(nextUser)
       setAccessTokenState(session.access_token ?? null)
       setApiAccessToken(session.access_token ?? null)
+      clearAuthCallbackHash()
     })
 
     return () => {
@@ -163,24 +180,37 @@ export function useAuth() {
     }
   }
 
-  const signup = async (email: string, password: string) => {
+  const signup = async (email: string, password: string): Promise<SignupResult> => {
     setIsLoading(true)
     try {
       if (supabaseEnabled && supabase) {
-        const hadBearerToken = Boolean(getApiAccessToken())
         const { data, error } = await supabase.auth.signUp({ email, password })
         if (error) throw error
-        const nextUser: AuthUser = {
-          id: data.user?.id ?? `local_${Date.now()}`,
-          email: data.user?.email ?? email,
-          tier: hadBearerToken ? user?.tier ?? 'free' : 'free',
-        }
-        setUser(nextUser)
-        persistAuth(nextUser)
         const nextAccessToken = data.session?.access_token ?? null
-        setAccessTokenState(nextAccessToken)
-        setApiAccessToken(nextAccessToken)
-        return
+        const identities = Array.isArray((data.user as { identities?: unknown[] } | null)?.identities)
+          ? ((data.user as { identities?: unknown[] }).identities ?? [])
+          : null
+        const looksLikeExistingAccount = !nextAccessToken && Array.isArray(identities) && identities.length === 0
+
+        if (nextAccessToken && data.user?.email) {
+          const nextUser: AuthUser = {
+            id: data.user.id,
+            email: data.user.email,
+            tier: user?.tier ?? 'free',
+          }
+          setUser(nextUser)
+          persistAuth(nextUser)
+          setAccessTokenState(nextAccessToken)
+          setApiAccessToken(nextAccessToken)
+          clearAuthCallbackHash()
+          return { status: 'signed_in' }
+        }
+
+        setUser(null)
+        persistAuth(null)
+        setAccessTokenState(null)
+        setApiAccessToken(null)
+        return { status: looksLikeExistingAccount ? 'existing_account' : 'confirmation_sent' }
       }
       const nextUser: AuthUser = {
         id: `local_${Date.now()}`,
@@ -191,6 +221,7 @@ export function useAuth() {
       persistAuth(nextUser)
       setAccessTokenState(null)
       setApiAccessToken(null)
+      return { status: 'signed_in' }
     } finally {
       setIsLoading(false)
     }
@@ -220,7 +251,7 @@ export function useAuth() {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: window.location.origin },
+        options: { redirectTo: `${window.location.origin}/chat` },
       })
       if (error) throw error
     } finally {

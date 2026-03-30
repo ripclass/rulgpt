@@ -12,6 +12,7 @@ export function Landing() {
       suggestions={[]}
       isAuthenticated={auth.isAuthenticated}
       tier={auth.tier}
+      userEmail={auth.user?.email ?? null}
       onOpenLogin={() => {
         track('landing_open_login_clicked')
         navigate('/chat', { state: { authMode: 'login' } })

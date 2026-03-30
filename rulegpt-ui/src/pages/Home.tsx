@@ -404,8 +404,19 @@ export function Home() {
         onOpenChange={setSignupOpen}
         onSubmit={async (email, password) => {
           try {
-            await auth.signup(email, password)
-            toast.success('Account created.')
+            const result = await auth.signup(email, password)
+            if (result.status === 'signed_in') {
+              toast.success('Account created.')
+              setSignupOpen(false)
+              return
+            }
+            if (result.status === 'existing_account') {
+              toast.message('That email already looks registered. Sign in instead.')
+              setSignupOpen(false)
+              setLoginOpen(true)
+              return
+            }
+            toast.success('Check your email to confirm your account.')
             setSignupOpen(false)
           } catch (error) {
             toast.error(`Signup failed: ${String(error)}`)

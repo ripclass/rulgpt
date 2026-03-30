@@ -17,6 +17,7 @@ interface PreviewLandingProps {
   suggestions: string[]
   isAuthenticated: boolean
   tier: SessionTier
+  userEmail?: string | null
   onOpenLogin: () => void
   onOpenSignup: () => void
   onOpenChat: () => void
@@ -82,6 +83,7 @@ export function PreviewLanding({
   suggestions,
   isAuthenticated,
   tier,
+  userEmail,
   onOpenLogin,
   onOpenSignup,
   onOpenChat,
@@ -105,7 +107,7 @@ export function PreviewLanding({
     await onSubmitPreview(draft)
   }
 
-  const accountLabel = isAuthenticated ? `${tier.toUpperCase()} account` : 'Start free'
+  const accountLabel = isAuthenticated ? 'Signed in' : 'Start free'
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -127,7 +129,19 @@ export function PreviewLanding({
             <span className="inline-flex min-h-9 items-center rounded-full bg-[#f7d9cb] px-3 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
               {accountLabel}
             </span>
-            {isAuthenticated ? null : (
+            {isAuthenticated ? (
+              <div className="hidden items-center gap-3 lg:flex">
+                <div className="text-right">
+                  <p className="text-sm font-medium text-[#0c111d]">Session active</p>
+                  <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                    {userEmail ?? `${tier.toUpperCase()} account`}
+                  </p>
+                </div>
+                <Button className="bg-[#111827] text-white hover:bg-primary" onClick={onOpenChat}>
+                  Open chat
+                </Button>
+              </div>
+            ) : (
               <>
                 <Button variant="outline" className="border-black/10 bg-white hover:bg-[#faf7f2]" onClick={onOpenLogin}>
                   Sign in
