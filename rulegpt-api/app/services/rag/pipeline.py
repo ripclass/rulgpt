@@ -75,18 +75,42 @@ def _classify_complexity(
     confidence_band: str,
 ) -> RoutingTier:
     """Select the cheapest model tier capable of answering the query."""
+    import logging
+    _log = logging.getLogger("rulegpt.routing")
+
     if not retrieved_rules:
+        _log.info("[ROUTING DEBUG] 0 rules → fallback")
         return "fallback"
 
     lowered = query.lower()
     rule_count = len(retrieved_rules)
+    unique_domains = {rule.domain for rule in retrieved_rules if rule.domain and rule.domain != "other"}
+    unique_jurisdictions = {rule.jurisdiction for rule in retrieved_rules if rule.jurisdiction and rule.jurisdiction != "global"}
 
     # Gate 1: Opus — fraud/TBML requires BOTH keyword match AND complex/interpretation
     has_fraud_signal = any(marker in lowered for marker in _FRAUD_TBML_MARKERS)
     is_complex_enough = intent.complexity in ("complex", "interpretation")
+
+    _log.info(
+        "[ROUTING DEBUG] query=%r | rule_count=%d | pre_confidence=%s "
+        "| domains=%s (count=%d) | jurisdictions=%s (count=%d) "
+        "| fraud_tbml_triggered=%s | classifier_complexity=%s "
+        "| is_complex_enough=%s",
+        query[:80],
+        rule_count,
+        confidence_band,
+        unique_domains,
+        len(unique_domains),
+        unique_jurisdictions,
+        len(unique_jurisdictions),
+        has_fraud_signal,
+        intent.complexity,
+        is_complex_enough,
+    )
+
     if has_fraud_signal and is_complex_enough:
+        _log.info("[ROUTING DEBUG] Gate 1 (opus): fraud_tbml + complex → opus")
         return "opus"
-    # Sanctions domain alone does NOT trigger opus — only fraud/TBML keywords do
 
     # Gate 2: Template — direct article lookup with single high-confidence rule
     if (
@@ -94,6 +118,7 @@ def _classify_complexity(
         and rule_count == 1
         and confidence_band == "high"
     ):
+        _log.info("[ROUTING DEBUG] Gate 2 (template): direct lookup regex match → template")
         return "template"
 
     # Gate 3: Rule count + confidence matrix
@@ -103,19 +128,25 @@ def _classify_complexity(
         tier = "haiku"
     else:
         tier = "sonnet"
+    _log.info("[ROUTING DEBUG] Gate 3 (rule count): %d rules, confidence=%s → %s", rule_count, confidence_band, tier)
 
     # Gate 4: Domain/jurisdiction diversity upgrades
-    unique_domains = {rule.domain for rule in retrieved_rules if rule.domain and rule.domain != "other"}
-    unique_jurisdictions = {rule.jurisdiction for rule in retrieved_rules if rule.jurisdiction and rule.jurisdiction != "global"}
     if len(unique_domains) >= 2:
+        prev = tier
         tier = _upgrade_tier(tier)
+        _log.info("[ROUTING DEBUG] Gate 4a (domain upgrade): %d domains %s → %s to %s", len(unique_domains), unique_domains, prev, tier)
     if len(unique_jurisdictions) >= 2:
+        prev = tier
         tier = _upgrade_tier(tier)
+        _log.info("[ROUTING DEBUG] Gate 4b (jurisdiction upgrade): %d jurisdictions %s → %s to %s", len(unique_jurisdictions), unique_jurisdictions, prev, tier)
 
     # Gate 5: Low confidence upgrade
     if confidence_band == "low":
+        prev = tier
         tier = _upgrade_tier(tier)
+        _log.info("[ROUTING DEBUG] Gate 5 (low confidence): %s → %s", prev, tier)
 
+    _log.info("[ROUTING DEBUG] FINAL TIER: %s", tier)
     return tier  # type: ignore[return-value]
 def _query_needs_lcopilot_redirect(query: str) -> bool:
     lowered = query.lower()
