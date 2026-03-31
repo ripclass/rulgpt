@@ -170,7 +170,7 @@ export function Home() {
           id: `preview-${crypto.randomUUID()}`,
           queryId: previewQueryId,
           role: 'assistant',
-          text: 'RuleGPT is showing the product shell here. Once the live answer engine is enabled for this environment, this same flow will return citation-backed answers.',
+          text: 'tfrules is showing the product shell here. Once the live answer engine is enabled for this environment, this same flow will return citation-backed answers.',
           createdAt: new Date().toISOString(),
           confidence: 'low',
           citations: [],

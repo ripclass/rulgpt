@@ -30,21 +30,21 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
       return (
         <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col items-start justify-center px-4 py-10">
           <div className="glass-panel w-full rounded-2xl p-6 md:p-8">
-            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary">RuleGPT</p>
-            <h1 className="mt-3 font-display text-4xl font-medium tracking-[-0.05em] text-[#0c111d]">
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-primary">tfrules</p>
+            <h1 className="mt-3 font-display text-4xl font-medium tracking-[-0.05em] text-foreground">
               The page hit an unexpected error
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground">
               The error has been recorded. You can reload, go back to chat, or return to the public site.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button className="rounded-none bg-[#111827] text-white hover:bg-primary" onClick={() => window.location.reload()}>
+              <Button className="rounded-none bg-primary text-primary-foreground hover:opacity-90" onClick={() => window.location.reload()}>
                 Reload
               </Button>
-              <Button asChild variant="outline" className="rounded-none border-black/10 bg-white hover:bg-[#faf7f2]">
+              <Button asChild variant="outline" className="rounded-none border-border hover:bg-surface-raised">
                 <Link to="/chat">Go to chat</Link>
               </Button>
-              <Button asChild variant="outline" className="rounded-none border-black/10 bg-white hover:bg-[#faf7f2]">
+              <Button asChild variant="outline" className="rounded-none border-border hover:bg-surface-raised">
                 <Link to="/">Public site</Link>
               </Button>
             </div>

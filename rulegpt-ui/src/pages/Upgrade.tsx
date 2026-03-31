@@ -86,7 +86,7 @@ export function Upgrade() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center px-4 py-10">
       <div className="glass-panel rounded-2xl p-6 md:p-8">
-        <p className="text-sm uppercase tracking-wide text-primary">RuleGPT Pro</p>
+        <p className="text-sm uppercase tracking-wide text-primary">tfrules Pro</p>
         <h1 className="mt-2 text-3xl font-semibold">Upgrade for teams and daily workflows</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {billingStatus.isLoading
@@ -117,14 +117,14 @@ export function Upgrade() {
             variant={billingInterval === 'monthly' ? 'default' : 'outline'}
             onClick={() => setBillingInterval('monthly')}
           >
-            Monthly - $20
+            Monthly - $19
           </Button>
           <Button
             type="button"
             variant={billingInterval === 'annual' ? 'default' : 'outline'}
             onClick={() => setBillingInterval('annual')}
           >
-            Annual - $200
+            Annual - $190
           </Button>
         </div>
         <div className="mt-5 flex flex-wrap gap-2">

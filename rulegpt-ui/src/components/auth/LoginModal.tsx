@@ -42,7 +42,7 @@ export function LoginModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Sign in to RuleGPT</DialogTitle>
+          <DialogTitle>Sign in to tfrules</DialogTitle>
           <DialogDescription>Use email login or OAuth to sync history, saved answers, and billing.</DialogDescription>
         </DialogHeader>
         {blockers.length > 0 ? (
