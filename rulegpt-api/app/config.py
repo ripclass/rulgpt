@@ -26,8 +26,16 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "dev-secret-key-change-in-production"
 
     API_PREFIX: str = "/api"
-    CORS_ORIGINS: List[str] = Field(default_factory=lambda: ["http://localhost:5173"])
-    CORS_ORIGIN_REGEX: str | None = r"^https://.*\.vercel\.app$"
+    CORS_ORIGINS: List[str] = Field(
+        default_factory=lambda: [
+            "http://localhost:5173",
+            "https://www.tfrules.com",
+            "https://tfrules.com",
+        ]
+    )
+    CORS_ORIGIN_REGEX: str | None = (
+        r"^https://([a-z0-9-]+\.)*vercel\.app$|^https://([a-z0-9-]+\.)?tfrules\.com$"
+    )
 
     FREE_TIER_MONTHLY_LIMIT: int = 10
     PRO_TIER_API_LIMIT: int = 10000
