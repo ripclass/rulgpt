@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,32 +6,31 @@
 
 @layer base {
   :root {
-    --background: 0 0% 4%;
-    --foreground: 36 30% 93%;
-    --card: 0 0% 7%;
-    --card-foreground: 36 30% 93%;
-    --popover: 0 0% 7%;
-    --popover-foreground: 36 30% 93%;
-    --primary: 36 90% 44%;
-    --primary-foreground: 0 0% 4%;
-    --secondary: 0 0% 10%;
-    --secondary-foreground: 36 30% 93%;
-    --muted: 0 0% 10%;
-    --muted-foreground: 24 10% 49%;
-    --accent: 36 90% 44%;
-    --accent-foreground: 0 0% 4%;
-    --border: 0 0% 16%;
-    --input: 0 0% 16%;
-    --ring: 36 90% 44%;
-    --radius: 0.5rem;
+    --background: 220 10% 6%;
+    --foreground: 0 0% 95%;
+    --card: 220 10% 9%;
+    --card-foreground: 0 0% 95%;
+    --popover: 220 10% 9%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 36 90% 50%;
+    --primary-foreground: 220 10% 6%;
+    --secondary: 220 8% 14%;
+    --secondary-foreground: 0 0% 85%;
+    --muted: 220 8% 14%;
+    --muted-foreground: 220 5% 50%;
+    --accent: 36 90% 50%;
+    --accent-foreground: 220 10% 6%;
+    --border: 220 8% 16%;
+    --input: 220 8% 16%;
+    --ring: 36 90% 50%;
+    --radius: 0.625rem;
 
-    /* Extended palette for components */
-    --surface: 0 0% 7%;
-    --surface-raised: 0 0% 10%;
-    --border-subtle: 0 0% 12%;
-    --accent-hover: 28 82% 35%;
-    --accent-muted: 28 82% 22%;
-    --success: 160 84% 39%;
+    --surface: 220 10% 9%;
+    --surface-raised: 220 8% 12%;
+    --border-subtle: 220 8% 13%;
+    --accent-hover: 36 85% 42%;
+    --accent-muted: 36 50% 20%;
+    --success: 142 71% 45%;
     --warning: 38 92% 50%;
     --error: 0 84% 60%;
   }
@@ -42,20 +41,10 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     min-height: 100vh;
-  }
-
-  /* Grain texture overlay — visible but not harsh */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: 0.035;
-    pointer-events: none;
-    z-index: 9999;
-    mix-blend-mode: overlay;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   #root {
@@ -65,8 +54,8 @@
 
 @layer components {
   .glass-panel {
-    @apply border border-border bg-card backdrop-blur-sm;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    @apply border border-border bg-card;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
   .surface-raised {
@@ -74,39 +63,24 @@
     border: 1px solid hsl(var(--border-subtle));
   }
 
-  /* Staggered fade-up animation for page sections */
   @keyframes fade-up {
-    from {
-      opacity: 0;
-      transform: translateY(16px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .animate-fade-up {
-    animation: fade-up 0.5s ease-out both;
+    animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
-  /* Chat message slide-in */
   @keyframes slide-up {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .animate-slide-up {
     animation: slide-up 0.3s ease-out both;
   }
 
-  /* Pulsing dots loading indicator */
   @keyframes pulse-dot {
     0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
     40% { opacity: 1; transform: scale(1); }
@@ -116,121 +90,13 @@
     animation: pulse-dot 1.4s ease-in-out infinite;
   }
 
-  /* ── Atmosphere & depth ── */
-
-  /* Amber glow behind key elements */
-  .glow-amber {
-    box-shadow:
-      0 0 20px hsl(36 90% 44% / 0.08),
-      0 0 60px hsl(36 90% 44% / 0.04);
-  }
-
-  .glow-amber-strong {
-    box-shadow:
-      0 0 30px hsl(36 90% 44% / 0.15),
-      0 0 80px hsl(36 90% 44% / 0.06),
-      inset 0 1px 0 hsl(36 90% 44% / 0.1);
-  }
-
-  /* Card with subtle lift on hover */
-  .card-hover {
-    @apply transition-all duration-300;
-  }
-  .card-hover:hover {
-    transform: translateY(-2px);
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      0 0 0 1px hsl(36 90% 44% / 0.1);
-  }
-
-  /* Winning card — the tfrules comparison card */
-  .card-winner {
-    @apply relative overflow-hidden;
-    box-shadow:
-      0 0 40px hsl(36 90% 44% / 0.1),
-      0 16px 48px rgba(0, 0, 0, 0.3);
-  }
-  .card-winner::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(
-      135deg,
-      hsl(36 90% 44% / 0.4) 0%,
-      hsl(36 90% 44% / 0.1) 50%,
-      hsl(36 90% 44% / 0.3) 100%
-    );
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-  }
-
-  /* Loser card — washed out competitor */
-  .card-loser {
-    opacity: 0.7;
-    filter: saturate(0.5);
-  }
-  .card-loser:hover {
-    opacity: 0.85;
-  }
-
-  /* Section divider with glow */
-  .section-divider {
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      hsl(var(--border)) 20%,
-      hsl(36 90% 44% / 0.3) 50%,
-      hsl(var(--border)) 80%,
-      transparent 100%
-    );
-  }
-
-  /* Floating label badge */
-  .badge-glow {
-    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
-    background: hsl(36 90% 44% / 0.1);
-    border: 1px solid hsl(36 90% 44% / 0.2);
-    color: hsl(var(--primary));
-  }
-
-  /* Hero background — layered depth */
-  .hero-bg {
-    background:
-      radial-gradient(ellipse 80% 60% at 50% 40%, hsl(36 90% 44% / 0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 50% 50%, hsl(28 82% 22% / 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 20% 80%, hsl(0 0% 10% / 0.5) 0%, transparent 40%),
-      radial-gradient(circle at 80% 20%, hsl(0 0% 8% / 0.3) 0%, transparent 40%);
-  }
-
-  /* Subtle grid for depth — very faint */
-  .grid-bg {
-    background-image:
-      linear-gradient(hsl(0 0% 100% / 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(0 0% 100% / 0.02) 1px, transparent 1px);
-    background-size: 64px 64px;
-  }
-
-  /* Feature number styling */
-  .step-number {
-    @apply font-display font-bold;
-    background: linear-gradient(180deg, hsl(var(--primary)) 0%, hsl(var(--accent-hover)) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Smooth reveal for FAQ */
   @keyframes expand {
     from { opacity: 0; max-height: 0; }
-    to { opacity: 1; max-height: 200px; }
+    to { opacity: 1; max-height: 300px; }
   }
+
   .animate-expand {
-    animation: expand 0.25s ease-out both;
+    animation: expand 0.2s ease-out both;
     overflow: hidden;
   }
 }
