@@ -6,14 +6,15 @@ const config: Config = {
   theme: {
     container: {
       center: true,
-      padding: '1.25rem',
+      padding: '1.5rem',
       screens: {
-        '2xl': '1400px',
+        '2xl': '1200px',
       },
     },
     extend: {
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        display: ['"DM Serif Display"', 'Georgia', 'serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       colors: {
@@ -74,7 +75,7 @@ const config: Config = {
           to: { height: '0' },
         },
         'fade-up': {
-          from: { opacity: '0', transform: 'translateY(12px)' },
+          from: { opacity: '0', transform: 'translateY(10px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
         'slide-up': {
@@ -85,7 +86,7 @@ const config: Config = {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'fade-up': 'fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both',
+        'fade-up': 'fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both',
         'slide-up': 'slide-up 0.3s ease-out both',
       },
     },

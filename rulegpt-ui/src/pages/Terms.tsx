@@ -7,7 +7,7 @@ export function Terms() {
       title="Terms of use"
       description="This is a launch-ready first-pass terms page. It makes the product boundary explicit and reduces ambiguity about what tfrules is and is not doing."
     >
-      <section className="space-y-6 border border-border bg-card px-6 py-6 text-sm leading-7 text-muted-foreground">
+      <section className="space-y-6 rounded-xl border border-border bg-card px-6 py-6 text-sm leading-7 text-muted-foreground">
         <div>
           <h2 className="font-display text-2xl font-medium tracking-[-0.03em] text-foreground">Product scope</h2>
           <p className="mt-2">tfrules provides trade-finance rule explanations and citation-backed information. It does not provide legal advice, transaction approval, or professional assurance.</p>

@@ -46,7 +46,7 @@ export function PublicPageShell({ eyebrow, title, description, children }: Publi
             </Link>
             <Link
               to="/chat"
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+              className="rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition hover:bg-foreground/90"
             >
               Try free &rarr;
             </Link>

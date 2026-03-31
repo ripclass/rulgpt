@@ -70,7 +70,7 @@ export function QueryInput({ disabled, previewMode, layout = 'docked', onSubmit 
         <div className="flex items-center gap-3">
           <Button
             size={isCentered ? 'default' : 'sm'}
-            className="rounded-lg bg-primary px-4 text-primary-foreground hover:bg-amber-hover"
+            className="rounded-full bg-foreground px-5 text-background hover:bg-foreground/90"
             disabled={disabled || !value.trim() || isTooLong}
           >
             Send <SendHorizonal className="ml-2 h-4 w-4" />

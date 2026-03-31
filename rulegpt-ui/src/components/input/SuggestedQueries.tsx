@@ -13,7 +13,7 @@ export function SuggestedQueries({ suggestions, onPick, disabled }: SuggestedQue
         <Button
           key={suggestion}
           variant="outline"
-          className="h-auto justify-start whitespace-normal rounded-lg border border-border bg-card px-4 py-4 text-left text-sm text-foreground transition-all hover:border-primary/30 hover:bg-surface-raised cursor-pointer"
+          className="h-auto justify-start whitespace-normal rounded-xl border border-border bg-card px-4 py-4 text-left text-sm text-foreground transition-all hover:bg-muted cursor-pointer"
           disabled={disabled}
           onClick={() => onPick(suggestion)}
         >

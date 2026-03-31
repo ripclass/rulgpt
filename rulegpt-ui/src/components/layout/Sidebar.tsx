@@ -62,7 +62,7 @@ export function Sidebar({
         <p className="mt-2 text-xs text-muted-foreground">Trade rules, cited.</p>
       </div>
 
-      <Button className="mt-4 h-11 w-full bg-primary text-primary-foreground hover:bg-amber-hover" onClick={onNewQuery}>
+      <Button className="mt-4 h-11 w-full rounded-full bg-foreground text-background hover:bg-foreground/90" onClick={onNewQuery}>
         <Plus className="mr-2 h-4 w-4" /> New chat
       </Button>
 
@@ -79,7 +79,7 @@ export function Sidebar({
             key={category}
             type="button"
             disabled={previewMode}
-            className="w-full rounded border border-[hsl(var(--border-subtle))] bg-surface-raised px-3 py-2 text-left text-xs text-foreground transition hover:border-primary/40 hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-lg px-3 py-2 text-left text-xs text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
             onClick={() => onQuickCategory(category)}
           >
             {category}
@@ -105,7 +105,7 @@ export function Sidebar({
             <Button variant="outline" className="w-full border-border text-muted-foreground hover:text-foreground hover:bg-surface-raised" onClick={onOpenLogin}>
               Sign in
             </Button>
-            <Button className="w-full bg-primary text-primary-foreground hover:bg-amber-hover" onClick={onOpenSignup}>
+            <Button className="w-full rounded-full bg-foreground text-background hover:bg-foreground/90" onClick={onOpenSignup}>
               Sign up
             </Button>
           </div>

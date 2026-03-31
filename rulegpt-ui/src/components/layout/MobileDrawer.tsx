@@ -54,7 +54,7 @@ export function MobileDrawer({
               API Access
             </Link>
           </Button>
-          <Button asChild className="w-full bg-primary text-primary-foreground hover:bg-amber-hover">
+          <Button asChild className="w-full rounded-full bg-foreground text-background hover:bg-foreground/90">
             <Link to="/upgrade" onClick={() => onOpenChange(false)}>
               Upgrade
             </Link>

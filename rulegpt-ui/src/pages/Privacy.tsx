@@ -7,7 +7,7 @@ export function Privacy() {
       title="Privacy policy"
       description="This is a lean first-pass privacy page for launch. It states what tfrules collects, why it is collected, and how users can contact you."
     >
-      <section className="space-y-6 border border-border bg-card px-6 py-6 text-sm leading-7 text-muted-foreground">
+      <section className="space-y-6 rounded-xl border border-border bg-card px-6 py-6 text-sm leading-7 text-muted-foreground">
         <div>
           <h2 className="font-display text-2xl font-medium tracking-[-0.03em] text-foreground">What we collect</h2>
           <p className="mt-2">tfrules may collect account information, query history, saved answers, technical logs, usage analytics, and support messages.</p>

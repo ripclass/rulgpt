@@ -84,7 +84,7 @@ export function Upgrade() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center px-4 py-10">
+    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center bg-background px-4 py-10">
       <div className="glass-panel rounded-2xl p-6 md:p-8">
         <p className="text-sm uppercase tracking-wide text-primary">tfrules Pro</p>
         <h1 className="mt-2 text-3xl font-semibold">Upgrade for teams and daily workflows</h1>

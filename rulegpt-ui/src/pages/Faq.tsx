@@ -36,7 +36,7 @@ export function Faq() {
     >
       <section className="space-y-3">
         {faqs.map((faq, i) => (
-          <div key={i} className="rounded-lg border border-border">
+          <div key={i} className="rounded-xl border border-border bg-card">
             <button
               type="button"
               onClick={() => setOpenIndex(openIndex === i ? null : i)}

@@ -27,7 +27,7 @@ export function Contact() {
     >
       <section className="grid gap-4 md:grid-cols-3">
         {contacts.map((contact) => (
-          <article key={contact.label} className="border border-border bg-card px-6 py-6">
+          <article key={contact.label} className="rounded-xl border border-border bg-card px-6 py-6">
             <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{contact.label}</p>
             <p className="mt-3 text-lg font-semibold text-foreground">{contact.value}</p>
             <p className="mt-2 text-sm leading-7 text-muted-foreground">{contact.note}</p>
@@ -35,7 +35,7 @@ export function Contact() {
         ))}
       </section>
 
-      <section className="mt-8 border border-border bg-card px-6 py-6">
+      <section className="mt-8 rounded-xl border border-border bg-card px-6 py-6">
         <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">What to send</p>
         <div className="mt-4 space-y-3 text-sm leading-7 text-muted-foreground">
           <p>For answer-quality issues, include the exact question, what you expected, and which rule or source you think was missed.</p>
