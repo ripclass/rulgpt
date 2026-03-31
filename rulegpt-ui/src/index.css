@@ -46,15 +46,16 @@
     min-height: 100vh;
   }
 
-  /* Grain texture overlay */
+  /* Grain texture overlay — visible but not harsh */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.035;
     pointer-events: none;
     z-index: 9999;
+    mix-blend-mode: overlay;
   }
 
   #root {
@@ -113,5 +114,123 @@
 
   .animate-pulse-dot {
     animation: pulse-dot 1.4s ease-in-out infinite;
+  }
+
+  /* ── Atmosphere & depth ── */
+
+  /* Amber glow behind key elements */
+  .glow-amber {
+    box-shadow:
+      0 0 20px hsl(36 90% 44% / 0.08),
+      0 0 60px hsl(36 90% 44% / 0.04);
+  }
+
+  .glow-amber-strong {
+    box-shadow:
+      0 0 30px hsl(36 90% 44% / 0.15),
+      0 0 80px hsl(36 90% 44% / 0.06),
+      inset 0 1px 0 hsl(36 90% 44% / 0.1);
+  }
+
+  /* Card with subtle lift on hover */
+  .card-hover {
+    @apply transition-all duration-300;
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      0 0 0 1px hsl(36 90% 44% / 0.1);
+  }
+
+  /* Winning card — the tfrules comparison card */
+  .card-winner {
+    @apply relative overflow-hidden;
+    box-shadow:
+      0 0 40px hsl(36 90% 44% / 0.1),
+      0 16px 48px rgba(0, 0, 0, 0.3);
+  }
+  .card-winner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      hsl(36 90% 44% / 0.4) 0%,
+      hsl(36 90% 44% / 0.1) 50%,
+      hsl(36 90% 44% / 0.3) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  /* Loser card — washed out competitor */
+  .card-loser {
+    opacity: 0.7;
+    filter: saturate(0.5);
+  }
+  .card-loser:hover {
+    opacity: 0.85;
+  }
+
+  /* Section divider with glow */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--border)) 20%,
+      hsl(36 90% 44% / 0.3) 50%,
+      hsl(var(--border)) 80%,
+      transparent 100%
+    );
+  }
+
+  /* Floating label badge */
+  .badge-glow {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
+    background: hsl(36 90% 44% / 0.1);
+    border: 1px solid hsl(36 90% 44% / 0.2);
+    color: hsl(var(--primary));
+  }
+
+  /* Hero background — layered depth */
+  .hero-bg {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 40%, hsl(36 90% 44% / 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 50% 50%, hsl(28 82% 22% / 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 20% 80%, hsl(0 0% 10% / 0.5) 0%, transparent 40%),
+      radial-gradient(circle at 80% 20%, hsl(0 0% 8% / 0.3) 0%, transparent 40%);
+  }
+
+  /* Subtle grid for depth — very faint */
+  .grid-bg {
+    background-image:
+      linear-gradient(hsl(0 0% 100% / 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(0 0% 100% / 0.02) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  /* Feature number styling */
+  .step-number {
+    @apply font-display font-bold;
+    background: linear-gradient(180deg, hsl(var(--primary)) 0%, hsl(var(--accent-hover)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Smooth reveal for FAQ */
+  @keyframes expand {
+    from { opacity: 0; max-height: 0; }
+    to { opacity: 1; max-height: 200px; }
+  }
+  .animate-expand {
+    animation: expand 0.25s ease-out both;
+    overflow: hidden;
   }
 }
