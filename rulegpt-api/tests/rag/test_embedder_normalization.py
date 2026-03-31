@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from app.services.rag.embedder import build_embedding_content, normalize_rule_record
+import json
+from pathlib import Path
+
+from app.services.rag.embedder import build_embedding_content, load_rules_from_local_data, normalize_rule_record
 
 
 def test_normalize_icc_shape():
@@ -62,3 +65,27 @@ def test_normalize_bank_profile_shape():
     content = build_embedding_content(normalized)
     assert "HDFC" in content or "hdfc" in content.lower()
 
+
+def test_load_rules_from_local_data_skips_non_rule_objects(tmp_path: Path):
+    non_rule = {
+        "domain": "bank_behavior",
+        "version": "v1",
+        "template_name": "case_output_contract",
+        "required_sections": ["summary", "reasoning"],
+    }
+    rule = {
+        "rule_id": "UCP600_20A",
+        "title": "Bill of lading must indicate shipment",
+        "reference": "UCP600 Article 20(a)",
+        "text": "A bill of lading must indicate shipment on board.",
+        "conditions": [{"document": "bill_of_lading"}],
+        "severity": "high",
+    }
+
+    (tmp_path / "templates.json").write_text(json.dumps(non_rule), encoding="utf-8")
+    (tmp_path / "rules.json").write_text(json.dumps([rule]), encoding="utf-8")
+
+    loaded = load_rules_from_local_data(tmp_path)
+
+    assert len(loaded) == 1
+    assert loaded[0].rule_id == "UCP600_20A"

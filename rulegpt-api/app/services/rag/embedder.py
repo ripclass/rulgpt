@@ -328,16 +328,40 @@ def build_embedding_content(rule: NormalizedRule) -> str:
 
 
 def _load_json_file(path: Path) -> List[Dict[str, Any]]:
+    def _looks_like_rule_record(record: Dict[str, Any]) -> bool:
+        if not isinstance(record, dict):
+            return False
+        if isinstance(record.get("rules"), list):
+            return True
+        if _as_str(record.get("rule_id")) or _as_str(record.get("id")):
+            return True
+
+        descriptive_fields = (
+            "title",
+            "text",
+            "description",
+            "summary",
+            "reference",
+            "article",
+            "conditions",
+            "condition",
+            "expected_outcome",
+            "examples",
+            "severity",
+        )
+        populated = sum(1 for field in descriptive_fields if record.get(field) not in (None, "", [], {}))
+        return populated >= 2
+
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
         return []
     if isinstance(payload, list):
-        return [item for item in payload if isinstance(item, dict)]
+        return [item for item in payload if _looks_like_rule_record(item)]
     if isinstance(payload, dict):
         if isinstance(payload.get("rules"), list):
-            return [item for item in payload["rules"] if isinstance(item, dict)]
-        return [payload]
+            return [item for item in payload["rules"] if _looks_like_rule_record(item)]
+        return [payload] if _looks_like_rule_record(payload) else []
     return []
 
 
