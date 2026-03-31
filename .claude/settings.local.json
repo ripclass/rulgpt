@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(python -m pytest tests/rag/test_smart_routing.py -v)",
-      "Bash(python -m pytest tests/ -v)"
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(npm run:*)",
+      "Bash(cd:*)"
     ]
+  },
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   }
 }

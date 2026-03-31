@@ -1,6 +1,7 @@
 import type { Citation, Message } from '@/types'
 import { UserMessage } from '@/components/chat/UserMessage'
 import { RuleGPTMessage } from '@/components/chat/RuleGPTMessage'
+import { LoadingDots } from '@/components/shared/LoadingDots'
 
 interface ChatThreadProps {
   messages: Message[]
@@ -15,21 +16,27 @@ export function ChatThread({ messages, isLoading, canSave, onCitationClick, onSa
     <section className="space-y-6">
       {messages.map((message) =>
         message.role === 'user' ? (
-          <UserMessage key={message.id} message={message} />
+          <div key={message.id} className="animate-slide-up">
+            <UserMessage message={message} />
+          </div>
         ) : (
-          <RuleGPTMessage
-            key={message.id}
-            message={message}
-            canSave={canSave}
-            onCitationClick={onCitationClick}
-            onSave={onSave}
-          />
+          <div key={message.id} className="animate-slide-up">
+            <RuleGPTMessage
+              message={message}
+              canSave={canSave}
+              onCitationClick={onCitationClick}
+              onSave={onSave}
+            />
+          </div>
         ),
       )}
       {isLoading ? (
-        <div className="flex justify-start">
-          <div className="w-full border border-black/10 bg-white px-5 py-4 text-sm text-muted-foreground">
-            RuleGPT is analyzing rules...
+        <div className="flex justify-start animate-slide-up">
+          <div className="w-full rounded-lg rounded-bl-sm border border-border bg-card px-5 py-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <LoadingDots />
+              <span>Analyzing rules...</span>
+            </div>
           </div>
         </div>
       ) : null}

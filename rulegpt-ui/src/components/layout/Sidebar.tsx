@@ -5,6 +5,7 @@ import { QueryHistory } from '@/components/shared/QueryHistory'
 import { SavedAnswers } from '@/components/shared/SavedAnswers'
 import { FreeTierCounter } from '@/components/shared/FreeTierCounter'
 import { UpgradeCTA } from '@/components/conversion/UpgradeCTA'
+import { RuxMark } from '@/components/shared/RuxMascot'
 import type { HistoryItem, SavedAnswer, SessionTier } from '@/types'
 
 interface SidebarProps {
@@ -52,13 +53,16 @@ export function Sidebar({
   onLogout,
 }: SidebarProps) {
   return (
-    <aside className="hidden h-screen w-[308px] shrink-0 border-r border-black/10 bg-[#f7f3ec] px-4 py-5 md:flex md:flex-col">
-      <div className="border-b border-black/10 pb-4">
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">RuleGPT / Chat</p>
-        <p className="mt-2 text-xl font-semibold tracking-tight text-[#0c111d]">Trade rules, without the memo.</p>
+    <aside className="hidden h-screen w-64 shrink-0 border-r border-border bg-card px-4 py-5 md:flex md:flex-col">
+      <div className="border-b border-border pb-4">
+        <div className="flex items-center gap-2">
+          <RuxMark />
+          <span className="font-display text-lg text-foreground">tfrules</span>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">Trade rules, cited.</p>
       </div>
 
-      <Button className="mt-4 h-11 w-full rounded-none bg-[#111827] font-mono text-xs uppercase tracking-[0.16em] text-white hover:bg-primary" onClick={onNewQuery}>
+      <Button className="mt-4 h-11 w-full bg-primary text-primary-foreground hover:bg-amber-hover" onClick={onNewQuery}>
         <Plus className="mr-2 h-4 w-4" /> New chat
       </Button>
 
@@ -75,7 +79,7 @@ export function Sidebar({
             key={category}
             type="button"
             disabled={previewMode}
-            className="w-full rounded-none border border-black/10 bg-white px-3 py-2 text-left text-xs text-[#0c111d] transition hover:border-primary hover:bg-[#fff7f1] disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded border border-[hsl(var(--border-subtle))] bg-surface-raised px-3 py-2 text-left text-xs text-foreground transition hover:border-primary/40 hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-50"
             onClick={() => onQuickCategory(category)}
           >
             {category}
@@ -90,23 +94,23 @@ export function Sidebar({
         <SavedAnswers items={savedAnswers} onDelete={onDeleteSaved} />
       </div>
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-4 space-y-3 border-t border-border pt-4">
         <UpgradeCTA tier={tier} />
         {isAuthenticated ? (
-          <Button variant="ghost" className="w-full justify-start rounded-none border border-black/10 bg-white text-[#0c111d] hover:bg-[#faf7f2]" onClick={onLogout}>
+          <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-surface-raised" onClick={onLogout}>
             <LogOut className="mr-2 h-4 w-4" /> Logout
           </Button>
         ) : (
           <div className="flex gap-2">
-            <Button variant="outline" className="w-full rounded-none border-black/10 bg-white hover:bg-[#faf7f2]" onClick={onOpenLogin}>
+            <Button variant="outline" className="w-full border-border text-muted-foreground hover:text-foreground hover:bg-surface-raised" onClick={onOpenLogin}>
               Sign in
             </Button>
-            <Button className="w-full rounded-none bg-primary text-primary-foreground hover:bg-primary/90" onClick={onOpenSignup}>
+            <Button className="w-full bg-primary text-primary-foreground hover:bg-amber-hover" onClick={onOpenSignup}>
               Sign up
             </Button>
           </div>
         )}
-        <Button asChild variant="ghost" className="w-full justify-start rounded-none text-xs text-[#0c111d] hover:bg-[#faf7f2]">
+        <Button asChild variant="ghost" className="w-full justify-start text-xs text-muted-foreground hover:text-foreground hover:bg-surface-raised">
           <Link to="/api-access">API access</Link>
         </Button>
       </div>

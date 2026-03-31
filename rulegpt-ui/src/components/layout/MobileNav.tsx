@@ -10,22 +10,22 @@ interface MobileNavProps {
 
 export function MobileNav({ onNewQuery, onHistory, onSaved, onPro }: MobileNavProps) {
   return (
-    <nav className="glass-panel fixed bottom-4 left-1/2 z-30 flex w-[calc(100%-1.5rem)] max-w-md -translate-x-1/2 items-center justify-between rounded-xl px-3 py-2 md:hidden">
-      <Button size="sm" variant="ghost" onClick={onNewQuery}>
+    <nav className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between border-t border-border bg-card/90 px-4 py-2 backdrop-blur md:hidden">
+      <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-primary" onClick={onNewQuery}>
         <MessageSquare className="mr-1 h-4 w-4" />
-        New
+        <span className="text-xs">New</span>
       </Button>
-      <Button size="sm" variant="ghost" onClick={onHistory}>
+      <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-primary" onClick={onHistory}>
         <Clock3 className="mr-1 h-4 w-4" />
-        History
+        <span className="text-xs">History</span>
       </Button>
-      <Button size="sm" variant="ghost" onClick={onSaved}>
+      <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-primary" onClick={onSaved}>
         <Bookmark className="mr-1 h-4 w-4" />
-        Saved
+        <span className="text-xs">Saved</span>
       </Button>
-      <Button size="sm" variant="ghost" onClick={onPro}>
+      <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-primary" onClick={onPro}>
         <Sparkles className="mr-1 h-4 w-4 text-primary" />
-        Pro
+        <span className="text-xs">Pro</span>
       </Button>
     </nav>
   )

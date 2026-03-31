@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { ChatThread } from '@/components/chat/ChatThread'
 import { QueryInput } from '@/components/input/QueryInput'
 import { SuggestedQueries } from '@/components/input/SuggestedQueries'
+import { RuxMascot } from '@/components/shared/RuxMascot'
 import type { Citation, Message } from '@/types'
 
 interface MainAreaProps {
@@ -36,21 +37,19 @@ export function MainArea({
   const isEmpty = messages.length === 0
 
   return (
-    <main className="flex min-h-screen flex-1 flex-col pb-28 md:pb-0">
-      <header className="border-b border-black/10 bg-background/85 px-4 py-4 backdrop-blur-xl md:px-8">
+    <main className="flex min-h-screen flex-1 flex-col bg-background pb-28 md:pb-0">
+      <header className="border-b border-border bg-card/80 px-4 py-4 backdrop-blur md:px-8">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                RuleGPT / Chat
-              </p>
-              <p className="mt-1 text-sm text-[#0c111d]">
-                {previewMode ? 'Preview workspace' : 'Short answers grounded in published trade rules'}
+              <span className="font-display text-lg text-foreground">tfrules</span>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {previewMode ? 'Preview workspace' : 'Cited trade finance answers'}
               </p>
             </div>
             <Badge
               variant="outline"
-              className={previewMode ? 'border-primary/25 bg-[#f7d9cb] text-primary' : 'border-emerald-600/20 bg-emerald-50 text-emerald-700'}
+              className={previewMode ? 'border-primary/25 bg-amber-muted/30 text-primary text-xs rounded-full' : 'border-success/20 bg-success/10 text-success text-xs rounded-full'}
             >
               {previewMode ? 'Preview' : 'Live'}
             </Badge>
@@ -59,7 +58,7 @@ export function MainArea({
           <div className="flex items-center gap-2">
             <Link
               to="/"
-              className="rounded-none border border-black/10 bg-white px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#0c111d] transition hover:bg-[#faf7f2]"
+              className="rounded-md border border-border bg-surface-raised px-3 py-2 text-xs text-muted-foreground transition hover:text-foreground hover:bg-secondary"
             >
               Public site
             </Link>
@@ -68,7 +67,7 @@ export function MainArea({
               <button
                 type="button"
                 onClick={onNewQuery}
-                className="rounded-none border border-black/10 bg-white px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#0c111d] transition hover:bg-[#faf7f2]"
+                className="rounded-md border border-border bg-surface-raised px-3 py-2 text-xs text-muted-foreground transition hover:text-foreground hover:bg-secondary"
               >
                 New chat
               </button>
@@ -78,23 +77,21 @@ export function MainArea({
       </header>
 
       {isEmpty ? (
-        <section className="flex flex-1 items-center px-4 py-10 md:px-8">
+        <section className="flex flex-1 items-center justify-center px-4 py-10 md:px-8">
           <div className="mx-auto flex w-full max-w-3xl flex-col items-center">
             {error ? (
-              <div className="mb-6 flex w-full items-center gap-2 border border-red-500/20 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="mb-6 flex w-full items-center gap-2 rounded-lg border border-error/20 bg-error/10 px-4 py-3 text-sm text-error">
                 <AlertTriangle className="h-4 w-4" /> {error}
               </div>
             ) : null}
 
-            <div className="w-full text-center">
-              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                Trade finance compliance assistant
-              </p>
-              <h2 className="mt-4 font-display text-4xl font-medium tracking-[-0.05em] text-[#0c111d] md:text-5xl">
-                Ask the rule.
+            <div className="flex w-full flex-col items-center text-center">
+              <RuxMascot pose="searching" size={64} />
+              <h2 className="mt-6 font-display text-2xl text-foreground">
+                Ask about any trade finance rule.
               </h2>
-              <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-muted-foreground md:text-[15px]">
-                Ask in plain English. Get the rule first, the explanation second, and no memo-style blob.
+              <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
+                UCP600 &middot; ISBP745 &middot; Incoterms &middot; Sanctions &middot; FTAs &middot; Customs &middot; Bank requirements
               </p>
             </div>
 
@@ -108,9 +105,6 @@ export function MainArea({
             </div>
 
             <div className="mt-6 w-full">
-              <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                Suggested prompts
-              </p>
               <SuggestedQueries suggestions={suggestions} onPick={onPickSuggestion} />
             </div>
           </div>
@@ -120,7 +114,7 @@ export function MainArea({
           <section className="flex-1 overflow-y-auto px-4 py-6 md:px-8 md:py-8">
             <div className="mx-auto max-w-[780px] space-y-6">
               {error ? (
-                <div className="flex items-center gap-2 border border-red-500/20 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <div className="flex items-center gap-2 rounded-lg border border-error/20 bg-error/10 px-4 py-3 text-sm text-error">
                   <AlertTriangle className="h-4 w-4" /> {error}
                 </div>
               ) : null}
@@ -135,7 +129,7 @@ export function MainArea({
             </div>
           </section>
 
-          <div className="border-t border-black/10 bg-background/92 px-4 py-4 backdrop-blur-xl md:px-8">
+          <div className="sticky bottom-0 border-t border-border bg-card px-4 py-4 md:px-8">
             <div className="mx-auto max-w-[780px]">
               <QueryInput disabled={isLoading} previewMode={previewMode} onSubmit={onSubmitQuery} />
             </div>

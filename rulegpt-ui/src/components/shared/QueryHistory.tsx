@@ -12,9 +12,9 @@ export function QueryHistory({ items, onPick, disabled }: QueryHistoryProps) {
   return (
     <div className="space-y-4">
       {Object.entries(grouped).map(([label, rows]) => (
-        <div key={label} className="space-y-2">
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</p>
-          <div className="space-y-1">
+        <div key={label} className="space-y-1">
+          <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">{label}</p>
+          <div className="space-y-0.5">
             {rows.map((item) => (
               <button
                 key={item.query_id}
@@ -22,7 +22,7 @@ export function QueryHistory({ items, onPick, disabled }: QueryHistoryProps) {
                 title={item.query_text}
                 disabled={disabled}
                 onClick={() => onPick(item)}
-                className="w-full truncate rounded-none border border-black/10 bg-white px-3 py-2 text-left text-xs text-[#243042] transition hover:border-primary hover:bg-[#fff7f1] disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full truncate rounded-md px-2 py-1.5 text-left text-sm text-foreground transition hover:bg-surface-raised cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {item.query_text}
               </button>
@@ -30,7 +30,7 @@ export function QueryHistory({ items, onPick, disabled }: QueryHistoryProps) {
           </div>
         </div>
       ))}
-      {items.length === 0 ? <p className="text-xs text-muted-foreground">No query history yet.</p> : null}
+      {items.length === 0 ? <p className="text-sm text-muted-foreground">No query history yet.</p> : null}
     </div>
   )
 }

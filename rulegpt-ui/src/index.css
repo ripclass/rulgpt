@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,24 +6,34 @@
 
 @layer base {
   :root {
-    --background: 36 50% 98%;
-    --foreground: 221 37% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 221 37% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 221 37% 11%;
-    --primary: 16 72% 46%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 40 33% 96%;
-    --secondary-foreground: 221 37% 11%;
-    --muted: 35 26% 95%;
-    --muted-foreground: 217 14% 42%;
-    --accent: 16 72% 46%;
-    --accent-foreground: 0 0% 100%;
-    --border: 220 20% 89%;
-    --input: 220 20% 91%;
-    --ring: 16 72% 46%;
-    --radius: 0.75rem;
+    --background: 0 0% 4%;
+    --foreground: 36 30% 93%;
+    --card: 0 0% 7%;
+    --card-foreground: 36 30% 93%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 36 30% 93%;
+    --primary: 36 90% 44%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 36 30% 93%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 24 10% 49%;
+    --accent: 36 90% 44%;
+    --accent-foreground: 0 0% 4%;
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 36 90% 44%;
+    --radius: 0.5rem;
+
+    /* Extended palette for components */
+    --surface: 0 0% 7%;
+    --surface-raised: 0 0% 10%;
+    --border-subtle: 0 0% 12%;
+    --accent-hover: 28 82% 35%;
+    --accent-muted: 28 82% 22%;
+    --success: 160 84% 39%;
+    --warning: 38 92% 50%;
+    --error: 0 84% 60%;
   }
 
   * {
@@ -32,15 +42,19 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    background-image:
-      radial-gradient(circle at 12% 18%, rgba(201, 75, 34, 0.11), transparent 22%),
-      radial-gradient(circle at 85% 84%, rgba(201, 75, 34, 0.06), transparent 26%),
-      linear-gradient(rgba(12, 17, 29, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(12, 17, 29, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, #fffdf8, #ffffff 55%, #fffcf6);
-    background-size: auto, auto, 28px 28px, 28px 28px, auto;
+    font-family: 'DM Sans', sans-serif;
     min-height: 100vh;
-    font-family: 'Inter', sans-serif;
+  }
+
+  /* Grain texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 9999;
   }
 
   #root {
@@ -50,24 +64,54 @@
 
 @layer components {
   .glass-panel {
-    @apply border border-border/90 bg-card/90 backdrop-blur;
-    box-shadow: 0 25px 60px rgba(17, 24, 39, 0.06);
+    @apply border border-border bg-card backdrop-blur-sm;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
   }
 
-  .ops-hero-art {
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.18)),
-      linear-gradient(90deg, rgba(12, 17, 29, 0.08) 1px, transparent 1px),
-      linear-gradient(0deg, rgba(12, 17, 29, 0.05) 1px, transparent 1px),
-      repeating-linear-gradient(
-        90deg,
-        rgba(12, 17, 29, 0.12) 0,
-        rgba(12, 17, 29, 0.12) 2px,
-        transparent 2px,
-        transparent 11px
-      ),
-      radial-gradient(circle at 65% 38%, rgba(201, 75, 34, 0.16), transparent 28%);
-    background-size: auto, 18px 18px, 18px 18px, 11px 100%, auto;
-    filter: grayscale(1);
+  .surface-raised {
+    background-color: hsl(var(--surface-raised));
+    border: 1px solid hsl(var(--border-subtle));
+  }
+
+  /* Staggered fade-up animation for page sections */
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.5s ease-out both;
+  }
+
+  /* Chat message slide-in */
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out both;
+  }
+
+  /* Pulsing dots loading indicator */
+  @keyframes pulse-dot {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+
+  .animate-pulse-dot {
+    animation: pulse-dot 1.4s ease-in-out infinite;
   }
 }

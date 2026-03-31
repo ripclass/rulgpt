@@ -9,12 +9,12 @@ interface MessageActionsProps {
 
 export function MessageActions({ canSave = true, onCopy, onSave }: MessageActionsProps) {
   return (
-    <div className="mt-4 flex flex-wrap gap-2 border-t border-black/8 pt-3">
+    <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-3 opacity-0 transition-opacity group-hover:opacity-100">
       <Button
         type="button"
         variant="ghost"
         size="sm"
-        className="rounded-none px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground hover:bg-[#faf7f2] hover:text-[#0c111d]"
+        className="px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-surface-raised"
         onClick={onCopy}
       >
         <Copy className="mr-1 h-3.5 w-3.5" /> Copy
@@ -23,7 +23,7 @@ export function MessageActions({ canSave = true, onCopy, onSave }: MessageAction
         type="button"
         variant="ghost"
         size="sm"
-        className="rounded-none px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground hover:bg-[#faf7f2] hover:text-[#0c111d]"
+        className="px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-surface-raised"
         disabled={!canSave}
         onClick={onSave}
       >
@@ -33,25 +33,25 @@ export function MessageActions({ canSave = true, onCopy, onSave }: MessageAction
         type="button"
         variant="ghost"
         size="sm"
-        className="rounded-none px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground hover:bg-[#faf7f2] hover:text-[#0c111d]"
+        className="px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-surface-raised"
       >
         <Share2 className="mr-1 h-3.5 w-3.5" /> Share
       </Button>
       <Button
         type="button"
         variant="ghost"
-        size="sm"
-        className="rounded-none px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground hover:bg-[#faf7f2] hover:text-[#0c111d]"
+        size="icon"
+        className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-surface-raised"
       >
-        <ThumbsUp className="mr-1 h-3.5 w-3.5" />
+        <ThumbsUp className="h-3.5 w-3.5" />
       </Button>
       <Button
         type="button"
         variant="ghost"
-        size="sm"
-        className="rounded-none px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground hover:bg-[#faf7f2] hover:text-[#0c111d]"
+        size="icon"
+        className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-surface-raised"
       >
-        <ThumbsDown className="mr-1 h-3.5 w-3.5" />
+        <ThumbsDown className="h-3.5 w-3.5" />
       </Button>
     </div>
   )

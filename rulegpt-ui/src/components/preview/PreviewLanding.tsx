@@ -1,16 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import {
-  ArrowDown,
-  ArrowRight,
-  BookOpen,
-  DatabaseZap,
-  ShieldCheck,
-  Sparkles,
-} from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
+import { RuxMark } from '@/components/shared/RuxMascot'
 import type { SessionTier } from '@/types'
 
 interface PreviewLandingProps {
@@ -31,53 +23,59 @@ const fallbackSuggestions = [
   'What is the difference between CIF and FOB under Incoterms 2020?',
 ]
 
-const workflow = [
+/* ─── FAQ data (inline on landing) ─── */
+const faqs = [
   {
-    number: '01',
-    title: 'Question Intake',
-    description: 'Start from a trade-finance question, a sanctions scenario, or a document rule check.',
+    q: 'Why not just ask ChatGPT?',
+    a: 'ChatGPT will give you a confident answer. It may be right. It may be wrong. You can\'t tell. tfrules cites the rule so you can verify it yourself.',
   },
   {
-    number: '02',
-    title: 'Rules Retrieval',
-    description: 'Pull the closest published rules by domain, jurisdiction, and document type.',
+    q: 'How current are the rules?',
+    a: 'We cover UCP600 (2007), ISBP745 (2013), current OFAC/EU/UN sanctions lists, RCEP, CPTPP, USMCA, and 4,000+ other rulesets. Sanctions data is updated regularly.',
   },
   {
-    number: '03',
-    title: 'Short Answer First',
-    description: 'Lead with the decisive answer, then explain only what the rules support.',
-  },
-  {
-    number: '04',
-    title: 'Scope Control',
-    description: 'Call out missing transaction facts instead of pretending the rule is complete.',
-  },
-  {
-    number: '05',
-    title: 'Learning Loop',
-    description: 'Capture useful question patterns and low-confidence cases to improve retrieval and answer quality.',
+    q: 'What if you don\'t have the rule I need?',
+    a: 'We tell you clearly. We never make up a rule. If it\'s not in our database, we say so and suggest where to look.',
   },
 ]
 
-const capabilityCards = [
-  {
-    icon: BookOpen,
-    title: 'Citations First',
-    description: 'Every answer points back to the rulebook, article, or paragraph that supports it.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Grounded by Design',
-    description: 'RuleGPT refuses to bluff when the rules are partial or the transaction facts are missing.',
-  },
-  {
-    icon: DatabaseZap,
-    title: 'ICE Training Ready',
-    description: 'Useful sessions stay structured so high-signal queries can become future training data.',
-  },
+/* ─── Database coverage ─── */
+const domains = [
+  { title: 'ICC Standards', items: 'UCP600, ISBP745, ISP98, URDG758, Incoterms 2020' },
+  { title: 'FTA Rules of Origin', items: 'RCEP, CPTPP, USMCA, AFCFTA' },
+  { title: 'Sanctions', items: 'OFAC, EU, UN, UK sanctions lists' },
+  { title: 'Customs', items: '48 countries, HS classification' },
+  { title: 'Bank Profiles', items: '50 global banks, LC requirements' },
+  { title: 'SWIFT / ISO', items: 'Message standards, format rules' },
 ]
 
-const coverageTags = ['UCP600', 'ISBP745', 'Incoterms 2020', 'OFAC', 'FTA Origin Rules', 'Bank Requirements']
+/* ─── Pricing plans ─── */
+const plans = [
+  {
+    name: 'Free',
+    price: '$0',
+    period: '/month',
+    features: ['20 queries per month', 'Citation-backed answers', 'No credit card required'],
+    cta: 'Start free \u2192',
+    featured: false,
+  },
+  {
+    name: 'Starter',
+    price: '$9',
+    period: '/month',
+    features: ['500 queries per month', 'Synced history', 'Saved answers', 'One avoided discrepancy fee covers a year'],
+    cta: 'Get started \u2192',
+    featured: true,
+  },
+  {
+    name: 'Pro',
+    price: '$19',
+    period: '/month',
+    features: ['2,000 queries per month', 'Priority routing', 'API access', 'Exports and reports'],
+    cta: 'Go Pro \u2192',
+    featured: false,
+  },
+]
 
 export function PreviewLanding({
   suggestions,
@@ -93,11 +91,20 @@ export function PreviewLanding({
     () => (suggestions.length > 0 ? suggestions.slice(0, 4) : fallbackSuggestions),
     [suggestions],
   )
-  const [draft, setDraft] = useState(promptSuggestions[0] ?? fallbackSuggestions[0])
 
-  const scrollToWorkbench = () => {
-    document.getElementById('landing-workbench')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+  /* keep draft synced for seeded query flow */
+  const [draft] = useState(promptSuggestions[0] ?? fallbackSuggestions[0])
+
+  /* sticky nav scroll state */
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  /* FAQ accordion */
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   const handlePreviewSubmit = async () => {
     if (!draft.trim()) {
@@ -107,345 +114,268 @@ export function PreviewLanding({
     await onSubmitPreview(draft)
   }
 
-  const accountLabel = isAuthenticated ? 'Signed in' : 'Start free'
-
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b border-border/80 bg-background/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-4 py-4 md:px-10">
+      {/* ─── NAV ─── */}
+      <header
+        className={`sticky top-0 z-50 transition-colors duration-300 ${
+          scrolled ? 'border-b border-border bg-card/90 backdrop-blur-lg' : 'bg-transparent'
+        }`}
+      >
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
+          <Link to="/" className="flex items-center gap-2">
+            <span className="font-display text-xl font-bold text-foreground">tfrules</span>
+            <RuxMark />
+          </Link>
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#111827] font-mono text-sm font-bold tracking-[0.3em] text-white">
-              RG
-            </div>
-            <div>
-              <p className="font-display text-sm font-semibold uppercase tracking-[0.22em]">RuleGPT</p>
-              <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                Trade finance rules assistant
-              </p>
-            </div>
-          </div>
-
-          <div className="hidden items-center gap-3 md:flex">
-            <span className="inline-flex min-h-9 items-center rounded-full bg-[#f7d9cb] px-3 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
-              {accountLabel}
-            </span>
-            {isAuthenticated ? (
-              <div className="hidden items-center gap-3 lg:flex">
-                <div className="text-right">
-                  <p className="text-sm font-medium text-[#0c111d]">Session active</p>
-                  <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-                    {userEmail ?? `${tier.toUpperCase()} account`}
-                  </p>
-                </div>
-                <Button className="bg-[#111827] text-white hover:bg-primary" onClick={onOpenChat}>
-                  Open chat
-                </Button>
-              </div>
-            ) : (
-              <>
-                <Button variant="outline" className="border-black/10 bg-white hover:bg-[#faf7f2]" onClick={onOpenLogin}>
-                  Sign in
-                </Button>
-                <Button className="bg-[#111827] text-white hover:bg-primary" onClick={onOpenSignup}>
-                  Create account
-                </Button>
-              </>
-            )}
-            <Button variant="ghost" className="font-mono text-xs uppercase tracking-[0.16em]" onClick={onOpenChat}>
-              Open chat
-            </Button>
-            <Button asChild variant="ghost" className="font-mono text-xs uppercase tracking-[0.16em]">
-              <Link to="/pricing">Pricing</Link>
-            </Button>
+            <button
+              type="button"
+              onClick={onOpenLogin}
+              className="hidden text-sm text-muted-foreground transition hover:text-foreground md:inline"
+            >
+              Sign in
+            </button>
+            <button
+              type="button"
+              onClick={onOpenChat}
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+            >
+              Try free <span aria-hidden="true">&rarr;</span>
+            </button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1400px] px-4 py-6 md:px-10 md:py-10">
-        <section className="relative overflow-hidden border border-black/10 bg-white px-5 py-5 md:min-h-[620px] md:px-12 md:py-12">
-          <div className="ops-hero-art absolute inset-y-0 right-0 hidden w-[44%] md:block" />
-
-          <div className="relative z-10 max-w-[760px] border border-black/10 bg-white px-6 py-7 shadow-[0_24px_70px_rgba(0,0,0,0.08)] md:px-11 md:py-10">
-            <div className="mb-6 flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em]">
-              <span className="bg-primary px-3 py-1 font-semibold text-primary-foreground">Citation-first answers</span>
-              <span className="text-muted-foreground">Trade finance rules, in plain English</span>
-            </div>
-
-            <h1 className="max-w-[12ch] font-display text-4xl font-medium leading-[1.05] tracking-[-0.05em] text-[#0c111d] md:text-7xl">
-              Ask a trade finance question. Get the rule that matters.
-            </h1>
-
-            <div className="mt-6 max-w-[620px] space-y-4 text-[15px] leading-7 text-[#303030] md:text-[17px]">
-              <p>
-                <span className="font-semibold text-[#0c111d]">RuleGPT</span> turns trade finance rules into short,
-                usable answers for exporters, importers, freight forwarders, compliance teams, and operations staff.
-              </p>
-              <p>
-                Every answer is designed to stay grounded in published standards like{' '}
-                <span className="font-semibold text-primary">
-                  UCP600, ISBP745, sanctions rules, FTAs, customs guidance, and bank requirements
-                </span>{' '}
-                with clear citations and explicit uncertainty when the rule coverage or transaction facts are incomplete.
-              </p>
-            </div>
-
-            <div className="mt-8 border-l-[3px] border-primary pl-4">
-              <p className="font-display text-lg font-medium tracking-[0.02em] text-[#0c111d] md:text-xl">
-                The source is part of the answer<span className="animate-pulse text-primary">_</span>
-              </p>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button
-                className="h-12 rounded-none bg-[#111827] px-5 font-mono text-xs uppercase tracking-[0.18em] text-white hover:bg-primary"
-                onClick={onOpenChat}
-              >
-                Open chat <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="h-12 rounded-none border-black/10 bg-white px-5 font-mono text-xs uppercase tracking-[0.18em] text-[#0c111d] hover:bg-[#faf7f2]"
-              >
-                <Link to="/pricing">See pricing</Link>
-              </Button>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            aria-label="Scroll to workbench"
-            onClick={scrollToWorkbench}
-            className="absolute bottom-6 right-6 hidden h-10 w-10 items-center justify-center border border-black/10 bg-white/90 text-[#111827] transition hover:border-primary hover:text-primary md:flex"
+      {/* ─── HERO ─── */}
+      <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden px-5 py-24 md:py-32">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse at center, hsl(36 90% 44% / 0.12) 0%, transparent 70%)',
+          }}
+        />
+        <div className="relative z-10 mx-auto max-w-3xl text-center">
+          <h1 className="animate-fade-up font-display text-5xl font-bold leading-[1.08] tracking-tight text-foreground md:text-6xl lg:text-7xl">
+            Don&rsquo;t guess.{' '}
+            <span className="text-primary">Cite the rule.</span>
+          </h1>
+          <p
+            className="animate-fade-up mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl"
+            style={{ animationDelay: '0.1s' }}
           >
-            <ArrowDown className="h-4 w-4" />
-          </button>
-        </section>
-
-        <section id="landing-workbench" className="grid gap-10 border-t border-black/10 pt-14 lg:grid-cols-[0.78fr_1.22fr]">
-          <div className="space-y-6">
-            <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Why teams trust it</p>
-              <h2 className="mt-4 font-display text-3xl font-medium tracking-[-0.04em] text-[#0c111d] md:text-4xl">
-                Built for daily rule questions, not generic AI chat
-              </h2>
-              <p className="mt-3 max-w-xl text-sm leading-7 text-muted-foreground md:text-[15px]">
-                RuleGPT leads with the answer, shows the rule behind it, and says clearly when the question still depends
-                on transaction facts or missing coverage.
-              </p>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="border border-black/10 px-5 py-4">
-                <p className="font-mono text-2xl font-semibold text-[#0c111d]">Citation-led</p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Answers are designed to show the exact article, paragraph, or rule reference.
-                </p>
-              </div>
-              <div className="border border-black/10 px-5 py-4">
-                <p className="font-mono text-2xl font-semibold text-[#0c111d]">ICE-ready</p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Stored query and answer pairs can feed the future Enso compliance model stack.
-                </p>
-              </div>
-            </div>
-
-            <div className="border border-black/10 px-6 py-6">
-              <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                Workflow sequence
-              </p>
-              <div className="space-y-5">
-                {workflow.map((item) => (
-                  <div key={item.number} className="flex items-start gap-4">
-                    <span className="font-mono text-sm font-bold text-black/30">{item.number}</span>
-                    <div>
-                      <p className="text-sm font-semibold text-[#0c111d]">{item.title}</p>
-                      <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="border border-black/15 bg-white p-2 shadow-[0_18px_40px_rgba(17,24,39,0.06)]">
-            <div className="space-y-6 border border-black/10 p-5 md:p-6">
-              <div>
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                  <span>01 / Coverage domains</span>
-                  <span>Coverage snapshot</span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {coverageTags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-flex items-center border border-black/10 bg-[#faf7f2] px-3 py-1 font-mono text-[11px] uppercase tracking-[0.12em] text-[#243042]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                  <span>&gt;_ 01B / Suggested prompts</span>
-                  <span>Click to load</span>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {promptSuggestions.map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      type="button"
-                      onClick={() => setDraft(suggestion)}
-                      className="border border-black/10 bg-[#fafafa] px-4 py-4 text-left text-sm leading-6 text-[#243042] transition hover:border-primary hover:bg-[#fff7f1]"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="h-px flex-1 bg-black/8" />
-                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-black/35">Try a question</span>
-                <div className="h-px flex-1 bg-black/8" />
-              </div>
-
-              <div>
-                <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                  &gt;_ 02 / Rule question draft
-                </div>
-                <div className="relative border border-black/10 bg-[#fafafa]">
-                  <Textarea
-                    value={draft}
-                    onChange={(event) => setDraft(event.target.value)}
-                    className="min-h-[180px] resize-none border-0 bg-transparent px-5 py-5 font-mono text-sm leading-7 text-[#0c111d] focus-visible:ring-0"
-                    placeholder="Ask a trade finance rule question..."
-                  />
-                  <div className="absolute bottom-3 right-4 font-mono text-[10px] uppercase tracking-[0.18em] text-black/35">
-                    RuleGPT
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
-                <div className="border border-black/10 bg-[#fafafa] px-4 py-4">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                    03 / What to expect
-                  </p>
-                  <ul className="mt-3 space-y-2 text-sm leading-6 text-[#243042]">
-                    <li>Answers are designed to be short first, with citations and clear uncertainty.</li>
-                    <li>Complex questions expand only when more detail is needed for accuracy.</li>
-                    <li>Document validation and transaction approval stay outside this chat.</li>
-                  </ul>
-                </div>
-                <div className="border border-black/10 bg-[#111827] px-4 py-4 text-white">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/60">Built for</p>
-                  <div className="mt-3 space-y-2 text-sm leading-6 text-white/85">
-                    <p>Exporters and importers</p>
-                    <p>Freight forwarders and C&amp;F agents</p>
-                    <p>Trade finance and compliance teams</p>
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                className="h-14 w-full rounded-none bg-[#111827] font-mono text-sm font-semibold uppercase tracking-[0.18em] text-white hover:bg-primary"
-                onClick={() => {
-                  void handlePreviewSubmit()
-                }}
-              >
-                Open this in chat <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-16 grid gap-4 md:grid-cols-3">
-          {capabilityCards.map((item) => {
-            const Icon = item.icon
-            return (
-              <article
-                key={item.title}
-                className="border border-black/10 bg-white px-5 py-5 shadow-[0_16px_36px_rgba(17,24,39,0.05)]"
-              >
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#f7d9cb] text-primary">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <h3 className="mt-4 font-display text-xl font-medium tracking-[-0.03em] text-[#0c111d]">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm leading-7 text-muted-foreground">{item.description}</p>
-              </article>
-            )
-          })}
-        </section>
-
-        <section className="mt-16 border border-black/10 bg-white px-5 py-6 md:px-8">
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                Built by Enso Intelligence
-              </p>
-              <h2 className="mt-3 max-w-3xl font-display text-3xl font-medium tracking-[-0.04em] text-[#0c111d]">
-                RuleGPT is the public answer layer for trade finance rules and compliance questions.
-              </h2>
-            </div>
-            <Button
-              asChild
-              className="h-12 rounded-none bg-[#111827] px-5 font-mono text-xs uppercase tracking-[0.18em] text-white hover:bg-primary"
+            Ask anything about UCP600, ISBP745, sanctions, FTAs, or customs. Get a cited answer in seconds. Free for 20 queries a month.
+          </p>
+          <div
+            className="animate-fade-up mt-10 flex flex-wrap items-center justify-center gap-4"
+            style={{ animationDelay: '0.2s' }}
+          >
+            <button
+              type="button"
+              onClick={() => { void handlePreviewSubmit() }}
+              className="rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition hover:opacity-90"
             >
-              <Link to="/chat">Start asking</Link>
-            </Button>
+              Ask a question free <span aria-hidden="true">&rarr;</span>
+            </button>
+            <a
+              href="#how-it-works"
+              className="rounded-lg border border-border px-6 py-3 text-sm font-medium text-foreground transition hover:border-primary/50"
+            >
+              See how it works
+            </a>
           </div>
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            <div className="border border-black/10 px-4 py-4">
-              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">For</p>
-              <p className="mt-2 text-lg font-semibold text-[#0c111d]">Trade operators</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Daily rule questions without searching through scattered manuals and PDFs.
-              </p>
-            </div>
-            <div className="border border-black/10 px-4 py-4">
-              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">For</p>
-              <p className="mt-2 text-lg font-semibold text-[#0c111d]">Compliance teams</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Faster first answers with a citation trail that can be checked quickly.
-              </p>
-            </div>
-            <div className="border border-black/10 px-4 py-4">
-              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">For</p>
-              <p className="mt-2 text-lg font-semibold text-[#0c111d]">Trade-finance workflows</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                A focused answer layer for rule interpretation, first-pass checks, and faster daily decisions.
-              </p>
-            </div>
-          </div>
-        </section>
+          <p
+            className="animate-fade-up mt-5 text-sm text-muted-foreground"
+            style={{ animationDelay: '0.3s' }}
+          >
+            20 free queries &middot; No credit card
+          </p>
+        </div>
+      </section>
 
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-black/10 py-6 text-sm text-muted-foreground">
-          <p>RuleGPT is designed to make trade finance rules more usable without pretending the rules are simpler than they are.</p>
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em]">
-              <Sparkles className="h-4 w-4 text-primary" />
-              RuleGPT by Enso Intelligence
+      {/* ─── PROBLEM ─── */}
+      <section className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
+        <h2 className="font-display text-3xl font-bold tracking-tight text-foreground">
+          The rules exist. Finding them is the problem.
+        </h2>
+        <div className="mt-6 space-y-4 text-base leading-relaxed text-muted-foreground md:text-lg">
+          <p>
+            A C&amp;F agent in Chittagong spends hours checking if an LC is compliant. A freight forwarder in Mumbai guesses which Incoterm applies. A banker in Dhaka calls a consultant for $200 an hour to answer what should take 30 seconds.
+          </p>
+          <p>The rules are published. ICC has written them down. They just aren&rsquo;t accessible.</p>
+          <p className="font-semibold text-foreground">tfrules fixes that.</p>
+        </div>
+      </section>
+
+      {/* ─── SIDE-BY-SIDE COMPARISON ─── */}
+      <section className="mx-auto max-w-5xl px-5 py-16 md:px-8">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {/* Generic AI card */}
+          <div className="rounded-lg border border-border/50 bg-card/50 p-6">
+            <span className="inline-flex rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+              Claude / ChatGPT
+            </span>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              Under UCP600, transport documents must comply with the specific requirements outlined in articles 19-25. The document must appear on its face to be consistent with the terms of the credit. Banks will examine transport documents to ensure they meet the required standards for the type of transport involved. It&rsquo;s important to ensure that the transport document covers the shipment as described in the credit terms.
+            </p>
+          </div>
+
+          {/* tfrules card */}
+          <div className="rounded-lg border border-primary/30 bg-card p-6">
+            <span className="inline-flex rounded-full border border-primary/30 bg-amber-muted/30 px-3 py-1 text-xs font-medium text-primary">
+              tfrules
+            </span>
+            <p className="mt-4 text-sm leading-relaxed text-foreground">
+              UCP600 requires a transport document that names the carrier, is signed by the carrier or agent, indicates shipment from the port stated in the credit, and is the sole original if issued in sets.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-foreground">
+              For multimodal transport, the document must cover at least two different modes and indicate the place of dispatch and final destination stated in the credit.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              What still depends on your transaction: the specific transport mode, whether a charter party B/L is involved, and whether the credit allows transhipment.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {['UCP600 Art. 19', 'UCP600 Art. 20', 'UCP600 Art. 19(a)'].map((cite) => (
+                <span
+                  key={cite}
+                  className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-amber-muted/30 px-3 py-1 font-mono text-xs text-primary"
+                >
+                  {cite}
+                </span>
+              ))}
             </div>
-            <Link to="/faq" className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#243042] hover:text-primary">
-              FAQ
-            </Link>
-            <Link to="/contact" className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#243042] hover:text-primary">
-              Contact
-            </Link>
-            <Link to="/privacy" className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#243042] hover:text-primary">
-              Privacy
-            </Link>
-            <Link to="/terms" className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#243042] hover:text-primary">
-              Terms
-            </Link>
           </div>
         </div>
-      </main>
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          Same question. One answer you can cite. One you can&rsquo;t.
+        </p>
+      </section>
+
+      {/* ─── HOW IT WORKS ─── */}
+      <section id="how-it-works" className="mx-auto max-w-5xl px-5 py-20 md:px-8">
+        <h2 className="mb-12 text-center font-display text-3xl font-bold tracking-tight text-foreground md:text-left">
+          How it works
+        </h2>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+          {[
+            { num: '1', title: 'Ask your question', desc: 'In plain language. No jargon needed.' },
+            { num: '2', title: 'Rules are retrieved', desc: 'From 4,000+ curated ICC standards, FTAs, sanctions lists, and bank profiles.' },
+            { num: '3', title: 'Get a cited answer', desc: 'Show it to a bank, a customs officer, or a client.' },
+          ].map((step, i) => (
+            <div key={step.num} className="relative">
+              {i < 2 && (
+                <hr className="absolute right-0 top-8 hidden w-full translate-x-1/2 border-t border-border md:block" />
+              )}
+              <div className="relative">
+                <span className="font-display text-4xl font-bold text-primary">{step.num}</span>
+                <h3 className="mt-2 text-base font-semibold text-foreground">{step.title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{step.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── DATABASE / COVERAGE ─── */}
+      <section className="mx-auto max-w-5xl px-5 py-20 md:px-8">
+        <h2 className="font-display text-3xl font-bold tracking-tight text-foreground">
+          4,000+ rules. Six domains.
+        </h2>
+        <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3">
+          {domains.map((d) => (
+            <div key={d.title} className="rounded-lg border border-border bg-card p-6">
+              <h3 className="font-semibold text-foreground">{d.title}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{d.items}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── PRICING ─── */}
+      <section id="pricing" className="mx-auto max-w-5xl px-5 py-20 md:px-8">
+        <h2 className="font-display text-3xl font-bold tracking-tight text-foreground">
+          Start free. Pay when it saves you money.
+        </h2>
+        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+          {plans.map((plan) => (
+            <div
+              key={plan.name}
+              className={`rounded-lg border p-6 ${
+                plan.featured
+                  ? 'border-primary bg-card'
+                  : 'border-border bg-card'
+              }`}
+            >
+              <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
+              <div className="mt-2 flex items-baseline gap-1">
+                <span className="font-display text-4xl font-bold text-foreground">{plan.price}</span>
+                <span className="text-sm text-muted-foreground">{plan.period}</span>
+              </div>
+              <ul className="mt-5 space-y-2">
+                {plan.features.map((f) => (
+                  <li key={f} className="text-sm text-muted-foreground">&ndash; {f}</li>
+                ))}
+              </ul>
+              <button
+                type="button"
+                onClick={plan.featured ? onOpenSignup : onOpenChat}
+                className={`mt-6 w-full rounded-lg px-4 py-2.5 text-sm font-medium transition ${
+                  plan.featured
+                    ? 'bg-primary text-primary-foreground hover:opacity-90'
+                    : 'border border-border text-foreground hover:border-primary/50'
+                }`}
+              >
+                {plan.cta}
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── FAQ ─── */}
+      <section className="mx-auto max-w-3xl px-5 py-20 md:px-8">
+        <h2 className="font-display text-3xl font-bold tracking-tight text-foreground">Questions</h2>
+        <div className="mt-8 space-y-3">
+          {faqs.map((faq, i) => (
+            <div key={i} className="rounded-lg border border-border">
+              <button
+                type="button"
+                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                className="flex w-full items-center justify-between px-5 py-4 text-left"
+              >
+                <span className="text-sm font-medium text-foreground">{faq.q}</span>
+                <ChevronDown
+                  className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${
+                    openFaq === i ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              {openFaq === i && (
+                <div className="px-5 pb-4 text-sm leading-relaxed text-muted-foreground">
+                  {faq.a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── FOOTER ─── */}
+      <footer className="border-t border-border">
+        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-8 md:flex-row md:items-center md:justify-between md:px-8">
+          <div>
+            <span className="font-display text-lg font-bold text-foreground">tfrules</span>
+            <span className="ml-2 text-xs text-muted-foreground">by Enso Intelligence</span>
+          </div>
+          <nav className="flex flex-wrap items-center gap-5 text-sm text-muted-foreground">
+            <Link to="/pricing" className="transition hover:text-foreground">Pricing</Link>
+            <Link to="/faq" className="transition hover:text-foreground">FAQ</Link>
+            <Link to="/contact" className="transition hover:text-foreground">Contact</Link>
+            <Link to="/privacy" className="transition hover:text-foreground">Privacy</Link>
+            <Link to="/terms" className="transition hover:text-foreground">Terms</Link>
+          </nav>
+          <p className="text-xs italic text-muted-foreground">Built in Bangladesh. For the world.</p>
+        </div>
+      </footer>
     </div>
   )
 }

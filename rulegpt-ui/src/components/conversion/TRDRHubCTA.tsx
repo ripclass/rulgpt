@@ -14,10 +14,10 @@ export function TRDRHubCTA({ text, url }: TRDRHubCTAProps) {
       href={url ?? 'https://trdrhub.com'}
       target="_blank"
       rel="noreferrer"
-      className="mt-3 flex items-center justify-between border border-primary/20 bg-[#fff7f1] px-4 py-3 text-left text-xs text-primary transition hover:border-primary/40 hover:bg-[#ffefe6]"
+      className="mt-3 flex items-center justify-between rounded-lg border border-primary/20 bg-amber-muted/10 px-4 py-4 text-left text-sm text-foreground transition hover:bg-amber-muted/20"
     >
       <span className="pr-3 leading-6">{text ?? DEFAULT_TEXT}</span>
-      <ArrowUpRight className="ml-2 h-4 w-4 shrink-0" />
+      <ArrowUpRight className="ml-2 h-4 w-4 shrink-0 text-primary" />
     </a>
   )
 }

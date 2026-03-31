@@ -1,46 +1,60 @@
+import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 
 const faqs = [
   {
-    question: 'What does RuleGPT actually do?',
-    answer:
-      'RuleGPT answers trade finance and trade-compliance questions in plain English, with citations back to the underlying rules, articles, and standards.',
+    q: 'Why not just ask ChatGPT?',
+    a: 'ChatGPT will give you a confident answer. It may be right. It may be wrong. You can\'t tell. tfrules cites the rule so you can verify it yourself.',
   },
   {
-    question: 'Is this for experts only?',
-    answer:
-      'No. The product is designed for daily operators, exporters, importers, freight forwarders, C&F agents, and compliance teams who need a usable answer quickly.',
+    q: 'How current are the rules?',
+    a: 'We cover UCP600 (2007), ISBP745 (2013), current OFAC/EU/UN sanctions lists, RCEP, CPTPP, USMCA, and 4,000+ other rulesets. Sanctions data is updated regularly.',
   },
   {
-    question: 'Does RuleGPT replace legal advice or document review?',
-    answer:
-      'No. RuleGPT explains published rules and standards. It does not provide legal advice or approve a specific transaction or document set.',
+    q: 'What if you don\'t have the rule I need?',
+    a: 'We tell you clearly. We never make up a rule. If it\'s not in our database, we say so and suggest where to look.',
   },
   {
-    question: 'What happens if the rules are incomplete?',
-    answer:
-      'RuleGPT is designed to say that clearly. It should separate what the retrieved rules support from what still depends on missing transaction facts or missing coverage.',
+    q: 'Is this for experts only?',
+    a: 'No. Built for daily operators \u2014 C&F agents, freight forwarders, importers, exporters, compliance teams. You don\'t need to be an ICC specialist.',
   },
   {
-    question: 'Which rulebooks and domains are covered?',
-    answer:
-      'Current coverage focuses on ICC rules, sanctions, FTAs, customs guidance, and bank requirements, with the rules corpus expanding continuously.',
+    q: 'Does this replace legal advice?',
+    a: 'No. tfrules explains published rules and standards. It does not provide legal advice or approve a specific transaction.',
   },
 ]
 
 export function Faq() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
+
   return (
     <PublicPageShell
       eyebrow="FAQ"
-      title="Questions people will ask before they trust it"
-      description="A product like RuleGPT wins or loses on trust. These are the practical questions the site should answer clearly."
+      title="Questions"
+      description="The practical questions people ask before they trust a tool like this."
     >
-      <section className="space-y-4">
-        {faqs.map((faq) => (
-          <article key={faq.question} className="border border-black/10 bg-white px-6 py-5">
-            <h2 className="font-display text-2xl font-medium tracking-[-0.03em] text-[#0c111d]">{faq.question}</h2>
-            <p className="mt-3 text-sm leading-7 text-[#243042]">{faq.answer}</p>
-          </article>
+      <section className="space-y-3">
+        {faqs.map((faq, i) => (
+          <div key={i} className="rounded-lg border border-border">
+            <button
+              type="button"
+              onClick={() => setOpenIndex(openIndex === i ? null : i)}
+              className="flex w-full items-center justify-between px-5 py-4 text-left"
+            >
+              <span className="text-sm font-medium text-foreground">{faq.q}</span>
+              <ChevronDown
+                className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${
+                  openIndex === i ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            {openIndex === i && (
+              <div className="px-5 pb-4 text-sm leading-relaxed text-muted-foreground">
+                {faq.a}
+              </div>
+            )}
+          </div>
         ))}
       </section>
     </PublicPageShell>

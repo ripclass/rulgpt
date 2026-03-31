@@ -30,7 +30,7 @@ export function MobileDrawer({
 }: MobileDrawerProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[70vh] overflow-hidden border-black/10 bg-[#f7f3ec] px-4 pb-8 pt-6 md:hidden">
+      <SheetContent side="bottom" className="h-[70vh] overflow-hidden border-border bg-card px-4 pb-8 pt-6 md:hidden">
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
         </SheetHeader>
@@ -49,12 +49,12 @@ export function MobileDrawer({
           )}
         </div>
         <div className="mt-3 flex gap-2">
-          <Button asChild variant="outline" className="w-full rounded-none border-black/10 bg-white hover:bg-[#faf7f2]">
+          <Button asChild variant="outline" className="w-full border-border text-muted-foreground hover:text-foreground hover:bg-surface-raised">
             <Link to="/api-access" onClick={() => onOpenChange(false)}>
               API Access
             </Link>
           </Button>
-          <Button asChild className="w-full rounded-none bg-[#111827] text-white hover:bg-primary">
+          <Button asChild className="w-full bg-primary text-primary-foreground hover:bg-amber-hover">
             <Link to="/upgrade" onClick={() => onOpenChange(false)}>
               Upgrade
             </Link>

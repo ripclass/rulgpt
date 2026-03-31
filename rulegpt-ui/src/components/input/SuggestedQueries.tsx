@@ -8,12 +8,12 @@ interface SuggestedQueriesProps {
 
 export function SuggestedQueries({ suggestions, onPick, disabled }: SuggestedQueriesProps) {
   return (
-    <div className="grid gap-2 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       {suggestions.map((suggestion) => (
         <Button
           key={suggestion}
           variant="outline"
-          className="h-auto justify-start whitespace-normal rounded-none border-black/10 bg-white px-4 py-4 text-left text-sm leading-6 text-[#243042] hover:bg-[#fff7f1] hover:text-[#0c111d]"
+          className="h-auto justify-start whitespace-normal rounded-lg border border-border bg-card px-4 py-4 text-left text-sm text-foreground transition-all hover:border-primary/30 hover:bg-surface-raised cursor-pointer"
           disabled={disabled}
           onClick={() => onPick(suggestion)}
         >
