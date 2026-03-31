@@ -85,7 +85,7 @@ def _classify_complexity(
     lowered = query.lower()
     rule_count = len(retrieved_rules)
     unique_domains = {rule.domain for rule in retrieved_rules if rule.domain and rule.domain != "other"}
-    unique_jurisdictions = {rule.jurisdiction for rule in retrieved_rules if rule.jurisdiction and rule.jurisdiction != "global"}
+    unique_rulebooks = {rule.rulebook for rule in retrieved_rules if rule.rulebook and rule.rulebook != "unknown"}
 
     # Gate 1: Opus — fraud/TBML requires BOTH keyword match AND complex/interpretation
     has_fraud_signal = any(marker in lowered for marker in _FRAUD_TBML_MARKERS)
@@ -93,7 +93,7 @@ def _classify_complexity(
 
     _log.info(
         "[ROUTING DEBUG] query=%r | rule_count=%d | pre_confidence=%s "
-        "| domains=%s (count=%d) | jurisdictions=%s (count=%d) "
+        "| domains=%s (count=%d) | rulebooks=%s (count=%d) "
         "| fraud_tbml_triggered=%s | classifier_complexity=%s "
         "| is_complex_enough=%s",
         query[:80],
@@ -101,8 +101,8 @@ def _classify_complexity(
         confidence_band,
         unique_domains,
         len(unique_domains),
-        unique_jurisdictions,
-        len(unique_jurisdictions),
+        unique_rulebooks,
+        len(unique_rulebooks),
         has_fraud_signal,
         intent.complexity,
         is_complex_enough,
@@ -130,15 +130,18 @@ def _classify_complexity(
         tier = "sonnet"
     _log.info("[ROUTING DEBUG] Gate 3 (rule count): %d rules, confidence=%s → %s", rule_count, confidence_band, tier)
 
-    # Gate 4: Domain/jurisdiction diversity upgrades
-    if len(unique_domains) >= 2:
+    # Gate 4: Domain/rulebook diversity upgrades (capped at ONE total upgrade)
+    upgrade_count = 0
+    if len(unique_domains) >= 2 and upgrade_count < 1:
         prev = tier
         tier = _upgrade_tier(tier)
+        upgrade_count += 1
         _log.info("[ROUTING DEBUG] Gate 4a (domain upgrade): %d domains %s → %s to %s", len(unique_domains), unique_domains, prev, tier)
-    if len(unique_jurisdictions) >= 2:
+    if len(unique_rulebooks) >= 2 and upgrade_count < 1:
         prev = tier
         tier = _upgrade_tier(tier)
-        _log.info("[ROUTING DEBUG] Gate 4b (jurisdiction upgrade): %d jurisdictions %s → %s to %s", len(unique_jurisdictions), unique_jurisdictions, prev, tier)
+        upgrade_count += 1
+        _log.info("[ROUTING DEBUG] Gate 4b (rulebook upgrade): %d rulebooks %s → %s to %s", len(unique_rulebooks), unique_rulebooks, prev, tier)
 
     # Gate 5: Low confidence upgrade
     if confidence_band == "low":

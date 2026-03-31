@@ -141,12 +141,12 @@ class TestClassifyComplexity:
         result = _classify_complexity(query, _intent(), rules, "high")
         assert result == "sonnet"
 
-    def test_08_jurisdiction_upgrade_haiku_to_sonnet(self):
-        """2 different jurisdictions upgrades haiku → sonnet."""
-        query = "Compare US and EU requirements?"
+    def test_08_rulebook_upgrade_haiku_to_sonnet(self):
+        """2 different rulebooks upgrades haiku → sonnet."""
+        query = "Compare UCP600 and ISBP745 requirements?"
         rules = [
-            _rule(rule_id="r1", jurisdiction="us", rerank_score=0.8),
-            _rule(rule_id="r2", jurisdiction="eu", rerank_score=0.75),
+            _rule(rule_id="r1", rulebook="UCP600", rerank_score=0.8),
+            _rule(rule_id="r2", rulebook="ISBP745", rerank_score=0.75),
         ]
         result = _classify_complexity(query, _intent(), rules, "high")
         assert result == "sonnet"
@@ -201,6 +201,39 @@ class TestClassifyComplexity:
         result = _classify_complexity(query, intent, rules, "high")
         # Has fraud keyword but complexity is simple → opus gate not triggered
         assert result == "template"
+        assert result != "opus"
+
+    def test_14_rcep_garment_query_not_opus(self):
+        """RCEP garment query with multiple FTA jurisdictions must NOT route
+        to opus. This was the production misfire — stacking domain + jurisdiction
+        upgrades pushed it to opus. After fix: max one upgrade from Gate 4."""
+        query = "Does my garment qualify for RCEP preferential tariff from Bangladesh?"
+        rules = [
+            _rule(rule_id="RCEP-SCOPE-001", rulebook="RCEP", domain="fta", jurisdiction="rcep", rerank_score=0.85),
+            _rule(rule_id="RCEP-ORIGIN-001", rulebook="RCEP", domain="fta", jurisdiction="rcep", rerank_score=0.8),
+            _rule(rule_id="RCEP-ORIGIN-002", rulebook="RCEP", domain="fta", jurisdiction="bd", rerank_score=0.7),
+        ]
+        intent = _intent(domain="fta", complexity="interpretation")
+        result = _classify_complexity(query, intent, rules, "medium")
+        # 3 rules → haiku base. Single domain (fta), single rulebook (RCEP).
+        # No upgrades from Gate 4. Should stay haiku.
+        assert result == "haiku"
+        assert result != "opus"
+
+    def test_15_domain_and_rulebook_upgrade_capped_at_one(self):
+        """When both domain and rulebook diversity trigger, only one upgrade
+        applies. Two upgrades must never stack."""
+        query = "How do RCEP origin rules interact with OFAC sanctions screening?"
+        rules = [
+            _rule(rule_id="r1", rulebook="RCEP", domain="fta", rerank_score=0.75),
+            _rule(rule_id="r2", rulebook="OFAC", domain="sanctions", rerank_score=0.7),
+            _rule(rule_id="r3", rulebook="UCP600", domain="icc", rerank_score=0.65),
+        ]
+        intent = _intent(domain="fta", complexity="interpretation")
+        result = _classify_complexity(query, intent, rules, "medium")
+        # 3 rules → haiku base. 3 domains → upgrade once → sonnet. 3 rulebooks
+        # would also trigger but cap=1 prevents second upgrade. Final: sonnet.
+        assert result == "sonnet"
         assert result != "opus"
 
 
