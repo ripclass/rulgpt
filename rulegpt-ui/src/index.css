@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,59 +6,58 @@
 
 @layer base {
   :root {
-    --background: 40 30% 97%;
-    --foreground: 30 10% 12%;
+    --background: 38 40% 97%;
+    --foreground: 24 10% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 30 10% 12%;
+    --card-foreground: 24 10% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 30 10% 12%;
-    --primary: 30 85% 52%;
+    --popover-foreground: 24 10% 10%;
+    --primary: 24 80% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 35 20% 93%;
-    --secondary-foreground: 30 10% 12%;
-    --muted: 35 15% 94%;
-    --muted-foreground: 30 5% 45%;
-    --accent: 30 85% 52%;
+    --secondary: 36 25% 94%;
+    --secondary-foreground: 24 10% 10%;
+    --muted: 36 20% 94%;
+    --muted-foreground: 24 8% 46%;
+    --accent: 24 80% 50%;
     --accent-foreground: 0 0% 100%;
-    --border: 30 10% 88%;
-    --input: 30 10% 88%;
-    --ring: 30 85% 52%;
+    --border: 30 15% 90%;
+    --input: 30 15% 90%;
+    --ring: 24 80% 50%;
     --radius: 0.75rem;
 
     --surface: 0 0% 100%;
-    --surface-raised: 35 20% 96%;
-    --border-subtle: 30 10% 91%;
-    --accent-hover: 30 80% 45%;
-    --accent-muted: 30 40% 90%;
-    --success: 142 71% 40%;
+    --surface-raised: 36 25% 96%;
+    --border-subtle: 30 12% 92%;
+    --accent-hover: 24 75% 43%;
+    --accent-muted: 30 50% 92%;
+    --success: 152 60% 40%;
     --warning: 38 92% 50%;
     --error: 0 72% 51%;
   }
 
   .dark {
-    --background: 30 8% 8%;
-    --foreground: 35 15% 90%;
-    --card: 30 8% 11%;
-    --card-foreground: 35 15% 90%;
-    --popover: 30 8% 11%;
-    --popover-foreground: 35 15% 90%;
-    --primary: 30 85% 52%;
-    --primary-foreground: 30 8% 8%;
-    --secondary: 30 6% 16%;
-    --secondary-foreground: 35 15% 80%;
-    --muted: 30 6% 16%;
-    --muted-foreground: 30 5% 50%;
-    --accent: 30 85% 52%;
-    --accent-foreground: 30 8% 8%;
-    --border: 30 6% 18%;
-    --input: 30 6% 18%;
-    --ring: 30 85% 52%;
-
-    --surface: 30 8% 11%;
-    --surface-raised: 30 6% 14%;
-    --border-subtle: 30 6% 16%;
-    --accent-hover: 30 80% 45%;
-    --accent-muted: 30 30% 18%;
+    --background: 24 10% 7%;
+    --foreground: 36 20% 90%;
+    --card: 24 8% 10%;
+    --card-foreground: 36 20% 90%;
+    --popover: 24 8% 10%;
+    --popover-foreground: 36 20% 90%;
+    --primary: 24 80% 50%;
+    --primary-foreground: 24 10% 7%;
+    --secondary: 24 6% 15%;
+    --secondary-foreground: 36 15% 80%;
+    --muted: 24 6% 15%;
+    --muted-foreground: 24 5% 50%;
+    --accent: 24 80% 50%;
+    --accent-foreground: 24 10% 7%;
+    --border: 24 6% 17%;
+    --input: 24 6% 17%;
+    --ring: 24 80% 50%;
+    --surface: 24 8% 10%;
+    --surface-raised: 24 6% 13%;
+    --border-subtle: 24 6% 15%;
+    --accent-hover: 24 75% 43%;
+    --accent-muted: 24 25% 16%;
   }
 
   * {
@@ -69,6 +68,7 @@
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     min-height: 100vh;
+    letter-spacing: -0.011em;
   }
 
   #root {
@@ -78,28 +78,36 @@
 
 @layer components {
   .glass-panel {
-    @apply border border-border bg-card;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    @apply bg-card;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   }
 
   .surface-raised {
     background-color: hsl(var(--surface-raised));
   }
 
-  @keyframes fade-up {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+  /* The warm gradient wash behind product cards — like happycapy */
+  .gradient-wash {
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 45%, hsl(24 80% 50% / 0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 60% at 30% 40%, hsl(30 60% 70% / 0.1) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 70% 55%, hsl(24 70% 60% / 0.06) 0%, transparent 60%),
+      hsl(var(--background));
+    border: 1px solid hsl(var(--border));
   }
 
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
   .animate-fade-up {
-    animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   @keyframes slide-up {
     from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
   }
-
   .animate-slide-up {
     animation: slide-up 0.3s ease-out both;
   }
@@ -108,7 +116,6 @@
     0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
     40% { opacity: 1; transform: scale(1); }
   }
-
   .animate-pulse-dot {
     animation: pulse-dot 1.4s ease-in-out infinite;
   }
@@ -117,7 +124,6 @@
     from { opacity: 0; max-height: 0; }
     to { opacity: 1; max-height: 300px; }
   }
-
   .animate-expand {
     animation: expand 0.2s ease-out both;
     overflow: hidden;
