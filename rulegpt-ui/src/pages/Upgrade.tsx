@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
 import { ApiError, api } from '@/lib/api'
 import { track } from '@/lib/analytics'
 import { useAuth } from '@/hooks/useAuth'
