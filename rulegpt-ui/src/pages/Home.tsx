@@ -141,6 +141,28 @@ export function Home() {
 
   const savedAnswers = useMemo<SavedAnswer[]>(() => savedQuery.data ?? [], [savedQuery.data])
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const checkoutState = params.get('checkout')
+    if (checkoutState !== 'success') return
+
+    void auth
+      .refreshSession()
+      .then((status) => {
+        if (status?.tier === 'starter' || status?.tier === 'pro') {
+          toast.success(`Billing updated. Your account is now ${status.tier}.`)
+        } else {
+          toast.success('Checkout completed. Refreshing your account status...')
+        }
+      })
+      .catch(() => {
+        toast.message('Checkout completed. Sign out and back in if your tier looks stale.')
+      })
+      .finally(() => {
+        navigate(location.pathname, { replace: true })
+      })
+  }, [auth, location.pathname, location.search, navigate])
+
   const recordHistory = (item: HistoryItem) => {
     setLocalHistory((prev) => {
       const next = mergeHistory([item], prev)
@@ -308,6 +330,7 @@ export function Home() {
         activeQuickCategory={activeQuickCategory}
         tier={auth.tier}
         isAuthenticated={auth.isAuthenticated}
+        userEmail={auth.user?.email ?? null}
         previewMode={previewMode}
         usedCount={tierLimit.usedCount}
         remaining={tierLimit.remaining}

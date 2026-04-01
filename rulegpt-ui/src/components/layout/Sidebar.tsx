@@ -14,6 +14,7 @@ interface SidebarProps {
   activeQuickCategory?: string | null
   tier: SessionTier
   isAuthenticated: boolean
+  userEmail?: string | null
   previewMode?: boolean
   usedCount: number
   remaining: number
@@ -42,6 +43,7 @@ export function Sidebar({
   activeQuickCategory,
   tier,
   isAuthenticated,
+  userEmail,
   previewMode,
   usedCount,
   remaining,
@@ -121,14 +123,37 @@ export function Sidebar({
       <div className="mt-4 space-y-3 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
         <UpgradeCTA tier={tier} />
         {isAuthenticated ? (
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            style={{ color: 'var(--color-text-secondary)' }}
-            onClick={onLogout}
-          >
-            <LogOut className="mr-2 h-4 w-4" /> Logout
-          </Button>
+          <>
+            <div
+              className="rounded-lg px-3 py-3"
+              style={{ background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)' }}
+            >
+              <p className="text-[11px] uppercase tracking-[0.14em]" style={{ color: 'var(--color-text-muted)' }}>Account</p>
+              <p className="mt-2 truncate text-sm font-medium" style={{ color: 'var(--color-parchment)' }}>
+                {userEmail ?? 'Signed in'}
+              </p>
+              <div className="mt-2 flex items-center gap-2">
+                <span
+                  className="rounded-full px-2 py-1 text-[11px] font-medium"
+                  style={{
+                    color: tier === 'pro' || tier === 'starter' ? 'var(--color-amber)' : 'var(--color-text-secondary)',
+                    background: tier === 'pro' || tier === 'starter' ? 'var(--color-amber-muted)' : 'transparent',
+                    border: '1px solid var(--color-border)',
+                  }}
+                >
+                  {tier.toUpperCase()}
+                </span>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              style={{ color: 'var(--color-text-secondary)' }}
+              onClick={onLogout}
+            >
+              <LogOut className="mr-2 h-4 w-4" /> Logout
+            </Button>
+          </>
         ) : (
           <div className="flex gap-2">
             <button

@@ -68,6 +68,26 @@ export function useAuth() {
   const googleEnabled = supabaseEnabled && envFlag('VITE_SUPABASE_GOOGLE_OAUTH_ENABLED') !== 'false'
   const linkedinEnabled = supabaseEnabled && envFlag('VITE_SUPABASE_LINKEDIN_OAUTH_ENABLED') === 'true'
 
+  const applyAuthStatus = (status: AuthStatusResponse | null) => {
+    setAuthStatus(status)
+    if (!status?.authenticated) {
+      return status
+    }
+    const normalizedTier = status.tier === 'starter' || status.tier === 'pro' || status.tier === 'free'
+      ? status.tier
+      : 'free'
+    setUser((current) => {
+      if (!current) return current
+      const nextUser = {
+        ...current,
+        tier: normalizedTier,
+      }
+      persistAuth(nextUser)
+      return nextUser
+    })
+    return status
+  }
+
   useEffect(() => {
     setApiAccessToken(accessToken)
   }, [accessToken])
@@ -124,7 +144,7 @@ export function useAuth() {
       .getAuthStatus()
       .then((status) => {
         if (mounted) {
-          setAuthStatus(status)
+          applyAuthStatus(status)
         }
       })
       .catch(() => {
@@ -135,7 +155,7 @@ export function useAuth() {
     return () => {
       mounted = false
     }
-  }, [])
+  }, [accessToken])
 
   const setTier = (tier: SessionTier) => {
     if (!user) return
@@ -237,6 +257,33 @@ export function useAuth() {
     persistAuth(null)
   }
 
+  const refreshSession = async () => {
+    if (supabaseEnabled && supabase) {
+      const { data, error } = await supabase.auth.refreshSession()
+      if (error) throw error
+      const session = data.session
+      if (session?.user?.email) {
+        const nextUser: AuthUser = {
+          id: session.user.id,
+          email: session.user.email,
+          tier: user?.tier ?? 'free',
+        }
+        setUser(nextUser)
+        persistAuth(nextUser)
+      }
+      const nextAccessToken = session?.access_token ?? null
+      setAccessTokenState(nextAccessToken)
+      setApiAccessToken(nextAccessToken)
+    }
+    return api
+      .getAuthStatus()
+      .then((status) => applyAuthStatus(status))
+      .catch(() => {
+        setAuthStatus(null)
+        return null
+      })
+  }
+
   const loginWithOAuth = async (provider: 'google' | 'linkedin_oidc') => {
     if (!supabaseEnabled || !supabase) {
       throw new Error('Supabase environment is not configured for OAuth.')
@@ -277,6 +324,7 @@ export function useAuth() {
     },
     authStatus,
     logout,
+    refreshSession,
     setTier,
   }
 }

@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ApiError, api } from '@/lib/api'
 import { track } from '@/lib/analytics'
 import { useAuth } from '@/hooks/useAuth'
@@ -44,6 +44,8 @@ const PLAN_COPY: Record<
 
 export function Upgrade() {
   const auth = useAuth()
+  const location = useLocation()
+  const navigate = useNavigate()
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null)
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null)
   const [isCheckingOut, setIsCheckingOut] = useState(false)
@@ -64,6 +66,36 @@ export function Upgrade() {
       cancel_url: `${origin}/upgrade?checkout=cancel`,
     }
   }, [])
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const checkoutState = params.get('checkout')
+    if (!checkoutState) return
+
+    if (checkoutState === 'success') {
+      void auth
+        .refreshSession()
+        .then((status) => {
+          if (status?.tier === 'starter' || status?.tier === 'pro') {
+            setCheckoutMessage(`Checkout completed. Your account is now ${status.tier}.`)
+          } else {
+            setCheckoutMessage('Checkout completed. Sign out and back in if your tier still looks stale.')
+          }
+        })
+        .catch(() => {
+          setCheckoutMessage('Checkout completed. Sign out and back in if your tier still looks stale.')
+        })
+        .finally(() => {
+          navigate(location.pathname, { replace: true })
+        })
+      return
+    }
+
+    if (checkoutState === 'cancel') {
+      setCheckoutMessage('Checkout was cancelled.')
+      navigate(location.pathname, { replace: true })
+    }
+  }, [auth, location.pathname, location.search, navigate])
 
   const startCheckout = async () => {
     track('upgrade_checkout_attempted', {

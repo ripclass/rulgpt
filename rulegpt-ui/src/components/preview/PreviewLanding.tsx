@@ -16,6 +16,7 @@ interface PreviewLandingProps {
 export function PreviewLanding({
   isAuthenticated,
   tier,
+  userEmail,
   onOpenLogin,
   onOpenSignup,
   onOpenChat,
@@ -50,9 +51,26 @@ export function PreviewLanding({
               <a href="#how" className="transition-colors hover:text-[#FAF7F2]">How it works</a>
               <Link to="/pricing" className="transition-colors hover:text-[#FAF7F2]">Pricing</Link>
             </div>
-            <button onClick={onOpenChat} className="btn-primary rounded-md px-5 py-2 text-[14px]">
-              Try tfrules <ArrowRight className="ml-1.5 inline h-3.5 w-3.5" />
-            </button>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <div className="hidden rounded-full border px-3 py-1.5 text-[12px] md:block" style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}>
+                  <span style={{ color: 'var(--color-parchment)' }}>{userEmail ?? 'Signed in'}</span>
+                  <span style={{ color: 'var(--color-text-muted)' }}> · {tier.toUpperCase()}</span>
+                </div>
+                <button onClick={onOpenChat} className="btn-primary rounded-md px-5 py-2 text-[14px]">
+                  Open chat <ArrowRight className="ml-1.5 inline h-3.5 w-3.5" />
+                </button>
+              </div>
+            ) : (
+              <>
+                <button onClick={onOpenLogin} className="btn-secondary rounded-md px-5 py-2 text-[14px]">
+                  Sign in
+                </button>
+                <button onClick={onOpenChat} className="btn-primary rounded-md px-5 py-2 text-[14px]">
+                  Try tfrules <ArrowRight className="ml-1.5 inline h-3.5 w-3.5" />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -74,11 +92,17 @@ export function PreviewLanding({
               </p>
               <div className="hero-cta mt-10 flex items-center gap-4">
                 <button onClick={onOpenChat} className="btn-primary rounded-md px-7 py-3 text-[15px]">
-                  Ask a question free
+                  {isAuthenticated ? 'Open chat' : 'Ask a question free'}
                 </button>
-                <button onClick={onOpenLogin} className="btn-secondary rounded-md px-5 py-3 text-[15px]">
-                  Sign in
-                </button>
+                {isAuthenticated ? (
+                  <div className="rounded-md border px-5 py-3 text-[14px]" style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}>
+                    Signed in as <span style={{ color: 'var(--color-parchment)' }}>{userEmail ?? 'your account'}</span> · {tier.toUpperCase()}
+                  </div>
+                ) : (
+                  <button onClick={onOpenLogin} className="btn-secondary rounded-md px-5 py-3 text-[15px]">
+                    Sign in
+                  </button>
+                )}
               </div>
               <p className="mt-5 text-[13px]" style={{ color: 'var(--color-text-muted)' }}>
                 No signup needed &middot; No credit card &middot; 20 free queries/month
