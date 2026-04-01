@@ -384,6 +384,10 @@ export function Home() {
         oauth={auth.oauth}
         authStatus={auth.authStatus}
         onOpenChange={setLoginOpen}
+        onSwitchMode={() => {
+          setLoginOpen(false)
+          setSignupOpen(true)
+        }}
         onSubmit={async (email, password) => {
           try {
             await auth.login(email, password)
@@ -408,6 +412,10 @@ export function Home() {
         oauth={auth.oauth}
         authStatus={auth.authStatus}
         onOpenChange={setSignupOpen}
+        onSwitchMode={() => {
+          setSignupOpen(false)
+          setLoginOpen(true)
+        }}
         onSubmit={async (email, password) => {
           try {
             const result = await auth.signup(email, password)
