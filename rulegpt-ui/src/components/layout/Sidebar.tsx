@@ -11,6 +11,7 @@ import type { HistoryItem, SavedAnswer, SessionTier } from '@/types'
 interface SidebarProps {
   history: HistoryItem[]
   savedAnswers: SavedAnswer[]
+  activeQuickCategory?: string | null
   tier: SessionTier
   isAuthenticated: boolean
   previewMode?: boolean
@@ -38,6 +39,7 @@ const quickCategories = [
 export function Sidebar({
   history,
   savedAnswers,
+  activeQuickCategory,
   tier,
   isAuthenticated,
   previewMode,
@@ -79,7 +81,11 @@ export function Sidebar({
             key={category}
             type="button"
             disabled={previewMode}
-            className="w-full rounded-lg px-3 py-2 text-left text-xs text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            className={`w-full rounded-lg px-3 py-2 text-left text-xs transition disabled:cursor-not-allowed disabled:opacity-50 ${
+              activeQuickCategory === category
+                ? 'bg-primary/10 text-foreground ring-1 ring-primary/20'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+            }`}
             onClick={() => onQuickCategory(category)}
           >
             {category}

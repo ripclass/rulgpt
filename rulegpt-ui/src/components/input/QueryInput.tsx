@@ -7,11 +7,30 @@ interface QueryInputProps {
   disabled?: boolean
   previewMode?: boolean
   layout?: 'centered' | 'docked'
+  placeholder?: string
+  value?: string
+  onValueChange?: (value: string) => void
   onSubmit: (value: string) => Promise<void> | void
 }
 
-export function QueryInput({ disabled, previewMode, layout = 'docked', onSubmit }: QueryInputProps) {
-  const [value, setValue] = useState('')
+export function QueryInput({
+  disabled,
+  previewMode,
+  layout = 'docked',
+  placeholder = 'Ask about any trade finance rule...',
+  value: controlledValue,
+  onValueChange,
+  onSubmit,
+}: QueryInputProps) {
+  const [internalValue, setInternalValue] = useState('')
+  const value = controlledValue ?? internalValue
+
+  const setValue = (nextValue: string) => {
+    onValueChange?.(nextValue)
+    if (controlledValue === undefined) {
+      setInternalValue(nextValue)
+    }
+  }
 
   const count = value.length
   const isTooLong = count > 500
@@ -37,7 +56,7 @@ export function QueryInput({ disabled, previewMode, layout = 'docked', onSubmit 
     >
       <Textarea
         value={value}
-        placeholder="Ask about any trade finance rule..."
+        placeholder={placeholder}
         className={
           isCentered
             ? 'min-h-[138px] resize-none rounded-lg border border-border bg-surface-raised px-4 py-4 text-[15px] leading-7 text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-primary'

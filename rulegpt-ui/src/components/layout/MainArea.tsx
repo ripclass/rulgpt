@@ -13,6 +13,7 @@ interface MainAreaProps {
   isLoading: boolean
   error: string | null
   canSave: boolean
+  activeQuickCategory?: string | null
   previewMode?: boolean
   onSubmitQuery: (query: string) => Promise<void>
   onPickSuggestion: (value: string) => void
@@ -27,6 +28,7 @@ export function MainArea({
   isLoading,
   error,
   canSave,
+  activeQuickCategory,
   previewMode,
   onSubmitQuery,
   onPickSuggestion,
@@ -35,6 +37,9 @@ export function MainArea({
   onNewQuery,
 }: MainAreaProps) {
   const isEmpty = messages.length === 0
+  const placeholder = activeQuickCategory
+    ? `Ask about ${activeQuickCategory.toLowerCase()}...`
+    : 'Ask about any trade finance rule...'
 
   return (
     <main className="flex min-h-screen flex-1 flex-col bg-background pb-28 md:pb-0">
@@ -99,6 +104,7 @@ export function MainArea({
               <QueryInput
                 layout="centered"
                 disabled={isLoading}
+                placeholder={placeholder}
                 previewMode={previewMode}
                 onSubmit={onSubmitQuery}
               />
@@ -131,7 +137,12 @@ export function MainArea({
 
           <div className="sticky bottom-0 border-t border-border bg-card px-4 py-4 md:px-8">
             <div className="mx-auto max-w-[780px]">
-              <QueryInput disabled={isLoading} previewMode={previewMode} onSubmit={onSubmitQuery} />
+              <QueryInput
+                disabled={isLoading}
+                placeholder={placeholder}
+                previewMode={previewMode}
+                onSubmit={onSubmitQuery}
+              />
             </div>
           </div>
         </>

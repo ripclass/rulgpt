@@ -84,6 +84,7 @@ export function Home() {
   const [selectedRule, setSelectedRule] = useState<RuleDetails | null>(null)
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
   const [mobileDrawerMode, setMobileDrawerMode] = useState<'history' | 'saved'>('history')
+  const [activeQuickCategory, setActiveQuickCategory] = useState<string | null>(null)
   const [localHistory, setLocalHistory] = useState<HistoryItem[]>(parseLocalHistory)
   const seededQueryRef = useRef<string | null>(null)
 
@@ -149,6 +150,7 @@ export function Home() {
   }
 
   const submitQuery = async (value: string) => {
+    setActiveQuickCategory(null)
     track('chat_query_submitted', {
       preview_mode: previewMode,
       authenticated: auth.isAuthenticated,
@@ -248,6 +250,7 @@ export function Home() {
   const handleNewQuery = () => {
     resetSession()
     query.clearMessages()
+    setActiveQuickCategory(null)
     setCitationPanelOpen(false)
     setSelectedRule(null)
     setMobileDrawerOpen(false)
@@ -265,6 +268,7 @@ export function Home() {
   }
 
   const openHistoryItem = (item: HistoryItem) => {
+    setActiveQuickCategory(null)
     track('chat_history_opened', {
       query_id: item.query_id,
       created_at: item.created_at,
@@ -301,6 +305,7 @@ export function Home() {
       <Sidebar
         history={historyItems}
         savedAnswers={savedAnswers}
+        activeQuickCategory={activeQuickCategory}
         tier={auth.tier}
         isAuthenticated={auth.isAuthenticated}
         previewMode={previewMode}
@@ -310,7 +315,7 @@ export function Home() {
         onNewQuery={handleNewQuery}
         onPickHistory={openHistoryItem}
         onQuickCategory={(value) => {
-          void submitQuery(value)
+          setActiveQuickCategory(value)
         }}
         onDeleteSaved={(savedId) => {
           void deleteSaved(savedId)
@@ -329,6 +334,7 @@ export function Home() {
         isLoading={query.isLoading}
         error={query.error}
         canSave={!previewMode && auth.isAuthenticated}
+        activeQuickCategory={activeQuickCategory}
         previewMode={previewMode}
         onSubmitQuery={submitQuery}
         onNewQuery={handleNewQuery}

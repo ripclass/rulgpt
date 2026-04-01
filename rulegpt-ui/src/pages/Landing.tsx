@@ -9,7 +9,6 @@ export function Landing() {
 
   return (
     <PreviewLanding
-      suggestions={[]}
       isAuthenticated={auth.isAuthenticated}
       tier={auth.tier}
       userEmail={auth.user?.email ?? null}
@@ -24,10 +23,6 @@ export function Landing() {
       onOpenChat={() => {
         track('landing_open_chat_clicked')
         navigate('/chat')
-      }}
-      onSubmitPreview={async (query) => {
-        track('landing_seeded_question_clicked', { query })
-        navigate('/chat', { state: { initialQuery: query } })
       }}
     />
   )

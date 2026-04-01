@@ -1,42 +1,25 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown, Check } from 'lucide-react'
-import { toast } from 'sonner'
 import { RuxMascot, RuxMark } from '@/components/shared/RuxMascot'
 import type { SessionTier } from '@/types'
 
 interface PreviewLandingProps {
-  suggestions: string[]
   isAuthenticated: boolean
   tier: SessionTier
   userEmail?: string | null
   onOpenLogin: () => void
   onOpenSignup: () => void
   onOpenChat: () => void
-  onSubmitPreview: (query: string) => Promise<void>
 }
 
-const fallbackSuggestions = [
-  'What does UCP600 say about transport documents?',
-  'How does ISBP745 define a compliant commercial invoice?',
-  'What are OFAC requirements for trading with UAE counterparties?',
-  'What is the difference between CIF and FOB under Incoterms 2020?',
-]
-
 export function PreviewLanding({
-  suggestions,
   isAuthenticated,
   tier,
   onOpenLogin,
   onOpenSignup,
   onOpenChat,
-  onSubmitPreview,
 }: PreviewLandingProps) {
-  const promptSuggestions = useMemo(
-    () => (suggestions.length > 0 ? suggestions.slice(0, 4) : fallbackSuggestions),
-    [suggestions],
-  )
-  const [draft] = useState(promptSuggestions[0] ?? fallbackSuggestions[0])
   const [scrolled, setScrolled] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
@@ -45,11 +28,6 @@ export function PreviewLanding({
     window.addEventListener('scroll', on, { passive: true })
     return () => window.removeEventListener('scroll', on)
   }, [])
-
-  const go = async () => {
-    if (!draft.trim()) { toast.message('Add a question first.'); return }
-    await onSubmitPreview(draft)
-  }
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
@@ -85,7 +63,7 @@ export function PreviewLanding({
               For the rest of us.
             </p>
             <div className="mt-10 flex items-center gap-4">
-              <button onClick={() => { void go() }} className="rounded-full bg-foreground px-7 py-3 text-[15px] font-medium text-background transition hover:opacity-90">
+              <button onClick={onOpenChat} className="rounded-full bg-foreground px-7 py-3 text-[15px] font-medium text-background transition hover:opacity-90">
                 Ask a question free
               </button>
             </div>
