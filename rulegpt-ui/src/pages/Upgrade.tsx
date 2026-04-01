@@ -84,11 +84,16 @@ export function Upgrade() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center bg-background px-4 py-10">
-      <div className="glass-panel rounded-2xl p-6 md:p-8">
-        <p className="text-sm uppercase tracking-wide text-primary">tfrules Pro</p>
-        <h1 className="mt-2 text-3xl font-semibold">Upgrade for teams and daily workflows</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+    <main
+      className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center px-4 py-10"
+      style={{ background: 'var(--color-obsidian)', fontFamily: 'var(--font-body)' }}
+    >
+      <div
+        className="card-dark rounded-2xl p-6 md:p-8"
+      >
+        <p className="text-sm uppercase tracking-wide" style={{ color: 'var(--color-amber)' }}>tfrules Pro</p>
+        <h1 className="heading-xl mt-2" style={{ color: 'var(--color-parchment)' }}>Upgrade for teams and daily workflows</h1>
+        <p className="mt-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
           {billingStatus.isLoading
             ? 'Checking billing configuration...'
             : canCheckout
@@ -96,39 +101,43 @@ export function Upgrade() {
               : 'Hosted checkout is waiting on the current billing configuration.'}
         </p>
         {billingStatus.data?.blockers?.length ? (
-          <div className="mt-4 rounded-lg border border-border/60 bg-secondary/30 p-3">
-            <p className="text-sm font-medium">Billing blockers</p>
-            <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+          <div
+            className="mt-4 rounded-lg p-3"
+            style={{ background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)' }}
+          >
+            <p className="text-sm font-medium" style={{ color: 'var(--color-parchment)' }}>Billing blockers</p>
+            <ul className="mt-2 space-y-1 text-xs" style={{ color: 'var(--color-text-secondary)' }}>
               {billingStatus.data.blockers.map((blocker) => (
                 <li key={blocker}>{blocker}</li>
               ))}
             </ul>
           </div>
         ) : null}
-        <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+        <ul className="mt-4 space-y-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
           <li>Formatted compliance reports</li>
           <li>Bulk export (session PDF/JSON)</li>
           <li>API access with fair-use limits</li>
           <li>Priority routing for model generation</li>
         </ul>
         <div className="mt-5 flex flex-wrap gap-2">
-          <Button
+          <button
             type="button"
-            variant={billingInterval === 'monthly' ? 'default' : 'outline'}
+            className={billingInterval === 'monthly' ? 'btn-primary rounded-md px-5 py-2 text-sm' : 'btn-secondary rounded-md px-5 py-2 text-sm'}
             onClick={() => setBillingInterval('monthly')}
           >
             Monthly - $19
-          </Button>
-          <Button
+          </button>
+          <button
             type="button"
-            variant={billingInterval === 'annual' ? 'default' : 'outline'}
+            className={billingInterval === 'annual' ? 'btn-primary rounded-md px-5 py-2 text-sm' : 'btn-secondary rounded-md px-5 py-2 text-sm'}
             onClick={() => setBillingInterval('annual')}
           >
             Annual - $190
-          </Button>
+          </button>
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
-          <Button
+          <button
+            className="btn-primary rounded-md px-5 py-2 text-sm disabled:opacity-50"
             onClick={() => {
               void startCheckout()
             }}
@@ -141,22 +150,24 @@ export function Upgrade() {
                 : billingStatus.data?.checkout_ready
                   ? 'Sign in from chat first'
                   : 'Checkout not configured yet'}
-          </Button>
+          </button>
           {checkoutUrl ? (
-            <Button asChild variant="outline">
-              <a href={checkoutUrl} rel="noreferrer">
-                Open Stripe checkout
-              </a>
-            </Button>
+            <a
+              href={checkoutUrl}
+              rel="noreferrer"
+              className="btn-secondary rounded-md px-5 py-2 text-sm"
+            >
+              Open Stripe checkout
+            </a>
           ) : null}
-          <Button asChild variant="outline">
-            <Link to="/chat">Back to chat</Link>
-          </Button>
+          <Link to="/chat" className="btn-secondary rounded-md px-5 py-2 text-sm">
+            Back to chat
+          </Link>
         </div>
         {checkoutMessage ? (
-          <p className="mt-3 text-sm text-muted-foreground">{checkoutMessage}</p>
+          <p className="mt-3 text-sm" style={{ color: 'var(--color-text-secondary)' }}>{checkoutMessage}</p>
         ) : null}
-        <p className="mt-3 text-xs text-muted-foreground">
+        <p className="mt-3 text-xs" style={{ color: 'var(--color-text-muted)' }}>
           Hosted checkout depends on the backend billing handlers and the Stripe configuration listed above. If the blockers are empty, this page should be ready for live checkout.
         </p>
       </div>

@@ -2,7 +2,6 @@ import { AtSign, Bookmark, History, Linkedin, LockKeyhole, ShieldCheck } from 'l
 import { Link } from 'react-router-dom'
 import type { FormEvent } from 'react'
 import { RuxMark } from '@/components/shared/RuxMascot'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import type { AuthStatusResponse } from '@/lib/api'
@@ -142,9 +141,19 @@ export function AuthDialogShell({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] overflow-hidden border-border/70 bg-card p-0 shadow-[0_40px_100px_-40px_rgba(12,17,29,0.55)] sm:max-w-4xl">
+      <DialogContent
+        className="max-h-[92vh] overflow-hidden p-0 sm:max-w-4xl"
+        style={{
+          background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+          boxShadow: '0 40px 100px -40px rgba(0,0,0,0.55)',
+        }}
+      >
         <div className="grid min-h-[640px] md:grid-cols-[0.95fr_1.05fr]">
-          <aside className="relative hidden overflow-hidden border-r border-border/60 bg-[#0C111D] px-8 py-8 text-[#F7F3EC] md:flex md:flex-col">
+          <aside
+            className="relative hidden overflow-hidden px-8 py-8 md:flex md:flex-col"
+            style={{ background: '#0C111D', borderRight: '1px solid var(--color-border)', color: '#F7F3EC' }}
+          >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(229,99,46,0.32),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(244,233,216,0.10),transparent_38%)]" />
             <AuthBackdropLines />
             <div className="relative z-10 flex items-center gap-3">
@@ -152,17 +161,25 @@ export function AuthDialogShell({
                 <RuxMark className="scale-110" />
               </div>
               <div>
-                <p className="font-display text-xl text-white">tfrules</p>
-                <p className="mt-1 text-sm text-white/55">Citation-first trade finance answers</p>
+                <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', color: 'white' }}>tfrules</p>
+                <p className="mt-1 text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>Citation-first trade finance answers</p>
               </div>
             </div>
 
             <div className="relative z-10 mt-10">
-              <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-white/55">{copy.eyebrow}</p>
-              <h2 className="mt-4 font-display text-[2.3rem] leading-[1.02] tracking-[-0.03em] text-white">
+              <p
+                className="text-[11px] uppercase tracking-[0.22em]"
+                style={{ fontFamily: 'var(--font-mono)', color: 'rgba(255,255,255,0.55)' }}
+              >
+                {copy.eyebrow}
+              </p>
+              <h2
+                className="mt-4 leading-[1.02] tracking-[-0.03em]"
+                style={{ fontFamily: 'var(--font-display)', fontSize: '2.3rem', color: 'white' }}
+              >
                 {copy.panelTitle}
               </h2>
-              <p className="mt-4 max-w-sm text-sm leading-7 text-white/72">{copy.panelBody}</p>
+              <p className="mt-4 max-w-sm text-sm leading-7" style={{ color: 'rgba(255,255,255,0.72)' }}>{copy.panelBody}</p>
             </div>
 
             <div className="relative z-10 mt-10 space-y-3">
@@ -173,20 +190,23 @@ export function AuthDialogShell({
                       <Icon className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-white">{title}</p>
-                      <p className="mt-1 text-xs leading-5 text-white/62">{body}</p>
+                      <p className="text-sm font-medium" style={{ color: 'white' }}>{title}</p>
+                      <p className="mt-1 text-xs leading-5" style={{ color: 'rgba(255,255,255,0.62)' }}>{body}</p>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="relative z-10 mt-auto rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm leading-6 text-white/72">
+            <div className="relative z-10 mt-auto rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm leading-6" style={{ color: 'rgba(255,255,255,0.72)' }}>
               One clean account is enough. Ask the rule, keep the citations, and come back where you left off.
             </div>
           </aside>
 
-          <div className="relative overflow-y-auto px-5 py-6 sm:px-8 sm:py-8 md:px-10 md:py-10">
+          <div
+            className="relative overflow-y-auto px-5 py-6 sm:px-8 sm:py-8 md:px-10 md:py-10"
+            style={{ background: 'var(--color-surface)' }}
+          >
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(229,99,46,0.12),transparent_26%),radial-gradient(circle_at_bottom_left,rgba(12,17,29,0.06),transparent_30%)]"
@@ -195,30 +215,44 @@ export function AuthDialogShell({
             <div className="relative z-10 mx-auto max-w-md">
               <div className="md:hidden">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border bg-surface-raised">
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-2xl"
+                    style={{ background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)' }}
+                  >
                     <RuxMark className="scale-110" />
                   </div>
                   <div>
-                    <p className="font-display text-xl text-foreground">tfrules</p>
-                    <p className="mt-1 text-sm text-muted-foreground">Citation-first trade finance answers</p>
+                    <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', color: 'var(--color-parchment)' }}>tfrules</p>
+                    <p className="mt-1 text-sm" style={{ color: 'var(--color-text-secondary)' }}>Citation-first trade finance answers</p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-6 md:mt-0">
-                <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-primary/70">{copy.eyebrow}</p>
-                <DialogTitle className="mt-3 font-display text-3xl leading-tight tracking-[-0.03em] text-foreground">
+                <p
+                  className="text-[11px] uppercase tracking-[0.22em]"
+                  style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-amber)', opacity: 0.7 }}
+                >
+                  {copy.eyebrow}
+                </p>
+                <DialogTitle
+                  className="mt-3 leading-tight tracking-[-0.03em]"
+                  style={{ fontFamily: 'var(--font-display)', fontSize: '1.875rem', color: 'var(--color-parchment)' }}
+                >
                   {copy.title}
                 </DialogTitle>
-                <DialogDescription className="mt-3 max-w-md text-sm leading-7 text-muted-foreground">
+                <DialogDescription className="mt-3 max-w-md text-sm leading-7" style={{ color: 'var(--color-text-secondary)' }}>
                   {copy.description}
                 </DialogDescription>
               </div>
 
               {blockers.length > 0 ? (
-                <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-4">
-                  <p className="text-sm font-medium text-foreground">Auth blockers</p>
-                  <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
+                <div
+                  className="mt-6 rounded-2xl px-4 py-4"
+                  style={{ background: 'rgba(217,119,6,0.05)', border: '1px solid rgba(217,119,6,0.2)' }}
+                >
+                  <p className="text-sm font-medium" style={{ color: 'var(--color-parchment)' }}>Auth blockers</p>
+                  <ul className="mt-2 space-y-1.5 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                     {blockers.map((blocker) => (
                       <li key={blocker}>{blocker}</li>
                     ))}
@@ -227,108 +261,140 @@ export function AuthDialogShell({
               ) : null}
 
               <div className="mt-6 space-y-3">
-                <Button
+                <button
                   type="button"
-                  variant="outline"
-                  className="h-12 w-full justify-center rounded-xl border-border bg-card text-foreground hover:bg-secondary"
+                  className="flex h-12 w-full items-center justify-center rounded-xl text-sm font-medium transition disabled:opacity-50"
+                  style={{
+                    background: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    color: 'var(--color-parchment)',
+                  }}
                   disabled={isLoading || !oauth.googleEnabled}
                   onClick={() => onOAuth('google')}
                 >
                   <GoogleIcon className="mr-3 h-4 w-4" />
                   Continue with Google
-                </Button>
+                </button>
                 {oauth.linkedinEnabled ? (
-                  <Button
+                  <button
                     type="button"
-                    variant="outline"
-                    className="h-12 w-full justify-center rounded-xl border-border bg-card text-foreground hover:bg-secondary"
+                    className="flex h-12 w-full items-center justify-center rounded-xl text-sm font-medium transition disabled:opacity-50"
+                    style={{
+                      background: 'var(--color-surface)',
+                      border: '1px solid var(--color-border)',
+                      color: 'var(--color-parchment)',
+                    }}
                     disabled={isLoading}
                     onClick={() => onOAuth('linkedin_oidc')}
                   >
                     <Linkedin className="mr-3 h-4 w-4" />
                     Continue with LinkedIn
-                  </Button>
+                  </button>
                 ) : null}
               </div>
 
               <div className="my-6 flex items-center gap-3">
-                <div className="h-px flex-1 bg-border" />
-                <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">or use email</span>
-                <div className="h-px flex-1 bg-border" />
+                <div className="h-px flex-1" style={{ background: 'var(--color-border)' }} />
+                <span
+                  className="text-[11px] uppercase tracking-[0.18em]"
+                  style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-secondary)' }}
+                >
+                  or use email
+                </span>
+                <div className="h-px flex-1" style={{ background: 'var(--color-border)' }} />
               </div>
 
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="space-y-2">
-                  <label htmlFor={`${mode}-email`} className="text-sm font-medium text-foreground">
+                  <label
+                    htmlFor={`${mode}-email`}
+                    className="text-sm font-medium"
+                    style={{ color: 'var(--color-parchment)' }}
+                  >
                     Email
                   </label>
                   <div className="relative">
                     <Input
                       id={`${mode}-email`}
                       autoComplete="email"
-                      className="h-12 rounded-xl border-border bg-surface-raised pl-11"
+                      className="h-12 rounded-xl pl-11"
+                      style={{
+                        background: 'var(--color-surface-raised)',
+                        border: '1px solid var(--color-border)',
+                        color: 'var(--color-parchment)',
+                      }}
                       placeholder="your.email@example.com"
                       type="email"
                       value={email}
                       onChange={(event) => onEmailChange(event.target.value)}
                     />
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-muted-foreground">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4" style={{ color: 'var(--color-text-secondary)' }}>
                       <AtSign className="h-4 w-4" />
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground">{copy.emailHint}</p>
+                  <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>{copy.emailHint}</p>
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor={`${mode}-password`} className="text-sm font-medium text-foreground">
+                  <label
+                    htmlFor={`${mode}-password`}
+                    className="text-sm font-medium"
+                    style={{ color: 'var(--color-parchment)' }}
+                  >
                     Password
                   </label>
                   <div className="relative">
                     <Input
                       id={`${mode}-password`}
                       autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                      className="h-12 rounded-xl border-border bg-surface-raised pl-11"
+                      className="h-12 rounded-xl pl-11"
+                      style={{
+                        background: 'var(--color-surface-raised)',
+                        border: '1px solid var(--color-border)',
+                        color: 'var(--color-parchment)',
+                      }}
                       placeholder="Enter your password"
                       type="password"
                       value={password}
                       onChange={(event) => onPasswordChange(event.target.value)}
                     />
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-muted-foreground">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4" style={{ color: 'var(--color-text-secondary)' }}>
                       <LockKeyhole className="h-4 w-4" />
                     </div>
                   </div>
                 </div>
 
-                <Button
+                <button
                   type="submit"
-                  className="h-12 w-full rounded-xl bg-foreground text-background hover:bg-foreground/92"
+                  className="btn-primary h-12 w-full rounded-xl text-sm disabled:opacity-50"
                   disabled={isLoading || !email || !password}
                 >
                   {isLoading ? copy.submitBusy : copy.submitIdle}
-                </Button>
+                </button>
               </form>
 
               <div className="mt-5 space-y-4">
-                <p className="text-sm text-muted-foreground">{helperText}</p>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{helperText}</p>
                 {onSwitchMode ? (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                     {copy.switchLead}{' '}
                     <button
                       type="button"
-                      className="font-medium text-foreground underline-offset-4 hover:underline"
+                      className="font-medium underline-offset-4 hover:underline"
+                      style={{ color: 'var(--color-parchment)' }}
                       onClick={onSwitchMode}
                     >
                       {copy.switchAction}
                     </button>
                   </p>
                 ) : null}
-                <p className="text-xs leading-6 text-muted-foreground">
+                <p className="text-xs leading-6" style={{ color: 'var(--color-text-secondary)' }}>
                   By continuing, you agree to our{' '}
-                  <Link className="text-foreground underline underline-offset-4" to="/terms">
+                  <Link className="underline underline-offset-4" style={{ color: 'var(--color-parchment)' }} to="/terms">
                     Terms
                   </Link>{' '}
                   and{' '}
-                  <Link className="text-foreground underline underline-offset-4" to="/privacy">
+                  <Link className="underline underline-offset-4" style={{ color: 'var(--color-parchment)' }} to="/privacy">
                     Privacy Policy
                   </Link>
                   .

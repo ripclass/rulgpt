@@ -16,9 +16,21 @@ interface RuleGPTMessageProps {
 export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: RuleGPTMessageProps) {
   return (
     <div className="flex justify-start">
-      <article className="group w-full rounded-lg rounded-bl-sm border border-border bg-card px-5 py-5 text-sm">
+      <article
+        className="group w-full rounded-lg rounded-bl-sm px-5 py-5 text-sm"
+        style={{
+          background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+          fontFamily: 'var(--font-body)',
+        }}
+      >
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <p className="font-mono text-xs text-primary">tfrules</p>
+          <p
+            className="text-xs"
+            style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-amber)' }}
+          >
+            tfrules
+          </p>
           <div className="flex flex-wrap items-center gap-2">
             {message.confidence ? <ConfidenceBadge confidence={message.confidence} /> : null}
             {message.domainTags?.map((domain) => (
@@ -28,7 +40,12 @@ export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: Ru
         </div>
 
         <div className="pt-2">
-          <p className="whitespace-pre-wrap leading-relaxed text-foreground">{message.text}</p>
+          <p
+            className="whitespace-pre-wrap leading-relaxed"
+            style={{ color: 'var(--color-parchment)' }}
+          >
+            {message.text}
+          </p>
         </div>
 
         {message.citations && message.citations.length > 0 ? (
@@ -44,7 +61,10 @@ export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: Ru
         ) : null}
 
         {message.suggestedFollowups && message.suggestedFollowups.length > 0 ? (
-          <ul className="mt-4 list-disc space-y-1 pl-5 text-sm leading-6 text-muted-foreground">
+          <ul
+            className="mt-4 list-disc space-y-1 pl-5 text-sm leading-6"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
             {message.suggestedFollowups.map((item) => (
               <li key={item}>{item}</li>
             ))}
@@ -71,7 +91,10 @@ export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: Ru
         ) : null}
 
         {message.disclaimer ? (
-          <p className="mt-4 text-xs italic text-muted-foreground/60">
+          <p
+            className="mt-4 text-xs italic"
+            style={{ color: 'var(--color-text-muted)' }}
+          >
             {message.disclaimer}
           </p>
         ) : null}

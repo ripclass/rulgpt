@@ -36,21 +36,26 @@ export function Faq() {
     >
       <section className="space-y-3">
         {faqs.map((faq, i) => (
-          <div key={i} className="rounded-xl border border-border bg-card">
+          <div
+            key={i}
+            className="rounded-xl"
+            style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+          >
             <button
               type="button"
               onClick={() => setOpenIndex(openIndex === i ? null : i)}
               className="flex w-full items-center justify-between px-5 py-4 text-left"
             >
-              <span className="text-sm font-medium text-foreground">{faq.q}</span>
+              <span className="text-sm font-medium" style={{ color: 'var(--color-parchment)' }}>{faq.q}</span>
               <ChevronDown
-                className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${
+                className={`h-4 w-4 shrink-0 transition-transform ${
                   openIndex === i ? 'rotate-180' : ''
                 }`}
+                style={{ color: 'var(--color-text-secondary)' }}
               />
             </button>
             {openIndex === i && (
-              <div className="px-5 pb-4 text-sm leading-relaxed text-muted-foreground">
+              <div className="px-5 pb-4 text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
                 {faq.a}
               </div>
             )}

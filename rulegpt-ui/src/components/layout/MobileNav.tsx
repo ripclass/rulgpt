@@ -10,7 +10,7 @@ interface MobileNavProps {
 
 export function MobileNav({ onNewQuery, onHistory, onSaved, onPro }: MobileNavProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between border-t border-border bg-card px-4 py-2 backdrop-blur md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-2 md:hidden" style={{ background: 'var(--color-surface)', borderTop: '1px solid var(--color-border)' }}>
       <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground hover:bg-muted" onClick={onNewQuery}>
         <MessageSquare className="mr-1 h-4 w-4" />
         <span className="text-xs">New</span>

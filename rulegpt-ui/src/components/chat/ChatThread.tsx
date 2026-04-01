@@ -16,11 +16,11 @@ export function ChatThread({ messages, isLoading, canSave, onCitationClick, onSa
     <section className="space-y-6">
       {messages.map((message) =>
         message.role === 'user' ? (
-          <div key={message.id} className="animate-slide-up">
+          <div key={message.id} className="chat-message-enter">
             <UserMessage message={message} />
           </div>
         ) : (
-          <div key={message.id} className="animate-slide-up">
+          <div key={message.id} className="chat-message-enter">
             <RuleGPTMessage
               message={message}
               canSave={canSave}
@@ -31,11 +31,20 @@ export function ChatThread({ messages, isLoading, canSave, onCitationClick, onSa
         ),
       )}
       {isLoading ? (
-        <div className="flex justify-start animate-slide-up">
-          <div className="w-full rounded-lg rounded-bl-sm border border-border bg-card px-5 py-4">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex justify-start chat-message-enter">
+          <div
+            className="w-full rounded-lg rounded-bl-sm px-5 py-4"
+            style={{
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+            }}
+          >
+            <div
+              className="flex items-center gap-2 text-sm"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
               <LoadingDots />
-              <span>Analyzing rules...</span>
+              <span style={{ fontFamily: 'var(--font-body)' }}>Analyzing rules...</span>
             </div>
           </div>
         </div>

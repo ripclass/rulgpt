@@ -1,5 +1,4 @@
 import { Copy, Bookmark, Share2, ThumbsDown, ThumbsUp } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 
 interface MessageActionsProps {
   canSave?: boolean
@@ -7,52 +6,62 @@ interface MessageActionsProps {
   onSave: () => void
 }
 
+const actionBtnStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '4px',
+  padding: '4px 8px',
+  fontSize: '12px',
+  fontFamily: 'var(--font-body)',
+  color: 'var(--color-text-secondary)',
+  background: 'transparent',
+  border: 'none',
+  borderRadius: 'var(--radius-sm)',
+  cursor: 'pointer',
+  transition: 'color var(--duration-fast) var(--ease-default), background var(--duration-fast) var(--ease-default)',
+}
+
+const iconBtnStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '28px',
+  height: '28px',
+  color: 'var(--color-text-secondary)',
+  background: 'transparent',
+  border: 'none',
+  borderRadius: 'var(--radius-sm)',
+  cursor: 'pointer',
+  transition: 'color var(--duration-fast) var(--ease-default), background var(--duration-fast) var(--ease-default)',
+}
+
 export function MessageActions({ canSave = true, onCopy, onSave }: MessageActionsProps) {
   return (
-    <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-3 opacity-0 transition-opacity group-hover:opacity-100">
-      <Button
+    <div
+      className="mt-4 flex flex-wrap items-center gap-2 pt-3 opacity-0 transition-opacity group-hover:opacity-100"
+      style={{ borderTop: '1px solid var(--color-border)' }}
+    >
+      <button type="button" style={actionBtnStyle} className="btn-ghost" onClick={onCopy}>
+        <Copy className="h-3.5 w-3.5" /> Copy
+      </button>
+      <button
         type="button"
-        variant="ghost"
-        size="sm"
-        className="px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-surface-raised"
-        onClick={onCopy}
-      >
-        <Copy className="mr-1 h-3.5 w-3.5" /> Copy
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-surface-raised"
+        style={{ ...actionBtnStyle, opacity: canSave ? 1 : 0.4, cursor: canSave ? 'pointer' : 'not-allowed' }}
+        className="btn-ghost"
         disabled={!canSave}
         onClick={onSave}
       >
-        <Bookmark className="mr-1 h-3.5 w-3.5" /> Save
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-surface-raised"
-      >
-        <Share2 className="mr-1 h-3.5 w-3.5" /> Share
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-surface-raised"
-      >
+        <Bookmark className="h-3.5 w-3.5" /> Save
+      </button>
+      <button type="button" style={actionBtnStyle} className="btn-ghost">
+        <Share2 className="h-3.5 w-3.5" /> Share
+      </button>
+      <button type="button" style={iconBtnStyle} className="btn-ghost">
         <ThumbsUp className="h-3.5 w-3.5" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-surface-raised"
-      >
+      </button>
+      <button type="button" style={iconBtnStyle} className="btn-ghost">
         <ThumbsDown className="h-3.5 w-3.5" />
-      </Button>
+      </button>
     </div>
   )
 }

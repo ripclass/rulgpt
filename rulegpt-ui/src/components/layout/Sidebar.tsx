@@ -55,18 +55,24 @@ export function Sidebar({
   onLogout,
 }: SidebarProps) {
   return (
-    <aside className="hidden h-screen w-64 shrink-0 border-r border-border bg-card px-4 py-5 md:flex md:flex-col">
-      <div className="border-b border-border pb-4">
+    <aside
+      className="hidden h-screen w-64 shrink-0 px-4 py-5 md:flex md:flex-col"
+      style={{ background: 'var(--color-surface)', borderRight: '1px solid var(--color-border)' }}
+    >
+      <div className="pb-4" style={{ borderBottom: '1px solid var(--color-border)' }}>
         <div className="flex items-center gap-2">
           <RuxMark />
-          <span className="font-display text-lg text-foreground">tfrules</span>
+          <span className="wordmark wordmark--on-dark text-lg">tfrules</span>
         </div>
-        <p className="mt-2 text-xs text-muted-foreground">Trade rules, cited.</p>
+        <p className="mt-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>Trade rules, cited.</p>
       </div>
 
-      <Button className="mt-4 h-11 w-full rounded-full bg-foreground text-background hover:bg-foreground/90" onClick={onNewQuery}>
-        <Plus className="mr-2 h-4 w-4" /> New chat
-      </Button>
+      <button
+        className="btn-primary mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-md text-sm font-medium"
+        onClick={onNewQuery}
+      >
+        <Plus className="h-4 w-4" /> New chat
+      </button>
 
       {tier === 'anonymous' ? (
         <div className="mt-4">
@@ -74,18 +80,30 @@ export function Sidebar({
         </div>
       ) : null}
 
-      <div className="mt-4 space-y-2">
-        <p className="text-xs uppercase tracking-wide text-muted-foreground">Quick categories</p>
+      <div className="mt-4 space-y-1">
+        <p className="mb-2 text-xs uppercase tracking-wide" style={{ color: 'var(--color-text-muted)' }}>Quick categories</p>
         {quickCategories.map((category) => (
           <button
             key={category}
             type="button"
             disabled={previewMode}
-            className={`w-full rounded-lg px-3 py-2 text-left text-xs transition disabled:cursor-not-allowed disabled:opacity-50 ${
-              activeQuickCategory === category
-                ? 'bg-primary/10 text-foreground ring-1 ring-primary/20'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-            }`}
+            className="w-full rounded-md px-3 py-2 text-left text-xs transition disabled:cursor-not-allowed disabled:opacity-50"
+            style={{
+              color: activeQuickCategory === category ? 'var(--color-amber)' : 'var(--color-text-secondary)',
+              background: activeQuickCategory === category ? 'var(--color-amber-muted)' : 'transparent',
+            }}
+            onMouseEnter={(e) => {
+              if (activeQuickCategory !== category) {
+                e.currentTarget.style.background = 'var(--color-surface-raised)'
+                e.currentTarget.style.color = 'var(--color-parchment)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeQuickCategory !== category) {
+                e.currentTarget.style.background = 'transparent'
+                e.currentTarget.style.color = 'var(--color-text-secondary)'
+              }
+            }}
             onClick={() => onQuickCategory(category)}
           >
             {category}
@@ -94,29 +112,40 @@ export function Sidebar({
       </div>
 
       <div className="mt-5 min-h-0 flex-1 overflow-y-auto pr-1">
-        <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">History</p>
+        <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: 'var(--color-text-muted)' }}>History</p>
         <QueryHistory items={history} onPick={onPickHistory} disabled={previewMode} />
-        <p className="mb-2 mt-5 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Saved</p>
+        <p className="mb-2 mt-5 font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: 'var(--color-text-muted)' }}>Saved</p>
         <SavedAnswers items={savedAnswers} onDelete={onDeleteSaved} />
       </div>
 
-      <div className="mt-4 space-y-3 border-t border-border pt-4">
+      <div className="mt-4 space-y-3 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
         <UpgradeCTA tier={tier} />
         {isAuthenticated ? (
-          <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-surface-raised" onClick={onLogout}>
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
+            style={{ color: 'var(--color-text-secondary)' }}
+            onClick={onLogout}
+          >
             <LogOut className="mr-2 h-4 w-4" /> Logout
           </Button>
         ) : (
           <div className="flex gap-2">
-            <Button variant="outline" className="w-full border-border text-muted-foreground hover:text-foreground hover:bg-surface-raised" onClick={onOpenLogin}>
+            <button
+              className="btn-secondary w-full rounded-md py-2 text-sm"
+              onClick={onOpenLogin}
+            >
               Sign in
-            </Button>
-            <Button className="w-full rounded-full bg-foreground text-background hover:bg-foreground/90" onClick={onOpenSignup}>
+            </button>
+            <button
+              className="btn-primary w-full rounded-md py-2 text-sm"
+              onClick={onOpenSignup}
+            >
               Sign up
-            </Button>
+            </button>
           </div>
         )}
-        <Button asChild variant="ghost" className="w-full justify-start text-xs text-muted-foreground hover:text-foreground hover:bg-surface-raised">
+        <Button asChild variant="ghost" className="w-full justify-start text-xs" style={{ color: 'var(--color-text-muted)' }}>
           <Link to="/api-access">API access</Link>
         </Button>
       </div>

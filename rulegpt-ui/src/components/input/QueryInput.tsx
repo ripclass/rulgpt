@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { SendHorizonal } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
-import { Button } from '@/components/ui/button'
 
 interface QueryInputProps {
   disabled?: boolean
@@ -47,10 +46,14 @@ export function QueryInput({
 
   return (
     <form
-      className={
+      className={isCentered ? 'space-y-4 rounded-lg p-4 md:p-5' : 'space-y-3'}
+      style={
         isCentered
-          ? 'space-y-4 rounded-lg border border-border bg-card p-4 md:p-5'
-          : 'space-y-3'
+          ? {
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+            }
+          : undefined
       }
       onSubmit={handleSubmit}
     >
@@ -59,8 +62,8 @@ export function QueryInput({
         placeholder={placeholder}
         className={
           isCentered
-            ? 'min-h-[138px] resize-none rounded-lg border border-border bg-surface-raised px-4 py-4 text-[15px] leading-7 text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-primary'
-            : 'min-h-[88px] resize-none rounded-lg border border-border bg-surface-raised px-4 py-3 text-[14px] leading-7 text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-primary'
+            ? 'input-dark min-h-[138px] resize-none text-[15px] leading-7'
+            : 'input-dark min-h-[88px] resize-none text-[14px] leading-7'
         }
         disabled={disabled}
         onChange={(event) => setValue(event.target.value)}
@@ -73,27 +76,31 @@ export function QueryInput({
       />
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className={`text-xs ${isTooLong ? 'text-error' : 'text-muted-foreground'}`}>
+          <p
+            className="text-xs"
+            style={{ color: isTooLong ? 'var(--color-error)' : 'var(--color-text-muted)' }}
+          >
             {count}/500
           </p>
           {previewMode ? (
-            <p className="mt-1 max-w-[26rem] text-xs text-muted-foreground">
+            <p className="mt-1 max-w-[26rem] text-xs" style={{ color: 'var(--color-text-muted)' }}>
               Preview mode shows the conversation shell while live retrieval is paused.
             </p>
           ) : !isCentered ? (
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
               Press Enter to send. Use Shift+Enter for a new line.
             </p>
           ) : null}
         </div>
         <div className="flex items-center gap-3">
-          <Button
-            size={isCentered ? 'default' : 'sm'}
-            className="rounded-full bg-foreground px-5 text-background hover:bg-foreground/90"
+          <button
+            type="submit"
+            className="btn-primary inline-flex items-center rounded-full px-5"
+            style={{ fontSize: isCentered ? '1rem' : '0.875rem' }}
             disabled={disabled || !value.trim() || isTooLong}
           >
             Send <SendHorizonal className="ml-2 h-4 w-4" />
-          </Button>
+          </button>
         </div>
       </div>
     </form>
