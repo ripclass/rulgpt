@@ -21,14 +21,22 @@ class StripeClient:
         *,
         secret_key: str | None = None,
         webhook_secret: str | None = None,
-        monthly_price_id: str | None = None,
-        annual_price_id: str | None = None,
+        starter_monthly_price_id: str | None = None,
+        starter_annual_price_id: str | None = None,
+        pro_monthly_price_id: str | None = None,
+        pro_annual_price_id: str | None = None,
         supabase_auth: SupabaseAuthService | None = None,
     ) -> None:
         self.secret_key = secret_key or settings.STRIPE_SECRET_KEY
         self.webhook_secret = webhook_secret or settings.STRIPE_WEBHOOK_SECRET
-        self.monthly_price_id = monthly_price_id or settings.STRIPE_PRO_MONTHLY_PRICE_ID
-        self.annual_price_id = annual_price_id or settings.STRIPE_PRO_ANNUAL_PRICE_ID
+        self.starter_monthly_price_id = (
+            starter_monthly_price_id or settings.STRIPE_STARTER_MONTHLY_PRICE_ID
+        )
+        self.starter_annual_price_id = (
+            starter_annual_price_id or settings.STRIPE_STARTER_ANNUAL_PRICE_ID
+        )
+        self.pro_monthly_price_id = pro_monthly_price_id or settings.STRIPE_PRO_MONTHLY_PRICE_ID
+        self.pro_annual_price_id = pro_annual_price_id or settings.STRIPE_PRO_ANNUAL_PRICE_ID
         self.supabase_auth = supabase_auth or SupabaseAuthService()
 
     def _require_secret_key(self) -> str:
@@ -41,17 +49,30 @@ class StripeClient:
             raise RuntimeError("Stripe webhook secret is not configured.")
         return self.webhook_secret
 
-    def _price_id_for_interval(self, interval: str) -> str:
+    def _price_id_for_plan_and_interval(self, plan: str, interval: str) -> str:
+        normalized_plan = str(plan or "").strip().lower()
         normalized = str(interval or "").strip().lower()
-        if normalized == "monthly":
-            price_id = self.monthly_price_id
-        elif normalized == "annual":
-            price_id = self.annual_price_id
-        else:
+        price_matrix = {
+            "starter": {
+                "monthly": self.starter_monthly_price_id,
+                "annual": self.starter_annual_price_id,
+            },
+            "pro": {
+                "monthly": self.pro_monthly_price_id,
+                "annual": self.pro_annual_price_id,
+            },
+        }
+
+        if normalized_plan not in price_matrix:
+            raise ValueError("Unsupported billing plan.")
+        if normalized not in {"monthly", "annual"}:
             raise ValueError("Unsupported billing interval.")
 
+        price_id = price_matrix[normalized_plan][normalized]
         if not price_id:
-            raise RuntimeError(f"Stripe price id for {normalized} billing is not configured.")
+            raise RuntimeError(
+                f"Stripe price id for {normalized_plan} {normalized} billing is not configured."
+            )
         return price_id
 
     async def create_checkout_session(
@@ -59,17 +80,20 @@ class StripeClient:
         *,
         user_id: UUID | str,
         customer_email: str | None,
+        plan: str,
         interval: str,
         success_url: str,
         cancel_url: str,
     ) -> dict[str, Any]:
-        """Create a Pro subscription checkout session."""
+        """Create a paid subscription checkout session."""
 
-        price_id = self._price_id_for_interval(interval)
+        normalized_plan = str(plan or "").strip().lower()
+        price_id = self._price_id_for_plan_and_interval(normalized_plan, interval)
         stripe.api_key = self._require_secret_key()
         metadata = {
             "supabase_user_id": str(user_id),
-            "rulegpt_tier": "pro",
+            "rulegpt_tier": normalized_plan,
+            "rulegpt_plan": normalized_plan,
             "billing_interval": str(interval).strip().lower(),
         }
 
@@ -92,7 +116,9 @@ class StripeClient:
             "mode": session.get("mode"),
             "status": session.get("status"),
             "price_id": price_id,
+            "plan": normalized_plan,
             "interval": str(interval).strip().lower(),
+            "tier": normalized_plan,
         }
 
     async def _resolve_event_user_id(self, event_object: dict[str, Any]) -> UUID:
@@ -112,9 +138,32 @@ class StripeClient:
         return UUID(str(candidate))
 
     @staticmethod
-    def _tier_for_subscription_status(status: str | None) -> str:
+    def _resolve_event_tier(event_object: dict[str, Any]) -> str:
+        def _metadata_value(container: Any, key: str) -> Any:
+            if isinstance(container, dict):
+                return (container.get("metadata") or {}).get(key)
+            return None
+
+        candidates = [
+            (event_object.get("metadata") or {}).get("rulegpt_tier"),
+            (event_object.get("metadata") or {}).get("rulegpt_plan"),
+            _metadata_value(event_object.get("subscription_details"), "rulegpt_tier"),
+            _metadata_value(event_object.get("subscription_details"), "rulegpt_plan"),
+            _metadata_value(event_object.get("subscription"), "rulegpt_tier"),
+            _metadata_value(event_object.get("subscription"), "rulegpt_plan"),
+            _metadata_value(event_object.get("lines"), "rulegpt_tier"),
+            _metadata_value(event_object.get("lines"), "rulegpt_plan"),
+        ]
+        for candidate in candidates:
+            normalized = str(candidate or "").strip().lower()
+            if normalized in {"starter", "pro"}:
+                return normalized
+        return "pro"
+
+    @staticmethod
+    def _tier_for_subscription_status(status: str | None, paid_tier: str) -> str:
         if str(status or "").lower() in {"active", "trialing"}:
-            return "pro"
+            return paid_tier
         return "free"
 
     async def handle_webhook(self, payload: bytes, signature: str) -> dict[str, Any]:
@@ -132,11 +181,12 @@ class StripeClient:
 
         if event_type == "checkout.session.completed":
             user_id = await self._resolve_event_user_id(event_object)
-            updated = await self.supabase_auth.set_user_tier(user_id, "pro")
+            tier = self._resolve_event_tier(event_object)
+            updated = await self.supabase_auth.set_user_tier(user_id, tier)
             return {
                 "event_type": event_type,
                 "user_id": str(user_id),
-                "tier": "pro",
+                "tier": tier,
                 "action": "upgraded",
                 "supabase_user": updated,
             }
@@ -147,7 +197,11 @@ class StripeClient:
             "customer.subscription.deleted",
         }:
             user_id = await self._resolve_event_user_id(event_object)
-            tier = self._tier_for_subscription_status(event_object.get("status"))
+            paid_tier = self._resolve_event_tier(event_object)
+            tier = self._tier_for_subscription_status(
+                event_object.get("status"),
+                paid_tier,
+            )
             updated = await self.supabase_auth.set_user_tier(user_id, tier)
             return {
                 "event_type": event_type,

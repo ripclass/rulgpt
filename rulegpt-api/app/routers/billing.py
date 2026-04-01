@@ -24,19 +24,31 @@ billing_client = StripeClient()
 @router.get("/status", response_model=BillingConfigStatusResponse)
 async def billing_status() -> BillingConfigStatusResponse:
     stripe_configured = bool(billing_client.secret_key)
-    monthly_price_configured = bool(billing_client.monthly_price_id)
-    annual_price_configured = bool(billing_client.annual_price_id)
+    starter_monthly_price_configured = bool(billing_client.starter_monthly_price_id)
+    starter_annual_price_configured = bool(billing_client.starter_annual_price_id)
+    pro_monthly_price_configured = bool(billing_client.pro_monthly_price_id)
+    pro_annual_price_configured = bool(billing_client.pro_annual_price_id)
     webhook_secret_configured = bool(billing_client.webhook_secret)
-    checkout_ready = stripe_configured and monthly_price_configured and annual_price_configured
+    checkout_ready = (
+        stripe_configured
+        and starter_monthly_price_configured
+        and starter_annual_price_configured
+        and pro_monthly_price_configured
+        and pro_annual_price_configured
+    )
     webhook_ready = stripe_configured and webhook_secret_configured
 
     blockers: list[str] = []
     if not stripe_configured:
         blockers.append("Stripe secret key is missing.")
-    if not monthly_price_configured:
-        blockers.append("Monthly Stripe price ID is missing.")
-    if not annual_price_configured:
-        blockers.append("Annual Stripe price ID is missing.")
+    if not starter_monthly_price_configured:
+        blockers.append("Starter monthly Stripe price ID is missing.")
+    if not starter_annual_price_configured:
+        blockers.append("Starter annual Stripe price ID is missing.")
+    if not pro_monthly_price_configured:
+        blockers.append("Pro monthly Stripe price ID is missing.")
+    if not pro_annual_price_configured:
+        blockers.append("Pro annual Stripe price ID is missing.")
     if not webhook_secret_configured:
         blockers.append("Stripe webhook secret is missing.")
 
@@ -44,10 +56,13 @@ async def billing_status() -> BillingConfigStatusResponse:
         stripe_configured=stripe_configured,
         secret_key_configured=stripe_configured,
         webhook_secret_configured=webhook_secret_configured,
-        monthly_price_configured=monthly_price_configured,
-        annual_price_configured=annual_price_configured,
+        starter_monthly_price_configured=starter_monthly_price_configured,
+        starter_annual_price_configured=starter_annual_price_configured,
+        pro_monthly_price_configured=pro_monthly_price_configured,
+        pro_annual_price_configured=pro_annual_price_configured,
         checkout_ready=checkout_ready,
         webhook_ready=webhook_ready,
+        supported_plans=["starter", "pro"],
         supported_intervals=["monthly", "annual"],
         blockers=blockers,
     )
@@ -74,7 +89,7 @@ async def create_checkout_session(
     payload: CheckoutSessionCreateRequest | None = None,
     _user_id=Depends(require_authenticated_user),
 ) -> CheckoutSessionResponse:
-    payload = payload or CheckoutSessionCreateRequest(interval="monthly")
+    payload = payload or CheckoutSessionCreateRequest(plan="pro", interval="monthly")
     claims = getattr(request.state, "auth_claims", {}) or {}
     customer_email = payload.customer_email or claims.get("email")
     frontend_base = _frontend_base_url(request)
@@ -85,6 +100,7 @@ async def create_checkout_session(
         session = await billing_client.create_checkout_session(
             user_id=request.state.user_id,
             customer_email=customer_email,
+            plan=payload.plan,
             interval=payload.interval,
             success_url=success_url,
             cancel_url=cancel_url,
@@ -109,9 +125,9 @@ async def get_subscription(
     _user_id=Depends(require_authenticated_user),
 ) -> BillingSubscriptionResponse:
     tier = getattr(request.state, "user_tier", "free")
-    normalized_tier = "pro" if tier == "pro" else "free"
+    normalized_tier = tier if tier in {"starter", "pro"} else "free"
     return BillingSubscriptionResponse(
-        status="active" if normalized_tier == "pro" else "inactive",
+        status="active" if normalized_tier in {"starter", "pro"} else "inactive",
         tier=normalized_tier,
     )
 

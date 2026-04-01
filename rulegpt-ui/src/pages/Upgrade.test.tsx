@@ -60,10 +60,13 @@ describe('Upgrade', () => {
       stripe_configured: true,
       secret_key_configured: true,
       webhook_secret_configured: true,
-      monthly_price_configured: true,
-      annual_price_configured: true,
+      starter_monthly_price_configured: true,
+      starter_annual_price_configured: true,
+      pro_monthly_price_configured: true,
+      pro_annual_price_configured: true,
       checkout_ready: true,
       webhook_ready: true,
+      supported_plans: ['starter', 'pro'],
       supported_intervals: ['monthly', 'annual'],
       blockers: [],
     })
@@ -81,12 +84,13 @@ describe('Upgrade', () => {
 
     renderPage()
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Start Stripe checkout' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Start Starter checkout' }))
 
     await waitFor(() => {
       expect(createBillingCheckout).toHaveBeenCalledTimes(1)
     })
     expect(createBillingCheckout.mock.calls[0][0]).toMatchObject({
+      plan: 'starter',
       interval: 'monthly',
       customer_email: 'user@example.com',
     })
@@ -106,10 +110,13 @@ describe('Upgrade', () => {
       stripe_configured: false,
       secret_key_configured: false,
       webhook_secret_configured: false,
-      monthly_price_configured: false,
-      annual_price_configured: false,
+      starter_monthly_price_configured: false,
+      starter_annual_price_configured: false,
+      pro_monthly_price_configured: false,
+      pro_annual_price_configured: false,
       checkout_ready: false,
       webhook_ready: false,
+      supported_plans: ['starter', 'pro'],
       supported_intervals: ['monthly', 'annual'],
       blockers: ['Stripe is not configured.'],
     })
@@ -127,5 +134,49 @@ describe('Upgrade', () => {
     expect(await screen.findByRole('button', { name: 'Checkout not configured yet' })).toBeDisabled()
     expect(await screen.findByText('Stripe is not configured.')).toBeInTheDocument()
     expect(setTier).not.toHaveBeenCalled()
+  })
+
+  it('submits the pro plan when selected', async () => {
+    getBillingStatus.mockResolvedValue({
+      stripe_configured: true,
+      secret_key_configured: true,
+      webhook_secret_configured: true,
+      starter_monthly_price_configured: true,
+      starter_annual_price_configured: true,
+      pro_monthly_price_configured: true,
+      pro_annual_price_configured: true,
+      checkout_ready: true,
+      webhook_ready: true,
+      supported_plans: ['starter', 'pro'],
+      supported_intervals: ['monthly', 'annual'],
+      blockers: [],
+    })
+    createBillingCheckout.mockResolvedValue({
+      message: 'Checkout session created.',
+      tier: 'pro',
+    })
+    mockUseAuth.mockReturnValue({
+      accessToken: 'token-123',
+      currentTier: 'free',
+      isAuthenticated: true,
+      oauth: { supabaseEnabled: true },
+      user: { id: 'user-1', email: 'user@example.com', tier: 'free' },
+      setTier,
+    })
+
+    renderPage()
+
+    const proLabel = await screen.findByText('Pro')
+    fireEvent.click(proLabel.closest('button') as HTMLButtonElement)
+    fireEvent.click(await screen.findByRole('button', { name: 'Start Pro checkout' }))
+
+    await waitFor(() => {
+      expect(createBillingCheckout).toHaveBeenCalledTimes(1)
+    })
+    expect(createBillingCheckout.mock.calls[0][0]).toMatchObject({
+      plan: 'pro',
+      interval: 'monthly',
+    })
+    expect(setTier).toHaveBeenCalledWith('pro')
   })
 })

@@ -1,9 +1,10 @@
-export type SessionTier = 'anonymous' | 'free' | 'pro'
+export type SessionTier = 'anonymous' | 'free' | 'starter' | 'pro'
 export type ConfidenceBand = 'high' | 'medium' | 'low'
 export type LanguageCode = 'en' | 'bn' | 'hi'
 export type MessageRole = 'user' | 'assistant'
 export type DomainType = 'icc' | 'sanctions' | 'fta' | 'customs' | 'bank_specific' | 'other'
 export type BillingInterval = 'monthly' | 'annual'
+export type BillingPlan = 'starter' | 'pro'
 
 export interface QueryRequest {
   query: string
@@ -38,11 +39,13 @@ export interface BillingCheckoutResponse {
   redirect_url?: string | null
   url?: string | null
   message?: string | null
+  plan?: BillingPlan | null
   tier?: SessionTier
   subscription_status?: string | null
 }
 
 export interface BillingCheckoutRequest {
+  plan: BillingPlan
   interval: BillingInterval
   success_url: string
   cancel_url: string

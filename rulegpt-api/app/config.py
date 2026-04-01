@@ -37,7 +37,9 @@ class Settings(BaseSettings):
         r"^https://([a-z0-9-]+\.)*vercel\.app$|^https://([a-z0-9-]+\.)?tfrules\.com$"
     )
 
-    FREE_TIER_MONTHLY_LIMIT: int = 10
+    FREE_TIER_MONTHLY_LIMIT: int = 20
+    STARTER_TIER_MONTHLY_LIMIT: int = 500
+    PRO_TIER_MONTHLY_LIMIT: int = 2000
     PRO_TIER_API_LIMIT: int = 10000
 
     RATE_LIMIT_PER_MIN_ANON: int = 30
@@ -74,6 +76,8 @@ class Settings(BaseSettings):
 
     STRIPE_SECRET_KEY: str | None = None
     STRIPE_WEBHOOK_SECRET: str | None = None
+    STRIPE_STARTER_MONTHLY_PRICE_ID: str | None = None
+    STRIPE_STARTER_ANNUAL_PRICE_ID: str | None = None
     STRIPE_PRO_MONTHLY_PRICE_ID: str | None = None
     STRIPE_PRO_ANNUAL_PRICE_ID: str | None = None
 

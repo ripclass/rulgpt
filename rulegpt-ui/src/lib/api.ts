@@ -1,4 +1,5 @@
 import type {
+  BillingPlan,
   BillingCheckoutRequest,
   BillingCheckoutResponse,
   BillingSubscriptionResponse,
@@ -38,7 +39,7 @@ export interface AuthStatusResponse {
   jwt_verification_ready: boolean
   admin_user_sync_ready: boolean
   authenticated: boolean
-  tier: 'anonymous' | 'free' | 'pro'
+  tier: 'anonymous' | 'free' | 'starter' | 'pro'
   user_id: string | null
   auth_issuer: string | null
   auth_error: string | null
@@ -49,10 +50,13 @@ export interface BillingConfigStatusResponse {
   stripe_configured: boolean
   secret_key_configured: boolean
   webhook_secret_configured: boolean
-  monthly_price_configured: boolean
-  annual_price_configured: boolean
+  starter_monthly_price_configured: boolean
+  starter_annual_price_configured: boolean
+  pro_monthly_price_configured: boolean
+  pro_annual_price_configured: boolean
   checkout_ready: boolean
   webhook_ready: boolean
+  supported_plans: BillingPlan[]
   supported_intervals: Array<'monthly' | 'annual'>
   blockers: string[]
 }
@@ -139,7 +143,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 
 export interface RequestIdentity {
   userId?: string
-  tier?: 'anonymous' | 'free' | 'pro'
+  tier?: 'anonymous' | 'free' | 'starter' | 'pro'
   accessToken?: string | null
 }
 

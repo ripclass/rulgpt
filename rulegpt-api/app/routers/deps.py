@@ -12,7 +12,7 @@ from app.database import get_db
 
 def get_request_tier(request: Request) -> str:
     tier = getattr(request.state, "user_tier", "anonymous")
-    return tier if tier in {"anonymous", "free", "pro"} else "anonymous"
+    return tier if tier in {"anonymous", "free", "starter", "pro"} else "anonymous"
 
 
 def get_request_user_id(request: Request) -> UUID | None:

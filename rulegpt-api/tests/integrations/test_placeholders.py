@@ -93,7 +93,7 @@ async def test_supabase_auth_falls_back_to_free_for_authenticated_users(monkeypa
 
 
 @pytest.mark.asyncio
-async def test_stripe_checkout_session_is_created_for_monthly_pro(monkeypatch) -> None:
+async def test_stripe_checkout_session_is_created_for_monthly_starter(monkeypatch) -> None:
     captured: dict[str, object] = {}
 
     def _fake_checkout_create(**kwargs):
@@ -109,23 +109,27 @@ async def test_stripe_checkout_session_is_created_for_monthly_pro(monkeypatch) -
     client = StripeClient(
         secret_key="sk_test",
         webhook_secret="whsec_test",
-        monthly_price_id="price_monthly",
-        annual_price_id="price_annual",
+        starter_monthly_price_id="price_starter_monthly",
+        starter_annual_price_id="price_starter_annual",
+        pro_monthly_price_id="price_pro_monthly",
+        pro_annual_price_id="price_pro_annual",
         supabase_auth=SimpleNamespace(set_user_tier=AsyncMock()),
     )
 
     result = await client.create_checkout_session(
         user_id=uuid4(),
         customer_email="person@example.com",
+        plan="starter",
         interval="monthly",
         success_url="https://rulegpt.test/success",
         cancel_url="https://rulegpt.test/cancel",
     )
 
     assert result["session_id"] == "cs_test_123"
-    assert result["price_id"] == "price_monthly"
+    assert result["price_id"] == "price_starter_monthly"
     assert captured["customer_email"] == "person@example.com"
-    assert captured["metadata"]["rulegpt_tier"] == "pro"
+    assert captured["metadata"]["rulegpt_tier"] == "starter"
+    assert captured["metadata"]["rulegpt_plan"] == "starter"
     assert captured["subscription_data"]["metadata"]["billing_interval"] == "monthly"
 
 
@@ -143,6 +147,7 @@ async def test_stripe_webhook_upgrades_supabase_tier(monkeypatch) -> None:
             "data": {
                 "object": {
                     "metadata": {"supabase_user_id": str(user_id)},
+                    "subscription_details": {"metadata": {"rulegpt_tier": "starter"}},
                     "client_reference_id": str(user_id),
                 }
             },
@@ -152,13 +157,15 @@ async def test_stripe_webhook_upgrades_supabase_tier(monkeypatch) -> None:
     client = StripeClient(
         secret_key="sk_test",
         webhook_secret="whsec_test",
-        monthly_price_id="price_monthly",
-        annual_price_id="price_annual",
+        starter_monthly_price_id="price_starter_monthly",
+        starter_annual_price_id="price_starter_annual",
+        pro_monthly_price_id="price_pro_monthly",
+        pro_annual_price_id="price_pro_annual",
         supabase_auth=supabase_auth,
     )
 
     result = await client.handle_webhook(b'{"id":"evt_123"}', "whsec_signature")
 
     assert result["action"] == "upgraded"
-    assert result["tier"] == "pro"
-    supabase_auth.set_user_tier.assert_awaited_once()
+    assert result["tier"] == "starter"
+    supabase_auth.set_user_tier.assert_awaited_once_with(user_id, "starter")

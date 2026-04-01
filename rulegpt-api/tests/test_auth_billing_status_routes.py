@@ -43,8 +43,10 @@ def auth_configured(monkeypatch):
 def billing_configured(monkeypatch):
     monkeypatch.setattr(billing.billing_client, "secret_key", "sk_test")
     monkeypatch.setattr(billing.billing_client, "webhook_secret", "whsec_test")
-    monkeypatch.setattr(billing.billing_client, "monthly_price_id", "price_monthly")
-    monkeypatch.setattr(billing.billing_client, "annual_price_id", "price_annual")
+    monkeypatch.setattr(billing.billing_client, "starter_monthly_price_id", "price_starter_monthly")
+    monkeypatch.setattr(billing.billing_client, "starter_annual_price_id", "price_starter_annual")
+    monkeypatch.setattr(billing.billing_client, "pro_monthly_price_id", "price_pro_monthly")
+    monkeypatch.setattr(billing.billing_client, "pro_annual_price_id", "price_pro_annual")
     yield
 
 
@@ -92,14 +94,17 @@ def test_billing_status_reports_checkout_and_webhook_readiness(billing_configure
     assert data["checkout_ready"] is True
     assert data["webhook_ready"] is True
     assert data["blockers"] == []
+    assert data["supported_plans"] == ["starter", "pro"]
     assert data["supported_intervals"] == ["monthly", "annual"]
 
 
 def test_billing_status_reports_missing_stripe_blockers(monkeypatch):
     monkeypatch.setattr(billing.billing_client, "secret_key", "")
     monkeypatch.setattr(billing.billing_client, "webhook_secret", "")
-    monkeypatch.setattr(billing.billing_client, "monthly_price_id", "")
-    monkeypatch.setattr(billing.billing_client, "annual_price_id", "")
+    monkeypatch.setattr(billing.billing_client, "starter_monthly_price_id", "")
+    monkeypatch.setattr(billing.billing_client, "starter_annual_price_id", "")
+    monkeypatch.setattr(billing.billing_client, "pro_monthly_price_id", "")
+    monkeypatch.setattr(billing.billing_client, "pro_annual_price_id", "")
 
     client = TestClient(_build_app())
 
@@ -110,6 +115,8 @@ def test_billing_status_reports_missing_stripe_blockers(monkeypatch):
     assert data["checkout_ready"] is False
     assert data["webhook_ready"] is False
     assert "Stripe secret key is missing." in data["blockers"]
-    assert "Monthly Stripe price ID is missing." in data["blockers"]
-    assert "Annual Stripe price ID is missing." in data["blockers"]
+    assert "Starter monthly Stripe price ID is missing." in data["blockers"]
+    assert "Starter annual Stripe price ID is missing." in data["blockers"]
+    assert "Pro monthly Stripe price ID is missing." in data["blockers"]
+    assert "Pro annual Stripe price ID is missing." in data["blockers"]
     assert "Stripe webhook secret is missing." in data["blockers"]

@@ -4,13 +4,50 @@ import { Link } from 'react-router-dom'
 import { ApiError, api } from '@/lib/api'
 import { track } from '@/lib/analytics'
 import { useAuth } from '@/hooks/useAuth'
-import type { BillingInterval } from '@/types'
+import type { BillingInterval, BillingPlan } from '@/types'
+
+const PLAN_COPY: Record<
+  BillingPlan,
+  {
+    title: string
+    monthlyLabel: string
+    annualLabel: string
+    blurb: string
+    features: string[]
+  }
+> = {
+  starter: {
+    title: 'Starter',
+    monthlyLabel: '$9 / month',
+    annualLabel: '$90 / year',
+    blurb: 'For daily operators who need cited answers, history, and saved work without the heavier API tier.',
+    features: [
+      '500 queries / month',
+      'Query history',
+      'Saved answers',
+      'PDF export',
+    ],
+  },
+  pro: {
+    title: 'Pro',
+    monthlyLabel: '$19 / month',
+    annualLabel: '$190 / year',
+    blurb: 'For teams that need higher volume, exports, and API access on top of the core RuleGPT workflow.',
+    features: [
+      '2,000 queries / month',
+      'Everything in Starter',
+      'API access',
+      'Priority routing',
+    ],
+  },
+}
 
 export function Upgrade() {
   const auth = useAuth()
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null)
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null)
   const [isCheckingOut, setIsCheckingOut] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<BillingPlan>(auth.currentTier === 'starter' ? 'pro' : 'starter')
   const [billingInterval, setBillingInterval] = useState<BillingInterval>('monthly')
 
   const hasBearerToken = Boolean(auth.accessToken)
@@ -30,6 +67,7 @@ export function Upgrade() {
 
   const startCheckout = async () => {
     track('upgrade_checkout_attempted', {
+      plan: selectedPlan,
       interval: billingInterval,
       authenticated: auth.isAuthenticated,
       checkout_ready: billingStatus.data?.checkout_ready ?? false,
@@ -50,6 +88,7 @@ export function Upgrade() {
     try {
       const response = await api.createBillingCheckout(
         {
+          plan: selectedPlan,
           interval: billingInterval,
           success_url: checkoutPaths.success_url,
           cancel_url: checkoutPaths.cancel_url,
@@ -64,11 +103,11 @@ export function Upgrade() {
       const nextUrl = response.checkout_url ?? response.redirect_url ?? response.url ?? null
       if (nextUrl) {
         setCheckoutUrl(nextUrl)
-        setCheckoutMessage('Checkout session created. Open Stripe to complete the upgrade.')
+        setCheckoutMessage(`Checkout session created for ${PLAN_COPY[selectedPlan].title}. Open Stripe to complete the upgrade.`)
         return
       }
-      if (response.tier === 'pro' || response.subscription_status === 'active') {
-        auth.setTier('pro')
+      if (response.tier === 'starter' || response.tier === 'pro') {
+        auth.setTier(response.tier)
       }
       setCheckoutMessage(response.message ?? 'Checkout session created.')
     } catch (error) {
@@ -82,6 +121,8 @@ export function Upgrade() {
     }
   }
 
+  const selectedPlanCopy = PLAN_COPY[selectedPlan]
+
   return (
     <main
       className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center px-4 py-10"
@@ -90,8 +131,8 @@ export function Upgrade() {
       <div
         className="card-dark rounded-2xl p-6 md:p-8"
       >
-        <p className="text-sm uppercase tracking-wide" style={{ color: 'var(--color-amber)' }}>tfrules Pro</p>
-        <h1 className="heading-xl mt-2" style={{ color: 'var(--color-parchment)' }}>Upgrade for teams and daily workflows</h1>
+        <p className="text-sm uppercase tracking-wide" style={{ color: 'var(--color-amber)' }}>Billing</p>
+        <h1 className="heading-xl mt-2" style={{ color: 'var(--color-parchment)' }}>Choose the plan that fits your workflow</h1>
         <p className="mt-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
           {billingStatus.isLoading
             ? 'Checking billing configuration...'
@@ -112,11 +153,43 @@ export function Upgrade() {
             </ul>
           </div>
         ) : null}
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          {(['starter', 'pro'] as const).map((plan) => {
+            const planCopy = PLAN_COPY[plan]
+            const selected = selectedPlan === plan
+            return (
+              <button
+                key={plan}
+                type="button"
+                className="rounded-xl p-4 text-left transition"
+                style={{
+                  background: selected ? 'var(--color-surface-raised)' : 'var(--color-surface)',
+                  border: selected ? '1px solid var(--color-amber)' : '1px solid var(--color-border)',
+                }}
+                onClick={() => setSelectedPlan(plan)}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-base font-semibold" style={{ color: 'var(--color-parchment)' }}>{planCopy.title}</p>
+                    <p className="mt-1 text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                      {billingInterval === 'monthly' ? planCopy.monthlyLabel : planCopy.annualLabel}
+                    </p>
+                  </div>
+                  {selected ? (
+                    <span className="rounded-full px-2 py-1 text-[11px] font-medium" style={{ background: 'var(--color-amber-muted)', color: 'var(--color-amber)' }}>
+                      Selected
+                    </span>
+                  ) : null}
+                </div>
+                <p className="mt-3 text-sm" style={{ color: 'var(--color-text-secondary)' }}>{planCopy.blurb}</p>
+              </button>
+            )
+          })}
+        </div>
         <ul className="mt-4 space-y-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-          <li>Formatted compliance reports</li>
-          <li>Bulk export (session PDF/JSON)</li>
-          <li>API access with fair-use limits</li>
-          <li>Priority routing for model generation</li>
+          {selectedPlanCopy.features.map((feature) => (
+            <li key={feature}>{feature}</li>
+          ))}
         </ul>
         <div className="mt-5 flex flex-wrap gap-2">
           <button
@@ -124,14 +197,14 @@ export function Upgrade() {
             className={billingInterval === 'monthly' ? 'btn-primary rounded-md px-5 py-2 text-sm' : 'btn-secondary rounded-md px-5 py-2 text-sm'}
             onClick={() => setBillingInterval('monthly')}
           >
-            Monthly - $19
+            Monthly - {selectedPlanCopy.monthlyLabel.replace(' / month', '')}
           </button>
           <button
             type="button"
             className={billingInterval === 'annual' ? 'btn-primary rounded-md px-5 py-2 text-sm' : 'btn-secondary rounded-md px-5 py-2 text-sm'}
             onClick={() => setBillingInterval('annual')}
           >
-            Annual - $190
+            Annual - {selectedPlanCopy.annualLabel.replace(' / year', '')}
           </button>
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
@@ -145,7 +218,7 @@ export function Upgrade() {
             {isCheckingOut
               ? 'Starting checkout...'
               : canCheckout
-                ? 'Start Stripe checkout'
+                ? `Start ${selectedPlanCopy.title} checkout`
                 : billingStatus.data?.checkout_ready
                   ? 'Sign in from chat first'
                   : 'Checkout not configured yet'}
@@ -167,7 +240,7 @@ export function Upgrade() {
           <p className="mt-3 text-sm" style={{ color: 'var(--color-text-secondary)' }}>{checkoutMessage}</p>
         ) : null}
         <p className="mt-3 text-xs" style={{ color: 'var(--color-text-muted)' }}>
-          Hosted checkout depends on the backend billing handlers and the Stripe configuration listed above. If the blockers are empty, this page should be ready for live checkout.
+          Free stays free. Starter and Pro use hosted Stripe checkout. If the blockers are empty, this page should be ready for live checkout for both paid plans.
         </p>
       </div>
     </main>

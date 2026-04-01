@@ -81,6 +81,46 @@ def _anonymous_queries_this_month(db: Session, session_id) -> int:
     return int(total or 0)
 
 
+def _tier_monthly_limit(tier: str) -> int:
+    normalized = str(tier or "").strip().lower()
+    if normalized in {"anonymous", "free"}:
+        return settings.FREE_TIER_MONTHLY_LIMIT
+    if normalized == "starter":
+        return settings.STARTER_TIER_MONTHLY_LIMIT
+    if normalized == "pro":
+        return settings.PRO_TIER_MONTHLY_LIMIT
+    return settings.FREE_TIER_MONTHLY_LIMIT
+
+
+def _queries_this_month(db: Session, session_obj: RuleGPTSession, tier: str) -> int:
+    month_start = _month_start(_utc_now())
+    normalized = str(tier or "").strip().lower()
+
+    if normalized != "anonymous" and session_obj.user_id is not None:
+        total = db.scalar(
+            select(func.count(RuleGPTQuery.id)).where(
+                RuleGPTQuery.user_id == session_obj.user_id,
+                RuleGPTQuery.created_at >= month_start,
+            )
+        )
+        return int(total or 0)
+
+    return _anonymous_queries_this_month(db, session_obj.id)
+
+
+def _limit_reached_message(tier: str) -> str:
+    normalized = str(tier or "").strip().lower()
+    if normalized == "anonymous":
+        return "Anonymous monthly query limit reached. Please register to continue."
+    if normalized == "free":
+        return "Free monthly query limit reached. Upgrade to continue."
+    if normalized == "starter":
+        return "Starter monthly query limit reached. Upgrade to Pro or wait for the next cycle."
+    if normalized == "pro":
+        return "Pro monthly query limit reached. Contact support if you need a higher limit."
+    return "Monthly query limit reached."
+
+
 async def _maybe_await(result):
     if inspect.isawaitable(result):
         return await result
@@ -140,14 +180,13 @@ async def process_query_request(
 ) -> QueryResponse:
     session_obj = _find_or_create_session(db, request, payload)
     tier = session_obj.tier
-
-    if tier == "anonymous":
-        used_count = _anonymous_queries_this_month(db, session_obj.id)
-        if used_count >= settings.FREE_TIER_MONTHLY_LIMIT:
-            raise HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="Anonymous monthly query limit reached. Please register to continue.",
-            )
+    monthly_limit = _tier_monthly_limit(tier)
+    used_count = _queries_this_month(db, session_obj, tier)
+    if used_count >= monthly_limit:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=_limit_reached_message(tier),
+        )
 
     started = _utc_now()
     rag = await _call_rag_pipeline(payload.query, db, payload.language)
@@ -202,11 +241,7 @@ async def process_query_request(
     db.refresh(query_row)
     db.refresh(session_obj)
 
-    queries_remaining = (
-        max(0, settings.FREE_TIER_MONTHLY_LIMIT - _anonymous_queries_this_month(db, session_obj.id))
-        if tier == "anonymous"
-        else -1
-    )
+    queries_remaining = max(0, monthly_limit - _queries_this_month(db, session_obj, tier))
     return QueryResponse(
         query_id=query_row.id,
         answer=query_row.answer_text,

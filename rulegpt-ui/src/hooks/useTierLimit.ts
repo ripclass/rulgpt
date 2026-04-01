@@ -6,8 +6,14 @@ interface TierLimitArgs {
 }
 
 export function useTierLimit({ tier, queriesRemaining }: TierLimitArgs) {
-  const limitValue = tier === 'anonymous' ? 10 : -1
-  const hasLimit = tier === 'anonymous'
+  const limitByTier: Record<SessionTier, number> = {
+    anonymous: 20,
+    free: 20,
+    starter: 500,
+    pro: 2000,
+  }
+  const limitValue = limitByTier[tier] ?? -1
+  const hasLimit = queriesRemaining >= 0 && limitValue > 0
   const reachedLimit = hasLimit && queriesRemaining <= 0
   const usedCount = hasLimit ? Math.max(0, limitValue - queriesRemaining) : 0
 

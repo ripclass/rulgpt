@@ -4,7 +4,7 @@ import type { HistoryItem } from '@/types'
 
 export function useHistory(
   userId?: string,
-  tier: 'anonymous' | 'free' | 'pro' = 'anonymous',
+  tier: 'anonymous' | 'free' | 'starter' | 'pro' = 'anonymous',
   accessToken?: string | null,
   enabled = true,
 ) {

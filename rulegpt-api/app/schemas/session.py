@@ -9,7 +9,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
-SessionTier = Literal["anonymous", "free", "pro"]
+SessionTier = Literal["anonymous", "free", "starter", "pro"]
 ConfidenceBand = Literal["high", "medium", "low"]
 
 
@@ -19,4 +19,3 @@ class HistoryItem(BaseModel):
     answer_text: str
     confidence_band: ConfidenceBand
     created_at: datetime
-

@@ -52,11 +52,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     @staticmethod
     def _resolve_tier(request: Request) -> str:
         tier = request.state.user_tier if hasattr(request.state, "user_tier") else None
-        if tier in {"anonymous", "free", "pro"}:
+        if tier in {"anonymous", "free", "starter", "pro"}:
             return tier
 
         raw_tier = (request.headers.get("x-user-tier") or "anonymous").lower().strip()
-        if raw_tier not in {"anonymous", "free", "pro"}:
+        if raw_tier not in {"anonymous", "free", "starter", "pro"}:
             raw_tier = "anonymous"
 
         # Match TierCheck placeholder behavior when a user id is present.
@@ -83,7 +83,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         identifier = f"{ip}:{fingerprint}:{tier}:{request.url.path}"
         limit = (
             settings.RATE_LIMIT_PER_MIN_AUTH
-            if tier in {"free", "pro"}
+            if tier in {"free", "starter", "pro"}
             else settings.RATE_LIMIT_PER_MIN_ANON
         )
         allowed = _limiter.allow(identifier, limit=limit, window_seconds=self.window_seconds)

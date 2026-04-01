@@ -10,10 +10,12 @@ from pydantic import AnyUrl, BaseModel, Field
 
 
 BillingInterval = Literal["monthly", "annual"]
+BillingPlan = Literal["starter", "pro"]
 
 
 class CheckoutSessionCreateRequest(BaseModel):
-    interval: BillingInterval = Field(description="Pro billing cadence.")
+    plan: BillingPlan = Field(description="Paid plan to purchase.")
+    interval: BillingInterval = Field(description="Billing cadence for the selected plan.")
     success_url: AnyUrl | None = None
     cancel_url: AnyUrl | None = None
     customer_email: str | None = Field(default=None, max_length=320)
@@ -23,8 +25,9 @@ class CheckoutSessionResponse(BaseModel):
     session_id: str
     checkout_url: str | None = None
     price_id: str
+    plan: BillingPlan
     interval: BillingInterval
-    tier: Literal["pro"] = "pro"
+    tier: BillingPlan
 
 
 class BillingWebhookResponse(BaseModel):
@@ -37,7 +40,7 @@ class BillingWebhookResponse(BaseModel):
 
 class BillingSubscriptionResponse(BaseModel):
     status: Literal["active", "inactive"]
-    tier: Literal["free", "pro"]
+    tier: Literal["free", "starter", "pro"]
     current_period_end: datetime | None = None
     cancel_at_period_end: bool | None = None
 
@@ -46,9 +49,12 @@ class BillingConfigStatusResponse(BaseModel):
     stripe_configured: bool
     secret_key_configured: bool
     webhook_secret_configured: bool
-    monthly_price_configured: bool
-    annual_price_configured: bool
+    starter_monthly_price_configured: bool
+    starter_annual_price_configured: bool
+    pro_monthly_price_configured: bool
+    pro_annual_price_configured: bool
     checkout_ready: bool
     webhook_ready: bool
+    supported_plans: list[BillingPlan]
     supported_intervals: list[BillingInterval]
     blockers: list[str]

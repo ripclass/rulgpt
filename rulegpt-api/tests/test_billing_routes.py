@@ -27,8 +27,10 @@ def billing_client_stub(monkeypatch):
             return_value={
                 "session_id": "cs_test_123",
                 "checkout_url": "https://stripe.test/checkout",
-                "price_id": "price_monthly",
+                "price_id": "price_starter_monthly",
+                "plan": "starter",
                 "interval": "monthly",
+                "tier": "starter",
             }
         ),
     )
@@ -78,6 +80,7 @@ def test_checkout_session_requires_bearer_token(auth_stub, billing_client_stub):
     response = client.post(
         "/api/billing/checkout",
         json={
+            "plan": "starter",
             "interval": "monthly",
             "success_url": "https://rulegpt.test/success",
             "cancel_url": "https://rulegpt.test/cancel",
@@ -93,6 +96,7 @@ def test_checkout_session_succeeds_for_authenticated_user(auth_stub, billing_cli
         "/api/billing/checkout",
         headers={"Authorization": "Bearer free-token"},
         json={
+            "plan": "starter",
             "interval": "monthly",
             "success_url": "https://rulegpt.test/success",
             "cancel_url": "https://rulegpt.test/cancel",
@@ -103,7 +107,15 @@ def test_checkout_session_succeeds_for_authenticated_user(auth_stub, billing_cli
     data = response.json()
     assert data["session_id"] == "cs_test_123"
     assert data["interval"] == "monthly"
-    assert data["tier"] == "pro"
+    assert data["plan"] == "starter"
+    assert data["tier"] == "starter"
+    billing.billing_client.create_checkout_session.assert_awaited_once()
+    kwargs = billing.billing_client.create_checkout_session.await_args.kwargs
+    assert kwargs["customer_email"] == "free@example.com"
+    assert kwargs["plan"] == "starter"
+    assert kwargs["interval"] == "monthly"
+    assert kwargs["success_url"] == "https://rulegpt.test/success"
+    assert kwargs["cancel_url"] == "https://rulegpt.test/cancel"
 
 
 def test_subscription_endpoint_reflects_verified_request_tier(auth_stub, billing_client_stub):
@@ -117,6 +129,32 @@ def test_subscription_endpoint_reflects_verified_request_tier(auth_stub, billing
     assert response.json() == {
         "status": "active",
         "tier": "pro",
+        "current_period_end": None,
+        "cancel_at_period_end": None,
+    }
+
+
+def test_subscription_endpoint_marks_starter_as_active(monkeypatch, billing_client_stub):
+    async def _fake_verify_jwt(_token: str):
+        return {
+            "user_id": uuid4(),
+            "tier": "starter",
+            "claims": {"email": "starter@example.com"},
+            "issuer": "https://example.supabase.co/auth/v1",
+            "authenticated": True,
+        }
+
+    monkeypatch.setattr(auth_service, "verify_jwt", _fake_verify_jwt)
+    client = TestClient(_build_app())
+    response = client.get(
+        "/api/billing/subscription",
+        headers={"Authorization": "Bearer starter-token"},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "active",
+        "tier": "starter",
         "current_period_end": None,
         "cancel_at_period_end": None,
     }

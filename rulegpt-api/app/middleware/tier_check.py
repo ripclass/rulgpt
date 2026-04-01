@@ -12,7 +12,7 @@ from app.config import settings
 from app.services.integrations.supabase_auth import SupabaseAuthService
 
 
-VALID_TIERS = {"anonymous", "free", "pro"}
+VALID_TIERS = {"anonymous", "free", "starter", "pro"}
 auth_service = SupabaseAuthService()
 
 
