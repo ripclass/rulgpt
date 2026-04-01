@@ -66,7 +66,7 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(false)
   const [authStatus, setAuthStatus] = useState<AuthStatusResponse | null>(null)
   const googleEnabled = supabaseEnabled && envFlag('VITE_SUPABASE_GOOGLE_OAUTH_ENABLED') !== 'false'
-  const linkedinEnabled = supabaseEnabled && envFlag('VITE_SUPABASE_LINKEDIN_OAUTH_ENABLED') !== 'false'
+  const linkedinEnabled = supabaseEnabled && envFlag('VITE_SUPABASE_LINKEDIN_OAUTH_ENABLED') === 'true'
 
   useEffect(() => {
     setApiAccessToken(accessToken)

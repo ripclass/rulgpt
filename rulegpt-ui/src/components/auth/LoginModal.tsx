@@ -75,16 +75,18 @@ export function LoginModal({
           >
             Continue with Google
           </Button>
-          <Button
-            variant="outline"
-            className="w-full"
-            disabled={isLoading || !oauth.linkedinEnabled}
-            onClick={() => {
-              void onOAuth('linkedin_oidc')
-            }}
-          >
-            Continue with LinkedIn
-          </Button>
+          {oauth.linkedinEnabled ? (
+            <Button
+              variant="outline"
+              className="w-full"
+              disabled={isLoading}
+              onClick={() => {
+                void onOAuth('linkedin_oidc')
+              }}
+            >
+              Continue with LinkedIn
+            </Button>
+          ) : null}
           {!oauth.supabaseEnabled ? (
             <p className="text-xs text-muted-foreground">OAuth unavailable until Supabase env is configured.</p>
           ) : !authStatus?.jwt_verification_ready ? (
