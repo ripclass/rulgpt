@@ -19,6 +19,10 @@ _DOMAIN_KEYWORDS = {
         "docdex", "icc opinion", "urbpo", "urf800",
         "lc lifecycle", "trade lifecycle", "supply chain finance",
         "islamic finance", "murabaha", "musharaka", "ijara",
+        " lc ", "this lc", "my lc", "the lc", "an lc",
+        "lc compliant", "lc document", "lc requirement",
+        "compliant invoice", "invoice wording", "review my invoice",
+        "document compliant", "documents required",
     ),
     "fta": (
         "fta", "rcep", "cptpp", "usmca", "afcfta", "asean",

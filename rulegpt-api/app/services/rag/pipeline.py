@@ -158,11 +158,19 @@ def _query_needs_lcopilot_redirect(query: str) -> bool:
         for marker in (
             "is this lc compliant",
             "is this l/c compliant",
+            "is my lc compliant",
             "review my lc",
             "validate my lc",
             "check my lc",
             "document validation",
             "validate this document",
+            "review my invoice",
+            "review my document",
+            "review invoice wording",
+            "check my invoice",
+            "check my document",
+            "validate my invoice",
+            "is this compliant",
         )
     )
 
@@ -236,16 +244,24 @@ class RAGPipeline:
             classifier_model = "heuristic"
         stage_latency["classifier"] = int((time.perf_counter() - start) * 1000)
 
-        if not classifier_output.in_scope:
+        # Document-validation redirect runs BEFORE out-of-scope check —
+        # queries like "Is this LC compliant?" are trade-finance questions,
+        # just ones that need a product-boundary response, not a flat rejection.
+        if _query_needs_lcopilot_redirect(query):
             latency_ms = int((time.perf_counter() - start_total) * 1000)
             return QueryResult(
-                answer=OUT_OF_SCOPE_MESSAGE,
+                answer=(
+                    "I can explain the rules that apply to your situation, but I can't validate actual documents or confirm "
+                    "compliance from a text description alone. If you share the specific terms or requirements you're working "
+                    "with, I can walk you through what the rules say. For full document-level validation, that requires a "
+                    "dedicated document-review workflow."
+                ),
                 citations=[],
                 confidence_band="low",
                 suggested_followups=[
-                    "Would you like help with ICC, sanctions, FTA, or customs rules instead?",
-                    "Do you want guidance on LC compliance topics?",
-                    "Should I help with trade documentation requirements?",
+                    "Do you want the UCP600/ISBP745 rules to review before validation?",
+                    "Which document type are you checking first (BL, invoice, insurance)?",
+                    "Do you want a discrepancy checklist before you review the documents?",
                 ],
                 show_trdr_cta=False,
                 disclaimer=DISCLAIMER_TEXT,
@@ -257,19 +273,16 @@ class RAGPipeline:
                 stage_latency_ms=stage_latency,
             )
 
-        if _query_needs_lcopilot_redirect(query):
+        if not classifier_output.in_scope:
             latency_ms = int((time.perf_counter() - start_total) * 1000)
             return QueryResult(
-                answer=(
-                    "I explain published trade finance rules here, but I do not validate actual LC documents inside this chat. "
-                    "If you need document-level validation, that requires a separate document-review workflow."
-                ),
+                answer=OUT_OF_SCOPE_MESSAGE,
                 citations=[],
                 confidence_band="low",
                 suggested_followups=[
-                    "Do you want the UCP600/ISBP745 rules to review before validation?",
-                    "Which document type are you checking first (BL, invoice, insurance)?",
-                    "Do you want a discrepancy checklist before you review the documents?",
+                    "Would you like help with ICC, sanctions, FTA, or customs rules instead?",
+                    "Do you want guidance on LC compliance topics?",
+                    "Should I help with trade documentation requirements?",
                 ],
                 show_trdr_cta=False,
                 disclaimer=DISCLAIMER_TEXT,
