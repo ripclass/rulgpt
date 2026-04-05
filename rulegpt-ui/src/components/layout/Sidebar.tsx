@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, LogOut, Sun, Moon, ChevronUp, Zap } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { QueryHistory } from '@/components/shared/QueryHistory'
 import { SavedAnswers } from '@/components/shared/SavedAnswers'
 import { FreeTierCounter } from '@/components/shared/FreeTierCounter'
@@ -164,9 +163,6 @@ export function Sidebar({
   onOpenSignup,
   onLogout,
 }: SidebarProps) {
-  const { theme, setTheme } = useTheme()
-  const isDark = theme === 'dark'
-
   return (
     <aside className="hidden h-[100dvh] sticky top-0 w-64 shrink-0 px-4 py-5 md:flex md:flex-col bg-white dark:bg-[#0A0A0A] border-r border-neutral-200 dark:border-white/10 transition-colors">
       <Link to="/" className="pb-5 border-b border-neutral-100 dark:border-white/5 flex items-center gap-3 hover:opacity-80 transition-opacity">
