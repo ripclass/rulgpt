@@ -131,8 +131,16 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   })
 
   if (!response.ok) {
-    const message = await response.text()
-    throw new ApiError(message || `Request failed with status ${response.status}`, response.status)
+    const raw = await response.text()
+    let message = raw || `Request failed with status ${response.status}`
+    try {
+      const parsed = JSON.parse(raw)
+      if (typeof parsed.detail === 'string') message = parsed.detail
+      else if (typeof parsed.message === 'string') message = parsed.message
+    } catch {
+      // raw text is fine as-is
+    }
+    throw new ApiError(message, response.status)
   }
 
   if (response.status === 204) {
