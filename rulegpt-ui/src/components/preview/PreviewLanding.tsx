@@ -213,7 +213,7 @@ export function PreviewLanding({
             </div>
             
             <p className="mt-8 max-w-xl text-lg md:text-2xl text-neutral-300 leading-relaxed font-light animate-fade-up" style={{ animationDelay: '200ms', animationFillMode: 'both' }}>
-              The citation engine for exporters, compliance teams, and trade finance professionals. Ask a question, get a verified answer with the exact rule reference.
+              Trade finance rules have been locked behind paywalls and closed bank manuals for decades. Ask any question — get a cited, verifiable answer. Free.
             </p>
             
             <div className="mt-12 flex flex-col sm:flex-row gap-5 animate-fade-up" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
