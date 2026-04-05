@@ -72,8 +72,10 @@ export function PreviewLanding({
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 20)
-      const heroHeight = window.innerHeight * 0.9 // Approx height of hero
-      setHeroPassed(window.scrollY > heroHeight)
+      // Hero is 100vh, comparison section below is ~700px — both dark.
+      // Keep nav dark until user reaches the white "How it works" section.
+      const darkZoneHeight = window.innerHeight + 600
+      setHeroPassed(window.scrollY > darkZoneHeight)
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)

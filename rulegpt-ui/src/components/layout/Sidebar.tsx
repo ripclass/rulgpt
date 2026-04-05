@@ -1,5 +1,6 @@
+import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, LogOut, Sun, Moon } from 'lucide-react'
+import { Plus, LogOut, Sun, Moon, ChevronUp, Zap, Key, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { QueryHistory } from '@/components/shared/QueryHistory'
 import { SavedAnswers } from '@/components/shared/SavedAnswers'
@@ -36,6 +37,120 @@ const quickCategories = [
   'Trade Documentation',
   'Bank Requirements',
 ]
+
+function UserMenu({
+  isAuthenticated,
+  userEmail,
+  tier,
+  onOpenLogin,
+  onLogout,
+}: {
+  isAuthenticated: boolean
+  userEmail?: string | null
+  tier: SessionTier
+  onOpenLogin: () => void
+  onLogout: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const { theme, setTheme } = useTheme()
+  const isDark = theme === 'dark'
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    if (open) document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [open])
+
+  if (!isAuthenticated) {
+    return (
+      <div className="mt-6 pt-5 border-t border-neutral-200 dark:border-white/10 flex items-center justify-between">
+        <button
+          className="text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-[#FF4F00] transition"
+          onClick={onOpenLogin}
+        >
+          Sign in for history &amp; saved
+        </button>
+        <button
+          onClick={() => setTheme(isDark ? 'light' : 'dark')}
+          className="p-2 text-neutral-400 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-white transition-colors"
+          title="Toggle theme"
+        >
+          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+        </button>
+      </div>
+    )
+  }
+
+  const initials = userEmail
+    ? userEmail.slice(0, 2).toUpperCase()
+    : 'U'
+
+  return (
+    <div className="mt-6 pt-5 border-t border-neutral-200 dark:border-white/10 relative" ref={menuRef}>
+      {/* Dropdown menu — opens upward */}
+      {open && (
+        <div className="absolute bottom-full left-0 right-0 mb-2 rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#141414] shadow-xl py-1 z-50">
+          <Link
+            to="/upgrade"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/5 transition"
+          >
+            <Zap className="h-3.5 w-3.5" /> Upgrade plan
+          </Link>
+          <Link
+            to="/api-access"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/5 transition"
+          >
+            <Key className="h-3.5 w-3.5" /> API access
+          </Link>
+          <button
+            onClick={() => { setTheme(isDark ? 'light' : 'dark'); setOpen(false) }}
+            className="flex w-full items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/5 transition"
+          >
+            {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+            {isDark ? 'Light mode' : 'Dark mode'}
+          </button>
+          <div className="my-1 border-t border-neutral-100 dark:border-white/5" />
+          <button
+            onClick={() => { onLogout(); setOpen(false) }}
+            className="flex w-full items-center gap-3 px-3 py-2.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-neutral-50 dark:hover:bg-white/5 transition"
+          >
+            <LogOut className="h-3.5 w-3.5" /> Sign out
+          </button>
+        </div>
+      )}
+
+      {/* Compact user row */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center gap-3 rounded-sm px-2 py-2 hover:bg-neutral-50 dark:hover:bg-white/5 transition group"
+      >
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-200 dark:bg-white/10 text-[11px] font-bold text-neutral-600 dark:text-neutral-300">
+          {initials}
+        </div>
+        <div className="flex-1 min-w-0 text-left">
+          <p className="truncate text-xs font-medium text-neutral-900 dark:text-neutral-200">
+            {userEmail ?? 'User'}
+          </p>
+          <p className={`text-[10px] font-semibold uppercase tracking-wider ${
+            tier === 'pro' || tier === 'starter'
+              ? 'text-[#FF4F00]'
+              : 'text-neutral-400 dark:text-neutral-500'
+          }`}>
+            {tier}
+          </p>
+        </div>
+        <ChevronUp className={`h-3.5 w-3.5 text-neutral-400 transition-transform ${open ? '' : 'rotate-180'}`} />
+      </button>
+    </div>
+  )
+}
 
 export function Sidebar({
   history,
@@ -115,54 +230,13 @@ export function Sidebar({
         )}
       </div>
 
-      <div className="mt-6 space-y-4 pt-5 border-t border-neutral-200 dark:border-white/10">
-        {isAuthenticated ? (
-          <>
-            <div className="rounded-sm bg-neutral-50 dark:bg-[#141414] border border-neutral-200 dark:border-white/10 px-3 py-3">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">Account</p>
-              <p className="mt-1 truncate text-xs font-medium text-neutral-900 dark:text-neutral-200">
-                {userEmail ?? 'Authenticated'}
-              </p>
-              <div className="mt-3 flex items-center justify-between">
-                <span className={`inline-block px-2 py-0.5 text-[10px] uppercase font-bold tracking-widest rounded-sm ${
-                  tier === 'pro' || tier === 'starter' 
-                    ? 'bg-[#FF4F00]/10 text-[#FF4F00]' 
-                    : 'bg-neutral-200 dark:bg-white/10 text-neutral-600 dark:text-neutral-300'
-                }`}>
-                  {tier} tier
-                </span>
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-xs font-semibold text-neutral-700 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white dark:hover:bg-white/5 transition"
-              onClick={onLogout}
-            >
-              <LogOut className="mr-3 h-4 w-4" /> Sign out
-            </Button>
-          </>
-        ) : (
-          <button
-            className="w-full text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-[#FF4F00] transition"
-            onClick={onOpenLogin}
-          >
-            Sign in to sync history &amp; saved answers
-          </button>
-        )}
-        
-        <div className="flex items-center justify-between pt-2">
-          <Button asChild variant="ghost" className="justify-start text-xs font-medium text-neutral-700 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300 dark:hover:bg-white/5 transition px-2">
-            <Link to="/api-access">API Access</Link>
-          </Button>
-          <button
-            onClick={() => setTheme(isDark ? 'light' : 'dark')}
-            className="p-2 text-neutral-400 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-white transition-colors"
-            title="Toggle theme"
-          >
-            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-        </div>
-      </div>
+      <UserMenu
+        isAuthenticated={isAuthenticated}
+        userEmail={userEmail}
+        tier={tier}
+        onOpenLogin={onOpenLogin}
+        onLogout={onLogout}
+      />
     </aside>
   )
 }
