@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ApiError, api } from '@/lib/api'
 import { track } from '@/lib/analytics'
 import { useAuth } from '@/hooks/useAuth'
+import { useAuthModal } from '@/contexts/AuthModalContext'
 import type { BillingInterval, BillingPlan } from '@/types'
 
 const PLAN_COPY: Record<
@@ -44,6 +45,7 @@ const PLAN_COPY: Record<
 
 export function Upgrade() {
   const auth = useAuth()
+  const authModal = useAuthModal()
   const location = useLocation()
   const navigate = useNavigate()
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null)
@@ -243,16 +245,20 @@ export function Upgrade() {
           <button
             className="inline-flex h-11 items-center justify-center rounded-sm bg-[#FF4F00] px-8 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[#E64600] disabled:opacity-50 shadow-md shadow-[#FF4F00]/20"
             onClick={() => {
+              if (!auth.isAuthenticated) {
+                authModal.openLogin()
+                return
+              }
               void startCheckout()
             }}
-            disabled={!canCheckout || isCheckingOut}
+            disabled={isCheckingOut || (!auth.isAuthenticated ? false : !canCheckout)}
           >
             {isCheckingOut
               ? 'Starting checkout...'
-              : canCheckout
-                ? `Start ${selectedPlanCopy.title} checkout`
-                : billingStatus.data?.checkout_ready
-                  ? 'Sign in from chat first'
+              : !auth.isAuthenticated
+                ? 'Sign in to upgrade'
+                : canCheckout
+                  ? `Start ${selectedPlanCopy.title} checkout`
                   : 'Checkout not configured yet'}
           </button>
           {checkoutUrl ? (
