@@ -9,31 +9,95 @@ from typing import Any, Dict, Optional
 from .models import ClassifierOutput
 
 _DOMAIN_KEYWORDS = {
-    "icc": ("ucp", "isbp", "isp98", "urdg", "urc", "incoterms", "eucp", "trade finance"),
-    "fta": ("fta", "rcep", "cptpp", "usmca", "rules of origin", "origin criteria", "tariff preference", "preferential tariff", "country pair"),
-    "sanctions": ("sanction", "ofac", "embargo", "sdn", "restricted party", "eu sanctions", "uk sanctions", "un sanctions"),
-    "customs": ("customs", "import license", "export license", "duty", "clearance", "hs code", "hs classification", "classification"),
-    "bank_specific": ("bank requirement", "swift code", "issuing bank", "confirming bank", "hdfc", "hsbc", "citibank"),
+    "icc": (
+        "ucp", "isbp", "isp98", "urdg", "urc", "urr725", "incoterms", "eucp",
+        "trade finance", "letter of credit", "documentary credit", "standby",
+        "guarantee", "collection", "reimbursement", "transport document",
+        "bill of lading", "presentation", "discrepancy", "amendment",
+        "transferable credit", "deferred payment", "acceptance", "negotiation",
+        "commodity", "shipment", "insurance certificate", "packing list",
+    ),
+    "fta": (
+        "fta", "rcep", "cptpp", "usmca", "afcfta", "asean",
+        "rules of origin", "origin criteria", "tariff preference",
+        "preferential tariff", "country pair", "cumulation",
+        "certificate of origin", "proof of origin", "de minimis",
+    ),
+    "sanctions": (
+        "sanction", "ofac", "embargo", "sdn", "restricted party",
+        "eu sanctions", "uk sanctions", "un sanctions",
+        "tbml", "trade based money laundering", "money laundering",
+        "vessel screening", "dual-use", "dual use", "export control",
+        "red flag", "suspicious", "underpricing", "overpricing",
+    ),
+    "customs": (
+        "customs", "import license", "export license", "duty", "clearance",
+        "hs code", "hs classification", "classification", "tariff code",
+        "customs valuation", "temporary import", "bonded warehouse",
+    ),
+    "bank_specific": (
+        "bank requirement", "swift code", "issuing bank", "confirming bank",
+        "advising bank", "nominated bank", "reimbursing bank",
+        "mt700", "mt760", "swift message",
+    ),
 }
 
 _DOC_TYPE_KEYWORDS = {
-    "lc": ("lc", "letter of credit"),
-    "bill_of_lading": ("bill of lading", "b/l", "bl "),
+    "lc": ("lc", "letter of credit", "documentary credit"),
+    "bill_of_lading": ("bill of lading", "b/l", "bl ", "transport document", "waybill"),
     "invoice": ("invoice", "commercial invoice"),
     "certificate": ("certificate", "coo", "certificate of origin"),
+    "insurance": ("insurance", "insurance certificate", "insurance document"),
+    "guarantee": ("guarantee", "demand guarantee", "urdg"),
+    "standby_lc": ("standby", "sblc", "isp98"),
+    "collection": ("collection", "urc522", "d/p", "d/a"),
 }
 
 _COUNTRY_ALIASES = {
-    "bd": ("bangladesh",),
-    "in": ("india",),
+    "bd": ("bangladesh", "dhaka", "bgmea"),
+    "in": ("india", "rbi "),
     "us": ("united states", "usa", "us "),
-    "ae": ("uae", "united arab emirates"),
+    "ae": ("uae", "united arab emirates", "dubai"),
     "uk": ("united kingdom", "uk "),
     "eu": ("european union", "eu "),
     "sg": ("singapore",),
-    "cn": ("china",),
+    "cn": ("china", "chinese"),
     "sa": ("saudi", "saudi arabia"),
     "ir": ("iran",),
+    "de": ("germany", "german"),
+    "jp": ("japan", "japanese"),
+    "kr": ("korea", "korean"),
+    "vn": ("vietnam", "vietnamese"),
+    "th": ("thailand", "thai"),
+    "my": ("malaysia", "malaysian"),
+    "id": ("indonesia", "indonesian"),
+    "ph": ("philippines", "filipino"),
+    "pk": ("pakistan", "pakistani"),
+    "ng": ("nigeria", "nigerian"),
+    "ke": ("kenya", "kenyan"),
+    "eg": ("egypt", "egyptian"),
+    "za": ("south africa",),
+    "au": ("australia", "australian"),
+    "nz": ("new zealand",),
+    "br": ("brazil", "brazilian"),
+    "mx": ("mexico", "mexican"),
+    "tr": ("turkey", "turkish"),
+    "hk": ("hong kong",),
+    "tw": ("taiwan",),
+    "ca": ("canada", "canadian"),
+    "gh": ("ghana", "ghanaian"),
+    "kh": ("cambodia", "cambodian"),
+    "lk": ("sri lanka",),
+    "et": ("ethiopia", "ethiopian"),
+    "fr": ("france", "french"),
+    "nl": ("netherlands", "dutch"),
+    "it": ("italy", "italian"),
+    "es": ("spain", "spanish"),
+    "qa": ("qatar",),
+    "kw": ("kuwait",),
+    "bh": ("bahrain",),
+    "om": ("oman",),
+    "jo": ("jordan",),
 }
 
 _OUT_OF_SCOPE_MARKERS = (
@@ -119,7 +183,18 @@ def _pick_complexity(query: str) -> str:
 
 def _pick_commodity(query: str) -> Optional[str]:
     lowered = query.lower()
-    for commodity in ("garment", "textile", "electronics", "agriculture", "steel", "oil", "food"):
+    for commodity in (
+        "garment", "textile", "shirt", "fabric", "cotton", "apparel",
+        "electronics", "semiconductor", "machinery",
+        "agriculture", "grain", "rice", "wheat", "coffee", "tea",
+        "steel", "metal", "aluminum", "copper",
+        "oil", "crude", "petroleum", "lng", "gas",
+        "food", "seafood", "shrimp", "fish", "frozen",
+        "timber", "wood", "furniture", "lumber",
+        "pharma", "pharmaceutical", "medicine",
+        "chemical", "fertilizer",
+        "vehicle", "auto", "automotive",
+    ):
         if commodity in lowered:
             return commodity
     return None

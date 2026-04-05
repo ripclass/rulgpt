@@ -71,19 +71,68 @@ _RULEBOOK_MARKERS: Tuple[Tuple[str, str], ...] = (
 )
 
 
+_DOMAIN_CANONICAL_MAP: Dict[str, str] = {
+    # ICC standards
+    "icc": "icc", "ucp": "icc", "ucp600": "icc", "isbp": "icc", "isbp745": "icc",
+    "isp98": "icc", "urdg": "icc", "urdg758": "icc", "urc": "icc", "urc522": "icc",
+    "urr": "icc", "urr725": "icc", "incoterms": "icc", "eucp": "icc",
+    # Sanctions
+    "sanctions": "sanctions", "ofac": "sanctions", "embargo": "sanctions",
+    "sdn": "sanctions",
+    # FTA
+    "fta": "fta", "rcep": "fta", "cptpp": "fta", "usmca": "fta",
+    "afcfta": "fta", "origin": "fta",
+    # Customs
+    "customs": "customs", "hs": "customs", "tariff": "customs",
+    # Bank specific
+    "bank": "bank_specific", "bank_specific": "bank_specific",
+    "bank_profiles": "bank_specific", "swift": "bank_specific",
+}
+
+# Substrings in domain values that map to canonical domains
+_DOMAIN_SUBSTRING_MAP = {
+    "sanction": "sanctions", "ofac": "sanctions", "embargo": "sanctions",
+    "tbml": "sanctions", "money_laundering": "sanctions", "trade_based_money": "sanctions",
+    "export_control": "sanctions", "entity_intel": "sanctions",
+    "fta": "fta", "rcep": "fta", "cptpp": "fta", "usmca": "fta",
+    "free_trade": "fta", "origin": "fta",
+    "customs": "customs", "hs_code": "customs",
+    "bank_behavior": "bank_specific", "bank_profile": "bank_specific",
+    "swift": "bank_specific", "iso20022": "bank_specific", "messaging": "bank_specific",
+    "icc": "icc", "ucp": "icc", "isbp": "icc", "incoterms": "icc",
+    "letter_rules": "icc", "presentation": "icc", "examination": "icc",
+    "collections": "icc", "guarantee": "icc", "standby": "icc",
+    "lifecycle": "icc", "payment_ops": "icc", "transport": "icc",
+    "commodity": "icc", "islamic_finance": "icc", "eca": "icc",
+    "mdb": "icc", "regulatory_capital": "icc", "supply_chain": "icc",
+    "electronic_trade": "icc", "cross_document": "icc", "clause_graph": "icc",
+    "requirement_graph": "icc", "dispute_reasoning": "icc",
+    "exception_waiver": "icc", "version_governance": "icc",
+    "data_quality": "icc", "event_driven": "icc",
+    "country_rules": "icc", "jurisdictional": "icc", "jurisdiction": "icc",
+    "lc_ops": "icc", "lc_": "icc",
+}
+
+
 def _canonicalize_domain(value: Any) -> str:
     text = _as_str(value).lower()
     if not text:
         return ""
-    if text.startswith("sanctions"):
-        return "sanctions"
-    if text.startswith("fta"):
-        return "fta"
-    if text.startswith("bank"):
-        return "bank_specific"
-    if text.startswith("customs") or text.startswith("hs"):
-        return "customs"
-    if text.startswith("icc") or text.startswith("ucp") or text.startswith("isbp") or text.startswith("incoterms"):
+    # Direct match
+    if text in _DOMAIN_CANONICAL_MAP:
+        return _DOMAIN_CANONICAL_MAP[text]
+    # Prefix match on known starters
+    for prefix in ("sanctions", "fta", "bank", "customs", "icc", "ucp", "isbp", "incoterms"):
+        if text.startswith(prefix):
+            return _DOMAIN_CANONICAL_MAP.get(prefix, text)
+    # Substring match for compound domain names
+    for substring, canonical in _DOMAIN_SUBSTRING_MAP.items():
+        if substring in text:
+            return canonical
+    # Country regulation rules (regulations.xx) → icc (jurisdictional trade rules)
+    if text.startswith("regulations.") or text.startswith("law.") or text.startswith("mode."):
+        return "icc"
+    if text == "correspondent_banking" or text == "commodities":
         return "icc"
     return text
 
@@ -153,16 +202,21 @@ def _infer_rulebook(record: Dict[str, Any], source_hint: Optional[str]) -> str:
 
 def _infer_domain(record: Dict[str, Any], source_hint: Optional[str], rulebook: str) -> str:
     explicit = _canonicalize_domain(record.get("domain"))
-    if explicit:
+    if explicit and explicit not in ("", "other"):
         return explicit
 
-    probe = f"{source_hint or ''} {rulebook}".lower()
+    probe = f"{source_hint or ''} {rulebook} {_as_str(record.get('rule_id'))} {_as_str(record.get('title'))}".lower()
+    # Check substring map against full probe text
+    for substring, canonical in _DOMAIN_SUBSTRING_MAP.items():
+        if substring in probe:
+            return canonical
+
     tokens = set(re.findall(r"[a-z0-9_]+", probe))
     if any(k in tokens for k in ("ucp600", "isbp745", "isbp", "incoterms", "urdg758", "urdg", "isp98", "isp", "urc522", "urc", "urr725", "urr")):
         return "icc"
-    if any(k in tokens for k in ("rcep", "cptpp", "usmca", "fta", "origin")):
+    if any(k in tokens for k in ("rcep", "cptpp", "usmca", "fta")):
         return "fta"
-    if any(k in tokens for k in ("ofac", "sanction", "sanctions", "embargo", "eu", "un", "uk")):
+    if any(k in tokens for k in ("ofac", "sanction", "sanctions", "embargo", "tbml")):
         return "sanctions"
     if "bank" in tokens or "bank_profiles" in tokens:
         return "bank_specific"
@@ -192,12 +246,69 @@ def _infer_document_type(record: Dict[str, Any], source_hint: Optional[str]) -> 
     return "other"
 
 
+_JURISDICTION_NORMALIZE: Dict[str, str] = {
+    "bangladesh": "bd", "india": "in", "china": "cn", "singapore": "sg",
+    "united states": "us", "usa": "us", "united_states": "us",
+    "united kingdom": "uk", "united_kingdom": "uk", "gb": "uk",
+    "european union": "eu", "european_union": "eu",
+    "uae": "ae", "united arab emirates": "ae",
+    "saudi arabia": "sa", "saudi": "sa",
+    "japan": "jp", "korea": "kr", "south korea": "kr",
+    "vietnam": "vn", "thailand": "th", "malaysia": "my",
+    "indonesia": "id", "philippines": "ph", "cambodia": "kh",
+    "pakistan": "pk", "sri lanka": "lk", "srilanka": "lk",
+    "nigeria": "ng", "kenya": "ke", "ghana": "gh", "south africa": "za",
+    "egypt": "eg", "morocco": "ma", "jordan": "jo",
+    "australia": "au", "new zealand": "nz", "newzealand": "nz",
+    "brazil": "br", "mexico": "mx", "colombia": "co", "peru": "pe",
+    "chile": "cl", "argentina": "ar", "panama": "pa",
+    "turkey": "tr", "qatar": "qa", "kuwait": "kw", "bahrain": "bh",
+    "oman": "om", "iran": "ir",
+    "germany": "de", "france": "fr", "netherlands": "nl", "italy": "it",
+    "spain": "es", "portugal": "pt", "belgium": "be", "austria": "at",
+    "switzerland": "ch", "sweden": "se", "norway": "no", "denmark": "dk",
+    "finland": "fi", "ireland": "ie", "greece": "gr", "poland": "pl",
+    "czech": "cz", "hungary": "hu", "romania": "ro",
+    "ukraine": "ua", "uzbekistan": "uz", "kazakhstan": "kz",
+    "hong kong": "hk", "hongkong": "hk", "taiwan": "tw",
+    "canada": "ca", "ethiopia": "et", "lebanon": "lb",
+    "international": "global",
+}
+
+
+def _normalize_jurisdiction(raw: str) -> str:
+    """Normalize jurisdiction to ISO 2-letter code or 'global'."""
+    text = raw.strip().lower()
+    if not text:
+        return "global"
+    # Already a 2-letter code
+    if len(text) == 2 and text.isalpha():
+        return text
+    # Direct lookup
+    if text in _JURISDICTION_NORMALIZE:
+        return _JURISDICTION_NORMALIZE[text]
+    # Extract leading 2-letter code from compound values like "bd bangladesh bank"
+    parts = text.split()
+    if len(parts[0]) == 2 and parts[0].isalpha():
+        return parts[0]
+    # Check if text starts with "regulations."
+    if text.startswith("regulations."):
+        code = text.split(".")[1]
+        if len(code) == 2:
+            return code
+    # Substring match
+    for name, code in _JURISDICTION_NORMALIZE.items():
+        if name in text:
+            return code
+    return text
+
+
 def _infer_jurisdiction(record: Dict[str, Any], source_hint: Optional[str]) -> str:
     explicit = _as_str(record.get("jurisdiction")).lower()
     if explicit:
-        return explicit
+        return _normalize_jurisdiction(explicit)
     if _as_str(record.get("country")):
-        return _as_str(record["country"]).lower()
+        return _normalize_jurisdiction(_as_str(record["country"]))
     if isinstance(record.get("members"), list) and record["members"]:
         return "regional"
     probe = (source_hint or "").lower()
