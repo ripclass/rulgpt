@@ -12,7 +12,7 @@ interface PreviewLandingProps {
   onOpenLogin: () => void
   onOpenSignup: () => void
   onOpenChat: () => void
-  onStartCheckout: (plan: 'starter' | 'pro') => void
+  onStartCheckout: (plan: 'starter' | 'pro', interval: 'monthly' | 'annual') => void
   isCheckingOut?: boolean
 }
 
@@ -68,6 +68,7 @@ export function PreviewLanding({
 }: PreviewLandingProps) {
   const [scrolled, setScrolled] = useState(false)
   const [heroPassed, setHeroPassed] = useState(false)
+  const [billingInterval, setBillingInterval] = useState<'monthly' | 'annual'>('monthly')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
 
@@ -400,9 +401,33 @@ export function PreviewLanding({
           ────────────────────────────────────────────────────────── */}
       <section id="pricing" className="py-32 bg-white scroll-mt-20">
         <div className="mx-auto max-w-6xl px-6">
-          <FadeInView className="text-center mb-24">
+          <FadeInView className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900">Simple pricing.</h2>
             <p className="mt-6 text-lg text-neutral-500 font-light max-w-2xl mx-auto">Start free. Upgrade when it saves you money. No hidden fees.</p>
+
+            {/* Billing interval toggle */}
+            <div className="mt-10 inline-flex items-center rounded-full border border-neutral-200 p-1">
+              <button
+                onClick={() => setBillingInterval('monthly')}
+                className={`rounded-full px-6 py-2 text-sm font-semibold transition ${
+                  billingInterval === 'monthly'
+                    ? 'bg-neutral-900 text-white shadow-sm'
+                    : 'text-neutral-500 hover:text-neutral-900'
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setBillingInterval('annual')}
+                className={`rounded-full px-6 py-2 text-sm font-semibold transition ${
+                  billingInterval === 'annual'
+                    ? 'bg-neutral-900 text-white shadow-sm'
+                    : 'text-neutral-500 hover:text-neutral-900'
+                }`}
+              >
+                Annual <span className="text-[10px] opacity-60 ml-1">save 2 months</span>
+              </button>
+            </div>
           </FadeInView>
 
           <FadeInView delay={200} className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -430,7 +455,12 @@ export function PreviewLanding({
                 <div className="absolute top-0 right-10 -translate-y-1/2 bg-[#FF4F00] text-white px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-lg">Popular</div>
                 <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400">Starter</h3>
                 <div className="mt-6 mb-2">
-                  <span className="text-5xl font-semibold tracking-tight text-white">$9</span><span className="text-neutral-500 font-medium">/mo</span>
+                  <span className="text-5xl font-semibold tracking-tight text-white">
+                    {billingInterval === 'monthly' ? '$9' : '$90'}
+                  </span>
+                  <span className="text-neutral-500 font-medium">
+                    {billingInterval === 'monthly' ? '/mo' : '/yr'}
+                  </span>
                 </div>
                 <p className="text-sm text-neutral-400 border-b border-neutral-800 pb-8 uppercase font-mono tracking-wide">500 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-300">
@@ -440,7 +470,7 @@ export function PreviewLanding({
                 </ul>
               </div>
               <button
-                onClick={() => isAuthenticated ? onStartCheckout('starter') : onOpenLogin()}
+                onClick={() => isAuthenticated ? onStartCheckout('starter', billingInterval) : onOpenLogin()}
                 disabled={isCheckingOut}
                 className="mt-12 w-full bg-[#FF4F00] py-4 font-bold text-white uppercase tracking-wider text-sm transition hover:bg-[#E64600] shadow-lg shadow-[#FF4F00]/20 disabled:opacity-50"
               >
@@ -453,7 +483,12 @@ export function PreviewLanding({
               <div>
                 <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400">Pro</h3>
                 <div className="mt-6 mb-2">
-                  <span className="text-5xl font-semibold tracking-tight text-neutral-900">$19</span><span className="text-neutral-400 font-medium">/mo</span>
+                  <span className="text-5xl font-semibold tracking-tight text-neutral-900">
+                    {billingInterval === 'monthly' ? '$19' : '$190'}
+                  </span>
+                  <span className="text-neutral-400 font-medium">
+                    {billingInterval === 'monthly' ? '/mo' : '/yr'}
+                  </span>
                 </div>
                 <p className="text-sm text-neutral-500 border-b border-neutral-100 pb-8 uppercase font-mono tracking-wide">2,000 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-600">
@@ -463,7 +498,7 @@ export function PreviewLanding({
                 </ul>
               </div>
               <button
-                onClick={() => isAuthenticated ? onStartCheckout('pro') : onOpenLogin()}
+                onClick={() => isAuthenticated ? onStartCheckout('pro', billingInterval) : onOpenLogin()}
                 disabled={isCheckingOut}
                 className="mt-12 w-full border border-neutral-200 py-4 font-semibold text-neutral-900 uppercase tracking-wider text-sm transition hover:bg-neutral-50 disabled:opacity-50"
               >

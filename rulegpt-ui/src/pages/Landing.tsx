@@ -14,8 +14,8 @@ export function Landing() {
   const authModal = useAuthModal()
   const [isCheckingOut, setIsCheckingOut] = useState(false)
 
-  const startCheckout = async (plan: BillingPlan) => {
-    track('landing_checkout_attempted', { plan, authenticated: auth.isAuthenticated })
+  const startCheckout = async (plan: BillingPlan, interval: 'monthly' | 'annual' = 'monthly') => {
+    track('landing_checkout_attempted', { plan, interval, authenticated: auth.isAuthenticated })
 
     if (!auth.isAuthenticated || !auth.accessToken) {
       authModal.openLogin()
@@ -28,7 +28,7 @@ export function Landing() {
       const response = await api.createBillingCheckout(
         {
           plan,
-          interval: 'monthly',
+          interval,
           success_url: `${origin}/chat?checkout=success`,
           cancel_url: `${origin}/#pricing`,
           customer_email: auth.user?.email ?? null,
