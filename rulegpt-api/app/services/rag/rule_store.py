@@ -69,16 +69,19 @@ def upsert_rule_record(session: Session, rule: NormalizedRule) -> str:
         "raw_payload": rule.raw,
     }
     if existing is None:
-        session.add(RuleRecord(rule_id=rule.rule_id, **payload))
+        session.add(RuleRecord(rule_id=rule.rule_id, is_active=True, **payload))
         return "inserted"
 
     for key, value in payload.items():
         setattr(existing, key, value)
+    existing.is_active = True
     return "updated"
 
 
 def get_rule_details(session: Session, rule_id: str) -> dict[str, Any] | None:
-    record = session.scalar(select(RuleRecord).where(RuleRecord.rule_id == rule_id))
+    record = session.scalar(
+        select(RuleRecord).where(RuleRecord.rule_id == rule_id, RuleRecord.is_active == True)  # noqa: E712
+    )
     if record is None:
         return None
     return {
@@ -103,7 +106,7 @@ def load_rules_for_retrieval(
     document_type: str | None = None,
     limit: int | None = None,
 ) -> list[dict[str, Any]]:
-    stmt = select(RuleRecord)
+    stmt = select(RuleRecord).where(RuleRecord.is_active == True)  # noqa: E712
     if domain:
         stmt = stmt.where(RuleRecord.domain == domain)
     if jurisdiction:

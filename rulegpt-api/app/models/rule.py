@@ -38,6 +38,7 @@ class RuleRecord(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true", index=True)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

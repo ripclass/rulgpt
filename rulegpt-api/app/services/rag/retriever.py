@@ -254,7 +254,8 @@ class RuleRetriever:
                 (embedding <=> CAST(:qvec AS vector)) AS distance
             FROM rulegpt_rule_embeddings
             WHERE
-                (:domain IS NULL OR domain = :domain)
+                is_active = true
+                AND (:domain IS NULL OR domain = :domain)
                 AND (:jurisdiction IS NULL OR jurisdiction = :jurisdiction OR jurisdiction = 'global')
                 AND (:document_type IS NULL OR document_type = :document_type OR document_type = 'other')
             ORDER BY embedding <=> CAST(:qvec AS vector)

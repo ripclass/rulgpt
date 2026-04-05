@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import DateTime, String, Text, func
+from sqlalchemy import Boolean, DateTime, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -24,6 +24,7 @@ class RuleEmbedding(Base):
     domain: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     embedding: Mapped[list[float] | None] = mapped_column(Vector(1536), nullable=True)
     content_hash: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true", index=True)
     embedded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
