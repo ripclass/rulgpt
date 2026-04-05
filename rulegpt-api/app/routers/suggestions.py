@@ -12,10 +12,24 @@ router = APIRouter(prefix="/api", tags=["suggestions"])
 @router.get("/suggestions", response_model=list[QuerySuggestion])
 async def get_suggestions() -> list[QuerySuggestion]:
     return [
-        QuerySuggestion(text="What documents are required for a CIF shipment under UCP600?"),
-        QuerySuggestion(text="Does my garment qualify for RCEP preferential tariff from Bangladesh?"),
-        QuerySuggestion(text="What are OFAC requirements for trading with UAE counterparties?"),
-        QuerySuggestion(text="What is the difference between UCP600 and eUCP 2.1?"),
-        QuerySuggestion(text="How does ISBP745 define a compliant bill of lading?"),
+        QuerySuggestion(
+            text='My LC says "Cotton Woven Shirts" but my invoice says "Cotton Woven Dress Shirts". '
+            "The bank rejected it. Is the word \"Dress\" really a discrepancy under UCP 600?"
+        ),
+        QuerySuggestion(
+            text="I shipped on June 10 but the BL on-board date says June 11 because the carrier delayed "
+            "the notation. The LC last shipment date is June 10. Is this late shipment?"
+        ),
+        QuerySuggestion(
+            text="I'm exporting wooden furniture from Vietnam to Australia. The raw timber was imported "
+            "from Malaysia. Does that count as originating material under RCEP cumulation rules?"
+        ),
+        QuerySuggestion(
+            text="We received an LC for crude oil from UAE to China but the unit price is 40% below market. "
+            "The beneficiary was incorporated 3 months ago. What TBML red flags should we check?"
+        ),
+        QuerySuggestion(
+            text="I'm exporting frozen shrimp to Germany. The buyer says I need a health certificate, "
+            "a catch certificate, and an IUU declaration. Which of these must the LC specifically call for?"
+        ),
     ]
-
