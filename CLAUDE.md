@@ -2,7 +2,7 @@
 
 ## WHAT THIS IS
 
-RuleGPT is a citation-first conversational AI for trade finance rules. Users ask questions about ICC standards (UCP600, ISBP745), sanctions (OFAC), FTAs (RCEP, CPTPP), customs, and bank-specific LC rules. They get short, grounded answers with exact rule citations. No account needed for first 10 queries per month.
+RuleGPT is a citation-first conversational AI for trade finance rules. Users ask questions about ICC standards (UCP600, ISBP745), sanctions (OFAC), FTAs (RCEP, CPTPP), customs, and bank-specific LC rules. They get short, grounded answers with exact rule citations. No account needed for first 20 queries per month.
 
 Built by a Codex agent from a product brief. This document describes what was actually built, not what was planned.
 
@@ -57,7 +57,7 @@ Four products in the Enso Intelligence ecosystem:
 - Rule data population (database schema exists but rules must be synced via `scripts/sync_local_rules.py` or the admin `/api/embed/sync` endpoint before queries return meaningful results)
 
 ### Incomplete or stubbed
-- Admin auth uses `x-admin=true` header only — no real RBAC (`rulegpt-api/app/routers/deps.py:73`)
+- Admin auth uses `ADMIN_SECRET` shared secret — no real RBAC (`rulegpt-api/app/routers/deps.py:45`)
 - API usage counting returns hardcoded 0 (`rulegpt-api/app/routers/api_access.py:31`)
 - `show_trdr_cta` is always `False` — the CTA trigger logic exists in generator.py but is never set to True in the pipeline response
 - Blog scaffold is missing (mentioned in planning docs as next priority)
@@ -132,7 +132,9 @@ Query arrives → classifier → embeddings table (semantic search)
    - Post-processing: strips markdown headings, strips follow-up blocks, tightens AI voice, validates that no hallucinated references appear
    - If LLM answer mentions unknown references, falls back to grounded answer
 
-6. **Citations** (`citations.py`): Builds citations from retrieved rules. Prioritizes rules explicitly mentioned in answer text. Max 8 citations. Confidence per citation based on rerank score.
+6. **Intent Detection** (`query_intent.py`): Determines query characteristics — `requires_document_breadth()`, `has_partial_coverage_language()`, `extract_fta_agreement()`, `expected_document_families()`. Used by generator and pipeline for specialized handling.
+
+7. **Citations** (`citations.py`): Builds citations from retrieved rules. Prioritizes rules explicitly mentioned in answer text. Max 8 citations. Confidence per citation based on rerank score.
 
 7. **Confidence** (`pipeline.py:_confidence_from_rules`):
    - Always "low" if partial coverage, no rules, or 0 citations
@@ -275,19 +277,26 @@ This mapping is in `rulegpt-api/app/services/integrations/openrouter.py`.
 
 As actually implemented:
 
-**Tiers:** `anonymous`, `free`, `pro`
+**Tiers:** `anonymous`, `free`, `starter`, `pro`
 
-**Monthly query limit (anonymous):** 10 queries per calendar month per session. Enforced in `routers/query.py:_anonymous_queries_this_month()`. When exceeded, returns HTTP 429 with message "Anonymous monthly query limit reached. Please register to continue."
+**Monthly query limits:**
+- Anonymous: 20 queries per calendar month per session (`FREE_TIER_MONTHLY_LIMIT`)
+- Free: 20 queries per calendar month
+- Starter: 500 queries per calendar month (`STARTER_TIER_MONTHLY_LIMIT`)
+- Pro: 2,000 queries per calendar month (`PRO_TIER_MONTHLY_LIMIT`)
+- Pro API: 10,000 queries (`PRO_TIER_API_LIMIT`)
+
+Enforced in `routers/query.py:_anonymous_queries_this_month()`. When exceeded, returns HTTP 429 with message "Anonymous monthly query limit reached. Please register to continue."
 
 **Per-minute rate limiting:** In-memory sliding window in `middleware/rate_limit.py`:
 - Anonymous: 30 requests/minute
-- Authenticated (free/pro): 120 requests/minute
+- Authenticated (free/starter/pro): 120 requests/minute
 - Key: IP + fingerprint + tier + path
 - Exempt paths: /health, /docs, /openapi.json
 
 **Important:** Rate limiting is in-memory only. It resets on server restart and does not work across multiple backend instances.
 
-**Pro API limit:** 10,000 queries (defined in config but usage counting returns hardcoded 0).
+**Note:** Pro API usage counting returns hardcoded 0 (`api_access.py:31`). Real counting not yet implemented.
 
 ## AUTH
 
@@ -351,10 +360,11 @@ As actually implemented:
 - Payments: Stripe
 
 ### Design system
-- Light theme (NOT dark) with warm cream background (`hsl(36, 50%, 98%)`)
-- Primary accent: burnt orange/terracotta (`hsl(16, 72%, 46%)`)
-- Fonts: Inter (body), Space Grotesk (display), JetBrains Mono (code)
-- Subtle grid background pattern with orange radial gradients
+- Dark obsidian theme (#0A0A0A) with amber accent (#FF4F00), supports dark/light toggle via ThemeContext
+- Fonts: DM Sans (body), Fraunces (display), JetBrains Mono (citations/code)
+- CSS custom properties for colors, spacing (4px base), motion, radii
+- Component classes: `.card-dark`, `.card-amber`, `.card-parchment`, `.section-obsidian`, `.section-parchment`
+- Grain texture overlay on dark sections, fade/slide animations
 
 ## ENVIRONMENT VARIABLES
 
@@ -402,18 +412,25 @@ As actually implemented:
 **Stripe (optional until billing goes live):**
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_STARTER_MONTHLY_PRICE_ID`
+- `STRIPE_STARTER_ANNUAL_PRICE_ID`
 - `STRIPE_PRO_MONTHLY_PRICE_ID`
 - `STRIPE_PRO_ANNUAL_PRICE_ID`
 
+**Admin:**
+- `ADMIN_SECRET` — shared secret for admin endpoints. Required in production.
+
 **Rate limiting:**
-- `FREE_TIER_MONTHLY_LIMIT` — default: 10
+- `FREE_TIER_MONTHLY_LIMIT` — default: 20
+- `STARTER_TIER_MONTHLY_LIMIT` — default: 500
+- `PRO_TIER_MONTHLY_LIMIT` — default: 2000
 - `PRO_TIER_API_LIMIT` — default: 10000
 - `RATE_LIMIT_PER_MIN_ANON` — default: 30
 - `RATE_LIMIT_PER_MIN_AUTH` — default: 120
 
 **CORS:**
-- `CORS_ORIGINS` — default: `["http://localhost:5173"]`
-- `CORS_ORIGIN_REGEX` — default: `^https://.*\.vercel\.app$`
+- `CORS_ORIGINS` — default: `["http://localhost:5173","https://www.tfrules.com","https://tfrules.com"]`
+- `CORS_ORIGIN_REGEX` — default: `^https://([a-z0-9-]+\.)*vercel\.app$|^https://([a-z0-9-]+\.)?tfrules\.com$`
 
 ### Frontend (from `rulegpt-ui/.env.example`)
 - `VITE_API_BASE_URL` — backend URL (default: `http://localhost:8000`)
@@ -525,17 +542,15 @@ Based on what actually exists in the codebase:
 
 ## KNOWN ISSUES
 
-ISSUE: Admin auth is a placeholder
-FILE: rulegpt-api/app/routers/deps.py (line 73)
-DETAIL: `require_admin_user()` checks only for `x-admin=true` header. Anyone can add this header. No real RBAC.
-PRIORITY: high
+ISSUE: Admin auth uses shared secret, not real RBAC
+FILE: rulegpt-api/app/routers/deps.py (line 45)
+DETAIL: `require_admin_user()` uses `ADMIN_SECRET` env var. Better than the old `x-admin=true` header, but still not role-based. Anyone with the secret has full admin access.
+PRIORITY: medium
 BLOCKED BY: Decision on whether to use Supabase roles or a separate admin system
 
-ISSUE: Global exception handler leaks error details
-FILE: rulegpt-api/app/exceptions.py (line 35)
-DETAIL: `unhandled_exception_handler` returns `str(exc)` in the JSON response, which could expose internal paths, SQL errors, or stack traces in production.
-PRIORITY: high
-BLOCKED BY: Nothing — straightforward fix
+ISSUE: ~~Global exception handler leaks error details~~ FIXED 2026-04-05
+FILE: rulegpt-api/app/exceptions.py
+DETAIL: Now logs full exception server-side and returns generic message in production. Dev mode still shows details.
 
 ISSUE: In-memory rate limiting is not distributed
 FILE: rulegpt-api/app/middleware/rate_limit.py
@@ -555,23 +570,9 @@ DETAIL: The TRDR Hub CTA is never shown. The trigger logic exists in `generator.
 PRIORITY: low
 BLOCKED BY: Product decision on when/how to show CTAs
 
-ISSUE: Hardcoded local rules path
-FILE: rulegpt-api/app/services/rag/embedder.py (line 21), rulegpt-api/app/services/integrations/rulhub_client.py (line 94)
-DETAIL: Default path is `J:\Enso Intelligence\trdrhub.com\Data` — a Windows-specific absolute path. Will fail on Linux/Render unless `RULEGPT_LOCAL_RULES_ROOT` is explicitly set.
-PRIORITY: medium
-BLOCKED BY: Nothing — should default to empty/None when env var is not set, not a Windows path
-
-ISSUE: Frontend design is light theme, not dark
-FILE: rulegpt-ui/src/index.css
-DETAIL: The Enso ecosystem is described as using dark background with amber/gold accent, but RuleGPT uses a light cream theme with burnt orange accent. This may be intentional or a divergence.
-PRIORITY: low
-BLOCKED BY: Design decision from Ripon
-
-ISSUE: No RULES_SOURCE toggle variable exists
-FILE: N/A
-DETAIL: The prompt/planning docs reference a `RULES_SOURCE` environment variable for the RulHub migration switch. This variable does not exist anywhere in the codebase. The migration is controlled by boolean params in the embedding sync methods.
-PRIORITY: low
-BLOCKED BY: Decision on whether to add a simple toggle or keep the current approach
+ISSUE: ~~Hardcoded local rules path~~ FIXED
+FILE: rulegpt-api/app/config.py (line 75)
+DETAIL: `RULEGPT_LOCAL_RULES_ROOT` now defaults to `None`. No Windows path hardcoded.
 
 ## LESSONS LEARNED
 
@@ -584,7 +585,10 @@ CONTEXT: [What happened]
 ACTION: [What to do differently]
 ```
 
-_No entries yet. Add the first entry after the first work session._
+DATE: 2026-04-05
+LESSON: CLAUDE.md drifted significantly from codebase reality.
+CONTEXT: Full audit revealed 12+ factual errors: tiers changed from 3→4 (starter added), anonymous limit 10→20, design system flipped from light cream/burnt orange to dark obsidian/amber, fonts changed from Inter/Space Grotesk to DM Sans/Fraunces, render.yaml existed but wasn't documented, Stripe Starter price IDs existed in config but not render.yaml, local rules path was already fixed to None. No CI/CD existed at all.
+ACTION: Update CLAUDE.md after every significant session. Cross-check against actual config.py, not memory. Added GitHub Actions CI/CD (backend-ci, frontend-ci, deploy-gate).
 
 ## SUCCESS CRITERIA
 
@@ -602,4 +606,31 @@ _No entries yet. Add the first entry after the first work session._
 - Confidence band accurately reflects actual coverage
 - Citations only reference rules that were actually retrieved
 
-Last audited: 2026-03-31 by Claude Code.
+## CI/CD
+
+**GitHub Actions workflows** (added 2026-04-05):
+- `.github/workflows/backend-ci.yml` — Python 3.11, PostgreSQL+pgvector service, pip install, alembic migrate, pytest. Triggers on push/PR to `rulegpt-api/**`.
+- `.github/workflows/frontend-ci.yml` — Node 20, npm ci, type-check, lint, test. Triggers on push/PR to `rulegpt-ui/**`.
+- `.github/workflows/deploy-gate.yml` — Runs both CI workflows on PRs to `main`. Blocks merge until both pass.
+
+**Deployment:**
+- Backend auto-deploys to Render on push to `main` (configured in render.yaml)
+- Frontend auto-deploys to Vercel (connected via Vercel dashboard)
+- No staging environment yet — preview deployments via Vercel PR previews
+
+## DEPLOYMENT CONFIG
+
+### render.yaml (backend)
+- Service: `rulegpt-api`, Python 3.11.10, Oregon region, Starter plan
+- Build: `pip install -r requirements.txt`
+- Pre-deploy: `alembic upgrade head`
+- Start: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- Health check: `/health`
+- Auto-deploy: on commit
+- 74 env vars total (25+ secrets must be set in Render dashboard, marked `sync: false`)
+
+### vercel.json (frontend)
+- SPA rewrite: all routes → `/index.html`
+- Build/output settings configured in Vercel dashboard
+
+Last audited: 2026-04-05 by Claude Code.

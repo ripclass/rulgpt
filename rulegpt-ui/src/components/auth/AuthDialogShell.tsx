@@ -224,7 +224,7 @@ export function AuthDialogShell({
 
               <button
                 type="submit"
-                className="mt-2 flex h-11 w-full items-center justify-center rounded-sm bg-[#FF4F00] text-[13px] font-bold uppercase tracking-widest text-white transition hover:bg-[#E64600] disabled:opacity-50"
+                className="mt-2 flex h-11 w-full items-center justify-center rounded-sm bg-[#FF4F00] text-[13px] font-bold uppercase tracking-widest text-white transition hover:bg-[#E64600] disabled:bg-neutral-300 disabled:text-neutral-500 dark:disabled:bg-neutral-700 dark:disabled:text-neutral-400 disabled:cursor-not-allowed"
                 disabled={isLoading || !email || !password}
               >
                 {isLoading ? copy.submitBusy : copy.submitIdle}

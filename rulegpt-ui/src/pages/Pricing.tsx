@@ -17,7 +17,7 @@ const plans = [
     period: '/month',
     features: ['500 queries per month', 'Synced history', 'Saved answers', 'One avoided discrepancy fee covers a year'],
     cta: 'Get started \u2192',
-    href: '/chat',
+    href: '/upgrade',
     featured: true,
   },
   {
@@ -26,7 +26,7 @@ const plans = [
     period: '/month',
     features: ['2,000 queries per month', 'Priority routing', 'API access', 'Exports and reports'],
     cta: 'Go Pro \u2192',
-    href: '/chat',
+    href: '/upgrade',
     featured: false,
   },
 ]

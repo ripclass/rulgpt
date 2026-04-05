@@ -71,3 +71,9 @@ services:
         sync: false
       - key: STRIPE_PRO_ANNUAL_PRICE_ID
         sync: false
+      - key: STRIPE_STARTER_MONTHLY_PRICE_ID
+        sync: false
+      - key: STRIPE_STARTER_ANNUAL_PRICE_ID
+        sync: false
+      - key: ADMIN_SECRET
+        sync: false

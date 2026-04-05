@@ -2,9 +2,15 @@
 
 from __future__ import annotations
 
+import logging
+
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+
+from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class AppError(Exception):
@@ -35,8 +41,14 @@ async def validation_error_handler(_: Request, exc: RequestValidationError) -> J
 
 
 async def unhandled_exception_handler(_: Request, exc: Exception) -> JSONResponse:
+    logger.exception("Unhandled exception: %s", exc)
+    message = (
+        "An unexpected error occurred."
+        if settings.is_production
+        else str(exc)
+    )
     return JSONResponse(
         status_code=500,
-        content={"error": "internal_error", "message": str(exc)},
+        content={"error": "internal_error", "message": message},
     )
 

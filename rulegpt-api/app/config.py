@@ -81,6 +81,8 @@ class Settings(BaseSettings):
     STRIPE_PRO_MONTHLY_PRICE_ID: str | None = None
     STRIPE_PRO_ANNUAL_PRICE_ID: str | None = None
 
+    ADMIN_SECRET: str | None = None
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origins(cls, value: object) -> List[str]:

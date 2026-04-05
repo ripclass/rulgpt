@@ -43,8 +43,39 @@ def require_pro_user(request: Request) -> UUID:
 
 
 def require_admin_user(request: Request):
-    # Placeholder check: x-admin=true header only.
-    # Real RBAC/JWT should be wired via integrations layer once approved.
+    """Verify the caller has admin privileges.
+
+    Security model:
+    - Production with ADMIN_SECRET set: require ``Authorization: Bearer admin:<secret>``
+    - Production without ADMIN_SECRET: reject all admin requests
+    - Non-production with ADMIN_SECRET set: require the bearer token (same as prod)
+    - Non-production without ADMIN_SECRET: fall back to ``x-admin=true`` header for dev convenience
+    """
+    from app.config import get_settings
+
+    cfg = get_settings()
+    is_production = cfg.ENVIRONMENT.lower() == "production"
+    admin_secret = cfg.ADMIN_SECRET
+
+    if admin_secret:
+        # Secret is configured — require bearer token in all environments.
+        auth_header = (request.headers.get("authorization") or "").strip()
+        expected = f"Bearer admin:{admin_secret}"
+        if auth_header != expected:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid admin credentials.",
+            )
+        return True
+
+    if is_production:
+        # Production without a secret — deny everything.
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access not configured.",
+        )
+
+    # Non-production, no secret — allow legacy dev header.
     is_admin = (request.headers.get("x-admin") or "").lower() == "true"
     if not is_admin:
         raise HTTPException(

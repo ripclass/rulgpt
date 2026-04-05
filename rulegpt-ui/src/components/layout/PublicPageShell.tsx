@@ -1,7 +1,10 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { Sun, Moon } from 'lucide-react'
 import { PublicFooter } from '@/components/shared/PublicFooter'
 import { RuxMark } from '@/components/shared/RuxMascot'
+import { useTheme } from '@/contexts/ThemeContext'
+import { useAuthModal } from '@/contexts/AuthModalContext'
 
 interface PublicPageShellProps {
   eyebrow?: string
@@ -11,6 +14,9 @@ interface PublicPageShellProps {
 }
 
 export function PublicPageShell({ eyebrow, title, description, children }: PublicPageShellProps) {
+  const { theme, setTheme } = useTheme()
+  const authModal = useAuthModal()
+
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#050505] text-neutral-900 dark:text-white font-sans transition-colors flex flex-col">
       {/* 
@@ -42,13 +48,19 @@ export function PublicPageShell({ eyebrow, title, description, children }: Publi
                 {label}
               </Link>
             ))}
-            <Link
-              to="/chat"
-              state={{ authMode: 'login' }}
+            <button
+              onClick={() => authModal.openLogin()}
               className="text-[13px] font-medium transition-colors text-neutral-400 hover:text-white uppercase tracking-widest"
             >
               Sign in
-            </Link>
+            </button>
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 text-neutral-400 hover:text-white transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
             <Link
               to="/chat"
               className="h-10 px-5 flex items-center justify-center rounded-sm bg-[#FF4F00] text-[12px] font-bold uppercase tracking-widest text-white transition hover:bg-[#E64600] shadow-xl shadow-[#FF4F00]/20"

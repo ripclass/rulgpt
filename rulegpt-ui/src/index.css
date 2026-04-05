@@ -90,6 +90,35 @@
   --radius: 0.5rem;
 }
 
+/* ─── Light Mode Overrides ──────────────────────────────────── */
+html.light {
+  /* Primary palette — invert for light backgrounds */
+  --color-obsidian: #FFFFFF;
+  --color-parchment: #1A1A1A;
+  --color-ink: #E5E5E5;
+
+  /* Surface and structural */
+  --color-surface: #F5F5F5;
+  --color-surface-raised: #EBEBEB;
+  --color-border: #E0E0E0;
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #9CA3AF;
+
+  /* shadcn/ui compat */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 10%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 10%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+}
+
 /* ─── Base ──────────────────────────────────────────────────── */
 @layer base {
   * {

@@ -7,11 +7,10 @@ import { MobileDrawer } from '@/components/layout/MobileDrawer'
 import { MobileNav } from '@/components/layout/MobileNav'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { CitationPanel } from '@/components/chat/CitationPanel'
-import { LoginModal } from '@/components/auth/LoginModal'
-import { SignupModal } from '@/components/auth/SignupModal'
 import { api } from '@/lib/api'
 import { track } from '@/lib/analytics'
 import { useAuth } from '@/hooks/useAuth'
+import { useAuthModal } from '@/contexts/AuthModalContext'
 import { useQuery } from '@/hooks/useQuery'
 import { useSession } from '@/hooks/useSession'
 import { useTierLimit } from '@/hooks/useTierLimit'
@@ -78,8 +77,7 @@ export function Home() {
   const navigate = useNavigate()
   const location = useLocation()
   const queryClient = useQueryClient()
-  const [loginOpen, setLoginOpen] = useState(false)
-  const [signupOpen, setSignupOpen] = useState(false)
+  const authModal = useAuthModal()
   const [citationPanelOpen, setCitationPanelOpen] = useState(false)
   const [selectedRule, setSelectedRule] = useState<RuleDetails | null>(null)
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
@@ -257,7 +255,7 @@ export function Home() {
 
   const saveMessage = async (queryId: string) => {
     if (!auth.isAuthenticated || !auth.user) {
-      setLoginOpen(true)
+      authModal.openLogin()
       return
     }
     try {
@@ -304,10 +302,10 @@ export function Home() {
     let shouldClearState = false
 
     if (state?.authMode === 'login') {
-      setLoginOpen(true)
+      authModal.openLogin()
       shouldClearState = true
     } else if (state?.authMode === 'signup') {
-      setSignupOpen(true)
+      authModal.openSignup()
       shouldClearState = true
     }
 
@@ -343,8 +341,8 @@ export function Home() {
         onDeleteSaved={(savedId) => {
           void deleteSaved(savedId)
         }}
-        onOpenLogin={() => setLoginOpen(true)}
-        onOpenSignup={() => setSignupOpen(true)}
+        onOpenLogin={() => authModal.openLogin()}
+        onOpenSignup={() => authModal.openSignup()}
         onLogout={() => {
           void auth.logout()
           handleNewQuery()
@@ -361,7 +359,7 @@ export function Home() {
         previewMode={previewMode}
         reachedLimit={tierLimit.reachedLimit}
         isAuthenticated={auth.isAuthenticated}
-        onOpenSignup={() => setSignupOpen(true)}
+        onOpenSignup={() => authModal.openSignup()}
         onUpgrade={() => {
           resetSession()
           navigate('/upgrade')
@@ -407,74 +405,6 @@ export function Home() {
         }}
         onPro={() => navigate('/upgrade')}
       />
-
-      <LoginModal
-        open={loginOpen}
-        isLoading={auth.isLoading}
-        oauth={auth.oauth}
-        authStatus={auth.authStatus}
-        onOpenChange={setLoginOpen}
-        onSwitchMode={() => {
-          setLoginOpen(false)
-          setSignupOpen(true)
-        }}
-        onSubmit={async (email, password) => {
-          try {
-            await auth.login(email, password)
-            toast.success('Signed in.')
-            setLoginOpen(false)
-          } catch (error) {
-            toast.error(`Login failed: ${String(error)}`)
-          }
-        }}
-        onOAuth={async (provider) => {
-          try {
-            await auth.loginWithOAuth(provider)
-          } catch (error) {
-            toast.error(`OAuth unavailable: ${String(error)}`)
-          }
-        }}
-      />
-
-      <SignupModal
-        open={signupOpen}
-        isLoading={auth.isLoading}
-        oauth={auth.oauth}
-        authStatus={auth.authStatus}
-        onOpenChange={setSignupOpen}
-        onSwitchMode={() => {
-          setSignupOpen(false)
-          setLoginOpen(true)
-        }}
-        onSubmit={async (email, password) => {
-          try {
-            const result = await auth.signup(email, password)
-            if (result.status === 'signed_in') {
-              toast.success('Account created.')
-              setSignupOpen(false)
-              return
-            }
-            if (result.status === 'existing_account') {
-              toast.message('That email already looks registered. Sign in instead.')
-              setSignupOpen(false)
-              setLoginOpen(true)
-              return
-            }
-            toast.success('Check your email to confirm your account.')
-            setSignupOpen(false)
-          } catch (error) {
-            toast.error(`Signup failed: ${String(error)}`)
-          }
-        }}
-        onOAuth={async (provider) => {
-          try {
-            await auth.loginWithOAuth(provider)
-          } catch (error) {
-            toast.error(`OAuth unavailable: ${String(error)}`)
-          }
-        }}
-      />
-
 
     </div>
   )
