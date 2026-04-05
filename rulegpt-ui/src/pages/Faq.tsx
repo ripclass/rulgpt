@@ -4,12 +4,12 @@ import { PublicPageShell } from '@/components/layout/PublicPageShell'
 
 const faqs = [
   {
-    q: 'Why not just ask ChatGPT?',
-    a: 'ChatGPT will give you a confident answer. It may be right. It may be wrong. You can\'t tell. tfrules cites the rule so you can verify it yourself.',
+    q: 'Why not just ask a standard AI model?',
+    a: 'Generative models will give you a confident answer. It may be right. It may be a hallucination. In trade finance, an error means a discrepancy. tfrules operates strictly over a curated topological graph and cites exact articles so you can verify it yourself.',
   },
   {
-    q: 'How current are the rules?',
-    a: 'We cover UCP600 (2007), ISBP745 (2013), current OFAC/EU/UN sanctions lists, RCEP, CPTPP, USMCA, and 4,000+ other rulesets. Sanctions data is updated regularly.',
+    q: 'What is the scope of the engine?',
+    a: 'We cover ICC Core (UCP600/ISBP745), current OFAC/EU/UN sanctions, FTA origin rules, central bank regulations of 48 jurisdictions, and granular commodity compliance requirements.',
   },
   {
     q: 'What if you don\'t have the rule I need?',
@@ -38,24 +38,22 @@ export function Faq() {
         {faqs.map((faq, i) => (
           <div
             key={i}
-            className="rounded-xl"
-            style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+            className="rounded-sm bg-white dark:bg-[#121212] border border-neutral-200 dark:border-white/10"
           >
             <button
               type="button"
               onClick={() => setOpenIndex(openIndex === i ? null : i)}
               className="flex w-full items-center justify-between px-5 py-4 text-left"
             >
-              <span className="text-sm font-medium" style={{ color: 'var(--color-parchment)' }}>{faq.q}</span>
+              <span className="text-sm font-medium text-neutral-900 dark:text-white">{faq.q}</span>
               <ChevronDown
-                className={`h-4 w-4 shrink-0 transition-transform ${
+                className={`h-4 w-4 shrink-0 transition-transform text-neutral-400 dark:text-neutral-500 ${
                   openIndex === i ? 'rotate-180' : ''
                 }`}
-                style={{ color: 'var(--color-text-secondary)' }}
               />
             </button>
             {openIndex === i && (
-              <div className="px-5 pb-4 text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+              <div className="px-5 pb-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
                 {faq.a}
               </div>
             )}

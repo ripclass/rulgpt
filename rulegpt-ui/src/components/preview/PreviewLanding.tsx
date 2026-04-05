@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronDown, Check, ArrowRight } from 'lucide-react'
-import { RuxMascot, RuxMark } from '@/components/shared/RuxMascot'
+import { ChevronDown, Check, ArrowRight, Menu, X, Globe, Shield, BookOpen, Clock, FileText, Database, Scale, Box } from 'lucide-react'
+import { RuxMark } from '@/components/shared/RuxMascot'
+import { PublicFooter } from '@/components/shared/PublicFooter'
 import type { SessionTier } from '@/types'
 
 interface PreviewLandingProps {
@@ -13,6 +14,46 @@ interface PreviewLandingProps {
   onOpenChat: () => void
 }
 
+function useIntersectionObserver(options = {}) {
+  const [isIntersecting, setIsIntersecting] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsIntersecting(true)
+        observer.unobserve(entry.target)
+      }
+    }, { threshold: 0.2, ...options })
+
+    if (ref.current) {
+      observer.observe(ref.current)
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current) // eslint-disable-line
+      }
+    }
+  }, [options])
+
+  return [ref, isIntersecting] as const
+}
+
+// Fade in component for scroll
+function FadeInView({ children, delay = 0, className = '' }: { children: React.ReactNode, delay?: number, className?: string }) {
+  const [ref, isVisible] = useIntersectionObserver()
+  return (
+    <div 
+      ref={ref} 
+      className={`transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'} ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  )
+}
+
 export function PreviewLanding({
   isAuthenticated,
   tier,
@@ -22,384 +63,422 @@ export function PreviewLanding({
   onOpenChat,
 }: PreviewLandingProps) {
   const [scrolled, setScrolled] = useState(false)
+  const [heroPassed, setHeroPassed] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', on, { passive: true })
-    return () => window.removeEventListener('scroll', on)
+    const onScroll = () => {
+      setScrolled(window.scrollY > 20)
+      const heroHeight = window.innerHeight * 0.9 // Approx height of hero
+      setHeroPassed(window.scrollY > heroHeight)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  return (
-    <div className="min-h-screen" style={{ fontFamily: 'var(--font-body)' }}>
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth >= 768) setMobileMenuOpen(false) }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
-      {/* ═══════════════════════════════════════════════════════════
-          NAV — obsidian
-          ═══════════════════════════════════════════════════════════ */}
-      <nav
-        className={`hero-nav fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-          scrolled ? 'bg-[#0A0A0A]/95 backdrop-blur-sm shadow-lg shadow-black/20' : ''
+  useEffect(() => {
+    if (mobileMenuOpen) document.body.style.overflow = 'hidden'
+    else document.body.style.overflow = 'unset'
+    return () => { document.body.style.overflow = 'unset' }
+  }, [mobileMenuOpen])
+
+  // Top Nav styling logic:
+  // If we haven't scrolled past hero, it's transparent on dark BG (white text).
+  // If we scrolled past, it's white glass (dark text).
+  const isNavDarkTheme = !heroPassed
+
+  return (
+    <div className="min-h-screen bg-white font-sans text-neutral-900 selection:bg-[#FF4F00] selection:text-white pb-0">
+      
+      {/* ──────────────────────────────────────────────────────────
+          NAV (Dynamic Theme based on scroll)
+          ────────────────────────────────────────────────────────── */}
+      <header
+        className={`fixed inset-x-0 top-0 z-[110] transition-all duration-500 border-b ${
+          scrolled && isNavDarkTheme 
+            ? 'bg-black/30 backdrop-blur-md border-white/10 shadow-sm'
+            : scrolled && !isNavDarkTheme
+              ? 'bg-white/80 backdrop-blur-md border-neutral-200/50 shadow-sm' 
+              : 'bg-transparent border-transparent'
         }`}
       >
-        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
-          <Link to="/" className="flex items-center gap-2.5">
-            <RuxMark />
-            <span className="wordmark wordmark--on-dark text-xl">tfrules</span>
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-12">
+          {/* Logo */}
+          <Link to="/" className={`flex items-center gap-2.5 z-50 transition-colors duration-300 ${isNavDarkTheme ? 'text-white' : 'text-neutral-900'}`}>
+            <div className={isNavDarkTheme ? 'text-white' : 'text-black'}><RuxMark /></div>
+            <span className="text-xl font-medium tracking-tight">tfrules</span>
           </Link>
-          <div className="flex items-center gap-6">
-            <div className="hidden gap-6 text-[15px] md:flex" style={{ color: 'var(--color-text-secondary)' }}>
-              <a href="#how" className="transition-colors hover:text-[#FAF7F2]">How it works</a>
-              <Link to="/pricing" className="transition-colors hover:text-[#FAF7F2]">Pricing</Link>
-            </div>
+
+          {/* Desktop Nav */}
+          <div className={`hidden items-center gap-10 md:flex text-[15px] font-medium transition-colors duration-300 ${isNavDarkTheme ? 'text-neutral-300' : 'text-neutral-600'}`}>
+            <a href="#how" className={`transition duration-200 ${isNavDarkTheme ? 'hover:text-white' : 'hover:text-neutral-900'}`}>How it works</a>
+            <Link to="/pricing" className={`transition duration-200 ${isNavDarkTheme ? 'hover:text-white' : 'hover:text-neutral-900'}`}>Pricing</Link>
+            
+            <div className={`h-4 w-px ${isNavDarkTheme ? 'bg-white/20' : 'bg-neutral-200'}`} />
+
             {isAuthenticated ? (
-              <div className="flex items-center gap-3">
-                <div className="hidden rounded-full border px-3 py-1.5 text-[12px] md:block" style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}>
-                  <span style={{ color: 'var(--color-parchment)' }}>{userEmail ?? 'Signed in'}</span>
-                  <span style={{ color: 'var(--color-text-muted)' }}> · {tier.toUpperCase()}</span>
-                </div>
-                <button onClick={onOpenChat} className="btn-primary rounded-md px-5 py-2 text-[14px]">
-                  Open chat <ArrowRight className="ml-1.5 inline h-3.5 w-3.5" />
+              <div className="flex items-center gap-5">
+                <span className={`text-xs ${isNavDarkTheme ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  {userEmail} <span className="uppercase mx-2 opacity-50">·</span> {tier}
+                </span>
+                <button onClick={onOpenChat} className="flex h-11 items-center rounded-sm bg-[#FF4F00] px-6 text-[15px] font-semibold text-white transition hover:bg-[#E64600] uppercase tracking-wide">
+                  Open Chat <ArrowRight className="ml-2 h-4 w-4" />
                 </button>
               </div>
             ) : (
-              <>
-                <button onClick={onOpenLogin} className="btn-secondary rounded-md px-5 py-2 text-[14px]">
-                  Sign in
+              <div className="flex items-center gap-6">
+                <button onClick={onOpenLogin} className={`transition duration-200 ${isNavDarkTheme ? 'hover:text-white' : 'hover:text-neutral-900'}`}>Sign in</button>
+                <button onClick={onOpenChat} className="flex h-11 items-center rounded-sm bg-[#FF4F00] px-6 text-[15px] font-semibold text-white transition hover:bg-[#E64600] uppercase tracking-wide shadow-lg shadow-[#FF4F00]/20">
+                  Try tfrules free
                 </button>
-                <button onClick={onOpenChat} className="btn-primary rounded-md px-5 py-2 text-[14px]">
-                  Try tfrules <ArrowRight className="ml-1.5 inline h-3.5 w-3.5" />
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Nav Toggle */}
+          <button 
+            className={`z-[120] p-2 md:hidden focus:outline-none transition-colors duration-300 ${isNavDarkTheme && !mobileMenuOpen ? 'text-white' : 'text-neutral-900'}`}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
+          </button>
+        </div>
+
+        {/* Mobile Menu Overlay */}
+        <div className={`fixed inset-0 z-[115] h-dvh w-screen bg-white pt-28 px-8 md:hidden transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] flex flex-col ${mobileMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'}`}>
+          <nav className="flex flex-col gap-10 text-4xl sm:text-5xl font-bold uppercase tracking-widest text-neutral-900 mt-4">
+            <a href="#how" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">How it works</a>
+            <Link to="/pricing" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">Pricing</Link>
+            <Link to="/faq" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">FAQ</Link>
+            <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">Contact</Link>
+          </nav>
+
+          <div className="mt-12 flex flex-col gap-4">
+            {isAuthenticated ? (
+              <button onClick={() => { setMobileMenuOpen(false); onOpenChat(); }} className="w-full rounded-sm bg-[#FF4F00] py-5 text-center text-xl font-semibold text-white tracking-wide uppercase transition active:scale-95">
+                Open chat
+              </button>
+            ) : (
+              <>
+                <button onClick={() => { setMobileMenuOpen(false); onOpenChat(); }} className="w-full rounded-sm bg-[#FF4F00] py-5 text-center text-xl font-semibold text-white tracking-wide uppercase transition active:scale-95 shadow-lg shadow-[#FF4F00]/20">
+                  Try free
+                </button>
+                <button onClick={() => { setMobileMenuOpen(false); onOpenLogin(); }} className="w-full rounded-sm border-2 border-neutral-200 bg-transparent py-5 text-center text-xl font-semibold text-neutral-900 transition active:scale-95">
+                  Sign in
                 </button>
               </>
             )}
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* ═══════════════════════════════════════════════════════════
-          HERO — obsidian + grain + amber glow
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="section-obsidian section-dark hero-glow relative overflow-hidden">
-        <div className="relative z-10 mx-auto max-w-[1200px] px-6 pb-24 pt-32 md:pb-36 md:pt-44">
-          <div className="flex flex-col gap-12 md:flex-row md:items-center md:justify-between">
-            <div className="max-w-xl">
-              <h1 className="hero-headline display-xl">
-                Don&rsquo;t guess.<br />
-                <em style={{ fontStyle: 'italic', color: 'var(--color-amber)' }}>Cite the rule.</em>
+      {/* ──────────────────────────────────────────────────────────
+          HERO (Cinematic, Immersive, Full Screen)
+          ────────────────────────────────────────────────────────── */}
+      <section className="relative w-full h-screen min-h-[700px] flex items-center bg-[#050B14] overflow-hidden">
+        {/* Background Image Setup (Fixed Parallax style) */}
+        <div className="absolute inset-0 z-0 opacity-60">
+          <img 
+            src="/hero-bg.png" 
+            alt="Abstract Global Trade" 
+            className="w-full h-full object-cover object-center"
+          />
+          {/* Gradients to blend the image into the edges */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-black/40 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-black/20" />
+        </div>
+        
+        <div className="relative z-10 w-full mx-auto max-w-7xl px-6 lg:px-12 pt-20">
+          <div className="max-w-4xl relative">
+            <div className="animate-fade-up blur-0" style={{ animationDuration: '1000ms' }}>
+              {/* Massive Industrial Typography */}
+              <h1 className="text-[12vw] sm:text-[8vw] md:text-7xl lg:text-[110px] font-bold tracking-tighter text-white leading-[0.9] uppercase mix-blend-screen">
+                Cited Rules.<br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-200 to-neutral-500">Not Opinion.</span>
               </h1>
-              <p className="hero-sub mt-6 text-lg leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
-                The citation-first trade finance engine for C&amp;F agents, bank clerks,
-                and freight forwarders who need answers they can show to a bank.
-              </p>
-              <div className="hero-cta mt-10 flex items-center gap-4">
-                <button onClick={onOpenChat} className="btn-primary rounded-md px-7 py-3 text-[15px]">
-                  {isAuthenticated ? 'Open chat' : 'Ask a question free'}
-                </button>
-                {isAuthenticated ? (
-                  <div className="rounded-md border px-5 py-3 text-[14px]" style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}>
-                    Signed in as <span style={{ color: 'var(--color-parchment)' }}>{userEmail ?? 'your account'}</span> · {tier.toUpperCase()}
-                  </div>
-                ) : (
-                  <button onClick={onOpenLogin} className="btn-secondary rounded-md px-5 py-3 text-[15px]">
-                    Sign in
-                  </button>
-                )}
-              </div>
-              <p className="mt-5 text-[13px]" style={{ color: 'var(--color-text-muted)' }}>
-                No signup needed &middot; No credit card &middot; 20 free queries/month
-              </p>
             </div>
-            <div className="hero-illustration flex-shrink-0">
-              <RuxMascot pose="reading" size={260} className="drop-shadow-lg" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          PROBLEM / COMPARISON — parchment
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="section-parchment section-padding">
-        <div className="section-container">
-          <h2 className="display-md text-center" style={{ color: 'var(--color-ink)' }}>
-            Not AI opinion. <em style={{ fontStyle: 'italic' }}>Cited rules.</em>
-          </h2>
-          <p className="mx-auto mt-4 max-w-lg text-center text-[15px] leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
-            Same question. One answer you can cite in a dispute. One you can&rsquo;t.
-          </p>
-
-          <div className="mx-auto mt-14 grid max-w-[900px] gap-5 md:grid-cols-2">
-            {/* ChatGPT card — faded */}
-            <div className="rounded-xl border p-7 md:p-9" style={{ borderColor: '#E8E4DC', opacity: 0.6 }}>
-              <p className="text-[12px] font-medium uppercase tracking-[0.08em]" style={{ color: 'var(--color-text-muted)' }}>
-                ChatGPT / Claude
-              </p>
-              <p className="mt-5 text-[15px] leading-[1.85]" style={{ color: 'var(--color-text-muted)' }}>
-                Under UCP600, transport documents must comply with specific requirements in articles 19&#8209;25.
-                The document must appear consistent with the credit terms. Banks examine documents to ensure
-                they meet required standards for the type of transport involved.
-              </p>
-              <p className="mt-5 text-[11px] italic" style={{ color: 'var(--color-text-muted)', opacity: 0.5 }}>
-                No article numbers. No citations. Unverifiable.
-              </p>
-            </div>
-
-            {/* tfrules card — confident, amber-bordered */}
-            <div className="card-amber rounded-xl p-7 md:p-9" style={{ background: 'var(--color-parchment)', borderColor: 'var(--color-amber)' }}>
-              <p className="text-[12px] font-medium uppercase tracking-[0.08em]" style={{ color: 'var(--color-amber)' }}>
-                tfrules
-              </p>
-              <p className="mt-5 text-[15px] leading-[1.85]" style={{ color: 'var(--color-ink)' }}>
-                UCP600 requires a transport document naming the carrier, signed by the carrier or agent,
-                indicating shipment from the port in the credit, and the sole original if issued in sets.
-              </p>
-              <p className="mt-4 text-[14px] leading-[1.85]" style={{ color: 'var(--color-text-muted)' }}>
-                What still depends on your transaction: transport mode, charter party B/L, transhipment allowance.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {['UCP600 Art. 19', 'UCP600 Art. 20', 'UCP600 Art. 19(a)'].map(c => (
-                  <span key={c} className="citation-chip">{c}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          HOW IT WORKS — AMBER FULL BLEED (the bold Mailchimp moment)
-          ═══════════════════════════════════════════════════════════ */}
-      <section id="how" className="section-amber section-padding">
-        <div className="section-container">
-          <h2 className="display-md text-center" style={{ color: 'var(--color-obsidian)' }}>
-            How it <em style={{ fontStyle: 'italic' }}>works</em>
-          </h2>
-
-          <div className="mx-auto mt-20 max-w-[900px] space-y-20">
-            {/* Step 1 */}
-            <div className="flex flex-col items-center gap-10 md:flex-row md:justify-between">
-              <div className="max-w-sm">
-                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full font-display text-lg font-bold" style={{ background: 'var(--color-obsidian)', color: 'var(--color-amber)' }}>
-                  1
-                </div>
-                <h3 className="heading-lg" style={{ color: 'var(--color-obsidian)' }}>Ask your question.</h3>
-                <p className="mt-3 text-[15px] leading-relaxed" style={{ color: 'var(--color-amber-muted)' }}>
-                  In plain language. No jargon needed.
-                  Like texting a colleague who knows every ICC publication by heart.
-                </p>
-              </div>
-              <RuxMascot pose="searching" size={160} className="flex-shrink-0" />
-            </div>
-
-            {/* Step 2 */}
-            <div className="flex flex-col-reverse items-center gap-10 md:flex-row md:justify-between">
-              <RuxMascot pose="loading" size={160} className="flex-shrink-0" />
-              <div className="max-w-sm md:text-right">
-                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full font-display text-lg font-bold" style={{ background: 'var(--color-obsidian)', color: 'var(--color-amber)' }}>
-                  2
-                </div>
-                <h3 className="heading-lg" style={{ color: 'var(--color-obsidian)' }}>Rules are retrieved.</h3>
-                <p className="mt-3 text-[15px] leading-relaxed" style={{ color: 'var(--color-amber-muted)' }}>
-                  From 4,000+ curated ICC standards, FTAs, sanctions lists, and bank profiles.
-                  Not general knowledge. Real rules.
-                </p>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="flex flex-col items-center gap-10 md:flex-row md:justify-between">
-              <div className="max-w-sm">
-                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full font-display text-lg font-bold" style={{ background: 'var(--color-obsidian)', color: 'var(--color-amber)' }}>
-                  3
-                </div>
-                <h3 className="heading-lg" style={{ color: 'var(--color-obsidian)' }}>Get a cited answer.</h3>
-                <p className="mt-3 text-[15px] leading-relaxed" style={{ color: 'var(--color-amber-muted)' }}>
-                  With exact article numbers. Show it to a bank, a customs officer, or a client.
-                  Cite the rule, not a chatbot.
-                </p>
-              </div>
-              <RuxMascot pose="found" size={160} className="flex-shrink-0" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          COVERAGE — obsidian + grain
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="section-obsidian section-dark section-padding relative">
-        <div className="section-container relative z-10">
-          <h2 className="display-md text-center">
-            4,000+ rules. <em style={{ fontStyle: 'italic', color: 'var(--color-amber)' }}>Six domains.</em>
-          </h2>
-          <div className="mx-auto mt-14 grid max-w-[960px] grid-cols-2 gap-4 md:grid-cols-3">
-            {[
-              { t: 'ICC Standards', d: 'UCP600, ISBP745, ISP98, URDG758, Incoterms\u00a02020', chips: ['UCP600', 'ISBP745'] },
-              { t: 'FTA Origin Rules', d: 'RCEP, CPTPP, USMCA, AFCFTA', chips: ['RCEP', 'CPTPP'] },
-              { t: 'Sanctions', d: 'OFAC, EU, UN, UK sanctions lists', chips: ['OFAC', 'EU'] },
-              { t: 'Customs', d: '48 countries, HS classification', chips: ['HS Code'] },
-              { t: 'Bank Profiles', d: '50 global banks, LC requirements', chips: ['LC Req.'] },
-              { t: 'SWIFT / ISO', d: 'Message standards, format rules', chips: ['MT700'] },
-            ].map(d => (
-              <div key={d.t} className="card-dark rounded-xl p-5 md:p-6">
-                <p className="font-display text-lg font-semibold" style={{ color: 'var(--color-parchment)' }}>{d.t}</p>
-                <p className="mt-2 text-[13px] leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>{d.d}</p>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {d.chips.map(c => (
-                    <span key={c} className="citation-chip">{c}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          PRICING — parchment
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="section-parchment section-padding">
-        <div className="section-container">
-          <h2 className="display-md text-center" style={{ color: 'var(--color-ink)' }}>
-            Start free. <em style={{ fontStyle: 'italic' }}>Pay when it saves you money.</em>
-          </h2>
-
-          <div className="mx-auto mt-14 grid max-w-[900px] gap-5 md:grid-cols-3">
-            {[
-              { n: 'Free', p: '$0', per: '', d: '20 queries/month', f: ['Full citations', 'No signup needed'], cta: 'Start free', ft: false },
-              { n: 'Starter', p: '$9', per: '/mo', d: '500 queries/month', f: ['Synced history', 'Saved answers', 'PDF export'], cta: 'Get started', ft: true },
-              { n: 'Pro', p: '$19', per: '/mo', d: '2,000 queries/month', f: ['Priority routing', 'API access', 'Bulk export'], cta: 'Go Pro', ft: false },
-            ].map(plan => (
-              <div
-                key={plan.n}
-                className="rounded-xl border p-6 md:p-7"
-                style={{
-                  borderColor: plan.ft ? 'var(--color-amber)' : '#E8E4DC',
-                  background: plan.ft ? '#FFFDF8' : 'transparent',
-                }}
-              >
-                <p className="text-[13px] font-medium" style={{ color: 'var(--color-text-muted)' }}>{plan.n}</p>
-                <div className="mt-2 flex items-baseline gap-1">
-                  <span className="font-display text-4xl font-semibold tracking-tight" style={{ color: 'var(--color-ink)' }}>{plan.p}</span>
-                  {plan.per && <span className="text-[14px]" style={{ color: 'var(--color-text-muted)' }}>{plan.per}</span>}
-                </div>
-                <p className="mt-1 text-[13px]" style={{ color: 'var(--color-text-muted)' }}>{plan.d}</p>
-                <ul className="mt-6 space-y-2.5">
-                  {plan.f.map(feat => (
-                    <li key={feat} className="flex items-center gap-2.5 text-[14px]" style={{ color: 'var(--color-text-muted)' }}>
-                      <Check className="h-4 w-4 shrink-0" style={{ color: 'var(--color-amber)' }} />
-                      {feat}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={plan.ft ? onOpenSignup : onOpenChat}
-                  className="mt-7 flex h-10 w-full items-center justify-center rounded-md text-[14px] font-medium transition"
-                  style={
-                    plan.ft
-                      ? { background: 'var(--color-amber)', color: 'var(--color-obsidian)' }
-                      : { border: '1px solid var(--color-ink)', color: 'var(--color-ink)' }
-                  }
-                >
-                  {plan.cta} <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                </button>
-              </div>
-            ))}
-          </div>
-          <p className="mt-6 text-center text-[13px]" style={{ color: 'var(--color-text-muted)', opacity: 0.7 }}>
-            One avoided discrepancy fee covers a year of Starter.
-          </p>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          FAQ — obsidian
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="section-obsidian section-dark section-padding relative">
-        <div className="section-container relative z-10">
-          <h2 className="display-md text-center">
-            <em style={{ fontStyle: 'italic', color: 'var(--color-amber)' }}>Questions</em>
-          </h2>
-          <div className="mx-auto mt-14 max-w-2xl divide-y" style={{ borderColor: 'var(--color-border)' }}>
-            {[
-              { q: 'Why not just ask ChatGPT?', a: 'ChatGPT gives confident answers that may be wrong. You can\u2019t tell. tfrules cites the exact rule so you can verify it yourself.' },
-              { q: 'How current are the rules?', a: 'UCP600 (2007), ISBP745 (2013), current OFAC/EU/UN sanctions lists, RCEP, CPTPP, USMCA, and 4,000+ other rulesets. Sanctions data updated regularly.' },
-              { q: 'What if you don\u2019t have the rule?', a: 'We say so clearly. We never make up a rule. If it\u2019s not in our database, we tell you and suggest where to look.' },
-              { q: 'Is this for experts only?', a: 'No. Built for daily operators\u00a0\u2014 C&F agents, freight forwarders, importers, exporters, compliance teams.' },
-              { q: 'Does this replace legal advice?', a: 'No. tfrules explains published rules. It does not provide legal advice or approve specific transactions.' },
-            ].map((f, i) => (
-              <div key={i} style={{ borderColor: 'var(--color-border)' }}>
-                <button
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="flex w-full items-center justify-between py-5 text-left"
-                >
-                  <span className="text-[15px] font-medium" style={{ color: 'var(--color-parchment)' }}>{f.q}</span>
-                  <ChevronDown
-                    className={`ml-4 h-5 w-5 shrink-0 transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}
-                    style={{ color: 'var(--color-text-secondary)' }}
-                  />
-                </button>
-                {openFaq === i && (
-                  <div className="animate-expand pb-5 text-[15px] leading-[1.8]" style={{ color: 'var(--color-text-secondary)' }}>
-                    {f.a}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          BOTTOM CTA — obsidian
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="section-obsidian relative" style={{ padding: 'var(--space-5xl) 0' }}>
-        <div className="section-container relative z-10 text-center">
-          <RuxMascot pose="found" size={96} className="mx-auto" />
-          <h2 className="heading-xl mt-8">
-            Ready to cite the rule?
-          </h2>
-          <p className="mt-4 text-[15px]" style={{ color: 'var(--color-text-secondary)' }}>
-            Free for 20 queries. No credit card. No signup.
-          </p>
-          <button onClick={onOpenChat} className="btn-primary mt-8 rounded-md px-7 py-3 text-[15px]">
-            Get started <ArrowRight className="ml-1.5 inline h-4 w-4" />
-          </button>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          FOOTER — obsidian
-          ═══════════════════════════════════════════════════════════ */}
-      <footer style={{ borderTop: '1px solid var(--color-border)', background: 'var(--color-obsidian)' }}>
-        <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-6 py-12 md:flex-row md:items-start md:justify-between">
-          <div>
-            <div className="flex items-center gap-2.5">
-              <RuxMark />
-              <span className="wordmark wordmark--on-dark text-xl">tfrules</span>
-            </div>
-            <p className="mt-2 max-w-xs text-[13px] leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
-              Citation-first trade finance answers.
+            
+            <p className="mt-8 max-w-xl text-lg md:text-2xl text-neutral-300 leading-relaxed font-light animate-fade-up" style={{ animationDelay: '200ms', animationFillMode: 'both' }}>
+              The engine for trade compliance teams, banks, and forwarders to extract verifiable answers backed by global ICC standards and jurisdictional regulations.
             </p>
-          </div>
-          <div className="flex gap-16 text-[14px]">
-            <div className="space-y-3">
-              <p className="text-[12px] font-medium uppercase tracking-[0.1em]" style={{ color: 'var(--color-text-muted)' }}>Product</p>
-              <Link to="/pricing" className="block transition-colors hover:text-[#D97706]" style={{ color: 'var(--color-text-secondary)' }}>Pricing</Link>
-              <Link to="/faq" className="block transition-colors hover:text-[#D97706]" style={{ color: 'var(--color-text-secondary)' }}>FAQ</Link>
-              <Link to="/contact" className="block transition-colors hover:text-[#D97706]" style={{ color: 'var(--color-text-secondary)' }}>Contact</Link>
-            </div>
-            <div className="space-y-3">
-              <p className="text-[12px] font-medium uppercase tracking-[0.1em]" style={{ color: 'var(--color-text-muted)' }}>Legal</p>
-              <Link to="/privacy" className="block transition-colors hover:text-[#D97706]" style={{ color: 'var(--color-text-secondary)' }}>Privacy</Link>
-              <Link to="/terms" className="block transition-colors hover:text-[#D97706]" style={{ color: 'var(--color-text-secondary)' }}>Terms</Link>
+            
+            <div className="mt-12 flex flex-col sm:flex-row gap-5 animate-fade-up" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
+              <button onClick={onOpenChat} className="flex h-14 md:h-16 items-center justify-center rounded-sm bg-[#FF4F00] px-8 md:px-10 text-base md:text-lg font-bold uppercase tracking-widest text-white transition-all hover:bg-[#E64600] active:scale-[0.98] w-full sm:w-auto shadow-2xl shadow-[#FF4F00]/20">
+                {isAuthenticated ? 'Enter Platform' : 'Start Verification'}
+              </button>
             </div>
           </div>
-          <p className="text-[12px] leading-relaxed md:text-right" style={{ color: 'var(--color-text-muted)' }}>
-            Built in Bangladesh.<br />For the world.
-          </p>
         </div>
-      </footer>
+        
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 animate-pulse-dot opacity-50 hidden md:flex flex-col items-center">
+          <div className="w-[1px] h-16 bg-gradient-to-b from-white to-transparent" />
+        </div>
+      </section>
 
+      {/* ──────────────────────────────────────────────────────────
+          COMPARISON (The Pivot) - Dark minimal section seamlessly continuing
+          ────────────────────────────────────────────────────────── */}
+      <section className="bg-[#0A0A0A] pt-24 pb-32 text-white relative z-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <FadeInView className="text-center mb-20 max-w-3xl mx-auto">
+            <h2 className="text-4xl md:text-6xl font-semibold tracking-tight leading-[1.1]">
+              A generative AI is confident.<br/><span className="text-neutral-500">Only an engine is correct.</span>
+            </h2>
+          </FadeInView>
+
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12 relative">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-full bg-gradient-to-b from-transparent via-neutral-800 to-transparent hidden md:block"></div>
+            
+            {/* Generic AI Card */}
+            <FadeInView delay={100} className="rounded-xl bg-neutral-900/30 p-10 backdrop-blur border border-white/5 opacity-60">
+              <div className="mb-8">
+                <span className="text-sm font-mono tracking-widest text-neutral-600 uppercase border border-neutral-700/50 px-3 py-1 rounded">Generic AI</span>
+              </div>
+              <p className="text-xl leading-relaxed text-neutral-400">
+                "Under UCP600, transport documents must comply with specific requirements. 
+                Banks examine documents to ensure they meet required standards..."
+              </p>
+              <div className="mt-12 flex items-center gap-3">
+                <div className="h-px bg-red-900/50 flex-grow" />
+                <span className="text-sm font-mono text-red-500 tracking-wide">NO ARTICLE // UNVERIFIABLE</span>
+              </div>
+            </FadeInView>
+
+            {/* TFRules Card */}
+            <FadeInView delay={200} className="rounded-xl bg-gradient-to-br from-neutral-900 to-[#0A0A0A] p-10 border border-white/10 shadow-[0_0_50px_rgba(255,79,0,0.03)] relative overflow-hidden group">
+              <div className="absolute inset-0 bg-[#FF4F00] opacity-0 group-hover:opacity-[0.02] transition-opacity duration-1000" />
+              
+              <div className="mb-8 flex items-center justify-between">
+                <span className="text-sm font-mono tracking-widest text-white uppercase border border-white/20 bg-white/5 px-3 py-1 rounded flex items-center gap-2">
+                  TFRules Engine
+                </span>
+                <Check className="h-6 w-6 text-[#FF4F00]" />
+              </div>
+              <p className="text-xl leading-relaxed text-white font-light">
+                "UCP600 requires a transport document naming the carrier, signed by the carrier or agent, 
+                indicating shipment from the port in the credit, and the sole original if issued in sets."
+              </p>
+              <div className="mt-8 flex flex-wrap gap-2">
+                <span className="inline-flex items-center rounded bg-[#FF4F00]/10 px-3 py-1.5 font-mono text-xs text-[#FF4F00] border border-[#FF4F00]/20 tracking-wider">UCP600 Art. 19</span>
+                <span className="inline-flex items-center rounded bg-[#FF4F00]/10 px-3 py-1.5 font-mono text-xs text-[#FF4F00] border border-[#FF4F00]/20 tracking-wider">UCP600 Art. 20</span>
+              </div>
+              <div className="mt-8 flex items-center gap-3">
+                <div className="h-px bg-[#FF4F00]/30 flex-grow" />
+                <span className="text-sm font-mono text-[#FF4F00] tracking-wide">EXACT CITATION // DISPUTE READY</span>
+              </div>
+            </FadeInView>
+          </div>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────
+          HOW IT WORKS (Narrative Scroll Flow)
+          ────────────────────────────────────────────────────────── */}
+      <section id="how" className="py-32 bg-white relative">
+        <div className="mx-auto max-w-6xl px-6 relative">
+          
+          <FadeInView className="mb-24">
+            <h2 className="text-5xl font-semibold tracking-tight text-neutral-900 border-l-4 border-[#FF4F00] pl-6 py-2">System <br/>Architecture.</h2>
+          </FadeInView>
+
+          <div className="space-y-32">
+            <FadeInView delay={0} className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <span className="text-[#FF4F00] font-mono tracking-widest text-lg md:text-xl block mb-4">PHASE 01</span>
+                <h3 className="text-3xl md:text-4xl font-semibold text-neutral-900 mb-6 leading-tight">Query injection.</h3>
+                <p className="text-lg text-neutral-500 leading-relaxed font-light">
+                  Describe your complex scenario in plain language. You do not need to construct boolean searches or memorize precise jargon. Just ask the question.
+                </p>
+              </div>
+              <div className="bg-neutral-100 rounded-lg aspect-video flex flex-col justify-center p-12 border border-neutral-200">
+                <div className="bg-white p-4 font-mono text-sm border-l-2 border-neutral-300 shadow-sm text-neutral-600">
+                  <span className="text-[#FF4F00]">]</span> What documents are required for a CIF shipment under UCP600?
+                </div>
+              </div>
+            </FadeInView>
+            
+            <FadeInView delay={100} className="grid md:grid-cols-2 gap-12 items-center md:flex-row-reverse">
+              <div className="md:order-2">
+                <span className="text-[#FF4F00] font-mono tracking-widest text-lg md:text-xl block mb-4">PHASE 02</span>
+                <h3 className="text-3xl md:text-4xl font-semibold text-neutral-900 mb-6 leading-tight">Deep indexing.</h3>
+                <p className="text-lg text-neutral-500 leading-relaxed font-light">
+                  The engine bypasses opinion models entirely, scanning a unified topological graph of curated ICC standards, FTAs, sanctions lists, and the regulatory frameworks of over 48 global jurisdictions.
+                </p>
+              </div>
+              <div className="bg-neutral-900 rounded-lg aspect-video flex flex-col justify-center p-8 md:order-1 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)] bg-[size:24px_24px] opacity-20" />
+                <div className="flex flex-col gap-3 relative z-10 font-mono text-xs text-neutral-500">
+                  <div className="flex gap-4"><span className="text-emerald-500">✔</span> MATCH_FOUND [UCP600] Art. 19</div>
+                  <div className="flex gap-4 opacity-50"><span className="text-neutral-600">⚠</span> SCANNING [ISBP745] Block 4</div>
+                  <div className="flex gap-4"><span className="text-emerald-500">✔</span> MATCH_FOUND [INCOTERMS_2020] CIF</div>
+                </div>
+              </div>
+            </FadeInView>
+
+            <FadeInView delay={100} className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <span className="text-[#FF4F00] font-mono tracking-widest text-lg md:text-xl block mb-4">PHASE 03</span>
+                <h3 className="text-3xl md:text-4xl font-semibold text-neutral-900 mb-6 leading-tight">Absolute verification.</h3>
+                <p className="text-lg text-neutral-500 leading-relaxed font-light">
+                  Output is constructed with strict adherence to the retrieved rules. Every factual claim is bound directly to the source text. Show it to banks or clients with absolute confidence.
+                </p>
+              </div>
+              <div className="bg-[#FF4F00]/5 rounded-lg aspect-video flex flex-col justify-center p-12 border border-[#FF4F00]/20">
+                <div className="bg-white p-6 shadow-xl border border-neutral-100 flex flex-col gap-4">
+                  <div className="h-2 bg-neutral-200 rounded w-3/4" />
+                  <div className="h-2 bg-neutral-200 rounded w-full" />
+                  <div className="h-2 bg-neutral-200 rounded w-5/6" />
+                  <div className="flex gap-2 mt-2">
+                    <span className="h-4 w-16 bg-[#FF4F00] rounded-sm" />
+                    <span className="h-4 w-20 bg-[#FF4F00] rounded-sm opacity-50" />
+                  </div>
+                </div>
+              </div>
+            </FadeInView>
+          </div>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────
+          COVERAGE (Clean Icon List - Monochrome style)
+          ────────────────────────────────────────────────────────── */}
+      <section className="py-32 bg-neutral-50 border-t border-neutral-200">
+        <div className="mx-auto max-w-6xl px-6">
+          <FadeInView className="flex flex-col md:flex-row gap-16 md:gap-24">
+            <div className="md:w-1/3">
+              <h2 className="text-4xl font-semibold tracking-tight text-neutral-900 mb-6 leading-tight">Global scope.<br/> Singular graph.</h2>
+              <p className="text-lg text-neutral-500 leading-relaxed font-light">
+                TFRules unifies the fragmented landscape of global trade finance regulations into an instantly searchable format.
+              </p>
+            </div>
+            
+            <div className="md:w-2/3 grid sm:grid-cols-2 gap-x-12 gap-y-16">
+              {[
+                { i: BookOpen, t: 'ICC Standards', d: 'UCP600, ISBP745, ISP98, URDG758, Incoterms 2020' },
+                { i: Globe, t: 'FTA Origin', d: 'RCEP, CPTPP, USMCA, AFCFTA' },
+                { i: FileText, t: 'Jurisdictional Rules', d: '48 country central bank & customs frameworks' },
+                { i: Shield, t: 'Sanctions Data', d: 'OFAC, EU, UN, vessel screening' },
+                { i: Database, t: 'Bank Profiles', d: '50+ global bank LC execution standards' },
+                { i: Clock, t: 'SWIFT / ISO', d: 'Message standards and MT/MX formats' },
+                { i: Box, t: 'Commodities', d: 'Compliance for Timber, Pharma, Petro, Agri' },
+                { i: Scale, t: 'DOCDEX Findings', d: 'Pre-analyzed official ICC legal opinions' },
+              ].map((item, idx) => {
+                const Icon = item.i
+                return (
+                  <div key={idx} className="flex gap-5 group">
+                    <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-neutral-200 text-neutral-600 transition group-hover:bg-[#FF4F00] group-hover:text-white">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-semibold text-neutral-900">{item.t}</h4>
+                      <p className="mt-2 text-sm text-neutral-500 leading-relaxed">{item.d}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </FadeInView>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────
+          PRICING
+          ────────────────────────────────────────────────────────── */}
+      <section className="py-32 bg-white">
+        <div className="mx-auto max-w-6xl px-6">
+          <FadeInView className="text-center mb-24">
+            <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900">Procurement.</h2>
+            <p className="mt-6 text-lg text-neutral-500 font-light max-w-2xl mx-auto">Deploy the engine today. No complex enterprise sales process required to start verifying rules.</p>
+          </FadeInView>
+
+          <FadeInView delay={200} className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Free */}
+            <div className="bg-white p-10 border border-neutral-200 shadow-sm flex flex-col justify-between group hover:border-neutral-300 transition-colors">
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-[#FF4F00]">Trial Range</h3>
+                <div className="mt-6 mb-2">
+                  <span className="text-5xl font-semibold tracking-tight text-neutral-900">$0</span>
+                </div>
+                <p className="text-sm text-neutral-500 border-b border-neutral-100 pb-8 uppercase font-mono tracking-wide">20 queries / mo</p>
+                <ul className="mt-8 space-y-5 text-[15px] text-neutral-600">
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-neutral-300 shrink-0" /> Full citation access</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-neutral-300 shrink-0" /> Fast response time</li>
+                </ul>
+              </div>
+              <button onClick={onOpenChat} className="mt-12 w-full border border-neutral-200 py-4 font-semibold text-neutral-900 uppercase tracking-wider text-sm transition hover:bg-neutral-50">
+                Begin
+              </button>
+            </div>
+
+            {/* Starter */}
+            <div className="bg-neutral-900 p-10 border border-neutral-800 shadow-2xl relative md:-mt-4 md:mb-4 flex flex-col justify-between transform transition-transform hover:-translate-y-2">
+              <div>
+                <div className="absolute top-0 right-10 -translate-y-1/2 bg-[#FF4F00] text-white px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-lg">Standard</div>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400">Professional</h3>
+                <div className="mt-6 mb-2">
+                  <span className="text-5xl font-semibold tracking-tight text-white">$9</span><span className="text-neutral-500 font-medium">/mo</span>
+                </div>
+                <p className="text-sm text-neutral-400 border-b border-neutral-800 pb-8 uppercase font-mono tracking-wide">500 queries / mo</p>
+                <ul className="mt-8 space-y-5 text-[15px] text-neutral-300">
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Synced history DB</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Saved answer vault</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> PDF export format</li>
+                </ul>
+              </div>
+              <button onClick={onOpenSignup} className="mt-12 w-full bg-[#FF4F00] py-4 font-bold text-white uppercase tracking-wider text-sm transition hover:bg-[#E64600] shadow-lg shadow-[#FF4F00]/20">
+                Initialize
+              </button>
+            </div>
+
+            {/* Pro */}
+            <div className="bg-white p-10 border border-neutral-200 shadow-sm flex flex-col justify-between group hover:border-neutral-300 transition-colors">
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400">Enterprise</h3>
+                <div className="mt-6 mb-2">
+                  <span className="text-5xl font-semibold tracking-tight text-neutral-900">$19</span><span className="text-neutral-400 font-medium">/mo</span>
+                </div>
+                <p className="text-sm text-neutral-500 border-b border-neutral-100 pb-8 uppercase font-mono tracking-wide">2,000 queries / mo</p>
+                <ul className="mt-8 space-y-5 text-[15px] text-neutral-600">
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Priority routing</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> API access token</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Bulk data export</li>
+                </ul>
+              </div>
+              <button onClick={onOpenSignup} className="mt-12 w-full border border-neutral-200 py-4 font-semibold text-neutral-900 uppercase tracking-wider text-sm transition hover:bg-neutral-50">
+                Upgrade
+              </button>
+            </div>
+          </FadeInView>
+          <FadeInView delay={400}>
+            <p className="mt-16 text-center text-sm font-medium tracking-wide text-neutral-400 uppercase">One avoided discrepancy fee covers a year of Professional tier.</p>
+          </FadeInView>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────
+          BOTTOM CTA
+          ────────────────────────────────────────────────────────── */}
+      <section className="py-32 bg-[#FF4F00] text-center px-6">
+        <FadeInView>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-8">Deploy the Engine.</h2>
+          <button onClick={onOpenChat} className="inline-flex items-center justify-center bg-white px-10 py-5 text-xl font-bold text-[#FF4F00] uppercase tracking-widest transition hover:bg-neutral-100 hover:scale-105 active:scale-95 shadow-2xl">
+            Start Verification <ArrowRight className="ml-3 h-5 w-5" />
+          </button>
+        </FadeInView>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────
+          FOOTER
+          ────────────────────────────────────────────────────────── */}
+      <PublicFooter />
     </div>
   )
 }

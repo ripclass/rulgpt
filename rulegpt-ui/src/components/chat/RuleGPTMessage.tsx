@@ -5,6 +5,7 @@ import { DomainTag } from '@/components/chat/DomainTag'
 import { MessageActions } from '@/components/chat/MessageActions'
 import { TRDRHubCTA } from '@/components/conversion/TRDRHubCTA'
 import type { Citation, Message } from '@/types'
+import { RuxMark } from '@/components/shared/RuxMascot'
 
 interface RuleGPTMessageProps {
   message: Message
@@ -15,22 +16,18 @@ interface RuleGPTMessageProps {
 
 export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: RuleGPTMessageProps) {
   return (
-    <div className="flex justify-start">
-      <article
-        className="group w-full rounded-lg rounded-bl-sm px-5 py-5 text-sm"
-        style={{
-          background: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-          fontFamily: 'var(--font-body)',
-        }}
-      >
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <p
-            className="text-xs"
-            style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-amber)' }}
-          >
-            tfrules
-          </p>
+    <div className="flex justify-start mb-6">
+      <article className="group relative w-full rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#1A1A1A] px-6 py-6 shadow-sm transition-colors">
+        {/* Minimal left accent line for system messages */}
+        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#FF4F00] rounded-l-sm" />
+
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-4 border-b border-neutral-100 dark:border-white/5 pb-4 transition-colors">
+          <div className="flex items-center gap-2">
+            <RuxMark className="h-4 w-4" />
+            <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">
+              tfrules
+            </p>
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             {message.confidence ? <ConfidenceBadge confidence={message.confidence} /> : null}
             {message.domainTags?.map((domain) => (
@@ -40,62 +37,66 @@ export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: Ru
         </div>
 
         <div className="pt-2">
-          <p
-            className="whitespace-pre-wrap leading-relaxed"
-            style={{ color: 'var(--color-parchment)' }}
-          >
+          <p className="whitespace-pre-wrap leading-relaxed text-[15px] text-neutral-900 dark:text-neutral-100">
             {message.text}
           </p>
         </div>
 
         {message.citations && message.citations.length > 0 ? (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {message.citations.map((citation) => (
-              <CitationChip
-                key={`${citation.rule_id}-${citation.reference}`}
-                citation={citation}
-                onClick={onCitationClick}
-              />
-            ))}
+          <div className="mt-6 border-t border-neutral-100 dark:border-white/5 pt-5 transition-colors">
+            <p className="mb-3 text-[11px] font-semibold tracking-wider text-neutral-500 uppercase">Referenced Articles</p>
+            <div className="flex flex-wrap gap-2">
+              {message.citations.map((citation) => (
+                <CitationChip
+                  key={`${citation.rule_id}-${citation.reference}`}
+                  citation={citation}
+                  onClick={onCitationClick}
+                />
+              ))}
+            </div>
           </div>
         ) : null}
 
         {message.suggestedFollowups && message.suggestedFollowups.length > 0 ? (
-          <ul
-            className="mt-4 list-disc space-y-1 pl-5 text-sm leading-6"
-            style={{ color: 'var(--color-text-secondary)' }}
-          >
-            {message.suggestedFollowups.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
+          <div className="mt-6 border-t border-neutral-100 dark:border-white/5 pt-5 transition-colors">
+            <p className="mb-3 text-[11px] font-semibold tracking-wider text-neutral-500 uppercase">Suggested Topics</p>
+            <ul className="list-disc space-y-2 pl-5 text-[14px] leading-6 text-neutral-600 dark:text-neutral-400">
+              {message.suggestedFollowups.map((item) => (
+                <li key={item} className="hover:text-neutral-900 dark:hover:text-white transition-colors cursor-pointer">{item}</li>
+              ))}
+            </ul>
+          </div>
         ) : null}
 
-        <MessageActions
-          canSave={canSave}
-          onCopy={() => {
-            void navigator.clipboard.writeText(message.text)
-            toast.success('Answer copied.')
-          }}
-          onSave={() => {
-            if (message.queryId) {
-              onSave(message.queryId)
-              return
-            }
-            toast.error('Save unavailable for this message.')
-          }}
-        />
+        <div className="mt-6 border-t border-neutral-100 dark:border-white/5 pt-4 flex items-center justify-between transition-colors">
+          <div className="text-[10px] font-semibold tracking-wider text-neutral-400 dark:text-neutral-500 uppercase">
+            {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </div>
+          <MessageActions
+            canSave={canSave}
+            onCopy={() => {
+              void navigator.clipboard.writeText(message.text)
+              toast.success('Answer copied to clipboard.')
+            }}
+            onSave={() => {
+              if (message.queryId) {
+                onSave(message.queryId)
+                return
+              }
+              toast.error('Save unavailable for this message.')
+            }}
+          />
+        </div>
 
         {message.showTRDRCTA ? (
-          <TRDRHubCTA text={message.trdrCtaText} url={message.trdrCtaUrl} />
+          <div className="mt-6">
+            <TRDRHubCTA text={message.trdrCtaText} url={message.trdrCtaUrl} />
+          </div>
         ) : null}
 
         {message.disclaimer ? (
-          <p
-            className="mt-4 text-xs italic"
-            style={{ color: 'var(--color-text-muted)' }}
-          >
-            {message.disclaimer}
+          <p className="mt-4 text-[11px] font-medium text-neutral-500 dark:text-neutral-600 uppercase tracking-wide">
+            * {message.disclaimer}
           </p>
         ) : null}
       </article>

@@ -24,9 +24,11 @@ function RouteTracker() {
   return null
 }
 
+import { ThemeProvider } from '@/contexts/ThemeContext'
+
 export default function App() {
   return (
-    <>
+    <ThemeProvider defaultTheme="light" storageKey="tfrules-theme">
       <RouteTracker />
       <Routes>
         <Route path="/" element={<Landing />} />
@@ -41,6 +43,6 @@ export default function App() {
         <Route path="/api-access" element={<ApiAccess />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </>
+    </ThemeProvider>
   )
 }

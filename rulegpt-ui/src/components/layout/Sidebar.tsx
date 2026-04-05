@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
-import { Plus, LogOut } from 'lucide-react'
+import { Plus, LogOut, Sun, Moon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { QueryHistory } from '@/components/shared/QueryHistory'
 import { SavedAnswers } from '@/components/shared/SavedAnswers'
 import { FreeTierCounter } from '@/components/shared/FreeTierCounter'
-import { UpgradeCTA } from '@/components/conversion/UpgradeCTA'
 import { RuxMark } from '@/components/shared/RuxMascot'
+import { useTheme } from '@/contexts/ThemeContext'
 import type { HistoryItem, SavedAnswer, SessionTier } from '@/types'
 
 interface SidebarProps {
@@ -56,123 +56,120 @@ export function Sidebar({
   onOpenSignup,
   onLogout,
 }: SidebarProps) {
+  const { theme, setTheme } = useTheme()
+  const isDark = theme === 'dark'
+
   return (
-    <aside
-      className="hidden h-screen w-64 shrink-0 px-4 py-5 md:flex md:flex-col"
-      style={{ background: 'var(--color-surface)', borderRight: '1px solid var(--color-border)' }}
-    >
-      <div className="pb-4" style={{ borderBottom: '1px solid var(--color-border)' }}>
-        <div className="flex items-center gap-2">
-          <RuxMark />
-          <span className="wordmark wordmark--on-dark text-lg">tfrules</span>
-        </div>
-        <p className="mt-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>Trade rules, cited.</p>
-      </div>
+    <aside className="hidden h-[100dvh] sticky top-0 w-64 shrink-0 px-4 py-5 md:flex md:flex-col bg-white dark:bg-[#0A0A0A] border-r border-neutral-200 dark:border-white/10 transition-colors">
+      <Link to="/" className="pb-5 border-b border-neutral-100 dark:border-white/5 flex items-center gap-3 hover:opacity-80 transition-opacity">
+        <RuxMark className="w-6 h-6 border-none" />
+        <span className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white mt-0.5">tfrules</span>
+      </Link>
 
       <button
-        className="btn-primary mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-md text-sm font-medium"
+        className="mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-sm bg-[#FF4F00] text-[13px] font-bold uppercase tracking-widest text-white transition hover:bg-[#E64600] shadow-md shadow-[#FF4F00]/20"
         onClick={onNewQuery}
       >
         <Plus className="h-4 w-4" /> New chat
       </button>
 
       {tier === 'anonymous' ? (
-        <div className="mt-4">
+        <div className="mt-5 border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-[#141414] rounded-sm p-3">
           <FreeTierCounter usedCount={usedCount} remaining={remaining} limitValue={limitValue} />
         </div>
       ) : null}
 
-      <div className="mt-4 space-y-1">
-        <p className="mb-2 text-xs uppercase tracking-wide" style={{ color: 'var(--color-text-muted)' }}>Quick categories</p>
-        {quickCategories.map((category) => (
-          <button
-            key={category}
-            type="button"
-            disabled={previewMode}
-            className="w-full rounded-md px-3 py-2 text-left text-xs transition disabled:cursor-not-allowed disabled:opacity-50"
-            style={{
-              color: activeQuickCategory === category ? 'var(--color-amber)' : 'var(--color-text-secondary)',
-              background: activeQuickCategory === category ? 'var(--color-amber-muted)' : 'transparent',
-            }}
-            onMouseEnter={(e) => {
-              if (activeQuickCategory !== category) {
-                e.currentTarget.style.background = 'var(--color-surface-raised)'
-                e.currentTarget.style.color = 'var(--color-parchment)'
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeQuickCategory !== category) {
-                e.currentTarget.style.background = 'transparent'
-                e.currentTarget.style.color = 'var(--color-text-secondary)'
-              }
-            }}
-            onClick={() => onQuickCategory(category)}
-          >
-            {category}
-          </button>
-        ))}
+      <div className="mt-6 space-y-1">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">Quick queries</p>
+        {quickCategories.map((category) => {
+          const isActive = activeQuickCategory === category
+          return (
+            <button
+              key={category}
+              type="button"
+              disabled={previewMode}
+              className={`w-full px-3 py-2 text-left text-[13px] font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50 rounded-sm ${
+                isActive 
+                  ? 'text-[#FF4F00] bg-[#FF4F00]/10 dark:bg-[#FF4F00]/20' 
+                  : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/5'
+              }`}
+              onClick={() => onQuickCategory(category)}
+            >
+              {category}
+            </button>
+          )
+        })}
       </div>
 
-      <div className="mt-5 min-h-0 flex-1 overflow-y-auto pr-1">
-        <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: 'var(--color-text-muted)' }}>History</p>
-        <QueryHistory items={history} onPick={onPickHistory} disabled={previewMode} />
-        <p className="mb-2 mt-5 font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: 'var(--color-text-muted)' }}>Saved</p>
-        <SavedAnswers items={savedAnswers} onDelete={onDeleteSaved} />
+      <div className="mt-8 flex-1 overflow-y-auto pr-1 flex flex-col gap-8 custom-scrollbar">
+        <div>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">Session History</p>
+          <QueryHistory items={history} onPick={onPickHistory} disabled={previewMode} />
+        </div>
+        
+        {savedAnswers.length > 0 && (
+          <div>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">Saved Vault</p>
+            <SavedAnswers items={savedAnswers} onDelete={onDeleteSaved} />
+          </div>
+        )}
       </div>
 
-      <div className="mt-4 space-y-3 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
-        <UpgradeCTA tier={tier} />
+      <div className="mt-6 space-y-4 pt-5 border-t border-neutral-200 dark:border-white/10">
         {isAuthenticated ? (
           <>
-            <div
-              className="rounded-lg px-3 py-3"
-              style={{ background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)' }}
-            >
-              <p className="text-[11px] uppercase tracking-[0.14em]" style={{ color: 'var(--color-text-muted)' }}>Account</p>
-              <p className="mt-2 truncate text-sm font-medium" style={{ color: 'var(--color-parchment)' }}>
-                {userEmail ?? 'Signed in'}
+            <div className="rounded-sm bg-neutral-50 dark:bg-[#141414] border border-neutral-200 dark:border-white/10 px-3 py-3">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">Account</p>
+              <p className="mt-1 truncate text-xs font-medium text-neutral-900 dark:text-neutral-200">
+                {userEmail ?? 'Authenticated'}
               </p>
-              <div className="mt-2 flex items-center gap-2">
-                <span
-                  className="rounded-full px-2 py-1 text-[11px] font-medium"
-                  style={{
-                    color: tier === 'pro' || tier === 'starter' ? 'var(--color-amber)' : 'var(--color-text-secondary)',
-                    background: tier === 'pro' || tier === 'starter' ? 'var(--color-amber-muted)' : 'transparent',
-                    border: '1px solid var(--color-border)',
-                  }}
-                >
-                  {tier.toUpperCase()}
+              <div className="mt-3 flex items-center justify-between">
+                <span className={`inline-block px-2 py-0.5 text-[10px] uppercase font-bold tracking-widest rounded-sm ${
+                  tier === 'pro' || tier === 'starter' 
+                    ? 'bg-[#FF4F00]/10 text-[#FF4F00]' 
+                    : 'bg-neutral-200 dark:bg-white/10 text-neutral-600 dark:text-neutral-300'
+                }`}>
+                  {tier} tier
                 </span>
               </div>
             </div>
             <Button
               variant="ghost"
-              className="w-full justify-start"
-              style={{ color: 'var(--color-text-secondary)' }}
+              className="w-full justify-start text-xs font-semibold text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white dark:hover:bg-white/5 transition"
               onClick={onLogout}
             >
-              <LogOut className="mr-2 h-4 w-4" /> Logout
+              <LogOut className="mr-3 h-4 w-4" /> Sign out
             </Button>
           </>
         ) : (
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2.5">
             <button
-              className="btn-secondary w-full rounded-md py-2 text-sm"
+              className="w-full rounded-sm border-[1.5px] border-neutral-200 dark:border-white/10 bg-white dark:bg-[#0A0A0A] py-2.5 text-xs font-bold text-neutral-600 dark:text-neutral-300 transition hover:bg-neutral-50 dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-white"
               onClick={onOpenLogin}
             >
               Sign in
             </button>
             <button
-              className="btn-primary w-full rounded-md py-2 text-sm"
+              className="w-full rounded-sm bg-[#FF4F00] py-2.5 text-xs font-bold text-white transition hover:bg-[#E64600] shadow-md shadow-[#FF4F00]/20"
               onClick={onOpenSignup}
             >
               Sign up
             </button>
           </div>
         )}
-        <Button asChild variant="ghost" className="w-full justify-start text-xs" style={{ color: 'var(--color-text-muted)' }}>
-          <Link to="/api-access">API access</Link>
-        </Button>
+        
+        <div className="flex items-center justify-between pt-2">
+          <Button asChild variant="ghost" className="justify-start text-xs font-medium text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 dark:hover:bg-white/5 transition px-2">
+            <Link to="/api-access">API Access</Link>
+          </Button>
+          <button
+            onClick={() => setTheme(isDark ? 'light' : 'dark')}
+            className="p-2 text-neutral-400 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-white transition-colors"
+            title="Toggle theme"
+          >
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
     </aside>
   )

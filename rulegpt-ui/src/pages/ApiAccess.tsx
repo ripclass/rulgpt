@@ -29,30 +29,21 @@ export function ApiAccess() {
   })
 
   return (
-    <main
-      className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center px-4 py-10"
-      style={{ background: 'var(--color-obsidian)', fontFamily: 'var(--font-body)' }}
-    >
-      <div className="card-dark rounded-2xl p-6 md:p-8">
-        <p className="text-sm uppercase tracking-wide" style={{ color: 'var(--color-amber)' }}>API Access</p>
-        <h1 className="heading-lg mt-2" style={{ color: 'var(--color-parchment)' }}>Programmatic tfrules queries</h1>
-        <p className="mt-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+    <main className="mx-auto flex min-h-screen w-full flex-col justify-center px-4 py-10 bg-[#FAFAFA] dark:bg-[#050505] transition-colors">
+      <div className="mx-auto w-full max-w-3xl rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#0A0A0A] p-8 md:p-12 shadow-sm">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF4F00]">API Access</p>
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">Programmatic tfrules queries</h1>
+        <p className="mt-2 text-[13px] font-medium text-neutral-600 dark:text-neutral-400">
           Endpoint:{' '}
-          <code
-            className="rounded px-1 py-0.5"
-            style={{ fontFamily: 'var(--font-mono)', background: 'var(--color-surface-raised)', color: 'var(--color-amber)' }}
-          >
+          <code className="rounded-sm bg-neutral-100 dark:bg-white/5 px-1.5 py-0.5 font-mono text-[#FF4F00]">
             POST /api/v1/query
           </code>
         </p>
-        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+        <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
           Auth and API key issuance are backend placeholders today. This page validates usage endpoint readiness.
         </p>
 
-        <div
-          className="mt-4 rounded-lg p-3 text-sm"
-          style={{ background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }}
-        >
+        <div className="mt-8 rounded-sm border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-[#121212] p-4 text-[13px] font-medium text-neutral-600 dark:text-neutral-400">
           {auth.tier !== 'pro' ? (
             <p>Upgrade to Pro to unlock API usage metrics.</p>
           ) : usage.isLoading ? (
@@ -66,7 +57,7 @@ export function ApiAccess() {
           )}
         </div>
 
-        <Link to="/chat" className="btn-secondary mt-5 inline-block rounded-md px-5 py-2 text-sm">
+        <Link to="/chat" className="mt-8 inline-flex h-11 items-center justify-center rounded-sm bg-neutral-100 dark:bg-white/5 px-6 text-xs font-bold uppercase tracking-widest text-neutral-900 dark:text-white transition hover:bg-neutral-200 dark:hover:bg-white/10">
           Back to chat
         </Link>
       </div>

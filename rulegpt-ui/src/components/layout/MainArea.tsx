@@ -1,10 +1,9 @@
 import { AlertTriangle } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { ChatThread } from '@/components/chat/ChatThread'
 import { QueryInput } from '@/components/input/QueryInput'
 import { SuggestedQueries } from '@/components/input/SuggestedQueries'
-import { RuxMascot } from '@/components/shared/RuxMascot'
 import type { Citation, Message } from '@/types'
+import { RuxMark } from '@/components/shared/RuxMascot'
 
 interface MainAreaProps {
   messages: Message[]
@@ -14,6 +13,10 @@ interface MainAreaProps {
   canSave: boolean
   activeQuickCategory?: string | null
   previewMode?: boolean
+  reachedLimit?: boolean
+  isAuthenticated?: boolean
+  onOpenSignup?: () => void
+  onUpgrade?: () => void
   onSubmitQuery: (query: string) => Promise<void>
   onPickSuggestion: (value: string) => void
   onCitationClick: (citation: Citation) => void
@@ -29,6 +32,10 @@ export function MainArea({
   canSave,
   activeQuickCategory,
   previewMode,
+  reachedLimit,
+  isAuthenticated,
+  onOpenSignup,
+  onUpgrade,
   onSubmitQuery,
   onPickSuggestion,
   onCitationClick,
@@ -41,104 +48,78 @@ export function MainArea({
     : 'Ask about any trade finance rule...'
 
   return (
-    <main
-      className="flex min-h-screen flex-1 flex-col pb-28 md:pb-0"
-      style={{ background: 'var(--color-obsidian)' }}
-    >
-      <header
-        className="px-4 py-4 md:px-8"
-        style={{ borderBottom: '1px solid var(--color-border)', background: 'rgba(17,17,17,0.9)', backdropFilter: 'blur(8px)' }}
-      >
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <div>
-              <span className="wordmark wordmark--on-dark text-lg">tfrules</span>
-              <p className="mt-1 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                {previewMode ? 'Preview workspace' : 'Cited trade finance answers'}
-              </p>
-            </div>
-            <span
-              className="rounded-full px-2.5 py-0.5 text-xs font-medium"
-              style={
-                previewMode
-                  ? { background: 'var(--color-amber-muted)', color: 'var(--color-amber)', border: '1px solid var(--color-amber-muted)' }
-                  : { background: 'rgba(16,185,129,0.1)', color: 'var(--color-confidence-high)', border: '1px solid rgba(16,185,129,0.3)' }
-              }
-            >
-              {previewMode ? 'Preview' : 'Live'}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Link
-              to="/"
-              className="rounded-md px-3 py-2 text-xs transition"
-              style={{ border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)', background: 'var(--color-surface-raised)' }}
-            >
-              Public site
-            </Link>
-
-            {!isEmpty && onNewQuery ? (
-              <button
-                type="button"
-                onClick={onNewQuery}
-                className="rounded-md px-3 py-2 text-xs transition"
-                style={{ border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)', background: 'var(--color-surface-raised)' }}
-              >
-                New chat
-              </button>
-            ) : null}
-          </div>
-        </div>
-      </header>
+    <main className="flex min-h-[100dvh] flex-1 flex-col pb-28 md:pb-0 bg-[#FAFAFA] dark:bg-[#171717] selection:bg-[#FF4F00] selection:text-white relative transition-colors">
+      {/* Subtle Environment Status Badge */}
+      <div className="absolute top-6 right-8 hidden md:flex items-center gap-2 z-[50]">
+        <div className={`w-1.5 h-1.5 rounded-full ${previewMode ? 'bg-neutral-400' : 'bg-[#FF4F00] animate-pulse'}`} />
+        <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
+          {previewMode ? 'Preview Node' : 'Live Engine'}
+        </span>
+      </div>
 
       {isEmpty ? (
-        <section className="flex flex-1 items-center justify-center px-4 py-10 md:px-8">
-          <div className="mx-auto flex w-full max-w-3xl flex-col items-center">
+        <section className="flex flex-1 flex-col items-center justify-center px-4 py-10 md:px-8 relative z-10">
+          <div className="mx-auto flex w-full max-w-3xl flex-col items-center mb-16">
             {error ? (
-              <div
-                className="mb-6 flex w-full items-center gap-2 rounded-lg px-4 py-3 text-sm"
-                style={{ border: '1px solid rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.1)', color: 'var(--color-error)' }}
-              >
-                <AlertTriangle className="h-4 w-4" /> {error}
+              <div className="mb-8 flex w-full items-center gap-3 rounded-sm border border-red-500/20 bg-red-50 py-4 px-5 text-sm font-medium text-red-600">
+                <AlertTriangle className="h-4 w-4 shrink-0" /> {error}
               </div>
             ) : null}
 
             <div className="flex w-full flex-col items-center text-center">
-              <RuxMascot pose="searching" size={64} />
-              <h2 className="heading-lg mt-6" style={{ color: 'var(--color-parchment)' }}>
-                Ask about any trade finance rule.
+              <RuxMark className="h-12 w-12 mb-6 shadow-sm rounded-sm" />
+              <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
+                Verify any rule.
               </h2>
-              <p className="mx-auto mt-3 max-w-xl text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                UCP600 &middot; ISBP745 &middot; Incoterms &middot; Sanctions &middot; FTAs &middot; Customs &middot; Bank requirements
+              <p className="mt-4 max-w-xl text-lg font-light text-neutral-500 leading-relaxed">
+                Connect directly into the trade finance consensus. The engine parses UCP600, ISBP745, Incoterms, global sanctions, and FTAs in real-time.
               </p>
             </div>
-
-            <div className="mt-10 w-full">
+            
+            <div className="mt-12 w-full">
               <QueryInput
                 layout="centered"
-                disabled={isLoading}
-                placeholder={placeholder}
+                disabled={isLoading || reachedLimit}
+                placeholder={reachedLimit ? 'Limit reached' : placeholder}
                 previewMode={previewMode}
                 onSubmit={onSubmitQuery}
               />
             </div>
 
-            <div className="mt-6 w-full">
-              <SuggestedQueries suggestions={suggestions} onPick={onPickSuggestion} />
+            <div className="mt-12 w-full">
+              {reachedLimit ? (
+                <div className="relative w-full rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#1A1A1A] px-6 py-6 shadow-sm transition-colors group">
+                  <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#FF4F00] rounded-l-sm" />
+                  <div className="mb-4 flex items-center gap-2 border-b border-neutral-100 dark:border-white/5 pb-4">
+                    <span className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">System Notification</span>
+                  </div>
+                  <p className="whitespace-pre-wrap leading-relaxed text-[15px] text-neutral-900 dark:text-neutral-100 mb-6">
+                    You have exhausted your free query limit. Register for unlimited queries, or upgrade to Pro for API access.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-3">
+                    {isAuthenticated ? null : (
+                      <button onClick={onOpenSignup} className="rounded-sm border border-neutral-200 dark:border-white/10 px-4 py-2.5 text-xs font-bold text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/5 transition">
+                        Create free account
+                      </button>
+                    )}
+                    <button onClick={onUpgrade} className="rounded-sm bg-[#FF4F00] px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-white shadow-md shadow-[#FF4F00]/20 transition hover:bg-[#E64600]">
+                      Upgrade to Pro
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <SuggestedQueries suggestions={suggestions} onPick={onPickSuggestion} />
+              )}
             </div>
           </div>
         </section>
       ) : (
         <>
-          <section className="flex-1 overflow-y-auto px-4 py-6 md:px-8 md:py-8">
-            <div className="mx-auto max-w-[780px] space-y-6">
+          <section className="flex-1 overflow-y-auto px-4 py-8 md:px-8 relative z-10">
+            <div className="mx-auto max-w-4xl space-y-6">
               {error ? (
-                <div
-                  className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm"
-                  style={{ border: '1px solid rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.1)', color: 'var(--color-error)' }}
-                >
-                  <AlertTriangle className="h-4 w-4" /> {error}
+                <div className="flex items-center gap-3 rounded-sm border border-red-500/20 bg-red-50 py-4 px-5 text-sm font-medium text-red-600">
+                  <AlertTriangle className="h-4 w-4 shrink-0" /> {error}
                 </div>
               ) : null}
 
@@ -146,20 +127,21 @@ export function MainArea({
                 messages={messages}
                 isLoading={isLoading}
                 canSave={canSave}
+                reachedLimit={reachedLimit}
+                isAuthenticated={isAuthenticated}
+                onOpenSignup={onOpenSignup}
+                onUpgrade={onUpgrade}
                 onCitationClick={onCitationClick}
                 onSave={onSaveMessage}
               />
             </div>
           </section>
 
-          <div
-            className="sticky bottom-0 px-4 py-4 md:px-8"
-            style={{ borderTop: '1px solid var(--color-border)', background: 'var(--color-surface)' }}
-          >
-            <div className="mx-auto max-w-[780px]">
+          <div className="sticky bottom-0 z-20 bg-[#FAFAFA]/90 dark:bg-[#171717]/90 px-4 py-6 md:px-8 backdrop-blur-md transition-colors">
+            <div className="mx-auto max-w-4xl">
               <QueryInput
-                disabled={isLoading}
-                placeholder={placeholder}
+                disabled={isLoading || reachedLimit}
+                placeholder={reachedLimit ? 'Limit reached (Upgrade to continue)' : placeholder}
                 previewMode={previewMode}
                 onSubmit={onSubmitQuery}
               />

@@ -323,7 +323,7 @@ export function Home() {
   }, [location.pathname, location.state, navigate])
 
   return (
-    <div className="min-h-screen md:flex">
+    <div className="min-h-screen md:flex bg-[#FAFAFA] dark:bg-[#171717] transition-colors">
       <Sidebar
         history={historyItems}
         savedAnswers={savedAnswers}
@@ -359,6 +359,13 @@ export function Home() {
         canSave={!previewMode && auth.isAuthenticated}
         activeQuickCategory={activeQuickCategory}
         previewMode={previewMode}
+        reachedLimit={tierLimit.reachedLimit}
+        isAuthenticated={auth.isAuthenticated}
+        onOpenSignup={() => setSignupOpen(true)}
+        onUpgrade={() => {
+          resetSession()
+          navigate('/upgrade')
+        }}
         onSubmitQuery={submitQuery}
         onNewQuery={handleNewQuery}
         onPickSuggestion={(value) => {
@@ -468,35 +475,7 @@ export function Home() {
         }}
       />
 
-      {tierLimit.reachedLimit ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="glass-panel max-w-md rounded-xl p-5 text-center">
-            <p className="text-lg font-semibold">Monthly free query limit reached</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Register for unlimited queries or upgrade to Pro for exports and API access.
-            </p>
-            <div className="mt-4 flex justify-center gap-2">
-              <button
-                type="button"
-                className="rounded-md border border-border px-3 py-2 text-sm"
-                onClick={() => setSignupOpen(true)}
-              >
-                Create free account
-              </button>
-              <button
-                type="button"
-                className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground"
-                onClick={() => {
-                  resetSession()
-                  navigate('/upgrade')
-                }}
-              >
-                Upgrade to Pro
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+
     </div>
   )
 }
