@@ -135,7 +135,7 @@ export function Sidebar({
             </div>
             <Button
               variant="ghost"
-              className="w-full justify-start text-xs font-semibold text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white dark:hover:bg-white/5 transition"
+              className="w-full justify-start text-xs font-semibold text-neutral-700 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white dark:hover:bg-white/5 transition"
               onClick={onLogout}
             >
               <LogOut className="mr-3 h-4 w-4" /> Sign out
@@ -159,7 +159,7 @@ export function Sidebar({
         )}
         
         <div className="flex items-center justify-between pt-2">
-          <Button asChild variant="ghost" className="justify-start text-xs font-medium text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 dark:hover:bg-white/5 transition px-2">
+          <Button asChild variant="ghost" className="justify-start text-xs font-medium text-neutral-700 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300 dark:hover:bg-white/5 transition px-2">
             <Link to="/api-access">API Access</Link>
           </Button>
           <button

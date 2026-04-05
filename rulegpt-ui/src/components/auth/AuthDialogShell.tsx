@@ -161,7 +161,7 @@ export function AuthDialogShell({
                   <Input
                     id={`${mode}-email`}
                     autoComplete="email"
-                    className="h-11 rounded-sm border-neutral-300 dark:border-white/10 bg-white dark:bg-[#0A0A0A] pl-10 text-sm focus-visible:ring-1 focus-visible:ring-[#FF4F00] focus-visible:ring-offset-0 disabled:opacity-50 dark:text-white"
+                    className="h-11 rounded-sm border-neutral-300 dark:border-white/10 bg-white dark:bg-[#0A0A0A] pl-10 text-sm focus-visible:ring-1 focus-visible:ring-[#FF4F00] focus-visible:ring-offset-0 disabled:opacity-50 text-neutral-900 dark:text-white"
                     placeholder="email@company.com"
                     type="email"
                     value={email}
@@ -184,7 +184,7 @@ export function AuthDialogShell({
                   <Input
                     id={`${mode}-password`}
                     autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                    className="h-11 rounded-sm border-neutral-300 dark:border-white/10 bg-white dark:bg-[#0A0A0A] pl-10 text-sm focus-visible:ring-1 focus-visible:ring-[#FF4F00] focus-visible:ring-offset-0 disabled:opacity-50 dark:text-white"
+                    className="h-11 rounded-sm border-neutral-300 dark:border-white/10 bg-white dark:bg-[#0A0A0A] pl-10 text-sm focus-visible:ring-1 focus-visible:ring-[#FF4F00] focus-visible:ring-offset-0 disabled:opacity-50 text-neutral-900 dark:text-white"
                     placeholder="••••••••••••"
                     type="password"
                     value={password}
@@ -208,7 +208,7 @@ export function AuthDialogShell({
                     <Input
                       id="confirm-password"
                       autoComplete="new-password"
-                      className="h-11 rounded-sm border-neutral-300 dark:border-white/10 bg-white dark:bg-[#0A0A0A] pl-10 text-sm focus-visible:ring-1 focus-visible:ring-[#FF4F00] focus-visible:ring-offset-0 disabled:opacity-50 dark:text-white"
+                      className="h-11 rounded-sm border-neutral-300 dark:border-white/10 bg-white dark:bg-[#0A0A0A] pl-10 text-sm focus-visible:ring-1 focus-visible:ring-[#FF4F00] focus-visible:ring-offset-0 disabled:opacity-50 text-neutral-900 dark:text-white"
                       placeholder="••••••••••••"
                       type="password"
                       value={confirmPassword}
