@@ -17,27 +17,10 @@ import { useTierLimit } from '@/hooks/useTierLimit'
 import { isPreviewModeEnabled } from '@/lib/config'
 import type { Citation, HistoryItem, Message, RuleDetails, SavedAnswer } from '@/types'
 
-const LOCAL_HISTORY_KEY = 'rulegpt_local_history'
-
-function parseLocalHistory(): HistoryItem[] {
-  if (typeof localStorage === 'undefined') return []
-  try {
-    const raw = localStorage.getItem(LOCAL_HISTORY_KEY)
-    if (!raw) return []
-    const parsed = JSON.parse(raw) as HistoryItem[]
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
-    return []
-  }
-}
-
-function persistLocalHistory(items: HistoryItem[]) {
-  if (typeof localStorage === 'undefined') return
-  try {
-    localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(items.slice(0, 40)))
-  } catch {
-    // Ignore local storage failures.
-  }
+// Local history is in-memory only — clears on page refresh.
+// Authenticated users get persistent history from the backend.
+function persistLocalHistory(_items: HistoryItem[]) {
+  // no-op: intentionally not persisted to localStorage to avoid stale data
 }
 
 function mergeHistory(primary: HistoryItem[], secondary: HistoryItem[]) {
@@ -83,7 +66,7 @@ export function Home() {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
   const [mobileDrawerMode, setMobileDrawerMode] = useState<'history' | 'saved'>('history')
   const [activeQuickCategory, setActiveQuickCategory] = useState<string | null>(null)
-  const [localHistory, setLocalHistory] = useState<HistoryItem[]>(parseLocalHistory)
+  const [localHistory, setLocalHistory] = useState<HistoryItem[]>([])
   const seededQueryRef = useRef<string | null>(null)
 
   const auth = useAuth()
