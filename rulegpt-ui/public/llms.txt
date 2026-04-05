@@ -1,0 +1,39 @@
+# TFRules
+
+> Free citation engine for trade finance compliance rules. Verified answers from ICC standards, sanctions lists, FTAs, and customs regulations.
+
+TFRules is a conversational AI tool built by Enso Intelligence that answers trade finance rule questions with exact citations. Unlike general-purpose AI which hallucinates regulatory citations, TFRules grounds every answer in curated, versioned rules from authoritative sources.
+
+## What TFRules covers
+
+- ICC standards: UCP600, ISBP745, ISP98, URDG758, URC522, URR725, eUCP 2.1, Incoterms 2020
+- Sanctions: OFAC, EU, UN sanctions lists, vessel screening
+- FTA rules of origin: RCEP, CPTPP, USMCA, AFCFTA
+- Customs and import/export regulations across 48+ jurisdictions
+- Bank-specific LC execution standards
+- SWIFT/ISO messaging standards (MT/MX formats)
+- Commodities compliance (timber, pharma, petro, agriculture)
+- DOCDEX findings (ICC legal opinions)
+
+## How it works
+
+Users ask questions in plain language. The engine searches curated rules using semantic search, retrieves relevant articles, and generates a cited answer. Every factual claim is bound to a specific rule reference (e.g., UCP600 Art. 14(a)).
+
+## Pricing
+
+- Free: 20 queries/month, full citation access, no account required
+- Starter ($9/month): 500 queries/month, synced history, saved answers, JSON export
+- Pro ($19/month): 2,000 queries/month, priority model routing, session export
+
+## Links
+
+- Website: https://www.tfrules.com
+- Chat: https://www.tfrules.com/chat
+- FAQ: https://www.tfrules.com/faq
+- Contact: https://www.tfrules.com/contact
+- Document validation (TRDR Hub): https://trdrhub.com
+- Rules API (RulHub): https://rulhub.com
+
+## Built by
+
+Enso Intelligence — democratizing trade finance rules for exporters, compliance teams, and trade finance professionals worldwide.

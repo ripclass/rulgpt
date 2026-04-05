@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /api-access
 
 Sitemap: https://www.tfrules.com/sitemap.xml
+
+# AI crawler optimization
+# See https://www.tfrules.com/llms.txt for structured site description
