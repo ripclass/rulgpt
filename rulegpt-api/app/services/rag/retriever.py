@@ -33,6 +33,22 @@ _BANK_ALIASES: dict[str, tuple[str, ...]] = {
     "icbc": ("icbc",),
 }
 
+# Maps classifier domain to SQL LIKE prefix for sub-domain matching.
+# e.g. classifier says "icc" → also match "icc.docdex", "icc.opinions", etc.
+_DOMAIN_PREFIX_OVERRIDES: dict[str, str] = {
+    "bank_specific": "bank.%",  # classifier says bank_specific, rules use bank.hsbc etc.
+}
+
+
+def _domain_prefix(domain: str | None) -> str:
+    """Return a SQL LIKE pattern for prefix-matching sub-domains."""
+    if domain is None:
+        return "WILL_NOT_MATCH"  # NULL domain handled by :domain IS NULL
+    override = _DOMAIN_PREFIX_OVERRIDES.get(domain)
+    if override:
+        return override
+    return f"{domain}.%"
+
 
 async def _maybe_await(value: Any) -> Any:
     if hasattr(value, "__await__"):
@@ -255,7 +271,7 @@ class RuleRetriever:
             FROM rulegpt_rule_embeddings
             WHERE
                 is_active = true
-                AND (:domain IS NULL OR domain = :domain)
+                AND (:domain IS NULL OR domain = :domain OR domain LIKE :domain_prefix)
                 AND (:jurisdiction IS NULL OR jurisdiction = :jurisdiction OR jurisdiction = 'global')
                 AND (:document_type IS NULL OR document_type = :document_type OR document_type = 'other')
             ORDER BY embedding <=> CAST(:qvec AS vector)
@@ -269,6 +285,7 @@ class RuleRetriever:
                     {
                         "qvec": qvec,
                         "domain": None if classification.domain == "other" else classification.domain,
+                        "domain_prefix": _domain_prefix(None if classification.domain == "other" else classification.domain),
                         "jurisdiction": None if classification.jurisdiction == "global" else classification.jurisdiction,
                         "document_type": None if classification.document_type == "other" else classification.document_type,
                         "semantic_limit": semantic_limit,

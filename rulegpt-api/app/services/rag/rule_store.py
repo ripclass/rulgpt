@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from sqlalchemy import or_, select
+from sqlalchemy import or_, select, func
 from sqlalchemy.orm import Session
 
 from app.models.rule import RuleRecord
@@ -108,7 +108,10 @@ def load_rules_for_retrieval(
 ) -> list[dict[str, Any]]:
     stmt = select(RuleRecord).where(RuleRecord.is_active == True)  # noqa: E712
     if domain:
-        stmt = stmt.where(RuleRecord.domain == domain)
+        # Exact match OR prefix match (e.g. "icc" also matches "icc.docdex")
+        # Also handle bank_specific → bank.% mapping
+        prefix = "bank.%" if domain == "bank_specific" else f"{domain}.%"
+        stmt = stmt.where(or_(RuleRecord.domain == domain, RuleRecord.domain.like(prefix)))
     if jurisdiction:
         stmt = stmt.where(or_(RuleRecord.jurisdiction == jurisdiction, RuleRecord.jurisdiction == "global"))
     if document_type:

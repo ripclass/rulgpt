@@ -541,7 +541,7 @@ class RuleEmbedder:
 
     async def _fetch_existing_hashes(self, session: Any) -> Dict[str, str]:
         result = await _maybe_await(
-            session.execute(text("SELECT rule_id, content_hash FROM rulegpt_rule_embeddings"))
+            session.execute(text("SELECT rule_id, content_hash FROM rulegpt_rule_embeddings WHERE is_active = true"))
         )
         return {str(row.rule_id): str(row.content_hash) for row in result.fetchall()}
 
