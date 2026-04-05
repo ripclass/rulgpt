@@ -1,9 +1,13 @@
+import { useState } from 'react'
 import { Copy, Bookmark, Share2, ThumbsDown, ThumbsUp } from 'lucide-react'
 
 interface MessageActionsProps {
   canSave?: boolean
   onCopy: () => void
   onSave: () => void
+  onShare: () => void
+  onThumbsUp: () => void
+  onThumbsDown: () => void
 }
 
 const actionBtnStyle: React.CSSProperties = {
@@ -35,7 +39,9 @@ const iconBtnStyle: React.CSSProperties = {
   transition: 'color var(--duration-fast) var(--ease-default), background var(--duration-fast) var(--ease-default)',
 }
 
-export function MessageActions({ canSave = true, onCopy, onSave }: MessageActionsProps) {
+export function MessageActions({ canSave = true, onCopy, onSave, onShare, onThumbsUp, onThumbsDown }: MessageActionsProps) {
+  const [feedback, setFeedback] = useState<'up' | 'down' | null>(null)
+
   return (
     <div
       className="mt-4 flex flex-wrap items-center gap-2 pt-3 opacity-0 transition-opacity group-hover:opacity-100"
@@ -53,13 +59,25 @@ export function MessageActions({ canSave = true, onCopy, onSave }: MessageAction
       >
         <Bookmark className="h-3.5 w-3.5" /> Save
       </button>
-      <button type="button" style={actionBtnStyle} className="btn-ghost">
+      <button type="button" style={actionBtnStyle} className="btn-ghost" onClick={onShare}>
         <Share2 className="h-3.5 w-3.5" /> Share
       </button>
-      <button type="button" style={iconBtnStyle} className="btn-ghost">
+      <button
+        type="button"
+        style={{ ...iconBtnStyle, color: feedback === 'up' ? '#FF4F00' : undefined }}
+        className="btn-ghost"
+        disabled={feedback !== null}
+        onClick={() => { setFeedback('up'); onThumbsUp() }}
+      >
         <ThumbsUp className="h-3.5 w-3.5" />
       </button>
-      <button type="button" style={iconBtnStyle} className="btn-ghost">
+      <button
+        type="button"
+        style={{ ...iconBtnStyle, color: feedback === 'down' ? '#FF4F00' : undefined }}
+        className="btn-ghost"
+        disabled={feedback !== null}
+        onClick={() => { setFeedback('down'); onThumbsDown() }}
+      >
         <ThumbsDown className="h-3.5 w-3.5" />
       </button>
     </div>

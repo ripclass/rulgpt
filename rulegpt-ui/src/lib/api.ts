@@ -191,6 +191,11 @@ export const api = {
       method: 'DELETE',
       headers: identityHeaders(identity),
     }),
+  submitFeedback: (queryId: string, feedbackType: 'thumbs_up' | 'thumbs_down') =>
+    request<{ id: string; feedback_type: string }>(`/api/feedback/${queryId}`, {
+      method: 'POST',
+      body: { feedback_type: feedbackType },
+    }),
   getAuthStatus: () => request<AuthStatusResponse>('/api/auth/status'),
   getBillingStatus: () => request<BillingConfigStatusResponse>('/api/billing/status'),
   createBillingCheckout: (payload: BillingCheckoutRequest, identity: RequestIdentity) =>

@@ -4,6 +4,7 @@ import { ConfidenceBadge } from '@/components/chat/ConfidenceBadge'
 import { DomainTag } from '@/components/chat/DomainTag'
 import { MessageActions } from '@/components/chat/MessageActions'
 import { TRDRHubCTA } from '@/components/conversion/TRDRHubCTA'
+import { api } from '@/lib/api'
 import type { Citation, Message } from '@/types'
 import { RuxMark } from '@/components/shared/RuxMascot'
 
@@ -84,6 +85,27 @@ export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: Ru
                 return
               }
               toast.error('Save unavailable for this message.')
+            }}
+            onShare={() => {
+              const text = `${message.text}\n\n— via tfrules.com`
+              if (navigator.share) {
+                void navigator.share({ title: 'TFRules Answer', text, url: 'https://www.tfrules.com' })
+              } else {
+                void navigator.clipboard.writeText(text)
+                toast.success('Answer copied for sharing.')
+              }
+            }}
+            onThumbsUp={() => {
+              if (!message.queryId) return
+              api.submitFeedback(message.queryId, 'thumbs_up')
+                .then(() => toast.success('Thanks for the feedback.'))
+                .catch(() => toast.error('Feedback failed. Try again.'))
+            }}
+            onThumbsDown={() => {
+              if (!message.queryId) return
+              api.submitFeedback(message.queryId, 'thumbs_down')
+                .then(() => toast.success('Thanks — we\'ll work on improving this.'))
+                .catch(() => toast.error('Feedback failed. Try again.'))
             }}
           />
         </div>
