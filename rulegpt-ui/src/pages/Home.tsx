@@ -270,6 +270,8 @@ export function Home() {
   const handleNewQuery = () => {
     resetSession()
     query.clearMessages()
+    setLocalHistory([])
+    persistLocalHistory([])
     setActiveQuickCategory(null)
     setCitationPanelOpen(false)
     setSelectedRule(null)
