@@ -19,6 +19,7 @@ class RuleGPTSession(Base):
     user_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True, index=True)
     session_token: Mapped[str] = mapped_column(Text, nullable=False, unique=True, index=True)
     tier: Mapped[str] = mapped_column(String(32), nullable=False, default="anonymous")
+    client_ip: Mapped[str | None] = mapped_column(String(45), nullable=True, index=True)
     query_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     language: Mapped[str] = mapped_column(String(8), nullable=False, default="en")
     started_at: Mapped[datetime] = mapped_column(

@@ -35,10 +35,18 @@ def _get_user_id(request: Request):
     return getattr(request.state, "user_id", None)
 
 
+def _client_ip(request: Request) -> str:
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
 def _find_or_create_session(db: Session, request: Request, payload: QueryRequest) -> RuleGPTSession:
     session_token = payload.session_token
     user_id = _get_user_id(request)
     tier = _get_tier(request)
+    ip = _client_ip(request)
 
     db_session = None
     if session_token:
@@ -51,6 +59,7 @@ def _find_or_create_session(db: Session, request: Request, payload: QueryRequest
             session_token=session_token or str(uuid.uuid4()),
             user_id=user_id,
             tier=tier,
+            client_ip=ip,
             language=payload.language,
             started_at=_utc_now(),
             last_active_at=_utc_now(),
@@ -62,6 +71,7 @@ def _find_or_create_session(db: Session, request: Request, payload: QueryRequest
 
     db_session.last_active_at = _utc_now()
     db_session.language = payload.language
+    db_session.client_ip = ip
     if user_id and db_session.user_id is None:
         db_session.user_id = user_id
     db_session.tier = tier
@@ -70,11 +80,15 @@ def _find_or_create_session(db: Session, request: Request, payload: QueryRequest
     return db_session
 
 
-def _anonymous_queries_this_month(db: Session, session_id) -> int:
+def _anonymous_queries_this_month_by_ip(db: Session, client_ip: str) -> int:
+    """Count queries across ALL anonymous sessions from this IP this month."""
     month_start = _month_start(_utc_now())
     total = db.scalar(
-        select(func.count(RuleGPTQuery.id)).where(
-            RuleGPTQuery.session_id == session_id,
+        select(func.count(RuleGPTQuery.id))
+        .join(RuleGPTSession, RuleGPTQuery.session_id == RuleGPTSession.id)
+        .where(
+            RuleGPTSession.client_ip == client_ip,
+            RuleGPTSession.tier == "anonymous",
             RuleGPTQuery.created_at >= month_start,
         )
     )
@@ -105,7 +119,18 @@ def _queries_this_month(db: Session, session_obj: RuleGPTSession, tier: str) -> 
         )
         return int(total or 0)
 
-    return _anonymous_queries_this_month(db, session_obj.id)
+    # Count by IP across all anonymous sessions — prevents new-tab bypass
+    ip = session_obj.client_ip
+    if ip and ip != "unknown":
+        return _anonymous_queries_this_month_by_ip(db, ip)
+    # Fallback: count by session if IP unavailable
+    total = db.scalar(
+        select(func.count(RuleGPTQuery.id)).where(
+            RuleGPTQuery.session_id == session_obj.id,
+            RuleGPTQuery.created_at >= month_start,
+        )
+    )
+    return int(total or 0)
 
 
 def _limit_reached_message(tier: str) -> str:
