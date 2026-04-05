@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Check } from 'lucide-react'
 import { ApiError, api } from '@/lib/api'
 import { track } from '@/lib/analytics'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthModal } from '@/contexts/AuthModalContext'
+import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import type { BillingInterval, BillingPlan } from '@/types'
 
 const PLAN_COPY: Record<
@@ -107,11 +109,11 @@ export function Upgrade() {
     })
 
     if (!auth.isAuthenticated || !hasBearerToken) {
-      setCheckoutMessage('Sign in with Supabase to use the hosted checkout flow.')
+      setCheckoutMessage('Sign in to use the hosted checkout flow.')
       return
     }
     if (!billingStatus.data?.checkout_ready) {
-      setCheckoutMessage('Stripe checkout is not configured yet. See the blockers below.')
+      setCheckoutMessage('Stripe checkout is not configured yet.')
       return
     }
 
@@ -155,120 +157,127 @@ export function Upgrade() {
   const selectedPlanCopy = PLAN_COPY[selectedPlan]
 
   return (
-    <main className="mx-auto flex min-h-screen w-full flex-col justify-center px-4 py-10 bg-[#FAFAFA] dark:bg-[#050505] transition-colors">
-      <div className="mx-auto w-full max-w-3xl rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#0A0A0A] p-8 md:p-12 shadow-sm">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF4F00]">Billing</p>
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">Choose the plan that fits your workflow</h1>
-        <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-          {billingStatus.isLoading
-            ? 'Checking billing configuration...'
-            : canCheckout
-              ? 'Your account is ready for the hosted Stripe checkout.'
-              : 'Hosted checkout is waiting on the current billing configuration.'}
-        </p>
-        {billingStatus.data?.blockers?.length ? (
-          <div className="mt-6 rounded-sm border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-[#121212] p-4">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">Billing blockers</p>
-            <ul className="mt-3 space-y-2 text-[13px] font-medium text-neutral-600 dark:text-neutral-400">
-              {billingStatus.data.blockers.map((blocker) => (
-                <li key={blocker}>{blocker}</li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-        <div className="mt-5 grid gap-3 md:grid-cols-2">
-          {(['starter', 'pro'] as const).map((plan) => {
-            const planCopy = PLAN_COPY[plan]
-            const selected = selectedPlan === plan
-            return (
-              <button
-                key={plan}
-                type="button"
-                className={`rounded-sm p-5 text-left transition border ${
-                  selected 
-                    ? 'border-[#FF4F00] bg-neutral-50 dark:bg-white/5 shadow-md shadow-[#FF4F00]/5' 
-                    : 'border-neutral-200 dark:border-white/10 bg-white dark:bg-[#121212]'
-                }`}
-                onClick={() => setSelectedPlan(plan)}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">{planCopy.title}</p>
-                    <p className="mt-1 text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                      {billingInterval === 'monthly' ? planCopy.monthlyLabel : planCopy.annualLabel}
-                    </p>
-                  </div>
-                  {selected ? (
-                    <span className="rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest bg-[#FF4F00]/10 text-[#FF4F00]">
-                      Selected
+    <PublicPageShell
+      eyebrow="Upgrade"
+      title="Choose your plan."
+      description="One avoided discrepancy fee covers a year of Starter. Simple, transparent pricing."
+    >
+      {checkoutMessage ? (
+        <div className="mb-8 rounded-sm border border-[#FF4F00]/20 bg-[#FF4F00]/5 px-5 py-4">
+          <p className="text-sm font-medium text-[#FF4F00]">{checkoutMessage}</p>
+        </div>
+      ) : null}
+
+      {billingStatus.data?.blockers?.length ? (
+        <div className="mb-8 rounded-sm border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-[#121212] p-5">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">Configuration blockers</p>
+          <ul className="mt-3 space-y-2 text-[13px] font-medium text-neutral-600 dark:text-neutral-400">
+            {billingStatus.data.blockers.map((blocker) => (
+              <li key={blocker}>&ndash; {blocker}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {/* Plan Selection */}
+      <div className="grid gap-4 md:grid-cols-2">
+        {(['starter', 'pro'] as const).map((plan) => {
+          const planCopy = PLAN_COPY[plan]
+          const selected = selectedPlan === plan
+          return (
+            <button
+              key={plan}
+              type="button"
+              className={`rounded-sm p-6 text-left transition border ${
+                selected
+                  ? 'border-[#FF4F00] bg-[#FF4F00]/5 dark:bg-[#FF4F00]/10 shadow-md shadow-[#FF4F00]/5'
+                  : 'border-neutral-200 dark:border-white/10 bg-white dark:bg-[#121212] hover:border-neutral-300 dark:hover:border-white/20'
+              }`}
+              onClick={() => setSelectedPlan(plan)}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">{planCopy.title}</p>
+                  <p className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+                    {billingInterval === 'monthly' ? planCopy.monthlyLabel.replace(' / month', '') : planCopy.annualLabel.replace(' / year', '')}
+                    <span className="text-sm font-medium text-neutral-400 dark:text-neutral-500">
+                      {billingInterval === 'monthly' ? ' /mo' : ' /yr'}
                     </span>
-                  ) : null}
+                  </p>
                 </div>
-                <p className="mt-4 text-[13px] leading-relaxed font-medium text-neutral-600 dark:text-neutral-400">{planCopy.blurb}</p>
-              </button>
-            )
-          })}
-        </div>
-        <ul className="mt-6 space-y-3 text-[13px] font-medium text-neutral-600 dark:text-neutral-400">
-          {selectedPlanCopy.features.map((feature) => (
-            <li key={feature}>{feature}</li>
-          ))}
-        </ul>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <button
-            type="button"
-            className={`inline-flex h-11 items-center justify-center rounded-sm px-6 text-[11px] font-bold uppercase tracking-widest transition ${
-              billingInterval === 'monthly' 
-                ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-md' 
-                : 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 dark:bg-white/5 dark:text-white dark:hover:bg-white/10'
-            }`}
-            onClick={() => setBillingInterval('monthly')}
-          >
-            Monthly - {selectedPlanCopy.monthlyLabel.replace(' / month', '')}
-          </button>
-          <button
-            type="button"
-            className={`inline-flex h-11 items-center justify-center rounded-sm px-6 text-[11px] font-bold uppercase tracking-widest transition ${
-              billingInterval === 'annual' 
-                ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-md' 
-                : 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 dark:bg-white/5 dark:text-white dark:hover:bg-white/10'
-            }`}
-            onClick={() => setBillingInterval('annual')}
-          >
-            Annual - {selectedPlanCopy.annualLabel.replace(' / year', '')}
-          </button>
-        </div>
-        <div className="mt-8 flex flex-wrap gap-3 pt-6 border-t border-neutral-200 dark:border-white/10">
-          <button
-            className="inline-flex h-11 items-center justify-center rounded-sm bg-[#FF4F00] px-8 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[#E64600] disabled:opacity-50 shadow-md shadow-[#FF4F00]/20"
-            onClick={() => {
-              if (!auth.isAuthenticated) {
-                authModal.openLogin()
-                return
-              }
-              void startCheckout()
-            }}
-            disabled={isCheckingOut || (!auth.isAuthenticated ? false : !canCheckout)}
-          >
-            {isCheckingOut
-              ? 'Starting checkout...'
-              : !auth.isAuthenticated
-                ? 'Sign in to upgrade'
-                : canCheckout
-                  ? `Start ${selectedPlanCopy.title} checkout`
-                  : 'Checkout not configured yet'}
-          </button>
-          <Link to="/chat" className="inline-flex h-11 items-center justify-center rounded-sm bg-neutral-100 dark:bg-white/5 px-6 text-xs font-bold uppercase tracking-widest text-neutral-900 dark:text-white transition hover:bg-neutral-200 dark:hover:bg-white/10">
-            Back to chat
-          </Link>
-        </div>
-        {checkoutMessage ? (
-          <p className="mt-4 text-sm font-medium text-[#FF4F00]">{checkoutMessage}</p>
-        ) : null}
-        <p className="mt-6 text-[10px] uppercase tracking-widest !leading-loose text-neutral-400 dark:text-neutral-500">
-          Free stays free. Starter and Pro use hosted Stripe checkout. If the blockers are empty, this page should be ready for live checkout for both paid plans.
-        </p>
+                {selected ? (
+                  <span className="rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest bg-[#FF4F00]/10 text-[#FF4F00]">
+                    Selected
+                  </span>
+                ) : null}
+              </div>
+              <p className="mt-4 text-[13px] leading-relaxed font-medium text-neutral-500 dark:text-neutral-400">{planCopy.blurb}</p>
+              <ul className="mt-5 space-y-2.5">
+                {planCopy.features.map((feature) => (
+                  <li key={feature} className="flex items-center gap-3 text-[13px] font-medium text-neutral-600 dark:text-neutral-300">
+                    <Check className="h-4 w-4 text-[#FF4F00] shrink-0" /> {feature}
+                  </li>
+                ))}
+              </ul>
+            </button>
+          )
+        })}
       </div>
-    </main>
+
+      {/* Billing Interval */}
+      <div className="mt-8 flex flex-wrap gap-3">
+        <button
+          type="button"
+          className={`inline-flex h-11 items-center justify-center rounded-sm px-6 text-[11px] font-bold uppercase tracking-widest transition ${
+            billingInterval === 'monthly'
+              ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-md'
+              : 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 dark:bg-white/5 dark:text-white dark:hover:bg-white/10'
+          }`}
+          onClick={() => setBillingInterval('monthly')}
+        >
+          Monthly
+        </button>
+        <button
+          type="button"
+          className={`inline-flex h-11 items-center justify-center rounded-sm px-6 text-[11px] font-bold uppercase tracking-widest transition ${
+            billingInterval === 'annual'
+              ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-md'
+              : 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 dark:bg-white/5 dark:text-white dark:hover:bg-white/10'
+          }`}
+          onClick={() => setBillingInterval('annual')}
+        >
+          Annual <span className="ml-2 text-[10px] opacity-60">save 2 months</span>
+        </button>
+      </div>
+
+      {/* Checkout Action */}
+      <div className="mt-10 flex flex-wrap items-center gap-4 pt-8 border-t border-neutral-200 dark:border-white/10">
+        <button
+          className="inline-flex h-12 items-center justify-center rounded-sm bg-[#FF4F00] px-10 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[#E64600] disabled:bg-neutral-300 disabled:text-neutral-500 dark:disabled:bg-neutral-700 dark:disabled:text-neutral-400 disabled:cursor-not-allowed shadow-lg shadow-[#FF4F00]/20"
+          onClick={() => {
+            if (!auth.isAuthenticated) {
+              authModal.openLogin()
+              return
+            }
+            void startCheckout()
+          }}
+          disabled={isCheckingOut || (auth.isAuthenticated && !canCheckout)}
+        >
+          {isCheckingOut
+            ? 'Redirecting to Stripe...'
+            : !auth.isAuthenticated
+              ? 'Sign in to upgrade'
+              : canCheckout
+                ? `Upgrade to ${selectedPlanCopy.title}`
+                : 'Checkout not configured yet'}
+        </button>
+        <Link
+          to="/chat"
+          className="text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition uppercase tracking-widest"
+        >
+          Back to console
+        </Link>
+      </div>
+    </PublicPageShell>
   )
 }
