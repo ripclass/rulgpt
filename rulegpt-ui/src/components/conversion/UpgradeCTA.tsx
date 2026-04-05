@@ -7,8 +7,8 @@ export function UpgradeCTA({ tier }: { tier: SessionTier }) {
   const ctaLabel = tier === 'starter' ? 'Upgrade to Pro' : 'Plans from $9/mo'
   const helperText =
     tier === 'starter'
-      ? 'Need higher volume, API access, or priority routing? Move up to Pro.'
-      : 'Saved work, exports, and paid plans when the free tier is no longer enough.'
+      ? 'Need higher volume, priority model routing, or session export? Move up to Pro.'
+      : 'Synced history, saved answers, and exports when the free tier is no longer enough.'
   return (
     <div className="rounded-sm bg-neutral-50 dark:bg-[#141414] border border-neutral-200 dark:border-white/10 px-4 py-4 transition-colors">
       <p className="text-[13px] font-bold text-neutral-900 dark:text-neutral-100">Upgrade</p>

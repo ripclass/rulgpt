@@ -94,7 +94,7 @@ export function MainArea({
                     <span className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">System Notification</span>
                   </div>
                   <p className="whitespace-pre-wrap leading-relaxed text-[15px] text-neutral-900 dark:text-neutral-100 mb-6">
-                    You have exhausted your free query limit. Register for unlimited queries, or upgrade to Pro for API access.
+                    You have exhausted your free query limit. Register for unlimited queries, or upgrade for synced history, saved answers, and priority routing.
                   </p>
                   <div className="flex flex-wrap items-center gap-3">
                     {isAuthenticated ? null : (

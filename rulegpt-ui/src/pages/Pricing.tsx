@@ -15,7 +15,7 @@ const plans = [
     name: 'Starter',
     price: '$9',
     period: '/month',
-    features: ['500 queries per month', 'Synced history', 'Saved answers', 'One avoided discrepancy fee covers a year'],
+    features: ['500 queries per month', 'Synced history', 'Saved answers', 'JSON export'],
     cta: 'Get started \u2192',
     href: '/upgrade',
     featured: true,
@@ -24,7 +24,7 @@ const plans = [
     name: 'Pro',
     price: '$19',
     period: '/month',
-    features: ['2,000 queries per month', 'Priority routing', 'API access', 'Exports and reports'],
+    features: ['2,000 queries per month', 'Priority model routing', 'Session export', 'Extended history'],
     cta: 'Go Pro \u2192',
     href: '/upgrade',
     featured: false,
@@ -78,7 +78,7 @@ export function Pricing() {
         <h2 className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">Notes</h2>
         <div className="mt-4 space-y-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
           <p>tfrules answers from published trade-finance rules and standards. It saves time on first-pass interpretation, not replace transaction-level review.</p>
-          <p>API access is included for operational use. Heavy-volume programmatic usage will move to dedicated pricing as adoption patterns become clearer.</p>
+          <p>Pro users get priority model routing and full session export. Dedicated API pricing will be available as adoption patterns become clearer.</p>
         </div>
       </section>
     </PublicPageShell>

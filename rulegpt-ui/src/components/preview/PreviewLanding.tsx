@@ -373,7 +373,7 @@ export function PreviewLanding({
                 { i: Globe, t: 'FTA Origin', d: 'RCEP, CPTPP, USMCA, AFCFTA' },
                 { i: FileText, t: 'Jurisdictional Rules', d: '48 country central bank & customs frameworks' },
                 { i: Shield, t: 'Sanctions Data', d: 'OFAC, EU, UN, vessel screening' },
-                { i: Database, t: 'Bank Profiles', d: '50+ global bank LC execution standards' },
+                { i: Database, t: 'Bank Profiles', d: 'Global bank LC execution standards' },
                 { i: Clock, t: 'SWIFT / ISO', d: 'Message standards and MT/MX formats' },
                 { i: Box, t: 'Commodities', d: 'Compliance for Timber, Pharma, Petro, Agri' },
                 { i: Scale, t: 'DOCDEX Findings', d: 'Pre-analyzed official ICC legal opinions' },
