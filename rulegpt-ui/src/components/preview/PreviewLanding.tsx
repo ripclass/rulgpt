@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronDown, Check, ArrowRight, Menu, X, Globe, Shield, BookOpen, Clock, FileText, Database, Scale, Box } from 'lucide-react'
+import { Check, ArrowRight, Menu, X, Globe, Shield, BookOpen, Clock, FileText, Database, Scale, Box } from 'lucide-react'
 import { RuxMark } from '@/components/shared/RuxMascot'
 import { PublicFooter } from '@/components/shared/PublicFooter'
 import type { SessionTier } from '@/types'
@@ -65,7 +65,7 @@ export function PreviewLanding({
   const [scrolled, setScrolled] = useState(false)
   const [heroPassed, setHeroPassed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [openFaq, setOpenFaq] = useState<number | null>(null)
+
 
   useEffect(() => {
     const onScroll = () => {
