@@ -1,9 +1,8 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { Check, ArrowRight, Menu, X, Globe, Shield, BookOpen, Clock, FileText, Database, Scale, Box, Sun, Moon } from 'lucide-react'
+import { Check, ArrowRight, Menu, X, Globe, Shield, BookOpen, Clock, FileText, Database, Scale, Box } from 'lucide-react'
 import { RuxMark } from '@/components/shared/RuxMascot'
 import { PublicFooter } from '@/components/shared/PublicFooter'
-import { useTheme } from '@/contexts/ThemeContext'
 import type { SessionTier } from '@/types'
 
 interface PreviewLandingProps {
@@ -66,7 +65,6 @@ export function PreviewLanding({
   const [scrolled, setScrolled] = useState(false)
   const [heroPassed, setHeroPassed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { theme, setTheme } = useTheme()
 
 
   useEffect(() => {
@@ -125,14 +123,6 @@ export function PreviewLanding({
             <a href="#how" className={`transition duration-200 ${isNavDarkTheme ? 'hover:text-white' : 'hover:text-neutral-900'}`}>How it works</a>
             <Link to="/pricing" className={`transition duration-200 ${isNavDarkTheme ? 'hover:text-white' : 'hover:text-neutral-900'}`}>Pricing</Link>
             
-            <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className={`p-2 transition-colors duration-300 ${isNavDarkTheme ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'}`}
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
-
             <div className={`h-4 w-px ${isNavDarkTheme ? 'bg-white/20' : 'bg-neutral-200'}`} />
 
             {isAuthenticated ? (
@@ -170,14 +160,6 @@ export function PreviewLanding({
             <Link to="/pricing" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">Pricing</Link>
             <Link to="/faq" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">FAQ</Link>
             <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">Contact</Link>
-            <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="flex items-center gap-4 border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]"
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? <Sun className="h-8 w-8" /> : <Moon className="h-8 w-8" />}
-              <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
-            </button>
           </nav>
 
           <div className="mt-12 flex flex-col gap-4">

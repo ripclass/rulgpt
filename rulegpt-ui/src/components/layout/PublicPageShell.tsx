@@ -1,9 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { Sun, Moon } from 'lucide-react'
 import { PublicFooter } from '@/components/shared/PublicFooter'
 import { RuxMark } from '@/components/shared/RuxMascot'
-import { useTheme } from '@/contexts/ThemeContext'
 import { useAuthModal } from '@/contexts/AuthModalContext'
 
 interface PublicPageShellProps {
@@ -14,7 +12,6 @@ interface PublicPageShellProps {
 }
 
 export function PublicPageShell({ eyebrow, title, description, children }: PublicPageShellProps) {
-  const { theme, setTheme } = useTheme()
   const authModal = useAuthModal()
 
   return (
@@ -53,13 +50,6 @@ export function PublicPageShell({ eyebrow, title, description, children }: Publi
               className="text-[13px] font-medium transition-colors text-neutral-400 hover:text-white uppercase tracking-widest"
             >
               Sign in
-            </button>
-            <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-2 text-neutral-400 hover:text-white transition-colors"
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
             <Link
               to="/chat"
