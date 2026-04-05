@@ -106,13 +106,61 @@ export function Home() {
     queriesRemaining: query.queriesRemaining,
   })
 
+  const categorySuggestions: Record<string, string[]> = {
+    'LC Compliance': [
+      'What documents are required for a CIF shipment under UCP600?',
+      'What is the maximum period for presentation of documents under UCP600?',
+      'When can a bank refuse documents under UCP600 Article 16?',
+      'What are the rules for transferable credits under UCP600 Article 38?',
+      'How does ISBP745 define a compliant commercial invoice?',
+    ],
+    'Customs & HS Codes': [
+      'What are the HS code classification rules for mixed-material textiles?',
+      'How do customs valuation rules apply to related-party transactions?',
+      'What documents are required for customs clearance of perishable goods?',
+      'When is a certificate of origin required for preferential duty rates?',
+      'What are the rules for temporary importation under ATA Carnet?',
+    ],
+    'Sanctions': [
+      'What are OFAC requirements for trading with UAE counterparties?',
+      'How do EU sanctions differ from OFAC for dual-use goods?',
+      'What is the SDN list screening requirement for trade finance?',
+      'When does a vessel screening trigger a sanctions red flag?',
+      'What are the penalties for sanctions non-compliance in trade finance?',
+    ],
+    'FTA Rules of Origin': [
+      'Does my garment qualify for RCEP preferential tariff from Bangladesh?',
+      'What is the product-specific rule of origin for automotive parts under USMCA?',
+      'How does cumulation work under CPTPP for textiles?',
+      'What proof of origin is required under AFCFTA?',
+      'When does the de minimis rule apply under RCEP?',
+    ],
+    'Trade Documentation': [
+      'How does ISBP745 define a compliant bill of lading?',
+      'What are the requirements for a multimodal transport document?',
+      'When must an insurance document show warehouse-to-warehouse coverage?',
+      'What is the difference between UCP600 and eUCP 2.1?',
+      'What are the rules for a packing list under ISBP745?',
+    ],
+    'Bank Requirements': [
+      'What are the standard examination periods for banks under UCP600 Article 14?',
+      'How do banks handle discrepant documents under UCP600 Article 16?',
+      'What are the SWIFT MT700 field requirements for issuing an LC?',
+      'When can a confirming bank refuse to honour a credit?',
+      'What are the rules for deferred payment credits under UCP600?',
+    ],
+  }
+
+  const defaultSuggestions = suggestions.data?.map((item) => item.text) ?? [
+    'What documents are required for a CIF shipment under UCP600?',
+    'Does my garment qualify for RCEP preferential tariff from Bangladesh?',
+  ]
+
   const suggestionTexts = useMemo(
-    () =>
-      suggestions.data?.map((item) => item.text) ?? [
-        'What documents are required for a CIF shipment under UCP600?',
-        'Does my garment qualify for RCEP preferential tariff from Bangladesh?',
-      ],
-    [suggestions.data],
+    () => activeQuickCategory && categorySuggestions[activeQuickCategory]
+      ? categorySuggestions[activeQuickCategory]
+      : defaultSuggestions,
+    [activeQuickCategory, defaultSuggestions],
   )
 
   const historyItems = useMemo(
@@ -321,7 +369,7 @@ export function Home() {
         onNewQuery={handleNewQuery}
         onPickHistory={openHistoryItem}
         onQuickCategory={(value) => {
-          setActiveQuickCategory(value)
+          setActiveQuickCategory((prev) => prev === value ? null : value)
         }}
         onDeleteSaved={(savedId) => {
           void deleteSaved(savedId)
