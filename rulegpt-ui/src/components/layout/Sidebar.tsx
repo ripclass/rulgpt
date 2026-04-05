@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, LogOut, Sun, Moon, ChevronUp, Zap, Key, Settings } from 'lucide-react'
+import { Plus, LogOut, Sun, Moon, ChevronUp, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { QueryHistory } from '@/components/shared/QueryHistory'
 import { SavedAnswers } from '@/components/shared/SavedAnswers'
@@ -101,13 +101,6 @@ function UserMenu({
             className="flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/5 transition"
           >
             <Zap className="h-3.5 w-3.5" /> Upgrade plan
-          </Link>
-          <Link
-            to="/api-access"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/5 transition"
-          >
-            <Key className="h-3.5 w-3.5" /> API access
           </Link>
           <button
             onClick={() => { setTheme(isDark ? 'light' : 'dark'); setOpen(false) }}
