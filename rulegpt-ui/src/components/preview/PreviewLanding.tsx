@@ -162,7 +162,7 @@ export function PreviewLanding({
         <div className={`fixed inset-0 z-[115] h-dvh w-screen bg-white pt-28 px-8 md:hidden transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] flex flex-col ${mobileMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'}`}>
           <nav className="flex flex-col gap-10 text-4xl sm:text-5xl font-bold uppercase tracking-widest text-neutral-900 mt-4">
             <a href="#how" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">How it works</a>
-            <Link to="/pricing" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">Pricing</Link>
+            <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">Pricing</a>
             <Link to="/faq" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">FAQ</Link>
             <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">Contact</Link>
           </nav>
@@ -213,12 +213,12 @@ export function PreviewLanding({
             </div>
             
             <p className="mt-8 max-w-xl text-lg md:text-2xl text-neutral-300 leading-relaxed font-light animate-fade-up" style={{ animationDelay: '200ms', animationFillMode: 'both' }}>
-              The engine for trade compliance teams, banks, and forwarders to extract verifiable answers backed by global ICC standards and jurisdictional regulations.
+              The citation engine for exporters, compliance teams, and trade finance professionals. Ask a question, get a verified answer with the exact rule reference.
             </p>
             
             <div className="mt-12 flex flex-col sm:flex-row gap-5 animate-fade-up" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
               <button onClick={onOpenChat} className="flex h-14 md:h-16 items-center justify-center rounded-sm bg-[#FF4F00] px-8 md:px-10 text-base md:text-lg font-bold uppercase tracking-widest text-white transition-all hover:bg-[#E64600] active:scale-[0.98] w-full sm:w-auto shadow-2xl shadow-[#FF4F00]/20">
-                {isAuthenticated ? 'Enter Platform' : 'Start Verification'}
+                {isAuthenticated ? 'Open Chat' : 'Try it free'}
               </button>
             </div>
           </div>
@@ -293,14 +293,14 @@ export function PreviewLanding({
         <div className="mx-auto max-w-6xl px-6 relative">
           
           <FadeInView className="mb-24">
-            <h2 className="text-5xl font-semibold tracking-tight text-neutral-900 border-l-4 border-[#FF4F00] pl-6 py-2">System <br/>Architecture.</h2>
+            <h2 className="text-5xl font-semibold tracking-tight text-neutral-900 border-l-4 border-[#FF4F00] pl-6 py-2">How it <br/>works.</h2>
           </FadeInView>
 
           <div className="space-y-32">
             <FadeInView delay={0} className="grid md:grid-cols-2 gap-12 items-center">
               <div>
                 <span className="text-[#FF4F00] font-mono tracking-widest text-lg md:text-xl block mb-4">PHASE 01</span>
-                <h3 className="text-3xl md:text-4xl font-semibold text-neutral-900 mb-6 leading-tight">Query injection.</h3>
+                <h3 className="text-3xl md:text-4xl font-semibold text-neutral-900 mb-6 leading-tight">Ask in plain language.</h3>
                 <p className="text-lg text-neutral-500 leading-relaxed font-light">
                   Describe your complex scenario in plain language. You do not need to construct boolean searches or memorize precise jargon. Just ask the question.
                 </p>
@@ -317,7 +317,7 @@ export function PreviewLanding({
                 <span className="text-[#FF4F00] font-mono tracking-widest text-lg md:text-xl block mb-4">PHASE 02</span>
                 <h3 className="text-3xl md:text-4xl font-semibold text-neutral-900 mb-6 leading-tight">Deep indexing.</h3>
                 <p className="text-lg text-neutral-500 leading-relaxed font-light">
-                  The engine bypasses opinion models entirely, scanning a unified topological graph of curated ICC standards, FTAs, sanctions lists, and the regulatory frameworks of over 48 global jurisdictions.
+                  Every answer is grounded in curated, versioned rules — not model general knowledge. The engine searches across ICC standards, FTAs, sanctions lists, and regulations from 48+ jurisdictions to find exactly what applies.
                 </p>
               </div>
               <div className="bg-neutral-900 rounded-lg aspect-video flex flex-col justify-center p-8 md:order-1 relative overflow-hidden">
@@ -363,7 +363,7 @@ export function PreviewLanding({
             <div className="md:w-1/3">
               <h2 className="text-4xl font-semibold tracking-tight text-neutral-900 mb-6 leading-tight">Global scope.<br/> Singular graph.</h2>
               <p className="text-lg text-neutral-500 leading-relaxed font-light">
-                TFRules unifies the fragmented landscape of global trade finance regulations into an instantly searchable format.
+                The fragmented landscape of global trade finance regulations, unified into an instantly searchable format.
               </p>
             </div>
             
@@ -466,7 +466,7 @@ export function PreviewLanding({
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-300">
                   <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Synced history</li>
                   <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Saved answers</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> PDF export</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> JSON export</li>
                 </ul>
               </div>
               <button
@@ -492,9 +492,9 @@ export function PreviewLanding({
                 </div>
                 <p className="text-sm text-neutral-500 border-b border-neutral-100 pb-8 uppercase font-mono tracking-wide">2,000 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-600">
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Priority routing</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> API access</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Bulk export</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Priority model routing</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Session export</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Extended history</li>
                 </ul>
               </div>
               <button
@@ -513,13 +513,40 @@ export function PreviewLanding({
       </section>
 
       {/* ──────────────────────────────────────────────────────────
+          TRDRHUB BRIDGE — The funnel
+          ────────────────────────────────────────────────────────── */}
+      <section className="py-24 bg-neutral-50 border-t border-neutral-200">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <FadeInView>
+            <p className="text-sm font-mono tracking-widest text-[#FF4F00] uppercase mb-6">Beyond questions</p>
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-neutral-900 leading-tight">
+              Know the rules. Then validate the documents.
+            </h2>
+            <p className="mt-6 text-lg text-neutral-500 font-light max-w-2xl mx-auto leading-relaxed">
+              TFRules answers your compliance questions. When you need to validate
+              actual LCs, invoices, and transport documents against those same rules,
+              TRDR Hub runs the full check — with discrepancy reports your bank will accept.
+            </p>
+            <a
+              href="https://trdrhub.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-10 inline-flex items-center justify-center border-2 border-neutral-900 px-8 py-4 text-sm font-bold text-neutral-900 uppercase tracking-widest transition hover:bg-neutral-900 hover:text-white"
+            >
+              Explore TRDR Hub <ArrowRight className="ml-3 h-4 w-4" />
+            </a>
+          </FadeInView>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────
           BOTTOM CTA
           ────────────────────────────────────────────────────────── */}
       <section className="py-32 bg-[#FF4F00] text-center px-6">
         <FadeInView>
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-8">Deploy the Engine.</h2>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-8">Know the rule before it costs you.</h2>
           <button onClick={onOpenChat} className="inline-flex items-center justify-center bg-white px-10 py-5 text-xl font-bold text-[#FF4F00] uppercase tracking-widest transition hover:bg-neutral-100 hover:scale-105 active:scale-95 shadow-2xl">
-            Start Verification <ArrowRight className="ml-3 h-5 w-5" />
+            Try it free <ArrowRight className="ml-3 h-5 w-5" />
           </button>
         </FadeInView>
       </section>
