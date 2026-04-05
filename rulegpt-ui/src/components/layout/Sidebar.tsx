@@ -142,20 +142,12 @@ export function Sidebar({
             </Button>
           </>
         ) : (
-          <div className="flex flex-col gap-2.5">
-            <button
-              className="w-full rounded-sm border-[1.5px] border-neutral-200 dark:border-white/10 bg-white dark:bg-[#0A0A0A] py-2.5 text-xs font-bold text-neutral-600 dark:text-neutral-300 transition hover:bg-neutral-50 dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-white"
-              onClick={onOpenLogin}
-            >
-              Sign in
-            </button>
-            <button
-              className="w-full rounded-sm bg-[#FF4F00] py-2.5 text-xs font-bold text-white transition hover:bg-[#E64600] shadow-md shadow-[#FF4F00]/20"
-              onClick={onOpenSignup}
-            >
-              Sign up
-            </button>
-          </div>
+          <button
+            className="w-full text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-[#FF4F00] transition"
+            onClick={onOpenLogin}
+          >
+            Sign in to sync history &amp; saved answers
+          </button>
         )}
         
         <div className="flex items-center justify-between pt-2">

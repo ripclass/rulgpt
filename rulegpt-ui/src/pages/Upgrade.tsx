@@ -49,7 +49,6 @@ export function Upgrade() {
   const location = useLocation()
   const navigate = useNavigate()
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null)
-  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null)
   const [isCheckingOut, setIsCheckingOut] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<BillingPlan>(auth.currentTier === 'starter' ? 'pro' : 'starter')
   const [billingInterval, setBillingInterval] = useState<BillingInterval>('monthly')
@@ -118,7 +117,6 @@ export function Upgrade() {
 
     setIsCheckingOut(true)
     setCheckoutMessage(null)
-    setCheckoutUrl(null)
     try {
       const response = await api.createBillingCheckout(
         {
@@ -136,8 +134,7 @@ export function Upgrade() {
       )
       const nextUrl = response.checkout_url ?? response.redirect_url ?? response.url ?? null
       if (nextUrl) {
-        setCheckoutUrl(nextUrl)
-        setCheckoutMessage(`Checkout session created for ${PLAN_COPY[selectedPlan].title}. Open Stripe to complete the upgrade.`)
+        window.location.href = nextUrl
         return
       }
       if (response.tier === 'starter' || response.tier === 'pro') {
@@ -261,15 +258,6 @@ export function Upgrade() {
                   ? `Start ${selectedPlanCopy.title} checkout`
                   : 'Checkout not configured yet'}
           </button>
-          {checkoutUrl ? (
-            <a
-              href={checkoutUrl}
-              rel="noreferrer"
-              className="inline-flex h-11 items-center justify-center rounded-sm bg-neutral-100 dark:bg-white/5 px-6 text-xs font-bold uppercase tracking-widest text-neutral-900 dark:text-white transition hover:bg-neutral-200 dark:hover:bg-white/10"
-            >
-              Open Stripe checkout
-            </a>
-          ) : null}
           <Link to="/chat" className="inline-flex h-11 items-center justify-center rounded-sm bg-neutral-100 dark:bg-white/5 px-6 text-xs font-bold uppercase tracking-widest text-neutral-900 dark:text-white transition hover:bg-neutral-200 dark:hover:bg-white/10">
             Back to chat
           </Link>
