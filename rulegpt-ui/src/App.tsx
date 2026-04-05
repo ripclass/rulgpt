@@ -4,8 +4,6 @@ import { useLocation } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Home } from '@/pages/Home'
 import { Landing } from '@/pages/Landing'
-import { Upgrade } from '@/pages/Upgrade'
-import { Pricing } from '@/pages/Pricing'
 import { Faq } from '@/pages/Faq'
 import { Contact } from '@/pages/Contact'
 import { Privacy } from '@/pages/Privacy'
@@ -115,12 +113,12 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/chat" element={<Home />} />
           <Route path="/landing" element={<Navigate to="/" replace />} />
-          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/pricing" element={<Navigate to="/#pricing" replace />} />
+          <Route path="/upgrade" element={<Navigate to="/#pricing" replace />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
-          <Route path="/upgrade" element={<Upgrade />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <AppAuthModals />

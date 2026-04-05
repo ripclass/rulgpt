@@ -347,7 +347,7 @@ export function Home() {
         onOpenSignup={() => authModal.openSignup()}
         onUpgrade={() => {
           resetSession()
-          navigate('/upgrade')
+          navigate('/#pricing')
         }}
         onSubmitQuery={submitQuery}
         onNewQuery={handleNewQuery}
@@ -388,7 +388,7 @@ export function Home() {
           setMobileDrawerMode('saved')
           setMobileDrawerOpen(true)
         }}
-        onPro={() => navigate('/upgrade')}
+        onPro={() => navigate('/#pricing')}
       />
 
     </div>

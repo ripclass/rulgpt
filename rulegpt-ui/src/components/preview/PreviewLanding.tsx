@@ -12,6 +12,8 @@ interface PreviewLandingProps {
   onOpenLogin: () => void
   onOpenSignup: () => void
   onOpenChat: () => void
+  onStartCheckout: (plan: 'starter' | 'pro') => void
+  isCheckingOut?: boolean
 }
 
 function useIntersectionObserver(options = {}) {
@@ -61,6 +63,8 @@ export function PreviewLanding({
   onOpenLogin,
   onOpenSignup,
   onOpenChat,
+  onStartCheckout,
+  isCheckingOut,
 }: PreviewLandingProps) {
   const [scrolled, setScrolled] = useState(false)
   const [heroPassed, setHeroPassed] = useState(false)
@@ -121,7 +125,7 @@ export function PreviewLanding({
           {/* Desktop Nav */}
           <div className={`hidden items-center gap-10 md:flex text-[15px] font-medium transition-colors duration-300 ${isNavDarkTheme ? 'text-neutral-300' : 'text-neutral-600'}`}>
             <a href="#how" className={`transition duration-200 ${isNavDarkTheme ? 'hover:text-white' : 'hover:text-neutral-900'}`}>How it works</a>
-            <Link to="/pricing" className={`transition duration-200 ${isNavDarkTheme ? 'hover:text-white' : 'hover:text-neutral-900'}`}>Pricing</Link>
+            <a href="#pricing" className={`transition duration-200 ${isNavDarkTheme ? 'hover:text-white' : 'hover:text-neutral-900'}`}>Pricing</a>
             
             <div className={`h-4 w-px ${isNavDarkTheme ? 'bg-white/20' : 'bg-neutral-200'}`} />
 
@@ -394,73 +398,81 @@ export function PreviewLanding({
       {/* ──────────────────────────────────────────────────────────
           PRICING
           ────────────────────────────────────────────────────────── */}
-      <section className="py-32 bg-white">
+      <section id="pricing" className="py-32 bg-white scroll-mt-20">
         <div className="mx-auto max-w-6xl px-6">
           <FadeInView className="text-center mb-24">
-            <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900">Procurement.</h2>
-            <p className="mt-6 text-lg text-neutral-500 font-light max-w-2xl mx-auto">Deploy the engine today. No complex enterprise sales process required to start verifying rules.</p>
+            <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900">Simple pricing.</h2>
+            <p className="mt-6 text-lg text-neutral-500 font-light max-w-2xl mx-auto">Start free. Upgrade when it saves you money. No hidden fees.</p>
           </FadeInView>
 
           <FadeInView delay={200} className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Free */}
             <div className="bg-white p-10 border border-neutral-200 shadow-sm flex flex-col justify-between group hover:border-neutral-300 transition-colors">
               <div>
-                <h3 className="text-sm font-bold uppercase tracking-widest text-[#FF4F00]">Trial Range</h3>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-[#FF4F00]">Free</h3>
                 <div className="mt-6 mb-2">
                   <span className="text-5xl font-semibold tracking-tight text-neutral-900">$0</span>
                 </div>
                 <p className="text-sm text-neutral-500 border-b border-neutral-100 pb-8 uppercase font-mono tracking-wide">20 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-600">
                   <li className="flex gap-4"><Check className="h-5 w-5 text-neutral-300 shrink-0" /> Full citation access</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-neutral-300 shrink-0" /> Fast response time</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-neutral-300 shrink-0" /> No account required</li>
                 </ul>
               </div>
               <button onClick={onOpenChat} className="mt-12 w-full border border-neutral-200 py-4 font-semibold text-neutral-900 uppercase tracking-wider text-sm transition hover:bg-neutral-50">
-                Begin
+                Start free
               </button>
             </div>
 
             {/* Starter */}
             <div className="bg-neutral-900 p-10 border border-neutral-800 shadow-2xl relative md:-mt-4 md:mb-4 flex flex-col justify-between transform transition-transform hover:-translate-y-2">
               <div>
-                <div className="absolute top-0 right-10 -translate-y-1/2 bg-[#FF4F00] text-white px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-lg">Standard</div>
-                <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400">Professional</h3>
+                <div className="absolute top-0 right-10 -translate-y-1/2 bg-[#FF4F00] text-white px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-lg">Popular</div>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400">Starter</h3>
                 <div className="mt-6 mb-2">
                   <span className="text-5xl font-semibold tracking-tight text-white">$9</span><span className="text-neutral-500 font-medium">/mo</span>
                 </div>
                 <p className="text-sm text-neutral-400 border-b border-neutral-800 pb-8 uppercase font-mono tracking-wide">500 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-300">
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Synced history DB</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Saved answer vault</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> PDF export format</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Synced history</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Saved answers</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> PDF export</li>
                 </ul>
               </div>
-              <button onClick={onOpenSignup} className="mt-12 w-full bg-[#FF4F00] py-4 font-bold text-white uppercase tracking-wider text-sm transition hover:bg-[#E64600] shadow-lg shadow-[#FF4F00]/20">
-                Initialize
+              <button
+                onClick={() => isAuthenticated ? onStartCheckout('starter') : onOpenLogin()}
+                disabled={isCheckingOut}
+                className="mt-12 w-full bg-[#FF4F00] py-4 font-bold text-white uppercase tracking-wider text-sm transition hover:bg-[#E64600] shadow-lg shadow-[#FF4F00]/20 disabled:opacity-50"
+              >
+                {isCheckingOut ? 'Redirecting...' : isAuthenticated ? 'Get Starter' : 'Sign in to upgrade'}
               </button>
             </div>
 
             {/* Pro */}
             <div className="bg-white p-10 border border-neutral-200 shadow-sm flex flex-col justify-between group hover:border-neutral-300 transition-colors">
               <div>
-                <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400">Enterprise</h3>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400">Pro</h3>
                 <div className="mt-6 mb-2">
                   <span className="text-5xl font-semibold tracking-tight text-neutral-900">$19</span><span className="text-neutral-400 font-medium">/mo</span>
                 </div>
                 <p className="text-sm text-neutral-500 border-b border-neutral-100 pb-8 uppercase font-mono tracking-wide">2,000 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-600">
                   <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Priority routing</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> API access token</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Bulk data export</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> API access</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Bulk export</li>
                 </ul>
               </div>
-              <button onClick={onOpenSignup} className="mt-12 w-full border border-neutral-200 py-4 font-semibold text-neutral-900 uppercase tracking-wider text-sm transition hover:bg-neutral-50">
-                Upgrade
+              <button
+                onClick={() => isAuthenticated ? onStartCheckout('pro') : onOpenLogin()}
+                disabled={isCheckingOut}
+                className="mt-12 w-full border border-neutral-200 py-4 font-semibold text-neutral-900 uppercase tracking-wider text-sm transition hover:bg-neutral-50 disabled:opacity-50"
+              >
+                {isCheckingOut ? 'Redirecting...' : isAuthenticated ? 'Get Pro' : 'Sign in to upgrade'}
               </button>
             </div>
           </FadeInView>
           <FadeInView delay={400}>
-            <p className="mt-16 text-center text-sm font-medium tracking-wide text-neutral-400 uppercase">One avoided discrepancy fee covers a year of Professional tier.</p>
+            <p className="mt-16 text-center text-sm font-medium tracking-wide text-neutral-400 uppercase">One avoided discrepancy fee covers a year of Starter.</p>
           </FadeInView>
         </div>
       </section>

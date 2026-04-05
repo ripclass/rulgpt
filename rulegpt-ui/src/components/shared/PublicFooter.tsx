@@ -24,7 +24,7 @@ export function PublicFooter() {
           <div className="space-y-6">
             <p className="text-neutral-500">System</p>
             <div className="flex flex-col gap-4">
-              <Link to="/pricing" className="text-neutral-300 hover:text-white transition">Pricing</Link>
+              <Link to="/#pricing" className="text-neutral-300 hover:text-white transition">Pricing</Link>
               <Link to="/faq" className="text-neutral-300 hover:text-white transition">FAQ</Link>
               <Link to="/contact" className="text-neutral-300 hover:text-white transition">Contact</Link>
             </div>

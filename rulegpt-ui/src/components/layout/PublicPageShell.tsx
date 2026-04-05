@@ -36,7 +36,13 @@ export function PublicPageShell({ eyebrow, title, description, children }: Publi
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">
-            {['Pricing', 'FAQ', 'Contact'].map(label => (
+            <Link
+              to="/#pricing"
+              className="text-[13px] font-medium transition-colors text-neutral-400 hover:text-white uppercase tracking-widest"
+            >
+              Pricing
+            </Link>
+            {['FAQ', 'Contact'].map(label => (
               <Link
                 key={label}
                 to={`/${label.toLowerCase()}`}
