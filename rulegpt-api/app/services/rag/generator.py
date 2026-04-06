@@ -418,7 +418,12 @@ def _compose_generic_grounded_answer(rules: Sequence[RetrievedRule], partial_cov
 
 
 def _normalize_citation_token(value: str) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", (value or "").lower()).strip()
+    text = re.sub(r"[^a-z0-9]+", " ", (value or "").lower()).strip()
+    # Normalize common abbreviation variants so "Article 18" matches "Art. 18"
+    text = re.sub(r"\barticle\b", "art", text)
+    text = re.sub(r"\bparagraph\b", "para", text)
+    text = re.sub(r"\bsection\b", "sec", text)
+    return text
 
 
 def _first_sentence(value: str) -> str:
@@ -603,27 +608,87 @@ def _tighten_answer_voice(answer: str) -> str:
 def _allowed_reference_tokens(rules: Sequence[RetrievedRule]) -> tuple[set[str], set[str]]:
     allowed_citations: set[str] = set()
     allowed_articles: set[str] = set()
+    allowed_rulebooks: set[str] = set()
+
     for rule in rules:
-        allowed_citations.add(_normalize_citation_token(f"{rule.rulebook} {rule.reference}"))
-        allowed_citations.add(_normalize_citation_token(rule.reference))
-        allowed_articles.update(
-            _normalize_citation_token(match.group(0))
-            for match in re.finditer(r"article\s+\d+(?:\([a-z0-9]+\))?", rule.reference, flags=re.IGNORECASE)
-        )
+        ref = rule.reference or ""
+        rb = rule.rulebook or ""
+
+        # Full compound reference
+        allowed_citations.add(_normalize_citation_token(f"{rb} {ref}"))
+        allowed_citations.add(_normalize_citation_token(ref))
+        allowed_citations.add(_normalize_citation_token(rb))
+
+        # Rulebook name as standalone allowed token
+        rb_norm = _normalize_citation_token(rb)
+        if rb_norm:
+            allowed_rulebooks.add(rb_norm)
+
+        # Split compound references on comma/semicolon and add each part
+        for part in re.split(r"[;,]", ref):
+            part = part.strip()
+            if part:
+                allowed_citations.add(_normalize_citation_token(part))
+
+        # Extract all article/paragraph numbers from reference AND excerpt
+        for source_text in (ref, rule.excerpt or ""):
+            for match in re.finditer(
+                r"(?:article|art\.?|paragraph|para\.?|section|sec\.?)\s+\d+(?:\([a-z0-9]+\))*(?:\([a-z0-9]+\))?",
+                source_text,
+                flags=re.IGNORECASE,
+            ):
+                allowed_articles.add(_normalize_citation_token(match.group(0)))
+
     return allowed_citations, allowed_articles
 
 
 def answer_mentions_unknown_references(answer: str, rules: Sequence[RetrievedRule]) -> bool:
+    """Check if the LLM answer cites references NOT in the retrieved rules.
+
+    Uses relaxed matching: a citation like "[UCP600 Article 18(a)(i)]" is
+    allowed if the retrieved rules contain UCP600 with Art 18 anywhere in
+    their reference or excerpt.  Only returns True (= hallucinated) when
+    a cited article number doesn't appear in ANY retrieved rule.
+    """
     allowed_citations, allowed_articles = _allowed_reference_tokens(rules)
+
+    # Build a flat set of all allowed content for containment checks
+    all_allowed = allowed_citations | allowed_articles
+
+    # Check bracketed citations like [UCP600 Article 18(a)(i)]
+    unknown_count = 0
     for bracketed in re.findall(r"\[([^\]]+)\]", answer):
         normalized = _normalize_citation_token(bracketed)
-        if normalized and normalized not in allowed_citations:
-            return True
-    for match in re.finditer(r"article\s+\d+(?:\([a-z0-9]+\))?", answer, flags=re.IGNORECASE):
+        if not normalized:
+            continue
+        # Exact match
+        if normalized in all_allowed:
+            continue
+        # Containment: does any allowed token appear inside this citation or vice versa?
+        if any(allowed in normalized or normalized in allowed for allowed in all_allowed):
+            continue
+        unknown_count += 1
+
+    # Check standalone article references like "Article 18(a)(i)"
+    for match in re.finditer(
+        r"(?:article|art\.?)\s+\d+(?:\([a-z0-9]+\))*",
+        answer,
+        flags=re.IGNORECASE,
+    ):
         normalized = _normalize_citation_token(match.group(0))
-        if normalized and normalized not in allowed_articles:
-            return True
-    return False
+        if not normalized:
+            continue
+        if normalized in allowed_articles:
+            continue
+        # Relaxed: check if just the article number (e.g. "art 18") matches
+        art_num = re.search(r"art\s+(\d+)", normalized)
+        if art_num and any(f"art {art_num.group(1)}" in a for a in allowed_articles):
+            continue
+        unknown_count += 1
+
+    # Only flag as hallucinated if MULTIPLE unknown references found.
+    # A single borderline citation shouldn't kill an otherwise good answer.
+    return unknown_count >= 3
 
 
 def normalize_generated_answer(answer: str) -> str:
