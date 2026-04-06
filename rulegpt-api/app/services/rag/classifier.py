@@ -245,9 +245,21 @@ def _pick_commodity(query: str) -> Optional[str]:
 
 def _heuristic_classify(query: str) -> ClassifierOutput:
     lowered = query.lower()
-    in_scope = not any(marker in lowered for marker in _OUT_OF_SCOPE_MARKERS)
-    if in_scope and "tax" in lowered and not any(marker in lowered for marker in _TRADE_TAX_CONTEXT_MARKERS):
+    has_out_of_scope = any(marker in lowered for marker in _OUT_OF_SCOPE_MARKERS)
+    has_trade_context = any(marker in lowered for marker in _TRADE_TAX_CONTEXT_MARKERS)
+
+    if has_out_of_scope and has_trade_context:
+        # Query mentions both an out-of-scope topic AND trade context —
+        # keep in-scope so the LLM can address the trade compliance angles
+        # (e.g., "pay for import using Bitcoin" → sanctions/TBML relevant)
+        in_scope = True
+    elif has_out_of_scope:
         in_scope = False
+    elif "tax" in lowered and not has_trade_context:
+        # Pure tax question with no trade context
+        in_scope = False
+    else:
+        in_scope = True
     return ClassifierOutput(
         domain=_pick_domain(query),
         jurisdiction=_pick_jurisdiction(query),

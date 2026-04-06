@@ -76,6 +76,9 @@ _ANCHOR_RULES: dict[str, list[str]] = {
         "UCP600-31",      # Partial shipments ALLOWED (the one that failed)
         "UCP600-31-DERIVED-001",  # Partial shipments derived rule
         "UCP600-36",      # Force majeure (protects banks, not beneficiaries)
+        "MT700-43P-001",  # Field 43P partial shipments
+        "UCP600-19",      # Multimodal transport document
+        "UCP600-20",      # Bill of lading
     ],
     "sanctions": [
         "OFAC-IRAN-001",  # Iran comprehensive sanctions
@@ -90,6 +93,9 @@ _ANCHOR_TRIGGERS: dict[str, list[str]] = {
     "UCP600-30": ["tolerance", "about", "approximately", "5%", "10%"],
     "UCP600-28": ["insurance", "110%", "cif insurance", "cip insurance"],
     "UCP600-14": ["examination period", "banking days", "5 days", "five days", "how long"],
+    "UCP600-19": ["multimodal", "combined transport", "door to door", "multimodal transport document"],
+    "UCP600-20": ["bill of lading", "b/l", "ocean bill", "marine bill", "shipped on board"],
+    "MT700-43P-001": ["partial shipment", "field 43p"],
 }
 
 

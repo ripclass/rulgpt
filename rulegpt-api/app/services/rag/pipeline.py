@@ -184,6 +184,9 @@ def _query_needs_lcopilot_redirect(query: str) -> bool:
     lowered = query.lower()
 
     # Exact document-validation phrases
+    # Phrases where the USER is asking US to check/validate their documents.
+    # Must NOT trigger when the user is describing what a BANK is doing
+    # (e.g., "my bank is checking my documents" ≠ "can you check my documents")
     _DOC_VALIDATION_PHRASES = (
         "is this lc compliant",
         "is this l/c compliant",
@@ -200,13 +203,22 @@ def _query_needs_lcopilot_redirect(query: str) -> bool:
         "review my document",
         "review my documents",
         "review invoice wording",
-        "check my invoice",
+        "validate my invoice",
         "check my documents",
         "check my document",
-        "validate my invoice",
+        "check my invoice",
     )
 
-    return any(phrase in lowered for phrase in _DOC_VALIDATION_PHRASES)
+    if any(phrase in lowered for phrase in _DOC_VALIDATION_PHRASES):
+        # Don't trigger if the user is talking about a BANK checking documents
+        bank_context = any(b in lowered for b in (
+            "bank is", "bank has", "bank was", "bank taking",
+            "bank checking", "bank reviewed", "bank examining",
+            "advising bank", "issuing bank", "nominated bank",
+        ))
+        return not bank_context
+
+    return False
 
 
 def _confidence_from_rules(
