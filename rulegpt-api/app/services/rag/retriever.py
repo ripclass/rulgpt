@@ -591,6 +591,63 @@ class RuleRetriever:
 
         return selected
 
+    async def _enrich_from_rulhub(
+        self,
+        query: str,
+        candidates: List[RetrievedRule],
+        top_k: int,
+    ) -> List[RetrievedRule]:
+        """Supplement pgvector results with RulHub API semantic search."""
+        client = await self._get_rulhub_client()
+        if client is None or not hasattr(client, "search_rules"):
+            return candidates
+
+        try:
+            rulhub_results = await client.search_rules(query=query, limit=top_k)
+        except Exception:
+            return candidates
+
+        if not rulhub_results:
+            return candidates
+
+        existing_ids = {c.rule_id for c in candidates}
+        added = 0
+        for rule in rulhub_results:
+            rid = str(rule.get("rule_id", ""))
+            if rid in existing_ids or not rid:
+                continue
+            text = str(rule.get("text") or rule.get("description") or "")
+            if not text.strip() or len(text) < 10:
+                continue
+            # Skip internal engine rules
+            if any(rid.startswith(p) for p in ("DQ-", "VG-", "EVAPI-", "BBEH-")):
+                continue
+            rb = str(rule.get("rulebook") or rule.get("source") or "unknown")
+            if rb in _INTERNAL_RULEBOOKS:
+                continue
+
+            candidates.append(
+                RetrievedRule(
+                    rule_id=rid,
+                    rulebook=rb,
+                    reference=str(rule.get("reference") or rule.get("article") or "n/a"),
+                    title=str(rule.get("title") or ""),
+                    excerpt=text[:500],
+                    domain=str(rule.get("domain") or "other"),
+                    jurisdiction=str(rule.get("jurisdiction") or "global"),
+                    document_type=str(rule.get("document_type") or "other"),
+                    similarity_score=0.6,
+                    rerank_score=0.55,
+                    metadata={"_source": "rulhub_api"},
+                )
+            )
+            existing_ids.add(rid)
+            added += 1
+            if added >= 3:
+                break
+
+        return candidates
+
     async def _enrich_with_anchors(
         self,
         session: Any,
@@ -777,6 +834,9 @@ class RuleRetriever:
                 _log.info("[RETRIEVAL] Broadened search found %d results", len(merged_candidates))
             else:
                 _log.warning("[RETRIEVAL] Broadened search also returned zero results for: %r", query[:80])
+
+        # Enrich from RulHub API — supplements pgvector with server-side semantic search
+        merged_candidates = await self._enrich_from_rulhub(query, merged_candidates, target_top_k)
 
         # Enrich with anchor rules — foundational rules that should always be
         # in context when their domain is queried (safety net for vector search misses)

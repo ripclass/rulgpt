@@ -182,47 +182,60 @@ class RulHubClient:
         self,
         query: str,
         filters: Mapping[str, Any] | None = None,
+        limit: int = 10,
     ) -> list[dict[str, Any]]:
-        """
-        Best-effort search wrapper over current `/v1/rules` filter endpoints.
+        """Semantic search via RulHub POST /v1/rules/search.
 
-        Limitation: no verified server-side free-text search endpoint exists at this time.
-        This method applies filters remotely and then performs local text matching/ranking.
+        Falls back to local text matching if the API is unavailable.
         """
+        if not query or not query.strip():
+            return []
+
+        body: dict[str, Any] = {"query": query.strip(), "limit": min(max(1, limit), 50)}
+        if filters:
+            if filters.get("domain"):
+                body["domain"] = filters["domain"]
+            if filters.get("jurisdiction"):
+                body["jurisdiction"] = filters["jurisdiction"]
+
+        cache_key = f"search:{json.dumps(body, sort_keys=True)}"
+        try:
+            payload = await self._request_json(
+                "POST", "/v1/rules/search", json_body=body, cache_key=cache_key,
+            )
+            results_raw = payload.get("results") if isinstance(payload, dict) else []
+            if not isinstance(results_raw, list):
+                return []
+            return [self.normalize_rule(r) for r in results_raw if isinstance(r, Mapping)]
+        except RulHubClientError:
+            # Fall back to old client-side search
+            return await self._search_rules_local(query, filters, limit)
+
+    async def _search_rules_local(
+        self, query: str, filters: Mapping[str, Any] | None = None, limit: int = 10,
+    ) -> list[dict[str, Any]]:
+        """Fallback: filter + local text ranking when API search is unavailable."""
         filters = filters or {}
         domain = _to_str(filters.get("domain"))
         jurisdiction = _to_str(filters.get("jurisdiction"))
         document_type = _to_str(filters.get("document_type"))
-        limit = _to_int(filters.get("limit"))
-        start_page = _to_int(filters.get("page")) or 1
 
-        page_size = min(max((limit or 50), 25), 200)
         collected: list[dict[str, Any]] = []
-        for page in range(start_page, start_page + self.max_search_pages):
+        for page in range(1, 1 + self.max_search_pages):
             page_rules = await self.get_rules(
-                domain=domain,
-                jurisdiction=jurisdiction,
-                document_type=document_type,
-                limit=page_size,
-                page=page,
+                domain=domain, jurisdiction=jurisdiction, document_type=document_type,
+                limit=50, page=page,
             )
             if not page_rules:
                 break
             collected.extend(page_rules)
-            if len(page_rules) < page_size:
+            if len(page_rules) < 50:
                 break
 
-        normalized_query = (query or "").strip().lower()
-        if not normalized_query:
-            return collected[: limit or len(collected)]
-
-        scored: list[tuple[int, dict[str, Any]]] = []
-        for rule in collected:
-            score = _score_rule_for_query(rule, normalized_query)
-            if score > 0:
-                scored.append((score, rule))
+        normalized_query = query.strip().lower()
+        scored = [(s, r) for r in collected if (s := _score_rule_for_query(r, normalized_query)) > 0]
         scored.sort(key=lambda item: item[0], reverse=True)
-        return [rule for _, rule in scored[: limit or len(scored)]]
+        return [r for _, r in scored[:limit]]
 
     def list_local_rule_files(self) -> list[Path]:
         """Return JSON files discovered in the configured local rule root."""
@@ -303,6 +316,7 @@ class RulHubClient:
         method: str,
         path: str,
         params: Mapping[str, Any] | None = None,
+        json_body: Mapping[str, Any] | None = None,
         cache_key: str | None = None,
     ) -> Any:
         if cache_key:
@@ -312,9 +326,9 @@ class RulHubClient:
 
         url = f"{self.base_url}{path}"
         client = self._get_or_create_client()
-        headers = {"Accept": "application/json"}
+        headers: dict[str, str] = {"Accept": "application/json"}
         if self.api_key:
-            headers["Authorization"] = f"Bearer {self.api_key}"
+            headers["X-API-Key"] = self.api_key
 
         last_error: Exception | None = None
         for attempt in range(1, self.max_retries + 1):
@@ -323,6 +337,7 @@ class RulHubClient:
                     method=method,
                     url=url,
                     params=params,
+                    json=dict(json_body) if json_body else None,
                     headers=headers,
                     timeout=self.timeout_seconds,
                 )
