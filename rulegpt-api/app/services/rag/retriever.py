@@ -65,6 +65,34 @@ _INTERNAL_RULEBOOK_EXCLUSION = (
 )
 
 
+# Foundational anchor rules — always included when their domain is queried.
+# These are the rules that must NEVER be missing from retrieval context.
+_ANCHOR_RULES: dict[str, list[str]] = {
+    "icc": [
+        "UCP600-14",      # Standard for examination (5 banking days, face value)
+        "UCP600-18",      # Commercial invoice requirements
+        "UCP600-28",      # Insurance document (110% CIF)
+        "UCP600-30",      # Tolerance (about/approximately ±10%)
+        "UCP600-31",      # Partial shipments ALLOWED (the one that failed)
+        "UCP600-31-DERIVED-001",  # Partial shipments derived rule
+        "UCP600-36",      # Force majeure (protects banks, not beneficiaries)
+    ],
+    "sanctions": [
+        "OFAC-IRAN-001",  # Iran comprehensive sanctions
+    ],
+}
+
+# Keywords that trigger specific anchor rules
+_ANCHOR_TRIGGERS: dict[str, list[str]] = {
+    "UCP600-31": ["partial shipment", "partial drawing", "two shipments", "two presentations", "split shipment"],
+    "UCP600-31-DERIVED-001": ["partial shipment", "partial drawing"],
+    "UCP600-36": ["force majeure", "strike", "riot", "war", "act of god", "lc expired", "lc has expired"],
+    "UCP600-30": ["tolerance", "about", "approximately", "5%", "10%"],
+    "UCP600-28": ["insurance", "110%", "cif insurance", "cip insurance"],
+    "UCP600-14": ["examination period", "banking days", "5 days", "five days", "how long"],
+}
+
+
 def _domain_prefix(domain: str | None) -> str:
     """Return a SQL LIKE pattern for prefix-matching sub-domains."""
     if domain is None:
@@ -557,6 +585,56 @@ class RuleRetriever:
 
         return selected
 
+    async def _enrich_with_anchors(
+        self,
+        session: Any,
+        query: str,
+        domain: str,
+        results: List[RetrievedRule],
+    ) -> List[RetrievedRule]:
+        """Add foundational anchor rules if they're missing from results and relevant to the query."""
+        anchors = _ANCHOR_RULES.get(domain, [])
+        if not anchors:
+            return results
+
+        retrieved_ids = {r.rule_id for r in results}
+        query_lower = query.lower()
+
+        # Only add anchors triggered by query keywords
+        needed: list[str] = []
+        for rule_id in anchors:
+            if rule_id in retrieved_ids:
+                continue
+            triggers = _ANCHOR_TRIGGERS.get(rule_id, [])
+            if triggers and any(t in query_lower for t in triggers):
+                needed.append(rule_id)
+
+        if not needed:
+            return results
+
+        # Fetch and append (max 2 anchors to avoid diluting context)
+        for rule_id in needed[:2]:
+            detail = await self._fetch_rule_detail(session, rule_id)
+            if not detail or not (detail.get("text") or "").strip():
+                continue
+            results.append(
+                RetrievedRule(
+                    rule_id=rule_id,
+                    rulebook=str(detail.get("rulebook", "UCP600")),
+                    reference=str(detail.get("reference", "n/a")),
+                    title=str(detail.get("title", "")),
+                    excerpt=str(detail.get("text", ""))[:500],
+                    domain=str(detail.get("domain", domain)),
+                    jurisdiction=str(detail.get("jurisdiction", "global")),
+                    document_type=str(detail.get("document_type", "other")),
+                    similarity_score=0.5,
+                    rerank_score=0.5,
+                    metadata={"_anchor": True},
+                )
+            )
+
+        return results
+
     async def retrieve(
         self,
         session: Any,
@@ -694,4 +772,8 @@ class RuleRetriever:
             else:
                 _log.warning("[RETRIEVAL] Broadened search also returned zero results for: %r", query[:80])
 
-        return self._select_results(merged_candidates, target_top_k, document_breadth)
+        # Enrich with anchor rules — foundational rules that should always be
+        # in context when their domain is queried (safety net for vector search misses)
+        selected = self._select_results(merged_candidates, target_top_k, document_breadth)
+        selected = await self._enrich_with_anchors(session, query, classification.domain, selected)
+        return selected
