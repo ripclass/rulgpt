@@ -3,12 +3,12 @@ import type {
   BillingCheckoutRequest,
   BillingCheckoutResponse,
   BillingSubscriptionResponse,
-  HistoryItem,
   QueryRequest,
   QueryResponse,
   QuerySuggestion,
   RuleDetails,
   SavedAnswer,
+  SessionSummary,
 } from '@/types'
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ?? 'http://localhost:8000'
@@ -173,7 +173,7 @@ export const api = {
       headers: identityHeaders(identity),
     }),
   getHistory: (identity: RequestIdentity) =>
-    request<HistoryItem[]>('/api/history', {
+    request<SessionSummary[]>('/api/history', {
       headers: identityHeaders(identity),
     }),
   listSaved: (identity: RequestIdentity) =>

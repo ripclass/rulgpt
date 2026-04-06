@@ -3,17 +3,17 @@ import { QueryHistory } from '@/components/shared/QueryHistory'
 import { SavedAnswers } from '@/components/shared/SavedAnswers'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
-import type { HistoryItem, SavedAnswer } from '@/types'
+import type { SavedAnswer, SessionSummary } from '@/types'
 
 interface MobileDrawerProps {
   open: boolean
   title: string
   mode: 'history' | 'saved'
-  history: HistoryItem[]
+  history: SessionSummary[]
   savedAnswers: SavedAnswer[]
   previewMode?: boolean
   onOpenChange: (open: boolean) => void
-  onPickHistory: (item: HistoryItem) => void
+  onPickHistory: (session: SessionSummary) => void
   onDeleteSaved: (savedId: string) => void
 }
 

@@ -15,45 +15,28 @@ import { useQuery } from '@/hooks/useQuery'
 import { useSession } from '@/hooks/useSession'
 import { useTierLimit } from '@/hooks/useTierLimit'
 import { isPreviewModeEnabled } from '@/lib/config'
-import type { Citation, HistoryItem, Message, RuleDetails, SavedAnswer } from '@/types'
+import type { Citation, HistoryItem, Message, RuleDetails, SavedAnswer, SessionSummary } from '@/types'
 
-// Local history is in-memory only — clears on page refresh.
-// Authenticated users get persistent history from the backend.
-function persistLocalHistory(_items: HistoryItem[]) {
-  // no-op: intentionally not persisted to localStorage to avoid stale data
-}
-
-function mergeHistory(primary: HistoryItem[], secondary: HistoryItem[]) {
-  const seen = new Set<string>()
-  const merged: HistoryItem[] = []
-  for (const item of [...primary, ...secondary]) {
-    const key = item.query_id || `${item.created_at}:${item.query_text}`
-    if (seen.has(key)) continue
-    seen.add(key)
-    merged.push(item)
+function buildSessionMessages(session: SessionSummary): Message[] {
+  const messages: Message[] = []
+  for (const item of session.queries) {
+    messages.push(
+      { id: `${item.query_id}-user`, role: 'user', text: item.query_text, createdAt: item.created_at },
+      { id: item.query_id, queryId: item.query_id, role: 'assistant', text: item.answer_text, createdAt: item.created_at, confidence: item.confidence_band, citations: [], domainTags: [] },
+    )
   }
-  return merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  return messages
 }
 
-function buildHistoryMessages(item: HistoryItem): Message[] {
-  return [
-    {
-      id: `${item.query_id}-user`,
-      role: 'user',
-      text: item.query_text,
-      createdAt: item.created_at,
-    },
-    {
-      id: item.query_id,
-      queryId: item.query_id,
-      role: 'assistant',
-      text: item.answer_text,
-      createdAt: item.created_at,
-      confidence: item.confidence_band,
-      citations: [],
-      domainTags: [],
-    },
-  ]
+function mergeSessions(backend: SessionSummary[], local: SessionSummary[]): SessionSummary[] {
+  const seen = new Set<string>()
+  const merged: SessionSummary[] = []
+  for (const s of [...backend, ...local]) {
+    if (seen.has(s.session_id)) continue
+    seen.add(s.session_id)
+    merged.push(s)
+  }
+  return merged.sort((a, b) => new Date(b.last_active).getTime() - new Date(a.last_active).getTime())
 }
 
 export function Home() {
@@ -66,7 +49,8 @@ export function Home() {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
   const [mobileDrawerMode, setMobileDrawerMode] = useState<'history' | 'saved'>('history')
   const [activeQuickCategory, setActiveQuickCategory] = useState<string | null>(null)
-  const [localHistory, setLocalHistory] = useState<HistoryItem[]>([])
+  const [localSessions, setLocalSessions] = useState<SessionSummary[]>([])
+  const currentSessionIdRef = useRef<string>(`session-${Date.now()}`)
   const seededQueryRef = useRef<string | null>(null)
 
   const auth = useAuth()
@@ -163,9 +147,9 @@ export function Home() {
     [activeQuickCategory, defaultSuggestions],
   )
 
-  const historyItems = useMemo(
-    () => mergeHistory(historyQuery.data ?? [], localHistory),
-    [historyQuery.data, localHistory],
+  const historySessions = useMemo(
+    () => mergeSessions(historyQuery.data ?? [], localSessions),
+    [historyQuery.data, localSessions],
   )
 
   const savedAnswers = useMemo<SavedAnswer[]>(() => savedQuery.data ?? [], [savedQuery.data])
@@ -193,10 +177,20 @@ export function Home() {
   }, [auth, location.pathname, location.search, navigate])
 
   const recordHistory = (item: HistoryItem) => {
-    setLocalHistory((prev) => {
-      const next = mergeHistory([item], prev)
-      persistLocalHistory(next)
-      return next
+    const sessionId = currentSessionIdRef.current
+    setLocalSessions((prev) => {
+      const existing = prev.find(s => s.session_id === sessionId)
+      if (existing) {
+        return prev.map(s =>
+          s.session_id === sessionId
+            ? { ...s, queries: [...s.queries, item], query_count: s.query_count + 1, last_active: item.created_at }
+            : s,
+        )
+      }
+      return [
+        { session_id: sessionId, first_query: item.query_text, query_count: 1, last_active: item.created_at, queries: [item] },
+        ...prev,
+      ]
     })
   }
 
@@ -301,8 +295,7 @@ export function Home() {
   const handleNewQuery = () => {
     resetSession()
     query.clearMessages()
-    setLocalHistory([])
-    persistLocalHistory([])
+    currentSessionIdRef.current = `session-${Date.now()}`
     setActiveQuickCategory(null)
     setCitationPanelOpen(false)
     setSelectedRule(null)
@@ -320,13 +313,14 @@ export function Home() {
     }
   }
 
-  const openHistoryItem = (item: HistoryItem) => {
+  const openSession = (session: SessionSummary) => {
     setActiveQuickCategory(null)
     track('chat_history_opened', {
-      query_id: item.query_id,
-      created_at: item.created_at,
+      session_id: session.session_id,
+      query_count: session.query_count,
     })
-    query.setMessages(buildHistoryMessages(item))
+    query.setMessages(buildSessionMessages(session))
+    currentSessionIdRef.current = session.session_id
   }
 
   useEffect(() => {
@@ -356,7 +350,7 @@ export function Home() {
   return (
     <div className="min-h-screen md:flex bg-[#FAFAFA] dark:bg-[#171717] transition-colors">
       <Sidebar
-        history={historyItems}
+        history={historySessions}
         savedAnswers={savedAnswers}
         activeQuickCategory={activeQuickCategory}
         tier={auth.tier}
@@ -367,7 +361,7 @@ export function Home() {
         remaining={tierLimit.remaining}
         limitValue={tierLimit.limitValue}
         onNewQuery={handleNewQuery}
-        onPickHistory={openHistoryItem}
+        onPickHistory={openSession}
         onQuickCategory={(value) => {
           setActiveQuickCategory((prev) => prev === value ? null : value)
         }}
@@ -416,11 +410,11 @@ export function Home() {
         open={mobileDrawerOpen}
         title={mobileDrawerMode === 'history' ? 'History' : 'Saved'}
         mode={mobileDrawerMode}
-        history={historyItems}
+        history={historySessions}
         savedAnswers={savedAnswers}
         previewMode={previewMode}
         onOpenChange={setMobileDrawerOpen}
-        onPickHistory={openHistoryItem}
+        onPickHistory={openSession}
         onDeleteSaved={(savedId) => {
           void deleteSaved(savedId)
         }}

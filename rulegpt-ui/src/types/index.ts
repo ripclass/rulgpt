@@ -83,6 +83,14 @@ export interface HistoryItem {
   created_at: string
 }
 
+export interface SessionSummary {
+  session_id: string
+  first_query: string
+  query_count: number
+  last_active: string
+  queries: HistoryItem[]
+}
+
 export interface SavedAnswer {
   id: string
   query_id: string

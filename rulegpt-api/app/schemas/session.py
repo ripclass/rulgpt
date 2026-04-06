@@ -19,3 +19,12 @@ class HistoryItem(BaseModel):
     answer_text: str
     confidence_band: ConfidenceBand
     created_at: datetime
+
+
+class SessionSummary(BaseModel):
+    """One entry per session in the history sidebar."""
+    session_id: UUID
+    first_query: str
+    query_count: int
+    last_active: datetime
+    queries: list[HistoryItem]

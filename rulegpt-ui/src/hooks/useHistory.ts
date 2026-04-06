@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import type { HistoryItem } from '@/types'
+import type { SessionSummary } from '@/types'
 
 export function useHistory(
   userId?: string,
@@ -8,7 +8,7 @@ export function useHistory(
   accessToken?: string | null,
   enabled = true,
 ) {
-  return useQuery<HistoryItem[]>({
+  return useQuery<SessionSummary[]>({
     queryKey: ['history', userId, tier, accessToken ?? null],
     queryFn: () => api.getHistory({ userId, tier, accessToken }),
     enabled: Boolean(userId) && enabled,

@@ -6,10 +6,10 @@ import { SavedAnswers } from '@/components/shared/SavedAnswers'
 import { FreeTierCounter } from '@/components/shared/FreeTierCounter'
 import { RuxMark } from '@/components/shared/RuxMascot'
 import { useTheme } from '@/contexts/ThemeContext'
-import type { HistoryItem, SavedAnswer, SessionTier } from '@/types'
+import type { SavedAnswer, SessionSummary, SessionTier } from '@/types'
 
 interface SidebarProps {
-  history: HistoryItem[]
+  history: SessionSummary[]
   savedAnswers: SavedAnswer[]
   activeQuickCategory?: string | null
   tier: SessionTier
@@ -20,7 +20,7 @@ interface SidebarProps {
   remaining: number
   limitValue: number
   onNewQuery: () => void
-  onPickHistory: (item: HistoryItem) => void
+  onPickHistory: (session: SessionSummary) => void
   onQuickCategory: (value: string) => void
   onDeleteSaved: (savedId: string) => void
   onOpenLogin: () => void
