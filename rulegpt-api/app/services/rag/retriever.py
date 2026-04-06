@@ -39,6 +39,29 @@ _DOMAIN_PREFIX_OVERRIDES: dict[str, str] = {
     "bank_specific": "bank.%",  # classifier says bank_specific, rules use bank.hsbc etc.
 }
 
+# Internal engine rulebooks that must never appear in user-facing retrieval.
+# These are TRDR Hub validation engine internals, not trade finance rules.
+_INTERNAL_RULEBOOKS = {
+    "data_quality_extraction_confidence_v1",
+    "version_governance_core_v1",
+    "event_driven_rules_api_v1",
+    "clause_graph_core_v1",
+    "requirement_graph_core_v1",
+    "bank_behavior_confidence_v1",
+    "crossdomain_final_tightening_v3",
+    "crossdomain_integrated_case_v1",
+}
+
+# SQL fragment to exclude internal rulebooks from retrieval
+_INTERNAL_RULEBOOK_EXCLUSION = (
+    "AND rulebook NOT IN ("
+    + ",".join(f"'{rb}'" for rb in sorted(_INTERNAL_RULEBOOKS))
+    + ")"
+    " AND rule_id NOT LIKE 'DQ-%'"
+    " AND rule_id NOT LIKE 'VG-%'"
+    " AND rule_id NOT LIKE 'EVAPI-%'"
+)
+
 
 def _domain_prefix(domain: str | None) -> str:
     """Return a SQL LIKE pattern for prefix-matching sub-domains."""
@@ -259,7 +282,7 @@ class RuleRetriever:
     ) -> List[Dict[str, Any]]:
         qvec = "[" + ",".join(f"{x:.8f}" for x in query_embedding) + "]"
         sql = text(
-            """
+            f"""
             SELECT
                 rule_id,
                 rulebook,
@@ -274,6 +297,7 @@ class RuleRetriever:
                 AND (:domain IS NULL OR domain = :domain OR domain LIKE :domain_prefix)
                 AND (:jurisdiction IS NULL OR jurisdiction = :jurisdiction OR jurisdiction = 'global')
                 AND (:document_type IS NULL OR document_type = :document_type OR document_type = 'other')
+                {_INTERNAL_RULEBOOK_EXCLUSION}
             ORDER BY embedding <=> CAST(:qvec AS vector)
             LIMIT :semantic_limit
             """

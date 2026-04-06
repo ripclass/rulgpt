@@ -152,27 +152,38 @@ def _classify_complexity(
     _log.info("[ROUTING DEBUG] FINAL TIER: %s", tier)
     return tier  # type: ignore[return-value]
 def _query_needs_lcopilot_redirect(query: str) -> bool:
+    """Detect queries asking to validate/review actual documents.
+
+    Must be narrow — "Is this compliant with the G7 price cap?" is a sanctions
+    question, NOT a document validation request.  Only trigger when the query
+    clearly asks to examine a specific LC, invoice, or document set.
+    """
     lowered = query.lower()
-    return any(
-        marker in lowered
-        for marker in (
-            "is this lc compliant",
-            "is this l/c compliant",
-            "is my lc compliant",
-            "review my lc",
-            "validate my lc",
-            "check my lc",
-            "document validation",
-            "validate this document",
-            "review my invoice",
-            "review my document",
-            "review invoice wording",
-            "check my invoice",
-            "check my document",
-            "validate my invoice",
-            "is this compliant",
-        )
+
+    # Exact document-validation phrases
+    _DOC_VALIDATION_PHRASES = (
+        "is this lc compliant",
+        "is this l/c compliant",
+        "is my lc compliant",
+        "are my documents compliant",
+        "are these documents compliant",
+        "review my lc",
+        "validate my lc",
+        "check my lc",
+        "document validation",
+        "validate this document",
+        "validate my documents",
+        "review my invoice",
+        "review my document",
+        "review my documents",
+        "review invoice wording",
+        "check my invoice",
+        "check my documents",
+        "check my document",
+        "validate my invoice",
     )
+
+    return any(phrase in lowered for phrase in _DOC_VALIDATION_PHRASES)
 
 
 def _confidence_from_rules(

@@ -10,6 +10,18 @@ from sqlalchemy.orm import Session
 from app.models.rule import RuleRecord
 from app.services.rag.models import NormalizedRule
 
+# Internal engine rulebooks excluded from user-facing retrieval.
+_INTERNAL_RULEBOOKS = {
+    "data_quality_extraction_confidence_v1",
+    "version_governance_core_v1",
+    "event_driven_rules_api_v1",
+    "clause_graph_core_v1",
+    "requirement_graph_core_v1",
+    "bank_behavior_confidence_v1",
+    "crossdomain_final_tightening_v3",
+    "crossdomain_integrated_case_v1",
+}
+
 
 def _serialize_rule_record(rule: RuleRecord) -> dict[str, Any]:
     return {
@@ -107,6 +119,13 @@ def load_rules_for_retrieval(
     limit: int | None = None,
 ) -> list[dict[str, Any]]:
     stmt = select(RuleRecord).where(RuleRecord.is_active == True)  # noqa: E712
+    # Exclude internal engine rules from user-facing retrieval
+    stmt = stmt.where(
+        ~RuleRecord.rulebook.in_(_INTERNAL_RULEBOOKS),
+        ~RuleRecord.rule_id.like("DQ-%"),
+        ~RuleRecord.rule_id.like("VG-%"),
+        ~RuleRecord.rule_id.like("EVAPI-%"),
+    )
     if domain:
         # Exact match OR prefix match (e.g. "icc" also matches "icc.docdex")
         # Also handle bank_specific → bank.% mapping
