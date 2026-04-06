@@ -78,6 +78,7 @@ class QueryResult(BaseModel):
     latency_ms: int = 0
     stage_latency_ms: Dict[str, int] = Field(default_factory=dict)
     routing_tier: str = "sonnet"
+    fallback_reasons: List[str] = Field(default_factory=list)
 
 
 class EmbeddingSyncReport(BaseModel):

@@ -58,6 +58,7 @@ class QueryResponse(BaseModel):
     tier: SessionTier
     model_used: str | None = None
     routing_tier: str | None = None
+    fallback_reasons: List[str] | None = None
 
 
 class QuerySuggestion(BaseModel):

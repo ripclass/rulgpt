@@ -281,6 +281,7 @@ async def process_query_request(
         tier=tier,  # type: ignore[arg-type]
         model_used=query_row.model_used,
         routing_tier=query_row.routing_tier,
+        fallback_reasons=(rag or {}).get("fallback_reasons"),
     )
 
 

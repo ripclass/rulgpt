@@ -829,11 +829,22 @@ class AnswerGenerator:
         if routing_tier == "opus":
             token_budget = max(token_budget, 560)
 
+        import logging
+        _log = logging.getLogger("rulegpt.generator")
+
+        rendered_rules = _render_retrieved_rules(retrieved_rules)
         system_prompt = RULEGPT_SYSTEM_PROMPT_TEMPLATE.format(
             current_date=date.today().isoformat(),
             user_tier=user_tier,
-            retrieved_rules=_render_retrieved_rules(retrieved_rules),
+            retrieved_rules=rendered_rules,
         )
+        prompt_tokens_est = len(system_prompt.split()) + len(query.split())
+        _log.info(
+            "[GEN] query=%r model=%s tier=%s rules=%d prompt_words_est=%d token_budget=%d",
+            query[:80], model_for_tier, routing_tier, len(retrieved_rules), prompt_tokens_est, token_budget,
+        )
+
+        fallback_reasons: list[str] = []
 
         anthropic = await self._get_anthropic_client()
         if anthropic is not None:
@@ -857,8 +868,24 @@ class AnswerGenerator:
                             "partial_coverage": partial_coverage,
                             "routing_tier": routing_tier,
                         }
-            except Exception:
-                pass
+                    elif normalized:
+                        reason = f"Anthropic ({model_for_tier}): answer contained hallucinated references, dropped"
+                        _log.warning("[GEN] %s | query=%r", reason, query[:80])
+                        fallback_reasons.append(reason)
+                    else:
+                        reason = f"Anthropic ({model_for_tier}): answer was empty after normalization"
+                        _log.warning("[GEN] %s | query=%r", reason, query[:80])
+                        fallback_reasons.append(reason)
+                else:
+                    reason = f"Anthropic ({model_for_tier}): returned empty/None"
+                    _log.warning("[GEN] %s | query=%r", reason, query[:80])
+                    fallback_reasons.append(reason)
+            except Exception as exc:
+                reason = f"Anthropic ({model_for_tier}): {type(exc).__name__}: {exc}"
+                _log.error("[GEN] %s | query=%r", reason, query[:80], exc_info=True)
+                fallback_reasons.append(reason)
+        else:
+            fallback_reasons.append("Anthropic client not available")
 
         openai = await self._get_openai_client()
         if openai is not None:
@@ -881,12 +908,36 @@ class AnswerGenerator:
                             "model_used": "gpt-4.1",
                             "partial_coverage": partial_coverage,
                             "routing_tier": routing_tier,
+                            "fallback_reasons": fallback_reasons,
                         }
-            except Exception:
-                pass
+                    elif normalized:
+                        reason = "GPT-4.1: answer contained hallucinated references, dropped"
+                        _log.warning("[GEN] %s | query=%r", reason, query[:80])
+                        fallback_reasons.append(reason)
+                    else:
+                        reason = "GPT-4.1: answer was empty after normalization"
+                        _log.warning("[GEN] %s | query=%r", reason, query[:80])
+                        fallback_reasons.append(reason)
+                else:
+                    reason = "GPT-4.1: returned empty/None"
+                    _log.warning("[GEN] %s | query=%r", reason, query[:80])
+                    fallback_reasons.append(reason)
+            except Exception as exc:
+                reason = f"GPT-4.1: {type(exc).__name__}: {exc}"
+                _log.error("[GEN] %s | query=%r", reason, query[:80], exc_info=True)
+                fallback_reasons.append(reason)
+        else:
+            fallback_reasons.append("OpenAI client not available")
 
+        _log.error("[GEN] ALL MODELS FAILED, using grounded fallback | reasons=%s | query=%r", fallback_reasons, query[:80])
         answer = compose_grounded_answer(query, retrieved_rules, partial_coverage=partial_coverage)
-        return {"answer": answer, "model_used": "fallback", "partial_coverage": partial_coverage, "routing_tier": routing_tier}
+        return {
+            "answer": answer,
+            "model_used": "fallback",
+            "partial_coverage": partial_coverage,
+            "routing_tier": routing_tier,
+            "fallback_reasons": fallback_reasons,
+        }
 
     @staticmethod
     def suggested_followups(query: str, classifier: ClassifierOutput, partial_coverage: bool = False) -> List[str]:

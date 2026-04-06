@@ -372,11 +372,13 @@ class RAGPipeline:
             model_used = str(generation.get("model_used", "fallback"))
             partial_coverage = bool(generation.get("partial_coverage"))
             routing_tier = str(generation.get("routing_tier", routing_tier))
+            fallback_reasons = generation.get("fallback_reasons") or []
         else:
             answer = NO_RULE_MESSAGE
             model_used = "fallback"
             partial_coverage = True
             routing_tier = "fallback"
+            fallback_reasons = ["no rules retrieved"]
         stage_latency["generator"] = int((time.perf_counter() - start) * 1000)
 
         # Stage 4: citations
@@ -417,6 +419,7 @@ class RAGPipeline:
             latency_ms=latency_ms,
             stage_latency_ms=stage_latency,
             routing_tier=routing_tier,
+            fallback_reasons=fallback_reasons,
         )
 
 
