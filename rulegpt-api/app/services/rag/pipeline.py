@@ -68,89 +68,112 @@ def _pre_generation_confidence(rules: List[RetrievedRule]) -> str:
     return "low"
 
 
-def _classify_complexity(
+# ---------------------------------------------------------------------------
+# Tier-based model routing
+# ---------------------------------------------------------------------------
+
+_SANCTIONED_JURISDICTIONS = (
+    "iran", "russia", "north korea", "dprk", "syria", "cuba",
+    "venezuela", "myanmar", "crimea", "donetsk", "luhansk",
+)
+
+
+def select_model(
+    user_tier: str,
     query: str,
-    intent: ClassifierOutput,
     retrieved_rules: List[RetrievedRule],
-    confidence_band: str,
 ) -> RoutingTier:
-    """Select the cheapest model tier capable of answering the query."""
+    """Select Claude model based on user subscription tier + query complexity.
+
+    Tiers: free → Haiku only | starter → Haiku/Sonnet | professional →
+    Haiku/Sonnet/Opus | expert → Haiku/Sonnet/Opus (lower Opus threshold).
+
+    Before pricing tiers are live, all users default to "professional".
+    """
     import logging
     _log = logging.getLogger("rulegpt.routing")
 
     if not retrieved_rules:
-        _log.info("[ROUTING DEBUG] 0 rules → fallback")
+        _log.info("[ROUTING] 0 rules → fallback")
         return "fallback"
 
-    lowered = query.lower()
-    rule_count = len(retrieved_rules)
-    unique_domains = {rule.domain for rule in retrieved_rules if rule.domain and rule.domain != "other"}
-    unique_rulebooks = {rule.rulebook for rule in retrieved_rules if rule.rulebook and rule.rulebook != "unknown"}
+    query_lower = query.lower()
+    num_rules = len(retrieved_rules)
 
-    # Gate 1: Opus — fraud/TBML requires BOTH keyword match AND complex/interpretation
-    has_fraud_signal = any(marker in lowered for marker in _FRAUD_TBML_MARKERS)
-    is_complex_enough = intent.complexity in ("complex", "interpretation")
+    # --- Signals from retrieved rules ---
+    domains = set()
+    for rule in retrieved_rules:
+        d = getattr(rule, "domain", "") or ""
+        top = d.split(".")[0] if d else ""
+        if top and top != "other":
+            domains.add(top)
+    num_domains = len(domains)
+
+    is_sanctions = any(
+        (getattr(r, "domain", "") or "").startswith("sanctions")
+        for r in retrieved_rules
+    )
+    has_fail_severity = any(
+        getattr(r, "severity", "") == "fail"
+        for r in retrieved_rules
+    )
+    involves_sanctioned = any(c in query_lower for c in _SANCTIONED_JURISDICTIONS)
+    is_tbml = any(
+        (getattr(r, "domain", "") or "").startswith("tbml")
+        for r in retrieved_rules
+    ) or any(kw in query_lower for kw in _FRAUD_TBML_MARKERS)
+
+    # --- Simple-query signals (Haiku candidates) ---
+    is_definition = any(
+        query_lower.startswith(p)
+        for p in ("what is ", "what are ", "define ", "meaning of ", "explain ", "what does ")
+    ) and len(query.split()) < 12
+    is_simple_lookup = num_rules <= 2 and num_domains <= 1
+
+    # --- Tier-specific routing ---
+    tier = user_tier.strip().lower() if user_tier else "professional"
+
+    if tier in ("free", "anonymous"):
+        model: RoutingTier = "haiku"
+
+    elif tier == "starter":
+        # 40% Haiku / 60% Sonnet
+        model = "haiku" if (is_definition and is_simple_lookup) else "sonnet"
+
+    elif tier == "professional":
+        # 30% Haiku / 60% Sonnet / 10% Opus
+        if is_sanctions or involves_sanctioned or is_tbml:
+            model = "opus"
+        elif num_domains >= 3:
+            model = "opus"
+        elif is_definition and is_simple_lookup:
+            model = "haiku"
+        else:
+            model = "sonnet"
+
+    elif tier == "expert":
+        # 20% Haiku / 60% Sonnet / 20% Opus
+        if is_sanctions or is_tbml:
+            model = "opus"
+        elif num_domains >= 3 or num_rules >= 5:
+            model = "opus"
+        elif has_fail_severity and num_rules >= 3:
+            model = "opus"
+        elif is_definition and is_simple_lookup and not has_fail_severity:
+            model = "haiku"
+        else:
+            model = "sonnet"
+
+    else:
+        model = "sonnet"
 
     _log.info(
-        "[ROUTING DEBUG] query=%r | rule_count=%d | pre_confidence=%s "
-        "| domains=%s (count=%d) | rulebooks=%s (count=%d) "
-        "| fraud_tbml_triggered=%s | classifier_complexity=%s "
-        "| is_complex_enough=%s",
-        query[:80],
-        rule_count,
-        confidence_band,
-        unique_domains,
-        len(unique_domains),
-        unique_rulebooks,
-        len(unique_rulebooks),
-        has_fraud_signal,
-        intent.complexity,
-        is_complex_enough,
+        "[ROUTING] tier=%s model=%s | rules=%d domains=%d sanctions=%s tbml=%s "
+        "sanctioned_jurisdiction=%s definition=%s simple=%s | query=%r",
+        tier, model, num_rules, num_domains, is_sanctions, is_tbml,
+        involves_sanctioned, is_definition, is_simple_lookup, query[:80],
     )
-
-    if has_fraud_signal and is_complex_enough:
-        _log.info("[ROUTING DEBUG] Gate 1 (opus): fraud_tbml + complex → opus")
-        return "opus"
-
-    # Gate 2: Template — direct article lookup with single high-confidence rule
-    if (
-        _DIRECT_LOOKUP_RE.search(query)
-        and rule_count == 1
-        and confidence_band == "high"
-    ):
-        _log.info("[ROUTING DEBUG] Gate 2 (template): direct lookup regex match → template")
-        return "template"
-
-    # Gate 3: Rule count + confidence matrix
-    if rule_count == 1:
-        tier: str = "template" if confidence_band == "high" else "haiku"
-    elif rule_count <= 4:
-        tier = "haiku"
-    else:
-        tier = "sonnet"
-    _log.info("[ROUTING DEBUG] Gate 3 (rule count): %d rules, confidence=%s → %s", rule_count, confidence_band, tier)
-
-    # Gate 4: Domain/rulebook diversity upgrades (capped at ONE total upgrade)
-    upgrade_count = 0
-    if len(unique_domains) >= 2 and upgrade_count < 1:
-        prev = tier
-        tier = _upgrade_tier(tier)
-        upgrade_count += 1
-        _log.info("[ROUTING DEBUG] Gate 4a (domain upgrade): %d domains %s → %s to %s", len(unique_domains), unique_domains, prev, tier)
-    if len(unique_rulebooks) >= 2 and upgrade_count < 1:
-        prev = tier
-        tier = _upgrade_tier(tier)
-        upgrade_count += 1
-        _log.info("[ROUTING DEBUG] Gate 4b (rulebook upgrade): %d rulebooks %s → %s to %s", len(unique_rulebooks), unique_rulebooks, prev, tier)
-
-    # Gate 5: Low confidence upgrade
-    if confidence_band == "low":
-        prev = tier
-        tier = _upgrade_tier(tier)
-        _log.info("[ROUTING DEBUG] Gate 5 (low confidence): %s → %s", prev, tier)
-
-    _log.info("[ROUTING DEBUG] FINAL TIER: %s", tier)
-    return tier  # type: ignore[return-value]
+    return model
 def _query_needs_lcopilot_redirect(query: str) -> bool:
     """Detect queries asking to validate/review actual documents.
 
@@ -318,11 +341,12 @@ class RAGPipeline:
             retrieved_rules = []
         stage_latency["retriever"] = int((time.perf_counter() - start) * 1000)
 
-        # Stage 2.5: smart routing
+        # Stage 2.5: tier-based model routing (after retrieval)
         from app.config import settings as _settings
         if _settings.RULEGPT_ENABLE_SMART_ROUTING and retrieved_rules:
-            pre_confidence = _pre_generation_confidence(retrieved_rules)
-            routing_tier = _classify_complexity(query, classifier_output, retrieved_rules, pre_confidence)
+            # Default all users to "professional" tier until pricing tiers go live
+            effective_tier = "professional"
+            routing_tier = select_model(effective_tier, query, retrieved_rules)
         else:
             routing_tier = "sonnet"
 

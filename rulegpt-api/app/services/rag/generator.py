@@ -802,13 +802,9 @@ class AnswerGenerator:
         routing_tier: str = "sonnet",
     ) -> Dict[str, Any]:
         partial_coverage = assess_partial_coverage(query, retrieved_rules)
-        if requires_document_breadth(query):
-            return {
-                "answer": compose_grounded_answer(query, retrieved_rules, partial_coverage=partial_coverage),
-                "model_used": "grounded_fallback",
-                "partial_coverage": partial_coverage,
-                "routing_tier": "grounded",
-            }
+        # Document-breadth deterministic bypass removed — all queries go through
+        # the LLM now. The system prompt handles document-set questions better
+        # than any keyword heuristic.
 
         # Smart routing: template tier — no LLM call
         if routing_tier == "template":
@@ -854,14 +850,6 @@ class AnswerGenerator:
                 if answer:
                     normalized = normalize_generated_answer(answer)
                     if normalized and not answer_mentions_unknown_references(normalized, retrieved_rules):
-                        if partial_coverage and not has_partial_coverage_language(normalized):
-                            normalized = compose_grounded_answer(query, retrieved_rules, partial_coverage=True)
-                            return {
-                                "answer": normalized,
-                                "model_used": "grounded_fallback",
-                                "partial_coverage": True,
-                                "routing_tier": routing_tier,
-                            }
                         return {
                             "answer": normalized,
                             "model_used": model_for_tier,
@@ -887,14 +875,6 @@ class AnswerGenerator:
                 if answer:
                     normalized = normalize_generated_answer(answer)
                     if normalized and not answer_mentions_unknown_references(normalized, retrieved_rules):
-                        if partial_coverage and not has_partial_coverage_language(normalized):
-                            normalized = compose_grounded_answer(query, retrieved_rules, partial_coverage=True)
-                            return {
-                                "answer": normalized,
-                                "model_used": "grounded_fallback",
-                                "partial_coverage": True,
-                                "routing_tier": routing_tier,
-                            }
                         return {
                             "answer": normalized,
                             "model_used": "gpt-4.1",
