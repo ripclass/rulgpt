@@ -274,7 +274,9 @@ def _heuristic_classify(query: str) -> ClassifierOutput:
 def _reconcile_llm_output(query: str, llm_output: ClassifierOutput) -> ClassifierOutput:
     heuristic = _heuristic_classify(query)
 
-    if not llm_output.in_scope and heuristic.in_scope and heuristic.domain != "other":
+    if not llm_output.in_scope and heuristic.in_scope:
+        # Heuristic determined query has trade context (e.g., "export revenue"
+        # + "tax" → trade tax question). Override the LLM's out-of-scope call.
         heuristic.reason = "heuristic_scope_override"
         return heuristic
 
