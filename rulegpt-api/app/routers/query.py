@@ -279,6 +279,8 @@ async def process_query_request(
         disclaimer=DISCLAIMER_TEXT,
         queries_remaining=queries_remaining,
         tier=tier,  # type: ignore[arg-type]
+        model_used=query_row.model_used,
+        routing_tier=query_row.routing_tier,
     )
 
 

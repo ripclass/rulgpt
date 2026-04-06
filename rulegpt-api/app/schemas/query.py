@@ -56,6 +56,8 @@ class QueryResponse(BaseModel):
     disclaimer: str = DISCLAIMER_TEXT
     queries_remaining: int
     tier: SessionTier
+    model_used: str | None = None
+    routing_tier: str | None = None
 
 
 class QuerySuggestion(BaseModel):
