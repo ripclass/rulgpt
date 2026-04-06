@@ -641,6 +641,50 @@ class RuleRetriever:
 
         return results
 
+    async def _fetch_intelligence(
+        self,
+        query: str,
+        domain: str,
+        jurisdiction: str,
+        seen_ids: set[str],
+    ) -> List[RetrievedRule]:
+        """Fetch intelligence packs from RulHub for jurisdiction-specific context."""
+        client = await self._get_rulhub_client()
+        if client is None or not hasattr(client, "get_intelligence"):
+            return []
+        try:
+            packs = await client.get_intelligence(domain=domain, jurisdiction=jurisdiction, limit=3)
+        except Exception:
+            return []
+
+        results: List[RetrievedRule] = []
+        for pack in packs:
+            rid = str(pack.get("rule_id", ""))
+            if not rid or rid in seen_ids:
+                continue
+            text = str(pack.get("text") or pack.get("description") or "")
+            if not text.strip():
+                continue
+            seen_ids.add(rid)
+            results.append(
+                RetrievedRule(
+                    rule_id=rid,
+                    rulebook=str(pack.get("rulebook") or pack.get("source") or "intelligence"),
+                    reference=str(pack.get("reference") or "n/a"),
+                    title=str(pack.get("title") or ""),
+                    excerpt=text[:500],
+                    domain=str(pack.get("domain") or domain),
+                    jurisdiction=str(pack.get("jurisdiction") or jurisdiction),
+                    document_type=str(pack.get("document_type") or "other"),
+                    similarity_score=0.45,
+                    rerank_score=0.45,
+                    metadata={"_source": "rulhub_intelligence"},
+                )
+            )
+            if len(results) >= 2:
+                break
+        return results
+
     async def _retrieve_from_rulhub(self, query: str, top_k: int) -> List[RetrievedRule]:
         """Primary retrieval: RulHub API semantic search."""
         client = await self._get_rulhub_client()
@@ -770,6 +814,14 @@ class RuleRetriever:
                 continue
             seen.add(c.rule_id)
             merged.append(c)
+
+        # ── Stage 3b: Intelligence packs (jurisdiction-specific context) ──
+        if classification.jurisdiction and classification.jurisdiction != "global":
+            intel_candidates = await self._fetch_intelligence(
+                query, classification.domain, classification.jurisdiction, seen,
+            )
+            if intel_candidates:
+                merged.extend(intel_candidates)
 
         # ── Stage 4: Anchor rules (foundational safety net) ──
         selected = self._select_results(merged, target_top_k, document_breadth)

@@ -178,6 +178,26 @@ class RulHubClient:
         except RulHubClientError:
             return self._local_rulesets_summary()
 
+    async def get_intelligence(
+        self,
+        domain: str,
+        jurisdiction: str | None = None,
+        limit: int = 10,
+    ) -> list[dict[str, Any]]:
+        """Fetch intelligence packs (procedural, explainability, governance) for a domain."""
+        params: dict[str, Any] = {"domain": domain, "limit": min(max(1, limit), 50)}
+        if jurisdiction:
+            params["jurisdiction"] = jurisdiction
+        cache_key = f"intelligence:{json.dumps(params, sort_keys=True)}"
+        try:
+            payload = await self._request_json("GET", "/v1/rules/intelligence", params=params, cache_key=cache_key)
+            packs = payload.get("packs") if isinstance(payload, dict) else []
+            if not isinstance(packs, list):
+                return []
+            return [self.normalize_rule(p) for p in packs if isinstance(p, Mapping)]
+        except RulHubClientError:
+            return []
+
     async def search_rules(
         self,
         query: str,
