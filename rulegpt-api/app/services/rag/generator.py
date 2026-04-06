@@ -235,7 +235,23 @@ def _build_user_prompt(
         "commodity": classifier_output.commodity,
         "complexity": complexity,
     }
+    # Detect if retrieval was broadened (low confidence)
+    low_retrieval = any(
+        (getattr(r, "metadata", None) or {}).get("_retrieval_confidence") == "low"
+        for r in retrieved_rules
+    )
+    retrieval_note = ""
+    if low_retrieval:
+        retrieval_note = (
+            "[SYSTEM NOTE: The retrieved rules below have low relevance to the user's "
+            "specific query. No directly matching rules were found. Use these as "
+            "foundational principles and supplement with general trade finance knowledge, "
+            "clearly marking any guidance not derived from retrieved rules. Be honest "
+            "about the coverage gap.]\n\n"
+        )
+
     return (
+        f"{retrieval_note}"
         f"User query: {query}\n"
         f"Detected context: {detected_context}\n"
         f"Important missing facts: {gaps or 'none'}\n"
@@ -728,40 +744,58 @@ def _template_answer(query: str, rules: Sequence[RetrievedRule]) -> Dict[str, An
     }
 
 
-def _generation_token_budget(complexity: str, partial_coverage: bool) -> int:
-    if complexity == "complex":
-        return 560
-    if partial_coverage:
-        return 220
-    return 220 if complexity == "interpretation" else 180
+_DISTRESS_SIGNALS = (
+    "lost", "bankrupt", "rejected", "refused", "unfair",
+    "unreasonable", "desperate", "help me", "what can i do",
+    "is there anything", "going to lose", "can i sue", "going bankrupt",
+)
 
 
-def _query_deserves_long_form(
+def calculate_token_budget(
     query: str,
-    rules: Sequence[RetrievedRule],
-    classifier_output: ClassifierOutput,
-) -> bool:
+    retrieved_rules: Sequence[RetrievedRule],
+    routing_tier: str = "sonnet",
+) -> int:
+    """Adaptive token budget — response length matches question complexity."""
+    base = 600  # Enough for a solid single-topic answer
+
     lowered = query.lower()
-    if classifier_output.complexity == "complex":
-        return True
-    if len(rules) >= 6:
-        return True
-    long_markers = (
-        "compare",
-        "difference",
-        "versus",
-        " vs ",
-        "step by step",
-        "checklist",
-        "article by article",
-        "country pair",
-        "beneficial owner",
-        "secondary sanctions",
-        "all documents",
-        "full document set",
-        "requirements for trading",
-    )
-    return any(marker in lowered for marker in long_markers)
+
+    # Multi-part questions
+    question_marks = query.count("?")
+    numbered_parts = any(p in query for p in ("(1)", "(2)", "(3)", "1.", "2.", "3."))
+    if question_marks >= 2 or numbered_parts:
+        base += 400
+
+    # Many rules retrieved = complex topic
+    if len(retrieved_rules) >= 5:
+        base += 200
+
+    # Multiple domains = cross-domain analysis
+    domains = {(getattr(r, "domain", "") or "").split(".")[0] for r in retrieved_rules}
+    domains.discard("")
+    domains.discard("other")
+    if len(domains) >= 3:
+        base += 300
+
+    # Sanctions queries need thorough treatment
+    if any((getattr(r, "domain", "") or "").startswith("sanctions") for r in retrieved_rules):
+        base += 300
+
+    # Emotional / distressed language needs empathy + analysis + options
+    if any(signal in lowered for signal in _DISTRESS_SIGNALS):
+        base += 300
+
+    # Long detailed queries deserve detailed answers
+    if len(query.split()) > 80:
+        base += 200
+
+    # Opus gets room for deep analysis
+    if routing_tier == "opus":
+        base = max(base, 1200)
+
+    # Cap by effective tier (professional for now)
+    return min(base, 1800)
 
 
 class AnswerGenerator:
@@ -887,12 +921,7 @@ class AnswerGenerator:
             "opus": _settings.RULEGPT_OPUS_MODEL,
         }.get(routing_tier, _settings.RULEGPT_GENERATOR_MODEL)
 
-        token_budget = _generation_token_budget(classifier_output.complexity, partial_coverage)
-        if _query_deserves_long_form(query, retrieved_rules, classifier_output):
-            token_budget = max(token_budget, 360 if classifier_output.complexity != "complex" else 560)
-        # Opus gets a larger budget for complex analytical queries
-        if routing_tier == "opus":
-            token_budget = max(token_budget, 560)
+        token_budget = calculate_token_budget(query, retrieved_rules, routing_tier)
 
         import logging
         _log = logging.getLogger("rulegpt.generator")

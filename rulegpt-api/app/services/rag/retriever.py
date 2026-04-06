@@ -573,6 +573,7 @@ class RuleRetriever:
         else:
             effective_jurisdiction = classification.jurisdiction
         rows: List[Dict[str, Any]] = []
+        query_embedding: List[float] | None = None
         try:
             query_embedding = await self._embed_query(query)
             rows = await self._semantic_search(
@@ -644,11 +645,53 @@ class RuleRetriever:
             merged_candidates.append(candidate)
 
         if not merged_candidates:
-            return await self._fallback_retrieve(
+            merged_candidates = await self._fallback_retrieve(
                 session,
                 query,
                 classification,
                 target_top_k,
                 document_type_override=document_type_filter,
             )
+
+        # Last resort: if still no results, try an unfiltered semantic search
+        # with a lower threshold. This prevents retrieval dead zones.
+        if not merged_candidates and query_embedding:
+            import logging
+            _log = logging.getLogger("rulegpt.retriever")
+            _log.warning("[RETRIEVAL] Zero results after all filters — trying unfiltered broadened search for: %r", query[:80])
+            unfiltered_class = ClassifierOutput(
+                domain="other", jurisdiction="global", document_type="other",
+                commodity=None, complexity=classification.complexity,
+                in_scope=True, reason="broadened_search",
+            )
+            rows = await self._semantic_search(session, query_embedding, unfiltered_class, semantic_limit=10)
+            for row in rows:
+                detail = await self._fetch_rule_detail(session, row["rule_id"])
+                if not detail or not (detail.get("text") or detail.get("description") or "").strip():
+                    continue
+                similarity = max(0.0, min(1.0, 1.0 - row["distance"])) if not math.isnan(row["distance"]) else 0.0
+                if similarity < 0.30:
+                    continue
+                reference = str(detail.get("reference") or detail.get("article") or "n/a")
+                title = str(detail.get("title") or row["rule_id"])
+                excerpt = str(detail.get("text") or detail.get("description") or "")
+                lexical = _lexical_score(query, f"{title} {excerpt} {reference}")
+                rerank = (similarity * 0.7) + (lexical * 0.3)
+                merged_candidates.append(
+                    RetrievedRule(
+                        rule_id=row["rule_id"],
+                        rulebook=str(detail.get("rulebook") or row["rulebook"]),
+                        reference=reference, title=title, excerpt=excerpt,
+                        domain=str(detail.get("domain") or row["domain"]),
+                        jurisdiction=str(detail.get("jurisdiction") or row["jurisdiction"]),
+                        document_type=str(detail.get("document_type") or row["document_type"]),
+                        similarity_score=similarity, rerank_score=rerank,
+                        metadata={"_retrieval_confidence": "low", "raw_detail": detail},
+                    )
+                )
+            if merged_candidates:
+                _log.info("[RETRIEVAL] Broadened search found %d results", len(merged_candidates))
+            else:
+                _log.warning("[RETRIEVAL] Broadened search also returned zero results for: %r", query[:80])
+
         return self._select_results(merged_candidates, target_top_k, document_breadth)
