@@ -413,13 +413,14 @@ class RAGPipeline:
             answer=answer,
         )
         try:
-            suggested_followups = self.generator.suggested_followups(
-                query,
-                classifier_output,
+            suggested_followups = await self.generator.suggested_followups(
+                query=query,
+                answer=answer,
+                classifier=classifier_output,
                 partial_coverage=partial_coverage,
             )
-        except TypeError:
-            suggested_followups = self.generator.suggested_followups(query, classifier_output)
+        except Exception:
+            suggested_followups = self.generator._static_followups(query, classifier_output, partial_coverage)
         latency_ms = int((time.perf_counter() - start_total) * 1000)
 
         return QueryResult(

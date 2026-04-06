@@ -1033,25 +1033,59 @@ class AnswerGenerator:
             "fallback_reasons": fallback_reasons,
         }
 
+    async def suggested_followups(
+        self,
+        query: str,
+        answer: str,
+        classifier: ClassifierOutput,
+        partial_coverage: bool = False,
+    ) -> List[str]:
+        """Generate contextual followup suggestions using a fast LLM call."""
+        # Try a quick Haiku call for contextual suggestions
+        try:
+            client = await self._get_anthropic_client()
+            if client is not None and hasattr(client, "generate_answer"):
+                prompt = (
+                    f"The user asked: \"{query}\"\n\n"
+                    f"The system answered (summary): \"{answer[:300]}\"\n\n"
+                    f"Domain: {classifier.domain}, Jurisdiction: {classifier.jurisdiction}\n\n"
+                    "Generate exactly 3 short follow-up questions (max 15 words each) that a trade finance "
+                    "professional would naturally ask next. Questions must be specific to this conversation, "
+                    "not generic. Return ONLY the 3 questions, one per line, no numbering, no bullets."
+                )
+                from app.config import settings as _settings
+                raw = await _maybe_await(
+                    client.generate_answer(
+                        prompt=prompt,
+                        system_prompt="You generate concise follow-up questions for a trade finance Q&A tool. Return exactly 3 questions, one per line.",
+                        max_tokens=150,
+                        temperature=0.3,
+                        model=_settings.RULEGPT_HAIKU_MODEL,
+                    )
+                )
+                if raw:
+                    lines = [line.strip().lstrip("0123456789.-) ") for line in str(raw).strip().splitlines() if line.strip()]
+                    # Filter to reasonable question lengths
+                    questions = [q for q in lines if 10 < len(q) < 120 and q.endswith("?")]
+                    if questions:
+                        return questions[:3]
+        except Exception:
+            pass
+
+        # Fallback: basic contextual suggestions from the query itself
+        return self._static_followups(query, classifier, partial_coverage)
+
     @staticmethod
-    def suggested_followups(query: str, classifier: ClassifierOutput, partial_coverage: bool = False) -> List[str]:
+    def _static_followups(query: str, classifier: ClassifierOutput, partial_coverage: bool = False) -> List[str]:
+        """Fallback static suggestions when LLM call fails."""
         lowered = query.lower()
         if partial_coverage or classifier.complexity == "complex":
             limit = 3
-        elif requires_document_breadth(query) or classifier.domain in {"sanctions", "fta"}:
-            limit = 2
-        elif any(marker in lowered for marker in ("difference", "compare", "requirements", "qualify")):
+        elif classifier.domain in {"sanctions", "fta"}:
             limit = 2
         else:
             limit = 1
 
-        if requires_document_breadth(query):
-            options = [
-                "Want this mapped document by document?",
-                "Should I separate UCP600 from Incoterms obligations?",
-                "Do you want the missing document types flagged clearly?",
-            ]
-            return options[:limit]
         if classifier.domain == "sanctions":
             options = [
                 "Which regime matters most here: OFAC, EU, UN, or UK?",
@@ -1064,13 +1098,6 @@ class AnswerGenerator:
                 "Which country pair and HS code are you testing?",
                 "Do you want the proof-of-origin checklist?",
                 "Should I separate agreement scope from product-specific origin rules?",
-            ]
-            return options[:limit]
-        if _rule_cta_trigger(query):
-            options = [
-                "Do you want the discrepancy points mapped article by article?",
-                "Should I turn this into likely bank examination points?",
-                "Do you want document issues separated from the rule explanation?",
             ]
             return options[:limit]
         if classifier.domain == "icc":
