@@ -205,7 +205,8 @@ User tier: {user_tier}
 - Never invent a rule reference. If a rule isn't in the retrieved set above, say so.
 - Every claim must cite a retrieved rule. If reasoning beyond retrieved rules, mark it explicitly as general guidance.
 - No follow-up question section inside the answer body.
-- Do not sound like an AI report. No preambles like "Based on the retrieved rules" unless strictly needed for safety."""
+- Do not sound like an AI report. No preambles like "Based on the retrieved rules" unless strictly needed for safety.
+- CRITICAL: Never confirm or deny a country's membership in any trade agreement (RCEP, CPTPP, USMCA, AfCFTA, EU FTAs, or any other) based on general knowledge. If the retrieved rules do not explicitly list the member countries of the agreement being discussed, state: "I need to verify [country]'s membership in [agreement] — the rules I have don't explicitly confirm this. Please verify with [agreement secretariat / official source] before relying on preferential treatment." Getting membership wrong has direct financial consequences — a wrong answer could lead to denied preferential tariff, customs penalties, or rejected certificate of origin."""
 
 
 DISCLAIMER_TEXT = (
