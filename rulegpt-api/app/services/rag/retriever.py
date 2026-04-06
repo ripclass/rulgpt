@@ -48,11 +48,12 @@ _INTERNAL_RULEBOOKS = {
     "clause_graph_core_v1",
     "requirement_graph_core_v1",
     "bank_behavior_confidence_v1",
+    "bank_behavior_core_v1",
     "crossdomain_final_tightening_v3",
     "crossdomain_integrated_case_v1",
 }
 
-# SQL fragment to exclude internal rulebooks from retrieval
+# SQL fragment to exclude internal rulebooks and engine rule_id prefixes.
 _INTERNAL_RULEBOOK_EXCLUSION = (
     "AND rulebook NOT IN ("
     + ",".join(f"'{rb}'" for rb in sorted(_INTERNAL_RULEBOOKS))
@@ -60,6 +61,7 @@ _INTERNAL_RULEBOOK_EXCLUSION = (
     " AND rule_id NOT LIKE 'DQ-%'"
     " AND rule_id NOT LIKE 'VG-%'"
     " AND rule_id NOT LIKE 'EVAPI-%'"
+    " AND rule_id NOT LIKE 'BBEH-%'"
 )
 
 

@@ -18,6 +18,7 @@ _INTERNAL_RULEBOOKS = {
     "clause_graph_core_v1",
     "requirement_graph_core_v1",
     "bank_behavior_confidence_v1",
+    "bank_behavior_core_v1",
     "crossdomain_final_tightening_v3",
     "crossdomain_integrated_case_v1",
 }
@@ -90,11 +91,23 @@ def upsert_rule_record(session: Session, rule: NormalizedRule) -> str:
     return "updated"
 
 
+def _is_internal_rule(rule_id: str, rulebook: str) -> bool:
+    """Check if a rule should be excluded from user-facing results."""
+    if rulebook in _INTERNAL_RULEBOOKS:
+        return True
+    return any(rule_id.startswith(p) for p in ("DQ-", "VG-", "EVAPI-", "BBEH-"))
+
+
 def get_rule_details(session: Session, rule_id: str) -> dict[str, Any] | None:
     record = session.scalar(
         select(RuleRecord).where(RuleRecord.rule_id == rule_id, RuleRecord.is_active == True)  # noqa: E712
     )
     if record is None:
+        return None
+    # Skip internal engine rules and rules with empty text
+    if _is_internal_rule(record.rule_id, record.rulebook or ""):
+        return None
+    if not (record.text or "").strip():
         return None
     return {
         "rule_id": record.rule_id,
@@ -125,6 +138,7 @@ def load_rules_for_retrieval(
         ~RuleRecord.rule_id.like("DQ-%"),
         ~RuleRecord.rule_id.like("VG-%"),
         ~RuleRecord.rule_id.like("EVAPI-%"),
+        ~RuleRecord.rule_id.like("BBEH-%"),
     )
     if domain:
         # Exact match OR prefix match (e.g. "icc" also matches "icc.docdex")

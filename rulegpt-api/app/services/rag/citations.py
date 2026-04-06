@@ -15,18 +15,31 @@ def _score_to_confidence(score: float) -> str:
     return "low"
 
 
+def _is_displayable(rule: RetrievedRule) -> bool:
+    """Filter out rules that would look broken in the citations display."""
+    # Empty excerpt means the rule has no text — looks unreliable
+    if not (rule.excerpt or "").strip():
+        return False
+    # "unknown" or "n/a" reference with no excerpt is useless to the user
+    ref = (rule.reference or "").strip().lower()
+    if ref in ("", "unknown", "n/a", "null") and not (rule.excerpt or "").strip():
+        return False
+    return True
+
+
 def build_citations(answer: str, retrieved_rules: Sequence[RetrievedRule], max_items: int = 8) -> List[Citation]:
     """
     Build citation objects from retrieved rules.
 
-    Current implementation uses retrieval/rerank confidence and ensures output
-    is deterministic and bounded even when generation text is not easily parseable.
+    Filters out rules with empty text or broken references before display.
     """
     lowered_answer = (answer or "").lower()
     mentioned_rules: List[RetrievedRule] = []
     remaining_rules: List[RetrievedRule] = []
 
     for rule in retrieved_rules:
+        if not _is_displayable(rule):
+            continue
         reference_token = f"[{rule.rulebook} {rule.reference}]".lower()
         short_token = f"[{rule.reference}]".lower()
         if reference_token in lowered_answer or short_token in lowered_answer:
