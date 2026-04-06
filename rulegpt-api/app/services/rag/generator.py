@@ -646,6 +646,16 @@ def _allowed_reference_tokens(rules: Sequence[RetrievedRule]) -> tuple[set[str],
     allowed_articles: set[str] = set()
     allowed_rulebooks: set[str] = set()
 
+    # Well-known publication names the LLM may cite regardless of how
+    # the retrieved rules label them in the rulebook/source field.
+    _KNOWN_PUBLICATIONS = {
+        "ucp600", "ucp 600", "isbp745", "isbp 745", "isbp821", "isbp 821",
+        "isp98", "isp 98", "urdg758", "urdg 758", "urc522", "urc 522",
+        "urr725", "urr 725", "eucp", "eucp 2 1", "urf800", "urf 800",
+        "urbpo750", "urbpo 750", "urdtt", "incoterms 2020", "incoterms",
+        "ofac", "usmca", "rcep", "cptpp", "afcfta",
+    }
+
     for rule in rules:
         ref = rule.reference or ""
         rb = rule.rulebook or ""
@@ -659,6 +669,13 @@ def _allowed_reference_tokens(rules: Sequence[RetrievedRule]) -> tuple[set[str],
         rb_norm = _normalize_citation_token(rb)
         if rb_norm:
             allowed_rulebooks.add(rb_norm)
+
+        # Extract known publication names from source paths
+        # e.g. "icc_core.pop_urf800_letter_rules_v1" → allow "urf800"
+        source_lower = f"{rb} {ref} {rule.excerpt or ''}".lower()
+        for pub in _KNOWN_PUBLICATIONS:
+            if pub.replace(" ", "") in source_lower.replace(" ", ""):
+                allowed_citations.add(pub)
 
         # Split compound references on comma/semicolon and add each part
         for part in re.split(r"[;,]", ref):
@@ -722,9 +739,10 @@ def answer_mentions_unknown_references(answer: str, rules: Sequence[RetrievedRul
             continue
         unknown_count += 1
 
-    # Only flag as hallucinated if MULTIPLE unknown references found.
-    # A single borderline citation shouldn't kill an otherwise good answer.
-    return unknown_count >= 3
+    # Scale threshold by the number of retrieved rules — multi-domain queries
+    # naturally cite more diverse sources and have more format mismatches.
+    threshold = 3 + max(0, len(rules) - 5)  # 3 for ≤5 rules, 4 for 6, 5 for 7, etc.
+    return unknown_count >= threshold
 
 
 def normalize_generated_answer(answer: str) -> str:
