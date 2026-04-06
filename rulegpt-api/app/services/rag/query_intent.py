@@ -68,16 +68,26 @@ def _normalize(value: str) -> str:
     return " ".join((value or "").lower().split())
 
 
+def _has_word(word: str, text: str) -> bool:
+    """Check if a word appears as a whole word (not as a substring of another word)."""
+    return bool(re.search(rf"\b{re.escape(word)}\b", text))
+
+
 def requires_document_breadth(query: str) -> bool:
+    """Detect queries explicitly asking 'what documents do I need?'
+
+    Must be NARROW. Do NOT trigger on questions that merely mention a
+    document type (CIF, B/L, invoice) — those are specific compliance
+    questions, not document-set requests.
+    """
     lowered = _normalize(query)
+    # Only trigger on explicit document-set questions
     if any(marker in lowered for marker in _DOCUMENT_BREADTH_MARKERS):
         return True
-    if any(token in lowered for token in ("cif", "cip")) and any(
-        token in lowered for token in ("document", "documents", "shipment", "lc", "letter of credit")
-    ):
-        return True
-    if "documents" in lowered and any(token in lowered for token in ("required", "need", "needed", "checklist", "set", "package")):
-        return True
+    # CIF/CIP + explicit document-set language (not just "document" mentions)
+    if _has_word("cif", lowered) or _has_word("cip", lowered):
+        if any(marker in lowered for marker in ("what documents", "which documents", "documents required", "required documents", "documents needed", "documents do i need")):
+            return True
     return False
 
 
@@ -106,21 +116,19 @@ def extract_countries(query: str) -> set[str]:
 
 
 def expected_document_families(query: str) -> set[str]:
+    """Return expected document families ONLY for document-breadth queries.
+
+    For non-breadth queries, returns empty set — we don't want to trigger
+    partial_coverage assessment just because a user mentioned 'insurance'
+    or 'bill of lading' in a specific compliance question.
+    """
+    if not requires_document_breadth(query):
+        return set()
+
     lowered = _normalize(query)
-    families: set[str] = set()
-
-    if requires_document_breadth(query):
-        families.update({"invoice", "transport"})
-        if any(token in lowered for token in ("cif", "cip", "insurance")):
-            families.add("insurance")
-
-    if "invoice" in lowered:
-        families.add("invoice")
-    if any(token in lowered for token in ("bill of lading", "b/l", "bl ", "transport document")):
-        families.add("transport")
-    if any(token in lowered for token in ("insurance", "policy", "certificate of insurance")):
+    families: set[str] = {"invoice", "transport"}
+    if _has_word("cif", lowered) or _has_word("cip", lowered) or "insurance" in lowered:
         families.add("insurance")
-
     return families
 
 
