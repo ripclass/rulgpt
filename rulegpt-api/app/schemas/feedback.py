@@ -18,6 +18,8 @@ class FeedbackCreateRequest(BaseModel):
 
 
 class FeedbackResponse(BaseModel):
+    model_config = {"from_attributes": True}
+
     id: UUID
     query_id: UUID
     feedback_type: FeedbackType

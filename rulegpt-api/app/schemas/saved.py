@@ -13,6 +13,8 @@ class SaveAnswerRequest(BaseModel):
 
 
 class SavedAnswerResponse(BaseModel):
+    model_config = {"from_attributes": True}
+
     id: UUID
     query_id: UUID
     user_id: UUID
