@@ -591,63 +591,6 @@ class RuleRetriever:
 
         return selected
 
-    async def _enrich_from_rulhub(
-        self,
-        query: str,
-        candidates: List[RetrievedRule],
-        top_k: int,
-    ) -> List[RetrievedRule]:
-        """Supplement pgvector results with RulHub API semantic search."""
-        client = await self._get_rulhub_client()
-        if client is None or not hasattr(client, "search_rules"):
-            return candidates
-
-        try:
-            rulhub_results = await client.search_rules(query=query, limit=top_k)
-        except Exception:
-            return candidates
-
-        if not rulhub_results:
-            return candidates
-
-        existing_ids = {c.rule_id for c in candidates}
-        added = 0
-        for rule in rulhub_results:
-            rid = str(rule.get("rule_id", ""))
-            if rid in existing_ids or not rid:
-                continue
-            text = str(rule.get("text") or rule.get("description") or "")
-            if not text.strip() or len(text) < 10:
-                continue
-            # Skip internal engine rules
-            if any(rid.startswith(p) for p in ("DQ-", "VG-", "EVAPI-", "BBEH-")):
-                continue
-            rb = str(rule.get("rulebook") or rule.get("source") or "unknown")
-            if rb in _INTERNAL_RULEBOOKS:
-                continue
-
-            candidates.append(
-                RetrievedRule(
-                    rule_id=rid,
-                    rulebook=rb,
-                    reference=str(rule.get("reference") or rule.get("article") or "n/a"),
-                    title=str(rule.get("title") or ""),
-                    excerpt=text[:500],
-                    domain=str(rule.get("domain") or "other"),
-                    jurisdiction=str(rule.get("jurisdiction") or "global"),
-                    document_type=str(rule.get("document_type") or "other"),
-                    similarity_score=0.6,
-                    rerank_score=0.55,
-                    metadata={"_source": "rulhub_api"},
-                )
-            )
-            existing_ids.add(rid)
-            added += 1
-            if added >= 3:
-                break
-
-        return candidates
-
     async def _enrich_with_anchors(
         self,
         session: Any,
@@ -698,6 +641,57 @@ class RuleRetriever:
 
         return results
 
+    async def _retrieve_from_rulhub(self, query: str, top_k: int) -> List[RetrievedRule]:
+        """Primary retrieval: RulHub API semantic search."""
+        client = await self._get_rulhub_client()
+        if client is None or not hasattr(client, "search_rules"):
+            return []
+        try:
+            results = await client.search_rules(query=query, limit=top_k * 2)
+        except Exception:
+            return []
+        if not results:
+            return []
+
+        candidates: List[RetrievedRule] = []
+        for i, rule in enumerate(results):
+            rid = str(rule.get("rule_id", ""))
+            if not rid:
+                continue
+            text = str(rule.get("text") or rule.get("description") or "")
+            if not text.strip() or len(text) < 10:
+                continue
+            # Skip internal engine rules
+            if any(rid.startswith(p) for p in ("DQ-", "VG-", "EVAPI-", "BBEH-")):
+                continue
+            rb = str(rule.get("rulebook") or rule.get("source") or "unknown")
+            if rb in _INTERNAL_RULEBOOKS:
+                continue
+
+            title = str(rule.get("title") or "")
+            reference = str(rule.get("reference") or rule.get("article") or "n/a")
+            # Score: RulHub results are already ranked by relevance — use position
+            position_score = max(0.5, 0.95 - (i * 0.05))
+            lexical = _lexical_score(query, f"{title} {text[:200]} {reference}")
+            rerank = (position_score * 0.7) + (lexical * 0.3)
+
+            candidates.append(
+                RetrievedRule(
+                    rule_id=rid,
+                    rulebook=rb,
+                    reference=reference,
+                    title=title,
+                    excerpt=text[:500],
+                    domain=str(rule.get("domain") or "other"),
+                    jurisdiction=str(rule.get("jurisdiction") or "global"),
+                    document_type=str(rule.get("document_type") or "other"),
+                    similarity_score=position_score,
+                    rerank_score=rerank,
+                    metadata={"_source": "rulhub_api"},
+                )
+            )
+        return candidates
+
     async def retrieve(
         self,
         session: Any,
@@ -705,141 +699,79 @@ class RuleRetriever:
         classification: ClassifierOutput,
         top_k: int = 5,
     ) -> List[RetrievedRule]:
+        import logging
+        _log = logging.getLogger("rulegpt.retriever")
+
         document_breadth = requires_document_breadth(query)
         top_k = max(3, min(8, top_k))
         target_top_k = max(top_k, 6) if document_breadth else top_k
+
+        # ── Stage 1: RulHub API (primary source) ──
+        rulhub_candidates = await self._retrieve_from_rulhub(query, target_top_k)
+        if rulhub_candidates:
+            _log.info("[RETRIEVAL] RulHub returned %d candidates for: %r", len(rulhub_candidates), query[:60])
+
+        # ── Stage 2: pgvector (fallback / supplement) ──
+        pgvector_candidates: List[RetrievedRule] = []
         document_type_filter = None if classification.document_type == "other" or document_breadth else classification.document_type
-        if classification.domain == "fta":
-            effective_jurisdiction = "global"
-        else:
-            effective_jurisdiction = classification.jurisdiction
-        rows: List[Dict[str, Any]] = []
-        query_embedding: List[float] | None = None
-        try:
-            query_embedding = await self._embed_query(query)
-            rows = await self._semantic_search(
-                session,
-                query_embedding,
-                ClassifierOutput(
-                    domain=classification.domain,
-                    jurisdiction=effective_jurisdiction,
-                    document_type=document_type_filter or "other",
-                    commodity=classification.commodity,
-                    complexity=classification.complexity,
-                    in_scope=classification.in_scope,
-                    reason=classification.reason,
-                ),
-                semantic_limit=max(24, target_top_k * 4),
-            )
-        except Exception:
-            rows = []
-        if not rows:
-            return await self._fallback_retrieve(
-                session,
-                query,
-                classification,
-                target_top_k,
-                document_type_override=document_type_filter,
-            )
+        effective_jurisdiction = "global" if classification.domain == "fta" else classification.jurisdiction
 
-        candidates: List[RetrievedRule] = []
-        for row in rows:
-            detail = await self._fetch_rule_detail(session, row["rule_id"])
-            reference = str(detail.get("reference") or detail.get("article") or "n/a")
-            title = str(detail.get("title") or row["rule_id"])
-            excerpt = str(detail.get("text") or detail.get("description") or "")
-            similarity = max(0.0, min(1.0, 1.0 - row["distance"])) if not math.isnan(row["distance"]) else 0.0
-            lexical = _lexical_score(query, f"{title} {excerpt} {reference} {detail.get('tags', [])}")
-            rerank = (similarity * 0.7) + (lexical * 0.3)
-            candidates.append(
-                RetrievedRule(
-                    rule_id=row["rule_id"],
-                    rulebook=str(detail.get("rulebook") or row["rulebook"]),
-                    reference=reference,
-                    title=title,
-                    excerpt=excerpt,
-                    domain=str(detail.get("domain") or row["domain"]),
-                    jurisdiction=str(detail.get("jurisdiction") or row["jurisdiction"]),
-                    document_type=str(detail.get("document_type") or row["document_type"]),
-                    similarity_score=similarity,
-                    rerank_score=rerank,
-                    metadata={"raw_detail": detail} if detail else {},
+        if len(rulhub_candidates) < target_top_k:
+            # RulHub didn't return enough — supplement with pgvector
+            try:
+                query_embedding = await self._embed_query(query)
+                rows = await self._semantic_search(
+                    session, query_embedding,
+                    ClassifierOutput(
+                        domain=classification.domain,
+                        jurisdiction=effective_jurisdiction,
+                        document_type=document_type_filter or "other",
+                        commodity=classification.commodity,
+                        complexity=classification.complexity,
+                        in_scope=classification.in_scope,
+                        reason=classification.reason,
+                    ),
+                    semantic_limit=max(24, target_top_k * 4),
                 )
-            )
-
-        supplemental_candidates: List[RetrievedRule] = []
-        if document_breadth or len(candidates) < target_top_k:
-            supplemental_candidates = await self._fallback_retrieve(
-                session,
-                query,
-                classification,
-                target_top_k,
-                document_type_override=document_type_filter,
-            )
-
-        merged_candidates: List[RetrievedRule] = []
-        seen_rule_ids: set[str] = set()
-        for candidate in sorted(candidates + supplemental_candidates, key=lambda item: item.rerank_score, reverse=True):
-            if candidate.rule_id in seen_rule_ids:
-                continue
-            seen_rule_ids.add(candidate.rule_id)
-            merged_candidates.append(candidate)
-
-        if not merged_candidates:
-            merged_candidates = await self._fallback_retrieve(
-                session,
-                query,
-                classification,
-                target_top_k,
-                document_type_override=document_type_filter,
-            )
-
-        # Last resort: if still no results, try an unfiltered semantic search
-        # with a lower threshold. This prevents retrieval dead zones.
-        if not merged_candidates and query_embedding:
-            import logging
-            _log = logging.getLogger("rulegpt.retriever")
-            _log.warning("[RETRIEVAL] Zero results after all filters — trying unfiltered broadened search for: %r", query[:80])
-            unfiltered_class = ClassifierOutput(
-                domain="other", jurisdiction="global", document_type="other",
-                commodity=None, complexity=classification.complexity,
-                in_scope=True, reason="broadened_search",
-            )
-            rows = await self._semantic_search(session, query_embedding, unfiltered_class, semantic_limit=10)
-            for row in rows:
-                detail = await self._fetch_rule_detail(session, row["rule_id"])
-                if not detail or not (detail.get("text") or detail.get("description") or "").strip():
-                    continue
-                similarity = max(0.0, min(1.0, 1.0 - row["distance"])) if not math.isnan(row["distance"]) else 0.0
-                if similarity < 0.30:
-                    continue
-                reference = str(detail.get("reference") or detail.get("article") or "n/a")
-                title = str(detail.get("title") or row["rule_id"])
-                excerpt = str(detail.get("text") or detail.get("description") or "")
-                lexical = _lexical_score(query, f"{title} {excerpt} {reference}")
-                rerank = (similarity * 0.7) + (lexical * 0.3)
-                merged_candidates.append(
-                    RetrievedRule(
-                        rule_id=row["rule_id"],
-                        rulebook=str(detail.get("rulebook") or row["rulebook"]),
-                        reference=reference, title=title, excerpt=excerpt,
-                        domain=str(detail.get("domain") or row["domain"]),
-                        jurisdiction=str(detail.get("jurisdiction") or row["jurisdiction"]),
-                        document_type=str(detail.get("document_type") or row["document_type"]),
-                        similarity_score=similarity, rerank_score=rerank,
-                        metadata={"_retrieval_confidence": "low", "raw_detail": detail},
+                for row in rows:
+                    detail = await self._fetch_rule_detail(session, row["rule_id"])
+                    reference = str(detail.get("reference") or detail.get("article") or "n/a")
+                    title = str(detail.get("title") or row["rule_id"])
+                    excerpt = str(detail.get("text") or detail.get("description") or "")
+                    similarity = max(0.0, min(1.0, 1.0 - row["distance"])) if not math.isnan(row["distance"]) else 0.0
+                    lexical = _lexical_score(query, f"{title} {excerpt} {reference} {detail.get('tags', [])}")
+                    rerank = (similarity * 0.7) + (lexical * 0.3)
+                    pgvector_candidates.append(
+                        RetrievedRule(
+                            rule_id=row["rule_id"],
+                            rulebook=str(detail.get("rulebook") or row["rulebook"]),
+                            reference=reference, title=title, excerpt=excerpt,
+                            domain=str(detail.get("domain") or row["domain"]),
+                            jurisdiction=str(detail.get("jurisdiction") or row["jurisdiction"]),
+                            document_type=str(detail.get("document_type") or row["document_type"]),
+                            similarity_score=similarity, rerank_score=rerank,
+                            metadata={"_source": "pgvector"},
+                        )
                     )
+            except Exception:
+                pass
+
+            if not pgvector_candidates:
+                pgvector_candidates = await self._fallback_retrieve(
+                    session, query, classification, target_top_k,
+                    document_type_override=document_type_filter,
                 )
-            if merged_candidates:
-                _log.info("[RETRIEVAL] Broadened search found %d results", len(merged_candidates))
-            else:
-                _log.warning("[RETRIEVAL] Broadened search also returned zero results for: %r", query[:80])
 
-        # Enrich from RulHub API — supplements pgvector with server-side semantic search
-        merged_candidates = await self._enrich_from_rulhub(query, merged_candidates, target_top_k)
+        # ── Stage 3: Merge and deduplicate ──
+        merged: List[RetrievedRule] = []
+        seen: set[str] = set()
+        for c in sorted(rulhub_candidates + pgvector_candidates, key=lambda x: x.rerank_score, reverse=True):
+            if c.rule_id in seen:
+                continue
+            seen.add(c.rule_id)
+            merged.append(c)
 
-        # Enrich with anchor rules — foundational rules that should always be
-        # in context when their domain is queried (safety net for vector search misses)
-        selected = self._select_results(merged_candidates, target_top_k, document_breadth)
+        # ── Stage 4: Anchor rules (foundational safety net) ──
+        selected = self._select_results(merged, target_top_k, document_breadth)
         selected = await self._enrich_with_anchors(session, query, classification.domain, selected)
         return selected
