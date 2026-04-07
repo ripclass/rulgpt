@@ -45,9 +45,16 @@ export function MainArea({
   onNewQuery,
 }: MainAreaProps) {
   const isEmpty = messages.length === 0
+  const placeholderOptions = [
+    'What rule are you checking?',
+    'Describe your shipment scenario...',
+    'Which document is the bank questioning?',
+    'Paste your LC clause or field here...',
+    'What does the credit require?',
+  ]
   const placeholder = activeQuickCategory
     ? `Ask about ${activeQuickCategory.toLowerCase()}...`
-    : 'Ask about any trade finance rule...'
+    : placeholderOptions[Math.floor(Date.now() / 60000) % placeholderOptions.length]
 
   return (
     <main className="flex min-h-[100dvh] flex-1 flex-col pb-28 md:pb-0 bg-[#FAFAFA] dark:bg-[#171717] selection:bg-[#FF4F00] selection:text-white relative transition-colors">
@@ -70,17 +77,40 @@ export function MainArea({
 
             <div className="flex w-full flex-col items-center text-center">
               <RuxMark className="h-12 w-12 mb-6 shadow-sm rounded-sm" />
-              <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                {(() => {
-                  const hour = new Date().getHours()
-                  const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
-                  const name = userEmail?.split('@')[0]
-                  return name ? `${timeGreeting}, ${name}.` : `${timeGreeting}.`
-                })()}
-              </h2>
-              <p className="mt-4 max-w-xl text-lg font-light text-neutral-500 leading-relaxed">
-                Ask about any trade finance rule — ICC, sanctions, FTAs, customs, Incoterms. Cited answers in seconds.
-              </p>
+              {(() => {
+                const hour = new Date().getHours()
+                const name = userEmail?.split('@')[0]
+                let greeting: string
+                let subtext: string
+
+                if (hour < 12) {
+                  greeting = name ? `Good morning, ${name}.` : 'Good morning.'
+                  subtext = name
+                    ? 'What rule are you working through today?'
+                    : 'Ask anything — ICC, sanctions, FTAs, Incoterms. Cited answers, not guesses.'
+                } else if (hour < 17) {
+                  greeting = name ? `Good afternoon, ${name}.` : 'Good afternoon.'
+                  subtext = name
+                    ? "What's on the desk this afternoon?"
+                    : 'Trade finance rules, explained with exact citations. Ask any question.'
+                } else {
+                  greeting = name ? `Good evening, ${name}.` : 'Good evening.'
+                  subtext = name
+                    ? "Late-night compliance question? You're in the right place."
+                    : 'The rule you need, cited and explained. No paywalls, no guesswork.'
+                }
+
+                return (
+                  <>
+                    <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
+                      {greeting}
+                    </h2>
+                    <p className="mt-4 max-w-xl text-lg font-light text-neutral-500 leading-relaxed">
+                      {subtext}
+                    </p>
+                  </>
+                )
+              })()}
             </div>
             
             <div className="mt-12 w-full">
