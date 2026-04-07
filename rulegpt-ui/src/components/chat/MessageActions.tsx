@@ -64,7 +64,7 @@ export function MessageActions({ canSave = true, onCopy, onSave, onShare, onThum
       </button>
       <button
         type="button"
-        style={{ ...iconBtnStyle, color: feedback === 'up' ? '#FF4F00' : undefined }}
+        style={{ ...iconBtnStyle, color: feedback === 'up' ? '#B2F273' : undefined }}
         className="btn-ghost"
         disabled={feedback !== null}
         onClick={() => { setFeedback('up'); onThumbsUp() }}
@@ -73,7 +73,7 @@ export function MessageActions({ canSave = true, onCopy, onSave, onShare, onThum
       </button>
       <button
         type="button"
-        style={{ ...iconBtnStyle, color: feedback === 'down' ? '#FF4F00' : undefined }}
+        style={{ ...iconBtnStyle, color: feedback === 'down' ? '#B2F273' : undefined }}
         className="btn-ghost"
         disabled={feedback !== null}
         onClick={() => { setFeedback('down'); onThumbsDown() }}

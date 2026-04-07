@@ -15,14 +15,14 @@
 :root {
   /* Primary palette */
   --color-obsidian: #0A0A0A;
-  --color-amber: #D97706;
+  --color-amber: #B2F273;
   --color-parchment: #FAF7F2;
   --color-ink: #1A1A1A;
 
   /* Secondary palette */
-  --color-amber-deep: #B45309;
-  --color-amber-muted: #78350F;
-  --color-amber-light: #FEF3C7;
+  --color-amber-deep: #9AD65E;
+  --color-amber-muted: #3D5C1E;
+  --color-amber-light: #F0FBEA;
   --color-surface: #111111;
   --color-surface-raised: #1A1A1A;
   --color-border: #2A2A2A;

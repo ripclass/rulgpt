@@ -12,7 +12,7 @@ export function FreeTierCounter({ usedCount, limitValue, remaining }: FreeTierCo
         <span>{usedCount} of {limitValue} free queries</span>
       </div>
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-white/10">
-        <div className="h-full rounded-full bg-[#FF4F00] transition-all" style={{ width: `${progress}%` }} />
+        <div className="h-full rounded-full bg-[#B2F273] transition-all" style={{ width: `${progress}%` }} />
       </div>
     </div>
   )

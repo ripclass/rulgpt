@@ -69,7 +69,7 @@ function UserMenu({
     return (
       <div className="mt-6 pt-5 border-t border-neutral-200 dark:border-white/10 flex items-center justify-between">
         <button
-          className="text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-[#FF4F00] transition"
+          className="text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-[#B2F273] transition"
           onClick={onOpenLogin}
         >
           Sign in for history &amp; saved
@@ -132,7 +132,7 @@ function UserMenu({
           </p>
           <p className={`text-[10px] font-semibold uppercase tracking-wider ${
             tier === 'professional' || tier === 'enterprise' // legacy: was 'starter' || 'pro'
-              ? 'text-[#FF4F00]'
+              ? 'text-[#B2F273]'
               : 'text-neutral-400 dark:text-neutral-500'
           }`}>
             {tier}
@@ -171,7 +171,7 @@ export function Sidebar({
       </Link>
 
       <button
-        className="mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-sm bg-[#FF4F00] text-[13px] font-bold uppercase tracking-widest text-white transition hover:bg-[#E64600] shadow-md shadow-[#FF4F00]/20"
+        className="mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-sm bg-[#B2F273] text-[13px] font-bold uppercase tracking-widest text-neutral-900 transition hover:bg-[#9AD65E] shadow-md shadow-[#B2F273]/20"
         onClick={onNewQuery}
       >
         <Plus className="h-4 w-4" /> New chat
@@ -194,7 +194,7 @@ export function Sidebar({
               disabled={previewMode}
               className={`w-full px-3 py-2 text-left text-[13px] font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50 rounded-sm ${
                 isActive 
-                  ? 'text-[#FF4F00] bg-[#FF4F00]/10 dark:bg-[#FF4F00]/20' 
+                  ? 'text-[#B2F273] bg-[#B2F273]/10 dark:bg-[#B2F273]/20' 
                   : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/5'
               }`}
               onClick={() => onQuickCategory(category)}

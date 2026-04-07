@@ -81,7 +81,7 @@ export function Pricing() {
           onClick={() => setInterval('monthly')}
           className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-sm transition ${
             interval === 'monthly'
-              ? 'bg-[#FF4F00] text-white'
+              ? 'bg-[#B2F273] text-neutral-900'
               : 'bg-neutral-100 dark:bg-white/5 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-white/10'
           }`}
         >
@@ -92,7 +92,7 @@ export function Pricing() {
           onClick={() => setInterval('annual')}
           className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-sm transition ${
             interval === 'annual'
-              ? 'bg-[#FF4F00] text-white'
+              ? 'bg-[#B2F273] text-neutral-900'
               : 'bg-neutral-100 dark:bg-white/5 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-white/10'
           }`}
         >
@@ -117,12 +117,12 @@ export function Pricing() {
               key={plan.name}
               className={`rounded-sm p-6 bg-white dark:bg-[#121212] flex flex-col border relative ${
                 plan.featured
-                  ? 'border-[#FF4F00] shadow-md shadow-[#FF4F00]/5'
+                  ? 'border-[#B2F273] shadow-md shadow-[#B2F273]/5'
                   : 'border-neutral-200 dark:border-white/10'
               }`}
             >
               {plan.badge && (
-                <span className="absolute -top-3 left-4 bg-[#FF4F00] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-sm">
+                <span className="absolute -top-3 left-4 bg-[#B2F273] text-neutral-900 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-sm">
                   {plan.badge}
                 </span>
               )}
@@ -136,7 +136,7 @@ export function Pricing() {
                 <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">{period}</span>
               </div>
               {monthlySavings > 0 && (
-                <p className="mt-1 text-xs font-medium text-[#FF4F00]">Save ${monthlySavings}/year</p>
+                <p className="mt-1 text-xs font-medium text-[#B2F273]">Save ${monthlySavings}/year</p>
               )}
               <p className="mt-3 text-xs font-medium text-neutral-500 dark:text-neutral-400">{plan.queries}</p>
               <p className="mt-1 text-[11px] text-neutral-400 dark:text-neutral-500">AI: {plan.models}</p>
@@ -144,7 +144,7 @@ export function Pricing() {
               <ul className="mt-5 space-y-2.5 flex-1">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-[13px] font-medium text-neutral-600 dark:text-neutral-400">
-                    <Check className="h-3.5 w-3.5 mt-0.5 text-[#FF4F00] shrink-0" />
+                    <Check className="h-3.5 w-3.5 mt-0.5 text-[#B2F273] shrink-0" />
                     {f}
                   </li>
                 ))}
@@ -154,7 +154,7 @@ export function Pricing() {
                 to={plan.href}
                 className={`mt-6 block w-full rounded-sm px-4 py-2.5 text-center text-xs font-bold uppercase tracking-widest transition ${
                   plan.featured
-                    ? 'bg-[#FF4F00] text-white hover:bg-[#E64600]'
+                    ? 'bg-[#B2F273] text-neutral-900 hover:bg-[#9AD65E]'
                     : 'bg-neutral-100 dark:bg-white/5 text-neutral-900 dark:text-white hover:bg-neutral-200 dark:hover:bg-white/10'
                 }`}
               >
@@ -181,9 +181,9 @@ export function Pricing() {
             <p className="text-2xl font-bold text-neutral-900 dark:text-white mt-2">$2,799/yr</p>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Teaches rules, doesn't apply them</p>
           </div>
-          <div className="p-4 rounded-sm border-2 border-[#FF4F00]">
-            <p className="font-bold text-[#FF4F00]">tfrules Professional</p>
-            <p className="text-2xl font-bold text-[#FF4F00] mt-2">$79/mo</p>
+          <div className="p-4 rounded-sm border-2 border-[#B2F273]">
+            <p className="font-bold text-[#B2F273]">tfrules Professional</p>
+            <p className="text-2xl font-bold text-[#B2F273] mt-2">$79/mo</p>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Instant answers. 5,400+ rules. 24/7.</p>
           </div>
         </div>

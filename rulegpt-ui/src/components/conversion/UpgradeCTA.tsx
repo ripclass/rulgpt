@@ -13,7 +13,7 @@ export function UpgradeCTA({ tier }: { tier: SessionTier }) {
     <div className="rounded-sm bg-neutral-50 dark:bg-[#141414] border border-neutral-200 dark:border-white/10 px-4 py-4 transition-colors">
       <p className="text-[13px] font-bold text-neutral-900 dark:text-neutral-100">Upgrade</p>
       <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">{helperText}</p>
-      <Button asChild className="mt-4 w-full rounded-sm bg-[#FF4F00] text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[#E64600] shadow-sm shadow-[#FF4F00]/20 border-none">
+      <Button asChild className="mt-4 w-full rounded-sm bg-[#B2F273] text-xs font-bold uppercase tracking-widest text-neutral-900 transition hover:bg-[#9AD65E] shadow-sm shadow-[#B2F273]/20 border-none">
         <Link to="/upgrade">{ctaLabel}</Link>
       </Button>
     </div>

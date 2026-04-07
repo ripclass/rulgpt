@@ -169,8 +169,8 @@ export function Upgrade() {
       description="One avoided discrepancy fee covers a year of Professional. Simple, transparent pricing."
     >
       {checkoutMessage ? (
-        <div className="mb-8 rounded-sm border border-[#FF4F00]/20 bg-[#FF4F00]/5 px-5 py-4">
-          <p className="text-sm font-medium text-[#FF4F00]">{checkoutMessage}</p>
+        <div className="mb-8 rounded-sm border border-[#B2F273]/20 bg-[#B2F273]/5 px-5 py-4">
+          <p className="text-sm font-medium text-[#B2F273]">{checkoutMessage}</p>
         </div>
       ) : null}
 
@@ -196,7 +196,7 @@ export function Upgrade() {
               type="button"
               className={`rounded-sm p-6 text-left transition border ${
                 selected
-                  ? 'border-[#FF4F00] bg-[#FF4F00]/5 dark:bg-[#FF4F00]/10 shadow-md shadow-[#FF4F00]/5'
+                  ? 'border-[#B2F273] bg-[#B2F273]/5 dark:bg-[#B2F273]/10 shadow-md shadow-[#B2F273]/5'
                   : 'border-neutral-200 dark:border-white/10 bg-white dark:bg-[#121212] hover:border-neutral-300 dark:hover:border-white/20'
               }`}
               onClick={() => setSelectedPlan(plan)}
@@ -212,7 +212,7 @@ export function Upgrade() {
                   </p>
                 </div>
                 {selected ? (
-                  <span className="rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest bg-[#FF4F00]/10 text-[#FF4F00]">
+                  <span className="rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest bg-[#B2F273]/10 text-[#B2F273]">
                     Selected
                   </span>
                 ) : null}
@@ -221,7 +221,7 @@ export function Upgrade() {
               <ul className="mt-5 space-y-2.5">
                 {planCopy.features.map((feature: string) => (
                   <li key={feature} className="flex items-center gap-3 text-[13px] font-medium text-neutral-600 dark:text-neutral-300">
-                    <Check className="h-4 w-4 text-[#FF4F00] shrink-0" /> {feature}
+                    <Check className="h-4 w-4 text-[#B2F273] shrink-0" /> {feature}
                   </li>
                 ))}
               </ul>
@@ -259,7 +259,7 @@ export function Upgrade() {
       {/* Checkout Action */}
       <div className="mt-10 flex flex-wrap items-center gap-4 pt-8 border-t border-neutral-200 dark:border-white/10">
         <button
-          className="inline-flex h-12 items-center justify-center rounded-sm bg-[#FF4F00] px-10 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[#E64600] disabled:bg-neutral-300 disabled:text-neutral-500 dark:disabled:bg-neutral-700 dark:disabled:text-neutral-400 disabled:cursor-not-allowed shadow-lg shadow-[#FF4F00]/20"
+          className="inline-flex h-12 items-center justify-center rounded-sm bg-[#B2F273] px-10 text-xs font-bold uppercase tracking-widest text-neutral-900 transition hover:bg-[#9AD65E] disabled:bg-neutral-300 disabled:text-neutral-500 dark:disabled:bg-neutral-700 dark:disabled:text-neutral-400 disabled:cursor-not-allowed shadow-lg shadow-[#B2F273]/20"
           onClick={() => {
             if (!auth.isAuthenticated) {
               authModal.openLogin()
