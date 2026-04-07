@@ -102,7 +102,7 @@ export function PreviewLanding({
   const isNavDarkTheme = !heroPassed
 
   return (
-    <div className="min-h-screen bg-white font-sans text-neutral-900 selection:bg-[#00261C] selection:text-white pb-0">
+    <div className="min-h-screen bg-white font-sans text-neutral-900 selection:bg-[#FF4F00] selection:text-white pb-0">
       
       {/* ──────────────────────────────────────────────────────────
           NAV (Dynamic Theme based on scroll)
@@ -135,14 +135,14 @@ export function PreviewLanding({
                 <span className={`text-xs ${isNavDarkTheme ? 'text-neutral-400' : 'text-neutral-500'}`}>
                   {userEmail} <span className="uppercase mx-2 opacity-50">·</span> {tier}
                 </span>
-                <button onClick={onOpenChat} className="flex h-11 items-center rounded-sm bg-[#B2F273] px-6 text-[15px] font-semibold text-neutral-900 transition hover:bg-white hover:text-neutral-900 uppercase tracking-wide">
+                <button onClick={onOpenChat} className="flex h-11 items-center rounded-sm bg-[#FF4F00] px-6 text-[15px] font-semibold text-white transition hover:bg-[#E64600] uppercase tracking-wide">
                   Open Chat <ArrowRight className="ml-2 h-4 w-4" />
                 </button>
               </div>
             ) : (
               <div className="flex items-center gap-6">
                 <button onClick={onOpenLogin} className={`transition duration-200 ${isNavDarkTheme ? 'hover:text-white' : 'hover:text-neutral-900'}`}>Sign in</button>
-                <button onClick={onOpenChat} className="flex h-11 items-center rounded-sm bg-[#B2F273] px-6 text-[15px] font-semibold text-neutral-900 transition hover:bg-white hover:text-neutral-900 uppercase tracking-wide shadow-lg shadow-[#B2F273]/20">
+                <button onClick={onOpenChat} className="flex h-11 items-center rounded-sm bg-[#FF4F00] px-6 text-[15px] font-semibold text-white transition hover:bg-[#E64600] uppercase tracking-wide shadow-lg shadow-[#FF4F00]/20">
                   Try tfrules free
                 </button>
               </div>
@@ -161,20 +161,20 @@ export function PreviewLanding({
         {/* Mobile Menu Overlay */}
         <div className={`fixed inset-0 z-[115] h-dvh w-screen bg-white pt-28 px-8 md:hidden transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] flex flex-col ${mobileMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'}`}>
           <nav className="flex flex-col gap-10 text-4xl sm:text-5xl font-bold uppercase tracking-widest text-neutral-900 mt-4">
-            <a href="#how" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#00261C]">How it works</a>
-            <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#00261C]">Pricing</a>
-            <Link to="/faq" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#00261C]">FAQ</Link>
-            <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#00261C]">Contact</Link>
+            <a href="#how" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">How it works</a>
+            <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">Pricing</a>
+            <Link to="/faq" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">FAQ</Link>
+            <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">Contact</Link>
           </nav>
 
           <div className="mt-12 flex flex-col gap-4">
             {isAuthenticated ? (
-              <button onClick={() => { setMobileMenuOpen(false); onOpenChat(); }} className="w-full rounded-sm bg-[#B2F273] py-5 text-center text-xl font-semibold text-neutral-900 tracking-wide uppercase transition active:scale-95">
+              <button onClick={() => { setMobileMenuOpen(false); onOpenChat(); }} className="w-full rounded-sm bg-[#FF4F00] py-5 text-center text-xl font-semibold text-white tracking-wide uppercase transition active:scale-95">
                 Open chat
               </button>
             ) : (
               <>
-                <button onClick={() => { setMobileMenuOpen(false); onOpenChat(); }} className="w-full rounded-sm bg-[#B2F273] py-5 text-center text-xl font-semibold text-neutral-900 tracking-wide uppercase transition active:scale-95 shadow-lg shadow-[#B2F273]/20">
+                <button onClick={() => { setMobileMenuOpen(false); onOpenChat(); }} className="w-full rounded-sm bg-[#FF4F00] py-5 text-center text-xl font-semibold text-white tracking-wide uppercase transition active:scale-95 shadow-lg shadow-[#FF4F00]/20">
                   Try free
                 </button>
                 <button onClick={() => { setMobileMenuOpen(false); onOpenLogin(); }} className="w-full rounded-sm border-2 border-neutral-200 bg-transparent py-5 text-center text-xl font-semibold text-neutral-900 transition active:scale-95">
@@ -217,7 +217,7 @@ export function PreviewLanding({
             </p>
             
             <div className="mt-12 flex flex-col sm:flex-row gap-5 animate-fade-up" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
-              <button onClick={onOpenChat} className="flex h-14 md:h-16 items-center justify-center rounded-sm bg-[#B2F273] px-8 md:px-10 text-base md:text-lg font-bold uppercase tracking-widest text-neutral-900 transition-all hover:bg-white hover:text-neutral-900 active:scale-[0.98] w-full sm:w-auto shadow-2xl shadow-[#B2F273]/20">
+              <button onClick={onOpenChat} className="flex h-14 md:h-16 items-center justify-center rounded-sm bg-[#FF4F00] px-8 md:px-10 text-base md:text-lg font-bold uppercase tracking-widest text-white transition-all hover:bg-[#E64600] active:scale-[0.98] w-full sm:w-auto shadow-2xl shadow-[#FF4F00]/20">
                 {isAuthenticated ? 'Open Chat' : 'Try it free'}
               </button>
             </div>
@@ -261,25 +261,25 @@ export function PreviewLanding({
 
             {/* TFRules Card */}
             <FadeInView delay={200} className="rounded-xl bg-gradient-to-br from-neutral-900 to-[#0A0A0A] p-10 border border-white/10 shadow-[0_0_50px_rgba(255,79,0,0.03)] relative overflow-hidden group">
-              <div className="absolute inset-0 bg-[#00261C] opacity-0 group-hover:opacity-[0.02] transition-opacity duration-1000" />
+              <div className="absolute inset-0 bg-[#FF4F00] opacity-0 group-hover:opacity-[0.02] transition-opacity duration-1000" />
               
               <div className="mb-8 flex items-center justify-between">
                 <span className="text-sm font-mono tracking-widest text-white uppercase border border-white/20 bg-white/5 px-3 py-1 rounded flex items-center gap-2">
                   TFRules Engine
                 </span>
-                <Check className="h-6 w-6 text-[#00261C]" />
+                <Check className="h-6 w-6 text-[#FF4F00]" />
               </div>
               <p className="text-xl leading-relaxed text-white font-light">
                 "UCP600 requires a transport document naming the carrier, signed by the carrier or agent, 
                 indicating shipment from the port in the credit, and the sole original if issued in sets."
               </p>
               <div className="mt-8 flex flex-wrap gap-2">
-                <span className="inline-flex items-center rounded bg-[#00261C]/10 px-3 py-1.5 font-mono text-xs text-[#00261C] border border-[#00261C]/20 tracking-wider">UCP600 Art. 19</span>
-                <span className="inline-flex items-center rounded bg-[#00261C]/10 px-3 py-1.5 font-mono text-xs text-[#00261C] border border-[#00261C]/20 tracking-wider">UCP600 Art. 20</span>
+                <span className="inline-flex items-center rounded bg-[#FF4F00]/10 px-3 py-1.5 font-mono text-xs text-[#FF4F00] border border-[#FF4F00]/20 tracking-wider">UCP600 Art. 19</span>
+                <span className="inline-flex items-center rounded bg-[#FF4F00]/10 px-3 py-1.5 font-mono text-xs text-[#FF4F00] border border-[#FF4F00]/20 tracking-wider">UCP600 Art. 20</span>
               </div>
               <div className="mt-8 flex items-center gap-3">
-                <div className="h-px bg-[#00261C]/30 flex-grow" />
-                <span className="text-sm font-mono text-[#00261C] tracking-wide">EXACT CITATION // DISPUTE READY</span>
+                <div className="h-px bg-[#FF4F00]/30 flex-grow" />
+                <span className="text-sm font-mono text-[#FF4F00] tracking-wide">EXACT CITATION // DISPUTE READY</span>
               </div>
             </FadeInView>
           </div>
@@ -293,13 +293,13 @@ export function PreviewLanding({
         <div className="mx-auto max-w-6xl px-6 relative">
           
           <FadeInView className="mb-24">
-            <h2 className="text-5xl font-semibold tracking-tight text-neutral-900 border-l-4 border-[#00261C] pl-6 py-2">How it <br/>works.</h2>
+            <h2 className="text-5xl font-semibold tracking-tight text-neutral-900 border-l-4 border-[#FF4F00] pl-6 py-2">How it <br/>works.</h2>
           </FadeInView>
 
           <div className="space-y-32">
             <FadeInView delay={0} className="grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <span className="text-[#00261C] font-mono tracking-widest text-lg md:text-xl block mb-4">PHASE 01</span>
+                <span className="text-[#FF4F00] font-mono tracking-widest text-lg md:text-xl block mb-4">PHASE 01</span>
                 <h3 className="text-3xl md:text-4xl font-semibold text-neutral-900 mb-6 leading-tight">Ask in plain language.</h3>
                 <p className="text-lg text-neutral-500 leading-relaxed font-light">
                   Describe your complex scenario in plain language. You do not need to construct boolean searches or memorize precise jargon. Just ask the question.
@@ -307,14 +307,14 @@ export function PreviewLanding({
               </div>
               <div className="bg-neutral-100 rounded-lg aspect-video flex flex-col justify-center p-12 border border-neutral-200">
                 <div className="bg-white p-4 font-mono text-sm border-l-2 border-neutral-300 shadow-sm text-neutral-600">
-                  <span className="text-[#00261C]">]</span> What documents are required for a CIF shipment under UCP600?
+                  <span className="text-[#FF4F00]">]</span> What documents are required for a CIF shipment under UCP600?
                 </div>
               </div>
             </FadeInView>
             
             <FadeInView delay={100} className="grid md:grid-cols-2 gap-12 items-center md:flex-row-reverse">
               <div className="md:order-2">
-                <span className="text-[#00261C] font-mono tracking-widest text-lg md:text-xl block mb-4">PHASE 02</span>
+                <span className="text-[#FF4F00] font-mono tracking-widest text-lg md:text-xl block mb-4">PHASE 02</span>
                 <h3 className="text-3xl md:text-4xl font-semibold text-neutral-900 mb-6 leading-tight">Deep indexing.</h3>
                 <p className="text-lg text-neutral-500 leading-relaxed font-light">
                   Every answer is grounded in curated, versioned rules — not model general knowledge. The engine searches across ICC standards, FTAs, sanctions lists, and regulations from 48+ jurisdictions to find exactly what applies.
@@ -332,20 +332,20 @@ export function PreviewLanding({
 
             <FadeInView delay={100} className="grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <span className="text-[#00261C] font-mono tracking-widest text-lg md:text-xl block mb-4">PHASE 03</span>
+                <span className="text-[#FF4F00] font-mono tracking-widest text-lg md:text-xl block mb-4">PHASE 03</span>
                 <h3 className="text-3xl md:text-4xl font-semibold text-neutral-900 mb-6 leading-tight">Absolute verification.</h3>
                 <p className="text-lg text-neutral-500 leading-relaxed font-light">
                   Output is constructed with strict adherence to the retrieved rules. Every factual claim is bound directly to the source text. Show it to banks or clients with absolute confidence.
                 </p>
               </div>
-              <div className="bg-[#00261C]/5 rounded-lg aspect-video flex flex-col justify-center p-12 border border-[#00261C]/20">
+              <div className="bg-[#FF4F00]/5 rounded-lg aspect-video flex flex-col justify-center p-12 border border-[#FF4F00]/20">
                 <div className="bg-white p-6 shadow-xl border border-neutral-100 flex flex-col gap-4">
                   <div className="h-2 bg-neutral-200 rounded w-3/4" />
                   <div className="h-2 bg-neutral-200 rounded w-full" />
                   <div className="h-2 bg-neutral-200 rounded w-5/6" />
                   <div className="flex gap-2 mt-2">
-                    <span className="h-4 w-16 bg-[#00261C] rounded-sm" />
-                    <span className="h-4 w-20 bg-[#00261C] rounded-sm opacity-50" />
+                    <span className="h-4 w-16 bg-[#FF4F00] rounded-sm" />
+                    <span className="h-4 w-20 bg-[#FF4F00] rounded-sm opacity-50" />
                   </div>
                 </div>
               </div>
@@ -381,7 +381,7 @@ export function PreviewLanding({
                 const Icon = item.i
                 return (
                   <div key={idx} className="flex gap-5 group">
-                    <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-neutral-200 text-neutral-600 transition group-hover:bg-[#00261C] group-hover:text-white">
+                    <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-neutral-200 text-neutral-600 transition group-hover:bg-[#FF4F00] group-hover:text-white">
                       <Icon className="h-5 w-5" />
                     </div>
                     <div>
@@ -434,7 +434,7 @@ export function PreviewLanding({
             {/* Free */}
             <div className="bg-white p-10 border border-neutral-200 shadow-sm flex flex-col justify-between group hover:border-neutral-300 transition-colors">
               <div>
-                <h3 className="text-sm font-bold uppercase tracking-widest text-[#00261C]">Free</h3>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-[#FF4F00]">Free</h3>
                 <div className="mt-6 mb-2">
                   <span className="text-5xl font-semibold tracking-tight text-neutral-900">$0</span>
                 </div>
@@ -452,7 +452,7 @@ export function PreviewLanding({
             {/* Professional */}
             <div className="bg-neutral-900 p-10 border border-neutral-800 shadow-2xl relative md:-mt-4 md:mb-4 flex flex-col justify-between transform transition-transform hover:-translate-y-2">
               <div>
-                <div className="absolute top-0 right-10 -translate-y-1/2 bg-[#00261C] text-white px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-lg">Most Popular</div>
+                <div className="absolute top-0 right-10 -translate-y-1/2 bg-[#FF4F00] text-white px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-lg">Most Popular</div>
                 <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400">Professional</h3>
                 <div className="mt-6 mb-2">
                   <span className="text-5xl font-semibold tracking-tight text-white">
@@ -464,15 +464,15 @@ export function PreviewLanding({
                 </div>
                 <p className="text-sm text-neutral-400 border-b border-neutral-800 pb-8 uppercase font-mono tracking-wide">500 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-300">
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#00261C] shrink-0" /> Haiku + Sonnet + Opus AI</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#00261C] shrink-0" /> Sanctions routed to Opus</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#00261C] shrink-0" /> Session history &amp; saved answers</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Haiku + Sonnet + Opus AI</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Sanctions routed to Opus</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Session history &amp; saved answers</li>
                 </ul>
               </div>
               <button
                 onClick={() => isAuthenticated ? onStartCheckout('professional', billingInterval) : onOpenLogin()}
                 disabled={isCheckingOut}
-                className="mt-12 w-full bg-[#B2F273] py-4 font-bold text-neutral-900 uppercase tracking-wider text-sm transition hover:bg-white hover:text-neutral-900 shadow-lg shadow-[#B2F273]/20 disabled:opacity-50"
+                className="mt-12 w-full bg-[#FF4F00] py-4 font-bold text-white uppercase tracking-wider text-sm transition hover:bg-[#E64600] shadow-lg shadow-[#FF4F00]/20 disabled:opacity-50"
               >
                 {isCheckingOut ? 'Redirecting...' : isAuthenticated ? 'Get Professional' : 'Sign in to upgrade'}
               </button>
@@ -492,9 +492,9 @@ export function PreviewLanding({
                 </div>
                 <p className="text-sm text-neutral-500 border-b border-neutral-100 pb-8 uppercase font-mono tracking-wide">2,000 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-600">
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#00261C] shrink-0" /> Expanded Opus access</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#00261C] shrink-0" /> Full session export</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#00261C] shrink-0" /> Dedicated account support</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Expanded Opus access</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Full session export</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Dedicated account support</li>
                 </ul>
               </div>
               <button
@@ -518,7 +518,7 @@ export function PreviewLanding({
       <section className="py-24 bg-neutral-50 border-t border-neutral-200">
         <div className="mx-auto max-w-4xl px-6 text-center">
           <FadeInView>
-            <p className="text-sm font-mono tracking-widest text-[#00261C] uppercase mb-6">Beyond questions</p>
+            <p className="text-sm font-mono tracking-widest text-[#FF4F00] uppercase mb-6">Beyond questions</p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-neutral-900 leading-tight">
               Know the rules. Then validate the documents.
             </h2>
@@ -542,10 +542,10 @@ export function PreviewLanding({
       {/* ──────────────────────────────────────────────────────────
           BOTTOM CTA
           ────────────────────────────────────────────────────────── */}
-      <section className="py-32 bg-[#00261C] text-center px-6">
+      <section className="py-32 bg-[#FF4F00] text-center px-6">
         <FadeInView>
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-8">Know the rule before it costs you.</h2>
-          <button onClick={onOpenChat} className="inline-flex items-center justify-center bg-white px-10 py-5 text-xl font-bold text-[#00261C] uppercase tracking-widest transition hover:bg-neutral-100 hover:scale-105 active:scale-95 shadow-2xl">
+          <button onClick={onOpenChat} className="inline-flex items-center justify-center bg-white px-10 py-5 text-xl font-bold text-[#FF4F00] uppercase tracking-widest transition hover:bg-neutral-100 hover:scale-105 active:scale-95 shadow-2xl">
             Try it free <ArrowRight className="ml-3 h-5 w-5" />
           </button>
         </FadeInView>

@@ -48,10 +48,10 @@ export function MainArea({
     : 'Ask about any trade finance rule...'
 
   return (
-    <main className="flex min-h-[100dvh] flex-1 flex-col pb-28 md:pb-0 bg-[#FAFAFA] dark:bg-[#171717] selection:bg-[#00261C] dark:bg-[#B2F273] selection:text-white relative transition-colors">
+    <main className="flex min-h-[100dvh] flex-1 flex-col pb-28 md:pb-0 bg-[#FAFAFA] dark:bg-[#171717] selection:bg-[#FF4F00] selection:text-white relative transition-colors">
       {/* Subtle Environment Status Badge */}
       <div className="absolute top-6 right-8 hidden md:flex items-center gap-2 z-[50]">
-        <div className={`w-1.5 h-1.5 rounded-full ${previewMode ? 'bg-neutral-400' : 'bg-[#00261C] dark:bg-[#B2F273] animate-pulse'}`} />
+        <div className={`w-1.5 h-1.5 rounded-full ${previewMode ? 'bg-neutral-400' : 'bg-[#FF4F00] animate-pulse'}`} />
         <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
           {previewMode ? 'Preview Node' : 'Live Engine'}
         </span>
@@ -89,7 +89,7 @@ export function MainArea({
             <div className="mt-12 w-full">
               {reachedLimit ? (
                 <div className="relative w-full rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#1A1A1A] px-6 py-6 shadow-sm transition-colors group">
-                  <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00261C] dark:bg-[#B2F273] rounded-l-sm" />
+                  <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#FF4F00] rounded-l-sm" />
                   <div className="mb-4 flex items-center gap-2 border-b border-neutral-100 dark:border-white/5 pb-4">
                     <span className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">System Notification</span>
                   </div>
@@ -102,7 +102,7 @@ export function MainArea({
                         Create free account
                       </button>
                     )}
-                    <button onClick={onUpgrade} className="rounded-sm bg-[#00261C] dark:bg-[#B2F273] px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-white shadow-md shadow-[#00261C] dark:shadow-[#B2F273]/20 transition hover:bg-[#B2F273] hover:text-neutral-900 dark:hover:bg-[#00261C] dark:hover:text-white">
+                    <button onClick={onUpgrade} className="rounded-sm bg-[#FF4F00] px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-white shadow-md shadow-[#FF4F00]/20 transition hover:bg-[#E64600]">
                       Upgrade to Pro
                     </button>
                   </div>

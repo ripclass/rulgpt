@@ -15,15 +15,14 @@
 :root {
   /* Primary palette */
   --color-obsidian: #0A0A0A;
-  --color-amber: #00261C;
+  --color-amber: #D97706;
   --color-parchment: #FAF7F2;
   --color-ink: #1A1A1A;
 
-  /* Secondary palette — lime green accent (matches TRDR Hub) */
-  --color-amber-deep: #B2F273;
-  --color-amber-muted: #3D5C1E;
-  --color-amber-light: #F0FBEA;
-  --color-lime: #B2F273;
+  /* Secondary palette */
+  --color-amber-deep: #B45309;
+  --color-amber-muted: #78350F;
+  --color-amber-light: #FEF3C7;
   --color-surface: #111111;
   --color-surface-raised: #1A1A1A;
   --color-border: #2A2A2A;
