@@ -16,6 +16,61 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.tfrules.com/blog</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/cif-vs-fob-who-pays-insurance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/late-presentation-21-day-rule-ucp600</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/partial-shipments-ucp600-article-31</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/iran-sanctions-ofac-comprehensive</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/force-majeure-ucp600-article-36</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/bill-of-lading-vs-multimodal-transport-document</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/rcep-cumulation-rules-of-origin</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/demand-guarantee-extend-or-pay-urdg-758</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/usmca-automotive-rules-of-origin-75-rvc</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/backdating-bill-of-lading-fraud</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://www.tfrules.com/upgrade</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
