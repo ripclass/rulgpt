@@ -659,6 +659,11 @@ def _allowed_reference_tokens(rules: Sequence[RetrievedRule]) -> tuple[set[str],
     for rule in rules:
         ref = rule.reference or ""
         rb = rule.rulebook or ""
+        rid = rule.rule_id or ""
+
+        # Rule ID — Opus sometimes cites these directly (e.g. VESSEL-DARK-001)
+        if rid:
+            allowed_citations.add(_normalize_citation_token(rid))
 
         # Full compound reference
         allowed_citations.add(_normalize_citation_token(f"{rb} {ref}"))
