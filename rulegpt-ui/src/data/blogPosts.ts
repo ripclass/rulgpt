@@ -895,4 +895,248 @@ The harder truth: past acceptance of your documents doesn't create precedent. Ea
     ],
     tags: ['UCP600', 'ISBP745'],
   },
+  {
+    slug: 'fca-vs-cif-invoice-mismatch-lc',
+    title: 'Your Invoice Says FCA but the LC Says CIF — Is That a Discrepancy?',
+    description: 'Using a different Incoterm on the invoice than what the LC specifies is a discrepancy — even if the underlying contract says otherwise.',
+    question: 'My LC is irrevocable and confirmed. The goods are shipped CIF Hamburg. I used FCA Ho Chi Minh City in my commercial invoice because that\'s what my contract with the buyer says. The LC says CIF Hamburg. Is using FCA in the invoice okay since the contract says FCA?',
+    answer: `No — this is a discrepancy. The invoice must reflect the trade terms stated in the LC, not the underlying contract.
+
+Under UCP 600 Article 4(a), a credit is separate from the underlying contract. The bank examines documents against the credit terms, not against what the buyer and seller agreed privately. If your LC says CIF Hamburg, the invoice must show CIF Hamburg.
+
+UCP 600 Article 18(c) requires the goods description on the invoice to correspond with the description in the credit. Trade terms (Incoterms) are part of that description when stated in the LC. Showing "FCA Ho Chi Minh City" against a credit calling for "CIF Hamburg" is a data conflict that the bank will flag under Article 14(d).
+
+The fact that your underlying sales contract uses FCA is irrelevant to the bank. The bank doesn't see your contract and isn't bound by it. The LC creates a separate, autonomous obligation.
+
+Your options: reissue the invoice with CIF Hamburg before presenting — this is the simplest fix. If you've already presented, request a discrepancy waiver from the applicant. For future shipments, align the LC terms with your contract terms at the time of LC issuance — or accept that the invoice must mirror the LC regardless of the contract.
+
+The separation principle is fundamental: the LC lives in its own world.`,
+    citations: [
+      'UCP600 Article 4(a) — Credits vs contracts',
+      'UCP600 Article 18(c) — Invoice goods description',
+      'UCP600 Article 14(d) — Data consistency',
+      'Incoterms 2020 — FCA vs CIF obligations',
+    ],
+    tags: ['UCP600', 'Incoterms'],
+  },
+  {
+    slug: 'advising-bank-vs-confirming-bank-difference',
+    title: 'Advising Bank vs Confirming Bank — What\'s the Difference and Why It Matters',
+    description: 'An advising bank has no payment obligation. A confirming bank does. Confusing the two can leave you unprotected.',
+    question: 'My LC was advised by a local bank. I assumed they would pay me if the issuing bank didn\'t. But when I asked, they said they have no payment obligation. How is that possible? What\'s the difference between advising and confirming?',
+    answer: `Your advising bank has no payment obligation to you — and they're right. This is one of the most common and costly misconceptions in trade finance.
+
+Under UCP 600 Article 9, an advising bank's only obligation is to check the apparent authenticity of the credit and advise it to you. They're a messenger — they deliver the LC and confirm it looks genuine. They owe you nothing beyond that.
+
+A confirming bank, by contrast, adds its own independent, irrevocable undertaking to honour a complying presentation under UCP 600 Article 8. If the issuing bank fails to pay (due to insolvency, sanctions, country risk, or currency restrictions), the confirming bank must still pay you.
+
+The practical difference is enormous. With an advising bank only, your sole obligor is the issuing bank — if they're in a high-risk country or have weak credit, you carry that risk. With a confirming bank, you have two independent payment undertakings from two separate banks, typically in different countries.
+
+How to tell which you have: look at Field 49 in the SWIFT MT700. If it says "CONFIRM," the advising bank has been asked to add confirmation. If it says "WITHOUT" or "MAY ADD," there's no confirmation unless you separately requested and paid for it.
+
+If you need confirmation, ask for it before the LC is issued. Adding confirmation after issuance is possible but requires agreement from all parties and costs more.`,
+    citations: [
+      'UCP600 Article 9 — Advising bank obligations',
+      'UCP600 Article 8 — Confirming bank undertaking',
+      'UCP600 Article 2 — Definitions',
+      'SWIFT MT700 Field 49 — Confirmation instructions',
+    ],
+    tags: ['UCP600'],
+  },
+  {
+    slug: 'ucp600-article-30-quantity-tolerance',
+    title: 'UCP 600 Quantity Tolerance — When Can You Ship 5% More or Less?',
+    description: 'The 5% quantity tolerance under Article 30(b) only applies when quantity is NOT stated in units. If the LC says "10,000 pieces," the tolerance doesn\'t apply.',
+    question: 'My LC is for 500 metric tons of rice at USD 400 per ton, total USD 200,000. Can I ship 475 tons and draw the proportional amount? What about the 5% tolerance?',
+    answer: `Yes — the 5% tolerance applies to your shipment. Under UCP 600 Article 30(b), a tolerance of +/- 5% in quantity is allowed provided the credit does not state the quantity in terms of a stipulated number of packing units or individual items, AND the total drawing does not exceed the credit amount.
+
+"500 metric tons" is a bulk/weight quantity, not a unit count. So the 5% tolerance applies. You can ship anywhere from 475 to 525 metric tons.
+
+At 475 tons (5% under), your drawing would be 475 x USD 400 = USD 190,000 — within the credit amount of USD 200,000. This is fine.
+
+However, if you wanted to ship 525 tons (5% over), your drawing would be 525 x USD 400 = USD 210,000. This exceeds the credit amount of USD 200,000. Article 30(b) explicitly states the total must not exceed the credit amount. So you could ship 525 tons but only draw USD 200,000 — you'd absorb the cost of 25 tons.
+
+When the tolerance does NOT apply: if the LC said "10,000 bags" or "200 cartons" or "5,000 pieces" — these are stipulated numbers of packing units or individual items. The 5% tolerance is excluded.
+
+Also note Article 30(a): if "about" or "approximately" appears before the quantity, a 10% tolerance applies instead of 5%. Check your LC carefully.`,
+    citations: [
+      'UCP600 Article 30(b) — 5% quantity tolerance',
+      'UCP600 Article 30(a) — "About" tolerance (10%)',
+      'UCP600 Article 18(b) — Invoice amount not exceeding credit',
+      'ISBP745 Paragraph C7 — Quantity and tolerance',
+    ],
+    tags: ['UCP600'],
+  },
+  {
+    slug: 'urr725-reimbursement-bank-obligations',
+    title: 'URR 725 — How Bank-to-Bank Reimbursement Works Under Letters of Credit',
+    description: 'The reimbursing bank pays the claiming bank on behalf of the issuing bank. URR 725 governs this process — and the reimbursing bank doesn\'t examine documents.',
+    question: 'We\'re the reimbursing bank on an LC. The claiming bank submitted a reimbursement claim but didn\'t include the credit number. We know which credit it relates to because we only have one outstanding authorization from that issuing bank. Can we honour the claim anyway?',
+    answer: `No — you should not honour the claim without the credit number, even if you can identify the credit through context.
+
+Under URR 725 Article 11(b), a reimbursement claim must include the credit number and the issuing bank's name and location. These are mandatory elements of a complying claim. Article 12(a) states that the reimbursing bank must determine if a claim appears to comply with the terms of the reimbursement authorization.
+
+The fact that you can logically identify the credit doesn't satisfy the compliance requirement. URR 725 operates on the same documentary formalism as UCP 600 — claims are examined against the authorization terms, not against what you happen to know.
+
+If you honour the claim without the credit number and something goes wrong — a duplicate claim, a revoked authorization, a fraud — you've acted outside the reimbursement authorization and may lose your right to be reimbursed by the issuing bank.
+
+The correct action: contact the claiming bank and request they resubmit the claim with the credit number included. URR 725 Article 11(c) gives the claiming bank an opportunity to correct a non-complying claim. This is standard practice and takes minutes.
+
+The reimbursing bank's role is procedural, not investigative. Follow the rules exactly — that's your protection.`,
+    citations: [
+      'URR 725 Article 11(b) — Claim requirements',
+      'URR 725 Article 11(c) — Non-complying claims',
+      'URR 725 Article 12(a) — Examination of claims',
+      'URR 725 Article 3 — Definitions',
+    ],
+    tags: ['URR 725'],
+  },
+  {
+    slug: 'icc-banking-commission-opinions-docdex',
+    title: 'ICC Banking Commission Opinions and DOCDEX — How They Shape LC Practice',
+    description: 'ICC Banking Commission opinions are the closest thing to case law in trade finance. They\'re not binding, but banks follow them. DOCDEX decisions resolve disputes.',
+    question: 'Has the ICC Banking Commission ever issued an opinion on whether a bill of lading showing a "received for shipment" notation is acceptable under an LC that requires a "shipped on board" bill of lading? I need to cite the specific opinion for our internal policy.',
+    answer: `The ICC Banking Commission has addressed this issue multiple times, and the position is clear: a "received for shipment" bill of lading is NOT the same as an "on board" bill of lading. If the LC requires a B/L showing goods shipped on board, a received-for-shipment B/L without an on-board notation is discrepant.
+
+Under UCP 600 Article 20(a)(ii), a bill of lading must indicate that the goods have been shipped on board a named vessel. A "received for shipment" B/L only confirms the carrier received the goods — not that they were loaded on board.
+
+The B/L can be converted: if a "received for shipment" B/L bears a separate on-board notation showing the date of loading and the vessel name, it becomes acceptable. The on-board notation must be dated and signed or initialled. The date of the on-board notation becomes the date of shipment.
+
+ISBP 745 paragraphs E1-E8 provide detailed guidance on what constitutes acceptable on-board notations. ICC Banking Commission opinions in the Collected Opinions series (notably R209, R305, and subsequent opinions in the 2009-2019 volumes) have consistently upheld this distinction.
+
+For your internal policy: cite UCP 600 Article 20(a)(ii) as the primary authority, ISBP 745 E1-E8 for examination guidance, and reference the ICC Collected Opinions for supporting interpretation.`,
+    citations: [
+      'UCP600 Article 20(a)(ii) — On-board requirement',
+      'ISBP745 Paragraphs E1-E8 — On-board notation',
+      'ICC Banking Commission Collected Opinions — B/L examination',
+      'UCP600 Article 20(a)(iii) — Port of loading indication',
+    ],
+    tags: ['UCP600', 'ICC'],
+  },
+  {
+    slug: 'multi-jurisdiction-complex-query-sanctions-fta-customs',
+    title: 'Uzbekistan Textiles via Turkey to the EU — Sanctions, Origin, and Transshipment in One Deal',
+    description: 'A single shipment can trigger FTA origin rules, transshipment provisions, and sanctions screening simultaneously. Here\'s how to untangle a multi-jurisdiction transaction.',
+    question: 'We\'re routing a shipment of textiles from Uzbekistan through Turkey to the EU. The textiles qualify for EU GSP+ preferential tariff if shipped directly, but we\'re doing transshipment in Istanbul. Does transshipment through Turkey affect the GSP+ origin status? Are there sanctions concerns with Uzbekistan? Does Turkey\'s customs union with the EU help?',
+    answer: `This transaction touches three regulatory domains simultaneously — origin rules, transshipment provisions, and sanctions screening. Let's separate them.
+
+GSP+ origin and transshipment: Uzbekistan qualifies for EU GSP+ preferences. However, EU GSP rules include a "direct transport" or "non-manipulation" requirement. Under EU Regulation 952/2013 (Union Customs Code) and GSP origin rules, goods must be transported directly from the beneficiary country to the EU. Transshipment through a third country is permitted ONLY if the goods remain under customs supervision and do not undergo any processing beyond unloading, reloading, or operations to preserve them. If the goods are stored, consolidated, or processed in Turkey beyond these minimal operations, they lose GSP+ eligibility.
+
+Turkey's customs union: Turkey has a customs union with the EU for industrial goods, but the customs union does NOT grant GSP+ origin. The customs union covers free circulation of goods already in free circulation in Turkey or the EU. Uzbek textiles transshipped through Turkey don't gain Turkish or EU origin status — they remain Uzbek-origin goods.
+
+Sanctions: Uzbekistan is not comprehensively sanctioned by the EU or OFAC. However, specific entities and individuals may be listed. Screen the parties involved against EU Consolidated Sanctions List and OFAC SDN list. Cotton from Uzbekistan historically raised forced labor concerns — verify compliance with due diligence requirements.
+
+Bottom line: transshipment is fine if goods aren't manipulated in Turkey. Keep customs documentation showing unbroken transit. The customs union doesn't help with preferential origin. Screen parties for sanctions.`,
+    citations: [
+      'EU Regulation 978/2012 — GSP+ preferences',
+      'EU GSP Origin Rules — Direct transport requirement',
+      'EU-Turkey Customs Union Decision 1/95 — Scope',
+      'EU Consolidated Sanctions List — Entity screening',
+    ],
+    tags: ['FTA', 'EU GSP', 'Sanctions'],
+  },
+  {
+    slug: 'lc-expiry-tomorrow-what-to-do',
+    title: 'Your LC Expires Tomorrow — A Practical Checklist',
+    description: 'When your LC is about to expire and you still have issues, every hour matters. Here\'s what you can realistically do with 24 hours left.',
+    question: 'My LC expires tomorrow. Documents are mostly ready but I have a minor discrepancy in the B/L. What should I do? Is there any way to extend the expiry? What happens if I present with the discrepancy?',
+    answer: `Stop reading and start acting. With one day left, here's your priority checklist:
+
+First, understand what "expiry" means: under UCP 600 Article 6(d), documents must be presented at the nominated bank or issuing bank on or before the expiry date. If the expiry date falls on a non-banking day, presentation must be made on the first following banking day — Article 29(a). Check if tomorrow is actually a banking day at the place of presentation.
+
+Your three options, in order of preference:
+
+Option 1 — Fix the discrepancy now. If the B/L issue is minor (a data point, a notation), contact the shipping line or agent immediately. Many carriers can issue corrected documents same-day if you go in person. This is the cleanest outcome.
+
+Option 2 — Present with the discrepancy. Under UCP 600 Article 16(b), the bank will issue a refusal notice listing discrepancies. The applicant can waive them under Article 16(c)(iii)(b). If you have a good relationship with the buyer, call them now and get verbal agreement that they'll waive. The bank will formally seek their consent, but knowing in advance speeds things up dramatically.
+
+Option 3 — Request an expiry extension (LC amendment). This requires the applicant and issuing bank to agree. Realistically, getting an amendment processed in 24 hours is very difficult — but not impossible if the issuing bank is in the same time zone and the applicant cooperates. Start this process NOW in parallel with Options 1 and 2.
+
+Whatever you do, present your documents before close of business tomorrow. A late presentation is a hard discrepancy with no fix. A discrepant but timely presentation at least gives you the waiver path.`,
+    citations: [
+      'UCP600 Article 6(d) — Expiry date and place',
+      'UCP600 Article 29(a) — Expiry on non-banking day',
+      'UCP600 Article 16(b) — Refusal notice',
+      'UCP600 Article 16(c)(iii)(b) — Applicant waiver',
+    ],
+    tags: ['UCP600'],
+  },
+  {
+    slug: 'tbml-trade-based-money-laundering-red-flags',
+    title: 'Trade-Based Money Laundering (TBML) — Red Flags Every Trade Finance Officer Should Know',
+    description: 'TBML uses trade transactions to move value across borders. Over-invoicing, under-invoicing, phantom shipments, and multiple invoicing are the four primary techniques.',
+    question: 'I\'m a compliance officer reviewing trade finance transactions. What are the main TBML red flags I should watch for? How do criminals use legitimate trade to launder money?',
+    answer: `Trade-Based Money Laundering uses the international trade system to transfer value and obscure illicit proceeds. The FATF identifies four primary techniques:
+
+Over-invoicing: the exporter inflates the invoice value above the true market price. The buyer pays the inflated amount via the LC. The excess represents laundered funds transferred from the buyer's jurisdiction to the seller's. Red flags: prices significantly above market, no price negotiation, buyer unconcerned about high costs.
+
+Under-invoicing: the opposite — goods are invoiced below market value. The exporter ships high-value goods but only receives a small payment through banking channels. The difference is settled outside the banking system (cash, cryptocurrency, hawala). Red flag: the seller appears to be losing money on every deal.
+
+Phantom shipments: no goods are shipped at all. Fraudulent documents (fake B/Ls, forged inspection certificates) are presented to draw on the LC. Red flags: unknown shipping lines, inspection certificates from unverifiable entities, goods that don't match the parties' known business.
+
+Multiple invoicing: the same shipment is invoiced multiple times to different banks or against different financial instruments. Red flags: identical descriptions across separate LCs, same B/L number appearing in multiple transactions.
+
+Additional indicators: parties with no logical commercial relationship. Shipment routing that makes no geographic sense. Frequent amendments to LC terms without clear commercial justification. Goods descriptions that are deliberately vague. Shell companies as intermediaries. Rapid succession of LCs between the same parties with escalating values.
+
+Your due diligence: verify goods exist, prices are market-rate, parties are real businesses, and the trade route makes commercial sense. If three or more red flags cluster in one transaction, escalate immediately.`,
+    citations: [
+      'FATF Report — Trade-Based Money Laundering (2006, updated 2020)',
+      'Wolfsberg Group — Trade Finance Principles',
+      'OFAC Advisory — Illicit Trade Finance Schemes',
+      'Basel Committee — Guidelines on Sound Management of Risks',
+    ],
+    tags: ['Sanctions', 'TBML', 'Compliance'],
+  },
+  {
+    slug: 'incoterms-2020-exw-vs-fob-first-time-exporter',
+    title: 'EXW vs FOB — Which Incoterm Should a First-Time Exporter Use?',
+    description: 'EXW seems safest for the seller, but it can create problems with export customs, insurance, and LC compliance. FOB is usually the better choice.',
+    question: 'I\'m exporting for the first time. My buyer suggested EXW but I\'ve also heard FOB is common. What\'s the difference and which should I choose?',
+    answer: `For a first-time exporter, FOB is almost always the better choice. Here's why.
+
+EXW (Ex Works) means you make the goods available at your premises. The buyer arranges and pays for everything — pickup, export customs clearance, freight, insurance. Your obligation ends when the goods are ready at your factory door.
+
+The problem: under EXW, the BUYER is responsible for export customs clearance in YOUR country. Most countries require the exporter of record to be a local entity. If your buyer is foreign, they may not be able to clear customs in your country, creating a practical impossibility. This is the single biggest problem with EXW for international trade.
+
+FOB (Free on Board) means you deliver the goods on board the vessel at the named port of shipment. You handle inland transport, export customs clearance, and loading. Risk transfers to the buyer once goods are on board. The buyer arranges ocean freight and insurance from that point.
+
+FOB keeps you in control of the export process — which is where your local knowledge matters most. You handle your own country's customs, you deliver to a specific port, and the buyer takes over for the ocean leg.
+
+For LC compliance: FOB works cleanly with standard LC documentary requirements. The B/L shows the FOB port and on-board date. EXW with an LC creates complications because the transport document and insurance arrangements are entirely in the buyer's hands.
+
+One exception: if you're selling to a buyer who sends their own truck (common in cross-border land trade within the EU or NAFTA), EXW makes sense because the customs problem doesn't exist.
+
+For ocean shipments, use FOB until you're experienced enough to consider CIF or CFR.`,
+    citations: [
+      'Incoterms 2020 — EXW (Ex Works)',
+      'Incoterms 2020 — FOB (Free on Board)',
+      'ICC Guide to Incoterms 2020 — First-time exporter guidance',
+      'UCP600 Article 20 — B/L and port of loading',
+    ],
+    tags: ['Incoterms', 'Trade Finance'],
+  },
+  {
+    slug: 'ofac-uae-screening-requirements',
+    title: 'OFAC and UAE — What You Need to Know About Trading with Dubai Counterparties',
+    description: 'The UAE is not sanctioned, but it\'s a major transshipment hub. OFAC requires careful screening of UAE entities for diversion risk, ownership, and SDN connections.',
+    question: 'What are OFAC requirements for trading with UAE counterparties? My bank flagged a transaction with a Dubai company and I don\'t understand why.',
+    answer: `The UAE is not sanctioned — but it's one of the highest-risk jurisdictions for sanctions evasion due diligence, and your bank was right to flag it.
+
+Dubai and the wider UAE are major global trading and transshipment hubs. This makes them attractive for legitimate commerce — and for sanctions evasion. OFAC has repeatedly identified UAE-based entities involved in procurement networks for Iran, Russia, and North Korea.
+
+What your bank is checking: SDN list screening — is the UAE company or any of its owners on OFAC's Specially Designated Nationals list? Ownership and control — is the company owned or controlled by a person or entity from a sanctioned jurisdiction (Iran, Russia, Syria, North Korea, etc.)? The 50% rule applies: if sanctioned persons own 50% or more, the entity is treated as sanctioned even if not listed. End-use and destination — are the goods being re-exported from the UAE to a sanctioned destination? Dubai is a known transshipment point for goods destined for Iran.
+
+Specific risk indicators for UAE transactions: a Dubai intermediary between you and an end-user in a sanctioned country. Goods with dual-use potential (electronics, machinery, chemicals). The UAE company was recently incorporated with minimal business history. Reluctance to provide end-user certificates or final destination information. Payment structured through multiple intermediary accounts.
+
+What you need to provide your bank: full details on the UAE counterparty (registration, ownership, operating history). End-user certificate if goods are controlled. Clear commercial rationale for why a UAE intermediary is involved. Destination and end-use documentation.
+
+The transaction may be perfectly legitimate — most UAE trade is. But your bank has regulatory obligations to verify. Cooperate with their compliance team and provide documentation promptly.`,
+    citations: [
+      'OFAC 50% Rule — Ownership and control guidance',
+      'OFAC SDN List — Entity screening requirement',
+      'OFAC Advisory — Iranian sanctions evasion through UAE',
+      'UAE Federal AML/CFT Law — Due diligence requirements',
+    ],
+    tags: ['Sanctions', 'OFAC'],
+  },
 ]

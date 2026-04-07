@@ -221,6 +221,56 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://www.tfrules.com/blog/fca-vs-cif-invoice-mismatch-lc</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/advising-bank-vs-confirming-bank-difference</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/ucp600-article-30-quantity-tolerance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/urr725-reimbursement-bank-obligations</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/icc-banking-commission-opinions-docdex</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/multi-jurisdiction-complex-query-sanctions-fta-customs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/lc-expiry-tomorrow-what-to-do</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/tbml-trade-based-money-laundering-red-flags</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/incoterms-2020-exw-vs-fob-first-time-exporter</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/ofac-uae-screening-requirements</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://www.tfrules.com/upgrade</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
