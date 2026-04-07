@@ -1139,4 +1139,363 @@ The transaction may be perfectly legitimate — most UAE trade is. But your bank
     ],
     tags: ['Sanctions', 'OFAC'],
   },
+  {
+    slug: 'ucp600-transport-documents-overview',
+    title: 'UCP 600 Transport Documents — Articles 19 to 25 Explained',
+    description: 'UCP 600 dedicates seven articles to transport documents. Each covers a different mode — and getting the wrong article applied is a common discrepancy.',
+    question: 'What does UCP600 say about transport documents? I keep hearing about different articles for different types.',
+    answer: `UCP 600 devotes Articles 19 through 25 to transport documents — more space than any other document type. Each article covers a different mode of transport or a specific transport instrument.
+
+Article 19: Transport document covering at least two different modes of transport (multimodal/combined). Used when goods move by more than one mode — truck to port, then sea. Must show the named place of dispatch and final destination.
+
+Article 20: Bill of lading. The most heavily examined transport document. Must show goods shipped on board a named vessel at a named port of loading, with a named port of discharge. Subject to strict on-board notation requirements.
+
+Article 21: Non-negotiable sea waybill. Similar to a B/L but not a document of title — goods are released to the named consignee without surrender of the document. Less security for the seller.
+
+Article 22: Charter party bill of lading. Used when goods are shipped under a charter party agreement. Banks only accept these if the LC specifically allows them.
+
+Article 23: Air transport document (airway bill). Must show the named airport of departure and destination. The document is always non-negotiable.
+
+Article 24: Road, rail, or inland waterway transport documents. Must show the named place of shipment and destination.
+
+Article 25: Courier receipt, post receipt, or certificate of posting. For small shipments sent by courier or postal service.
+
+The critical point: if your LC calls for a "Bill of Lading," the bank examines under Article 20. If you present a multimodal transport document instead, the bank examines under Article 19 — different requirements. The document type must match what the LC specifies.`,
+    citations: [
+      'UCP600 Article 19 — Multimodal transport document',
+      'UCP600 Article 20 — Bill of lading',
+      'UCP600 Article 21 — Non-negotiable sea waybill',
+      'UCP600 Articles 22-25 — Charter party, air, road/rail, courier',
+    ],
+    tags: ['UCP600', 'Transport'],
+  },
+  {
+    slug: 'cif-shipment-required-documents-ucp600',
+    title: 'What Documents Are Required for a CIF Shipment Under an LC?',
+    description: 'A CIF shipment under UCP 600 requires at minimum a commercial invoice, transport document, and insurance document. But the LC terms determine the full list.',
+    question: 'What documents are required for a CIF shipment under UCP600? I want to make sure I have everything before presenting.',
+    answer: `For a CIF shipment under an LC, you need to present the documents specified in the LC — not just what CIF implies commercially. But CIF terms create specific documentary expectations that your LC will almost certainly reflect.
+
+The standard document set for a CIF LC presentation: a commercial invoice matching the LC goods description exactly, showing the CIF value. A bill of lading (or transport document as specified) showing goods shipped on board, with the named port of loading and discharge. An insurance document covering at least 110% of the CIF value, in the same currency as the credit, covering the risks specified in the LC.
+
+Beyond these three core documents, your LC may require: a packing list (almost always required), a certificate of origin (especially for preferential tariff claims), an inspection certificate (pre-shipment or quality), a weight certificate, a phytosanitary or health certificate (for food, agricultural, animal products), a fumigation certificate, and a beneficiary certificate.
+
+The insurance document is where CIF is distinctive. Under CIF, the seller arranges and pays for insurance — so the insurance certificate is a required presentation document. Under FOB, the buyer arranges insurance, so it typically isn't part of the LC document set.
+
+Check every document requirement in your LC carefully. Field 46A in the SWIFT MT700 lists all required documents. Present exactly what's listed — no more, no less. Missing a single required document is a discrepancy. Presenting unrequired documents creates examination risk.`,
+    citations: [
+      'UCP600 Article 18 — Commercial invoice',
+      'UCP600 Article 20 — Bill of lading',
+      'UCP600 Article 28 — Insurance document',
+      'Incoterms 2020 — CIF seller obligations',
+    ],
+    tags: ['UCP600', 'Incoterms'],
+  },
+  {
+    slug: 'bangladesh-not-rcep-member',
+    title: 'Does Bangladesh Qualify for RCEP Preferential Tariff? No — Here\'s Why',
+    description: 'Bangladesh is NOT an RCEP member. A garment from Bangladesh cannot claim RCEP preferential treatment regardless of where it\'s exported to.',
+    question: 'Does my garment qualify for RCEP preferential tariff from Bangladesh?',
+    answer: `No — Bangladesh is not an RCEP member. This is a threshold issue that must be resolved before any origin analysis.
+
+RCEP (Regional Comprehensive Economic Partnership) has 15 member countries: the 10 ASEAN nations (Brunei, Cambodia, Indonesia, Laos, Malaysia, Myanmar, Philippines, Singapore, Thailand, Vietnam) plus Australia, China, Japan, New Zealand, and South Korea. India was part of the negotiations but withdrew in 2019. Bangladesh was never part of RCEP.
+
+A garment manufactured in Bangladesh cannot claim RCEP preferential tariff treatment regardless of the destination country. RCEP rules of origin require that the goods originate in an RCEP member country. No membership means no eligibility — period.
+
+What Bangladesh does have: EU GSP (Everything But Arms) — duty-free access to the EU for all products except arms. This is Bangladesh's primary preferential trade arrangement and is far more valuable for garment exports than RCEP would be. Bangladesh also has bilateral trade agreements with select countries and benefits from other GSP schemes (US GSP, Japan GSP, etc.).
+
+If you're exporting garments FROM Bangladesh: check EU EBA, US GSP, or the specific bilateral arrangements. If you're exporting TO Bangladesh: check whether the exporting country has an FTA that covers Bangladesh.
+
+Don't assume regional membership based on geography. South Asia and Southeast Asia are different regions with different trade agreements.`,
+    citations: [
+      'RCEP Agreement — Member list (Article 1.3)',
+      'EU Everything But Arms (EBA) — LDC preferences',
+      'RCEP Chapter 3 — Rules of origin (member requirement)',
+    ],
+    tags: ['FTA', 'RCEP'],
+  },
+  {
+    slug: 'usmca-de-minimis-textiles',
+    title: 'USMCA De Minimis for Textiles — The 10% Rule and Yarn-Forward',
+    description: 'USMCA textile rules of origin use "yarn forward" — meaning the yarn must be spun in North America. The de minimis threshold is 10% by weight.',
+    question: 'What is the USMCA de minimis threshold for textile imports? My fabric has some non-originating fibers and I need to know if it still qualifies.',
+    answer: `USMCA's de minimis threshold for textiles is 10% by weight of the component that determines the tariff classification. This is more generous than the old NAFTA 7% threshold, but textiles under USMCA still face some of the strictest origin rules of any trade agreement.
+
+The baseline rule for textiles is "yarn forward": the yarn used to make the fabric must be spun in a USMCA country (US, Mexico, or Canada), and all subsequent production steps (weaving/knitting, cutting, sewing) must also occur in the region. Some products require "fiber forward" — even stricter.
+
+The de minimis exception allows up to 10% by weight of non-originating fibers or yarns in the component of the good that determines its classification. If the non-originating content stays below 10%, the good is treated as originating even though it doesn't fully meet the yarn-forward rule.
+
+Important limitations: the de minimis rule does NOT apply to elastomeric yarns (spandex, lycra). If your textile contains non-originating elastomeric yarn, it fails regardless of the percentage. Certain sensitive categories (some cotton and man-made fiber goods) may have additional restrictions in the USMCA textile-specific rules.
+
+The weight calculation is based on the component, not the finished garment. For a woven shirt, the 10% applies to the fabric weight, not the total weight including buttons and thread.
+
+Check the specific Product Specific Rule in USMCA Annex 4-B for your HS heading — the rules vary by product category.`,
+    citations: [
+      'USMCA Chapter 4, Annex 4-B — Textile Product Specific Rules',
+      'USMCA Chapter 4, Article 4.2 — De minimis (10%)',
+      'USMCA Chapter 6 — Textile and apparel goods',
+      'USMCA Chapter 4 — Elastomeric yarn exclusion',
+    ],
+    tags: ['FTA', 'USMCA'],
+  },
+  {
+    slug: 'urdg-758-demand-specifying-breach',
+    title: 'URDG 758 — When a Demand Must Specify "In What Respect" the Applicant Breached',
+    description: 'If the guarantee requires the demand to specify the nature of the breach, a generic statement isn\'t enough. The wording matters.',
+    question: 'We issued a demand guarantee under URDG 758. The beneficiary submitted a demand stating "the applicant has failed to perform their obligations." But the guarantee requires the demand to include a statement specifying "in what respect the applicant is in breach." Is this demand complying?',
+    answer: `No — if the guarantee requires the demand to specify "in what respect" the applicant is in breach, a generic statement that "the applicant has failed to perform" does not comply.
+
+Under URDG 758 Article 15(a), the demand must be supported by a statement indicating in what respect the applicant is in breach of its obligations under the underlying relationship — but only if the guarantee requires such a statement.
+
+Your guarantee explicitly requires the demand to specify the nature of the breach. The beneficiary's statement is too vague. It says THAT there was a breach but not WHAT the breach was. The guarantee text sets the bar: the demand must explain in what respect the breach occurred.
+
+Under Article 19(a), the guarantor examines the demand to determine whether it appears on its face to be a complying presentation. A demand that omits a required element — here, the specification of the breach — is non-complying on its face.
+
+Your obligation: issue a notice of non-compliance under Article 24(a), stating that the demand does not comply because it fails to specify in what respect the applicant is in breach, as required by the guarantee terms. Give the beneficiary the opportunity to submit a corrected demand within the guarantee's validity period.
+
+The beneficiary can resubmit a demand that says something like: "The applicant has failed to complete Phase 2 construction works by the contractual deadline of 15 March 2026, as required under Clause 8.1 of the Contract." That specifies the breach.`,
+    citations: [
+      'URDG 758 Article 15(a) — Demand requirements',
+      'URDG 758 Article 19(a) — Examination of demand',
+      'URDG 758 Article 24(a) — Non-complying demand notice',
+      'URDG 758 Article 14(a) — Complying presentation',
+    ],
+    tags: ['URDG 758', 'Guarantees'],
+  },
+  {
+    slug: 'document-dating-sequence-lc-presentation',
+    title: 'Invoice, B/L, and Certificate of Origin — Does the Dating Sequence Matter?',
+    description: 'There is no UCP 600 rule requiring documents to be dated in a specific sequence. But some combinations can still create problems.',
+    question: 'My commercial invoice is dated March 5. The bill of lading shows on-board date March 3. The certificate of origin is dated March 8. The LC says nothing about document dating sequence. Is there any problem with these dates?',
+    answer: `There is no general UCP 600 rule requiring documents to be dated in any particular sequence relative to each other. However, specific rules apply to specific documents that can create date-related discrepancies.
+
+Your invoice dated March 5 with a B/L dated March 3: this is fine. UCP 600 does not require the invoice to be dated before the transport document. ISBP 745 Paragraph A5 confirms that documents may be dated prior to the issuance date of the credit, but must not be dated later than the presentation date.
+
+Your certificate of origin dated March 8: also fine in principle — there is no requirement that it be dated before or after the B/L. A certificate of origin can be issued after shipment.
+
+The insurance document is the exception. Under UCP 600 Article 28(e), the insurance document must be dated no later than the date of shipment, UNLESS it appears that coverage is effective from a date no later than the shipment date. If your LC requires insurance and your insurance certificate is dated after March 3 (the shipment date), it must show coverage effective from March 3 or earlier.
+
+The transport document date matters for the 21-day presentation rule. Documents must be presented within 21 calendar days of the shipment date (March 3), so the deadline is March 24. And all documents must be presented before the LC expiry date.
+
+Bottom line: your March 5 invoice, March 3 B/L, and March 8 certificate of origin sequence creates no discrepancy. Just watch the insurance date and the 21-day clock.`,
+    citations: [
+      'UCP600 Article 28(e) — Insurance document dating',
+      'UCP600 Article 14(c) — 21-day presentation period',
+      'ISBP745 Paragraph A5 — Document dating',
+      'UCP600 Article 14(i) — Document dating general',
+    ],
+    tags: ['UCP600', 'ISBP745'],
+  },
+  {
+    slug: 'nigerian-inspection-certificate-suspended-program',
+    title: 'LC Requires a Nigerian Inspection Certificate — But the Program Was Suspended',
+    description: 'When a government suspends an inspection program but your LC still requires the certificate, the LC terms don\'t auto-update. You need an amendment.',
+    question: 'My LC requires a pre-shipment inspection certificate from a Nigerian inspection agent. But the Nigerian government suspended the pre-shipment inspection program last year. My buyer says "just get any inspection certificate." The LC still requires it. What do I do?',
+    answer: `The LC requirement doesn't automatically update when a government suspends a program. The credit says what it says, and the bank will examine against the credit terms.
+
+If the LC specifically requires a "pre-shipment inspection certificate issued by [specific Nigerian agency or under specific Nigerian program]" and that program has been suspended, you're facing an impossible documentary requirement. The bank cannot waive it on their own — they examine documents against the LC terms.
+
+Your buyer's suggestion to "just get any inspection certificate" is well-intentioned but wrong. If the LC specifies the issuing authority or program, a certificate from a different source doesn't comply. The bank will flag it as a discrepancy.
+
+Your options, in order of preference: request an LC amendment to either remove the inspection requirement entirely, or change it to a general "inspection certificate issued by an independent inspection company" (like SGS, Bureau Veritas, Intertek). This is the clean solution. If the Nigerian government has designated a replacement program or agency, request an amendment specifying the new authority. Present without the certificate and seek a discrepancy waiver — since the buyer already knows the program is suspended, they should waive. But you're relying on their cooperation.
+
+Do NOT fabricate or obtain a certificate from the suspended program — if the program is suspended, any certificate purporting to come from it is likely fraudulent.
+
+This situation is more common than people think — government programs change, but LC terms are frozen at the time of issuance.`,
+    citations: [
+      'UCP600 Article 14(a) — Examination against credit terms',
+      'UCP600 Article 10 — Amendment procedure',
+      'UCP600 Article 4(a) — Credits independent of contracts',
+      'ISBP745 Paragraph A26 — Documents not required by the credit',
+    ],
+    tags: ['UCP600', 'Regulatory'],
+  },
+  {
+    slug: 'cold-chain-temperature-monitoring-certificate-lc',
+    title: 'Cold Chain Break — What Happens When Your Temperature Certificate Shows a Spike?',
+    description: 'If the LC requires a certificate showing continuous cold chain, a recorded temperature spike is a discrepancy — even if the product is still viable.',
+    question: 'I\'m exporting temperature-sensitive vaccines to Kenya under an LC. The LC requires a "temperature monitoring certificate showing continuous cold chain maintenance between 2C and 8C." My monitoring device recorded a spike to 9.2C for 45 minutes during transit. The vaccines are still viable according to our quality team. Will the bank refuse the certificate?',
+    answer: `Yes — the bank will refuse the certificate if it shows any reading outside the range specified in the LC.
+
+The LC requires a certificate showing "continuous cold chain maintenance between 2C and 8C." Your certificate shows a reading of 9.2C. That's outside the specified range. The bank examines the certificate on its face under UCP 600 Article 14(a) — and on its face, the certificate shows a breach of the stated condition.
+
+It doesn't matter that the spike was only 45 minutes. It doesn't matter that your quality team says the vaccines are still viable. The bank is not a pharmaceutical regulator — they read documents against LC terms. The LC says 2C-8C. The certificate shows 9.2C. Discrepancy.
+
+This is exactly the kind of case where the documentary world and the commercial world diverge painfully. The vaccines may be perfectly fine. The documents say otherwise.
+
+Your options: if the monitoring device is still in transit and you can obtain a replacement certificate from the monitoring company showing only compliant readings — but only if the data genuinely supports it. Do NOT falsify temperature data. Present the certificate as-is and request a discrepancy waiver from the applicant. If the buyer knows the vaccines are viable, they may waive. Request an LC amendment widening the acceptable range (unlikely to be practical at this stage). For future shipments: use monitoring equipment with acceptable excursion protocols built into the LC terms — for example, "brief excursions not exceeding 15C for no more than 1 hour are acceptable."`,
+    citations: [
+      'UCP600 Article 14(a) — Face compliance examination',
+      'UCP600 Article 14(d) — Data consistency with credit',
+      'UCP600 Article 4(a) — Credits independent of contracts',
+      'WHO Guidelines — Vaccine cold chain requirements',
+    ],
+    tags: ['UCP600', 'Regulatory'],
+  },
+  {
+    slug: 'gold-bullion-uae-imports-conflict-minerals',
+    title: 'Importing Gold Bullion to Dubai — Documentation Beyond the LC',
+    description: 'Gold imports to the UAE require additional documentation for anti-money laundering, conflict minerals, and precious metals compliance — beyond standard LC documents.',
+    question: 'I\'m importing gold bullion from Uganda to Dubai. My LC is issued by Emirates NBD. What special documentation does UAE require for precious metals imports beyond the standard LC documents? I\'ve heard about conflict minerals requirements but I\'m not sure if gold from Uganda triggers anything.',
+    answer: `Gold bullion from Uganda to Dubai is a high-scrutiny transaction that triggers multiple layers of compliance beyond your standard LC document set.
+
+UAE precious metals requirements: the UAE requires an import license for precious metals from the Ministry of Economy. Gold imports must be accompanied by an assay certificate from a recognized refinery (preferably LBMA-accredited). The DMCC (Dubai Multi Commodities Centre) requires registration for gold traders and has specific import documentation requirements.
+
+Conflict minerals: gold from Uganda is a significant red flag. Uganda borders the Democratic Republic of Congo, and Ugandan gold exports have been repeatedly flagged by UN Panel of Experts reports as a conduit for conflict minerals from eastern DRC. The OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected Areas specifically covers gold.
+
+UAE implemented the UAE Good Delivery Standard and requires gold refineries to demonstrate responsible sourcing. DMCC's Responsible Sourcing Guidelines require importers to conduct due diligence on the origin of gold and ensure it doesn't finance conflict.
+
+What you need beyond LC documents: proof of legal export from Uganda (export permit, Uganda Revenue Authority clearance). Chain of custody documentation showing the mine or refinery of origin. An assay certificate showing purity and weight. A declaration or certificate confirming the gold does not originate from conflict-affected areas. Anti-money laundering documentation — know your supplier, source of funds.
+
+Emirates NBD's compliance team will almost certainly require extensive KYC/KYS documentation before processing this LC. Expect delays and additional due diligence requests.`,
+    citations: [
+      'OECD Due Diligence Guidance — Conflict minerals',
+      'DMCC Responsible Sourcing Guidelines — Gold',
+      'UAE Federal AML/CFT Law — Precious metals dealers',
+      'UN Panel of Experts Reports — DRC gold via Uganda',
+    ],
+    tags: ['Sanctions', 'Compliance'],
+  },
+  {
+    slug: 'ucp600-article-52-does-not-exist',
+    title: 'What Does UCP 600 Article 52 Say? Nothing — It Doesn\'t Exist',
+    description: 'UCP 600 has 39 articles. There is no Article 52. Knowing the boundaries of the rules is as important as knowing the rules themselves.',
+    question: 'What does UCP600 Article 52 say about electronic bills of lading?',
+    answer: `UCP 600 Article 52 does not exist. UCP 600 contains 39 articles — Article 39 is the last one. There is no Article 52, and UCP 600 does not specifically address electronic bills of lading.
+
+This is an important point: knowing the boundaries of a rule set is as critical as knowing its contents. Citing a non-existent article in a commercial dispute or internal policy document would undermine your credibility and could have legal consequences.
+
+If you're looking for ICC rules on electronic trade documents, the relevant instruments are: eUCP Version 2.0 — the Supplement to UCP 600 for Electronic Presentation. This is a separate supplement, not part of UCP 600 itself. It must be explicitly incorporated into the credit. MLETR (Model Law on Electronic Transferable Records) — a UNCITRAL model law adopted by some jurisdictions that provides legal equivalence for electronic transferable records including bills of lading.
+
+For electronic B/Ls specifically, the main platforms operating today (like WAVE, CargoX, Bolero, essDOCS, EBL solutions via DCSA standards) issue electronic bills of lading under their own rulebooks and are increasingly being recognized under MLETR-adopting jurisdictions.
+
+The ICC also developed the URDTT (Uniform Rules for Digital Trade Transactions), which governs purely digital trade transactions.
+
+Bottom line: electronic bills of lading are not covered by UCP 600 Articles 19-25. They require eUCP 2.0 incorporation in the credit, or a separate legal framework.`,
+    citations: [
+      'UCP600 — 39 articles total (Article 39 is the last)',
+      'eUCP 2.0 — Supplement for electronic presentation',
+      'UNCITRAL MLETR — Electronic transferable records',
+      'ICC URDTT — Digital trade transactions',
+    ],
+    tags: ['UCP600', 'eUCP'],
+  },
+  {
+    slug: 'urdtt-digital-trade-transactions',
+    title: 'URDTT — What Makes a "Digital Trade Transaction" Under ICC Rules?',
+    description: 'The ICC URDTT governs purely digital trade transactions. It\'s distinct from eUCP — URDTT covers the entire trade cycle digitally, not just electronic presentation under an LC.',
+    question: 'We\'re building a trade finance platform that uses digital trade documents. We want our transactions to be governed by the ICC URDTT. What makes a "digital trade transaction" under URDTT, and can we mix paper and digital documents in a single URDTT transaction?',
+    answer: `The ICC Uniform Rules for Digital Trade Transactions (URDTT) were designed from the ground up for end-to-end digital trade — unlike eUCP, which is a bolt-on to the paper-based UCP 600 framework.
+
+Under URDTT, a digital trade transaction is one where the parties agree that the transaction will be conducted using electronic data records throughout. The rules cover the entire trade cycle: offer, acceptance, performance, and payment — all digitally.
+
+A key distinction from eUCP: the URDTT does not assume an underlying letter of credit. It's a standalone framework for trade transactions conducted digitally. eUCP, by contrast, supplements UCP 600 — it still assumes an LC with bank involvement.
+
+Can you mix paper and digital? The URDTT contemplates fully digital transactions. Unlike eUCP (which explicitly allows mixed presentations under Article e5), the URDTT is designed for a fully digital environment. If you need to mix paper and digital within a single transaction, eUCP may be more appropriate. If your platform is fully digital, URDTT is the natural fit.
+
+Important practical consideration: the URDTT requires that all parties — including any financial institutions involved — agree to be bound by the URDTT and have the technical infrastructure to handle digital records. Banks and carriers that aren't yet equipped for fully digital processes may resist.
+
+Your platform should explicitly state in its terms that transactions are governed by the ICC URDTT, and ensure all parties technically and contractually opt in.`,
+    citations: [
+      'ICC URDTT Article 1 — Scope and application',
+      'ICC URDTT Article 3 — Digital trade transaction definition',
+      'eUCP 2.0 Article e5 — Mixed presentations (comparison)',
+      'ICC URDTT Article 7 — Data integrity requirements',
+    ],
+    tags: ['URDTT', 'Digital Trade'],
+  },
+  {
+    slug: 'urbpo-750-bank-payment-obligation',
+    title: 'URBPO 750 — How Bank Payment Obligations Differ from Letters of Credit',
+    description: 'A Bank Payment Obligation is an irrevocable bank undertaking triggered by data matching, not document examination. It\'s faster than an LC but less widely adopted.',
+    question: 'Our bank is exploring Bank Payment Obligations as an alternative to LCs for some clients. Under URBPO 750, what triggers the obligor bank\'s irrevocable payment obligation? Is it document presentation like an LC, or something different?',
+    answer: `A Bank Payment Obligation under URBPO 750 is fundamentally different from a letter of credit. The trigger is data matching through an electronic platform — not physical document presentation and examination.
+
+Under URBPO 750, the process works like this: the buyer's bank (obligor bank) and the seller's bank (recipient bank) agree to use a BPO for a specific trade. Both banks submit agreed baseline data to a Transaction Matching Application (TMA) — essentially a central platform that holds the expected data. When the seller ships and their bank submits the actual transaction data (shipping data, invoice data), the TMA automatically matches it against the baseline. If the data matches, the obligor bank's irrevocable payment obligation is automatically triggered.
+
+The key differences from an LC: no physical documents are examined — only data fields are matched electronically. The matching is automated, not manual — no five banking day examination period. The process is bank-to-bank — the BPO is between the two banks, not directly with the buyer or seller. Speed — data matching can happen in minutes, not days.
+
+What stays the same: the obligor bank's undertaking is irrevocable once triggered. The BPO is independent of the underlying trade contract (like an LC). The seller gets a bank payment guarantee.
+
+Adoption has been slower than expected because: banks need TMA infrastructure, corporates must adapt their processes, and the legal framework is less tested than UCP 600. But for high-volume, repeat trades between trusted partners, BPOs offer genuine efficiency over LCs.`,
+    citations: [
+      'URBPO 750 Article 3 — BPO definition',
+      'URBPO 750 Article 10 — Data matching and obligor undertaking',
+      'URBPO 750 Article 5 — Independence principle',
+      'URBPO 750 Article 9 — Role of Transaction Matching Application',
+    ],
+    tags: ['URBPO 750'],
+  },
+  {
+    slug: 'ucp600-myths-3-day-automatic-acceptance',
+    title: 'UCP 600 Myth — "If the Bank Doesn\'t Respond in 3 Days, It\'s Automatically Accepted"',
+    description: 'The examination period under UCP 600 is up to 5 banking days, not 3. And failure to act triggers preclusion, not automatic acceptance.',
+    question: 'I read that under UCP600, if the bank doesn\'t respond to your presentation within 3 days, it\'s automatically deemed accepted. Is that true? My bank hasn\'t responded in 4 days.',
+    answer: `Almost everything in that statement is wrong. Let's correct it point by point.
+
+The examination period is a MAXIMUM of 5 banking days, not 3. Under UCP 600 Article 14(b), the nominated bank, confirming bank, or issuing bank has a maximum of five banking days following the day of presentation to determine if a presentation is complying. "Banking days" excludes weekends, public holidays, and non-business days at the bank's location.
+
+At 4 banking days, the bank is still within its allowed timeframe. You cannot demand a response yet.
+
+"Automatically deemed accepted" is also incorrect. If a bank exceeds 5 banking days without sending a proper refusal notice, UCP 600 Article 16(f) says the bank is PRECLUDED from claiming that the documents do not comply. Preclusion is different from automatic acceptance — it means the bank loses the right to raise discrepancies, but the payment process still follows normal banking procedures.
+
+Where the "3 days" myth may come from: some banks have internal targets of 3 banking days. ISP98 (for standbys) uses 3 business days as its default examination period. And some practitioners confuse these different instruments.
+
+What to do at day 4: wait. The bank has one more banking day. If day 6 arrives without a refusal notice, then you have a strong preclusion argument. Document your dates carefully — "banking day" calculations matter.`,
+    citations: [
+      'UCP600 Article 14(b) — 5 banking days maximum',
+      'UCP600 Article 16(f) — Preclusion for late refusal',
+      'ISP98 Rule 5.01 — 3 business days (standbys only)',
+      'UCP600 Article 2 — Banking day definition',
+    ],
+    tags: ['UCP600'],
+  },
+  {
+    slug: 'ucp600-article-16-bank-holding-refused-documents',
+    title: 'How Long Can a Bank Hold Refused Documents? UCP 600 Article 16(c)(iii) Explained',
+    description: 'When a bank refuses documents, it must state what it will do with them. But UCP 600 doesn\'t set a time limit for holding — and that\'s a problem.',
+    question: 'Under UCP600 Article 16(c)(iii)(a), when a bank refuses documents, it can hold them pending further instructions from the presenter. But what if the presenter doesn\'t respond for 30 days? Is there a time limit? And does "return of documents" mean the bank must physically ship them back?',
+    answer: `UCP 600 does not set a specific time limit for how long a bank can hold refused documents pending instructions from the presenter. This is a known gap in the rules.
+
+Under Article 16(c)(iii), when refusing documents, the bank must state in its refusal notice whether it is: (a) holding the documents pending further instructions from the presenter, (b) holding them until it receives a waiver from the applicant and agrees to accept it, or (c) returning the documents to the presenter, or (d) acting in accordance with previously received instructions from the presenter.
+
+If the bank chooses option (a) — holding pending instructions — and the presenter goes silent for 30 days, the bank is in an awkward position. UCP 600 provides no mechanism to force the presenter to respond, and no time limit after which the bank can unilaterally dispose of the documents.
+
+In practice, banks typically: send reminders to the presenter requesting instructions. After a reasonable period (usually 30-60 days), they may return the documents to the presenter with a cover letter stating they received no instructions and are returning the documents. Some banks set their own internal time limits in their refusal notices.
+
+"Return of documents" under option (c) means the bank must dispatch the documents back to the presenter — typically by courier or registered mail. "Making available for collection" is not the same as returning. The bank bears the cost and risk of return unless otherwise agreed.
+
+ICC Banking Commission opinions have noted this gap. Best practice: when refusing, the bank should set a reasonable deadline in the refusal notice — for example, "We are holding documents pending your instructions. If no instructions are received within 30 calendar days, documents will be returned to you."`,
+    citations: [
+      'UCP600 Article 16(c)(iii) — Disposition of refused documents',
+      'UCP600 Article 16(c)(iii)(a) — Holding pending instructions',
+      'UCP600 Article 16(c)(iii)(c) — Return of documents',
+      'ICC Banking Commission Opinions — Document holding practices',
+    ],
+    tags: ['UCP600'],
+  },
+  {
+    slug: 'deferred-payment-usmca-origin-multi-part',
+    title: 'Multi-Part Question — Deferred Payment LC, Forfaiting, and USMCA Origin in One Deal',
+    description: 'Some trade transactions require expertise across multiple domains simultaneously. Here\'s how to untangle a deal that spans payment, forfaiting, and origin rules.',
+    question: 'I have a deferred payment LC for machinery parts from Japan to Mexico. The LC amount is $1.2 million. I need to know: when does the issuing bank\'s payment obligation mature? Can I forfait the deferred payment receivable? What are the USMCA rules of origin implications if the machinery parts contain 30% Chinese components?',
+    answer: `This question spans three distinct domains. Let me separate them clearly.
+
+Payment maturity: under UCP 600 Article 7(c), the issuing bank's obligation to pay matures on the date specified in the credit — typically stated as a number of days after the B/L date (e.g., "90 days from B/L date") or after sight. The bank accepts the presentation as complying, calculates the maturity date per the LC terms, and pays on that date. Check Field 42C/42P in your SWIFT MT700 for the exact maturity formula.
+
+Forfaiting: yes, you can forfait a deferred payment LC receivable. Once the issuing bank confirms the presentation complies, you have an irrevocable payment obligation maturing on a known date from a known bank. That's a tradeable asset. Under URF 800, the forfaiter buys this receivable at a discount — without recourse to you. At $1.2 million with a Japanese issuing bank (likely strong credit rating), the forfaiting discount should be competitive. Contact a forfaiting bank or specialist house.
+
+USMCA origin: this is where it gets complex. Machinery parts from Japan containing 30% Chinese components are being imported into Mexico. USMCA only covers goods traded between the US, Mexico, and Canada. Japanese-origin machinery parts don't qualify for USMCA preferential treatment — USMCA origin rules are irrelevant for a Japan-to-Mexico shipment.
+
+However, if these parts will be further processed in Mexico and incorporated into finished goods exported to the US or Canada, THEN USMCA origin becomes relevant for the finished product. The 30% Chinese content counts as non-originating in the USMCA RVC calculation for the finished good. Whether the finished product meets the RVC threshold depends on the specific HS heading and the value added in Mexico.
+
+Three separate analyses, three separate answers. Don't let cross-domain complexity lead to conflation.`,
+    citations: [
+      'UCP600 Article 7(c) — Deferred payment maturity',
+      'URF 800 Article 3 — Forfaiting requirements',
+      'USMCA Chapter 4, Article 4.1 — Origin determination',
+      'USMCA Chapter 4, Article 4.5 — Regional Value Content',
+    ],
+    tags: ['UCP600', 'URF 800', 'USMCA'],
+  },
 ]
