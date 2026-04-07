@@ -685,6 +685,53 @@ class RuleRetriever:
                 break
         return results
 
+    async def _fetch_opinions(self, query: str, seen_ids: set[str]) -> List[RetrievedRule]:
+        """Fetch ICC Banking Commission opinions / DOCDEX decisions via targeted RulHub search."""
+        client = await self._get_rulhub_client()
+        if client is None:
+            return []
+        try:
+            # Search specifically for opinions/DOCDEX
+            opinion_query = query
+            if "docdex" not in query.lower() and "opinion" not in query.lower():
+                opinion_query = f"ICC opinion {query}"
+            results = await client.search_rules(query=opinion_query, limit=5)
+        except Exception:
+            return []
+
+        candidates: List[RetrievedRule] = []
+        for rule in results:
+            rid = str(rule.get("rule_id", ""))
+            if not rid or rid in seen_ids:
+                continue
+            # Only include actual opinions/DOCDEX
+            source = str(rule.get("source") or rule.get("rulebook") or "").lower()
+            rid_lower = rid.lower()
+            if not any(kw in f"{source} {rid_lower}" for kw in ("opinion", "docdex", "icc-r", "icc-op")):
+                continue
+            text = str(rule.get("text") or rule.get("description") or "")
+            if not text.strip():
+                continue
+            seen_ids.add(rid)
+            candidates.append(
+                RetrievedRule(
+                    rule_id=rid,
+                    rulebook=str(rule.get("rulebook") or rule.get("source") or "ICC Opinions"),
+                    reference=str(rule.get("reference") or rule.get("article") or "n/a"),
+                    title=str(rule.get("title") or ""),
+                    excerpt=text[:500],
+                    domain=str(rule.get("domain") or "icc"),
+                    jurisdiction="global",
+                    document_type="other",
+                    similarity_score=0.7,
+                    rerank_score=0.7,
+                    metadata={"_source": "rulhub_opinions"},
+                )
+            )
+            if len(candidates) >= 3:
+                break
+        return candidates
+
     async def _fetch_checklists(self, query: str, seen_ids: set[str]) -> List[RetrievedRule]:
         """Fetch examination checklists from RulHub when user asks for step-by-step guidance."""
         client = await self._get_rulhub_client()
@@ -911,8 +958,14 @@ class RuleRetriever:
             if intel_candidates:
                 merged.extend(intel_candidates)
 
-        # ── Stage 3c: Checklists (step-by-step guides for "what to check" queries) ──
+        # ── Stage 3b2: ICC Opinions / DOCDEX (when user asks about precedent) ──
         query_lower = query.lower()
+        if any(kw in query_lower for kw in ("icc opinion", "docdex", "banking commission opinion", "precedent", "has the icc")):
+            opinion_results = await self._fetch_opinions(query, seen)
+            if opinion_results:
+                merged.extend(opinion_results)
+
+        # ── Stage 3c: Checklists (step-by-step guides for "what to check" queries) ──
         if any(kw in query_lower for kw in ("checklist", "what to check", "step by step", "examination steps", "what should i check")):
             checklist_results = await self._fetch_checklists(query, seen)
             if checklist_results:
