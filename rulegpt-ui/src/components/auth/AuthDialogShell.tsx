@@ -253,7 +253,7 @@ export function AuthDialogShell({
           {/* Right Column: Subtle Image Area */}
           <div className="relative hidden w-full h-full bg-[#050505] md:flex overflow-hidden">
             <img
-              src="/auth-bg.png"
+              src="/auth-bg.jpg"
               alt="Trade finance documents on desk"
               className="absolute inset-0 h-full w-full object-cover opacity-70"
             />
