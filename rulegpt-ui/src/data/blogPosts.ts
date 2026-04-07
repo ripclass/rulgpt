@@ -681,4 +681,218 @@ For future LCs: always check that port names in the credit match current officia
     ],
     tags: ['UCP600', 'Transport'],
   },
+  {
+    slug: 'transferable-lc-first-beneficiary-rights',
+    title: 'Transferable LC — Can the Issuing Bank Refuse to Pay You Because the Buyer Is Unhappy?',
+    description: 'In a transferable LC, the bank\'s payment obligation is documentary, not contractual. Buyer dissatisfaction with goods doesn\'t affect compliant presentation.',
+    question: 'I\'m the first beneficiary of a transferable LC. I transferred it to my supplier who presented documents and the bank accepted them. But now the buyer is refusing to pay, claiming the goods are defective. Can the bank refuse to pay me because the buyer is unhappy? Can my supplier come after me directly?',
+    answer: `The bank cannot refuse to pay you because the buyer is unhappy with the goods. Under UCP 600 Article 5, banks deal with documents, not goods. Once the bank has accepted a complying presentation, its obligation to pay is irrevocable and independent of the underlying contract.
+
+The buyer's complaint about defective goods is a contract matter between the buyer and the seller. It has no bearing on the bank's documentary obligation. The issuing bank must pay — Article 7(a) is unconditional on this point. If the bank accepted the documents as complying, they cannot later reverse that acceptance based on the applicant's complaints about the goods.
+
+As for your supplier coming after you directly: under the LC itself, the second beneficiary has no direct claim against you. The LC creates obligations between the issuing bank and the beneficiaries. Your supplier was paid (or will be paid) under the transferred portion. Your commercial relationship with your supplier is governed by your contract with them, not by the LC.
+
+The buyer's recourse is against you under the sales contract — they can pursue claims for defective goods, seek damages, or negotiate. But they cannot instruct the bank to withhold payment on an already-accepted presentation.
+
+This is the fundamental principle of documentary credits: the bank's obligation is autonomous from the underlying trade.`,
+    citations: [
+      'UCP600 Article 5 — Documents vs goods',
+      'UCP600 Article 7(a) — Issuing bank undertaking',
+      'UCP600 Article 38 — Transferable credit',
+      'UCP600 Article 4 — Credits vs contracts',
+    ],
+    tags: ['UCP600'],
+  },
+  {
+    slug: 'murabaha-lc-shariah-vs-ucp600',
+    title: 'Murabaha LC — Does Shariah Compliance Override UCP 600?',
+    description: 'Islamic trade finance structures like Murabaha LCs can be subject to UCP 600, but Shariah compliance adds constraints the credit must explicitly address.',
+    question: 'We structure our import LCs as Murabaha-based facilities. A client is asking whether UCP600 applies to a Murabaha LC, or whether Shariah compliance overrides UCP600 when there\'s a conflict. For example, UCP600 doesn\'t prohibit interest charges, but our facility cannot involve riba. How do we handle this?',
+    answer: `UCP 600 can and frequently does apply to Murabaha-structured LCs — but it doesn't override Shariah requirements. The two frameworks operate at different levels: UCP 600 governs the documentary mechanics of the credit, while Shariah compliance governs the underlying financing structure.
+
+A Murabaha LC is typically structured as a cost-plus-profit arrangement rather than an interest-bearing loan. The bank purchases the goods on behalf of the client and sells them at a marked-up price, paid in instalments. The LC itself — the documentary instrument — follows UCP 600 rules for examination, presentation, and payment.
+
+The Shariah constraints are built into the facility agreement between the bank and the client, not into the LC terms that the beneficiary sees. The beneficiary presents documents under UCP 600 exactly as they would for a conventional LC. The Islamic structuring is between the issuing bank and the applicant.
+
+Where conflicts can arise: late payment penalties (conventional LCs may charge interest — Shariah-compliant structures use charitable donation mechanisms instead). Discounting or forfaiting (selling the receivable must be structured as a sale, not an interest-bearing loan). Document requirements may include additional Shariah compliance certificates.
+
+The practical answer: your LC is subject to UCP 600 for documentary purposes. Your Murabaha structure is a separate layer. Build the Shariah-specific constraints into the facility agreement and any additional document requirements into the LC terms. The two coexist — neither overrides the other.`,
+    citations: [
+      'UCP600 Article 1 — Application of UCP',
+      'UCP600 Article 4 — Credits vs contracts',
+      'AAOIFI Shariah Standard 8 — Murabaha',
+      'UCP600 Article 5 — Documents vs goods',
+    ],
+    tags: ['UCP600', 'Islamic Finance'],
+  },
+  {
+    slug: 'export-controls-ear-eccn-classification',
+    title: 'Do You Need an Export License? EAR, ECCN, and Dual-Use Controls Explained',
+    description: 'US Export Administration Regulations control technology exports based on ECCN classification, end-use, and destination. Getting it wrong can end your business.',
+    question: 'I\'m exporting high-performance computing chips to a research university in India. My product has a composite theoretical performance of 15 TFLOPS. Do I need an export license under the EAR? What\'s the ECCN classification for this?',
+    answer: `High-performance computing chips are controlled under Category 3 — Electronics, and Category 4 — Computers, of the Commerce Control List. Your 15 TFLOPS chip likely falls under ECCN 3A090 or 4A090, which were updated in recent semiconductor controls.
+
+The analysis has three steps: classify the item (ECCN), identify the destination and end-user, and check the license requirements.
+
+For computing chips at 15 TFLOPS: the threshold for ECCN 3A090 (advanced semiconductor controls) captures chips above certain performance levels for specific architectures. Whether your chip triggers these controls depends on the specific architecture, interconnect bandwidth, and whether it's designed for AI/ML workloads. You need the manufacturer's ECCN classification — they are best positioned to determine this.
+
+India is not under comprehensive embargo, but it's not in Country Group A:5 (close allies) either. India sits in Country Group D:2 for nuclear-related controls and has specific license requirements for high-performance computing above certain thresholds.
+
+A research university as end-user adds complexity: academic institutions can qualify for License Exception TMP (temporary exports) or other exceptions, but "fundamental research" exclusions have significant limitations for controlled items.
+
+Do not self-classify sensitive items. Contact the Bureau of Industry and Security (BIS) for a formal commodity classification, or use the manufacturer's classification. The penalty for unlicensed export of controlled items can be up to $300,000 per violation and criminal prosecution.`,
+    citations: [
+      'EAR Part 774 — Commerce Control List (CCL)',
+      'ECCN 3A090 — Advanced semiconductor controls',
+      'EAR Part 740 — License exceptions',
+      'EAR Part 742 — Country-specific controls',
+    ],
+    tags: ['Export Controls', 'EAR'],
+  },
+  {
+    slug: 'eu-catch-all-dual-use-regulation',
+    title: 'EU Catch-All — When Unlisted Items Still Need an Export License',
+    description: 'Even if your product isn\'t on the EU dual-use control list, the "catch-all" provision can still require an export license based on end-use concerns.',
+    question: 'I\'m exporting CNC milling machines to a company in Pakistan. The machines aren\'t on the EU dual-use control list (Annex I), but I\'ve heard there\'s a "catch-all" provision that might still require a license. Is that true? What triggers the catch-all?',
+    answer: `Yes, the EU catch-all provision is real and it can require an export license for items NOT listed on the dual-use control list (Annex I of EU Regulation 2021/821). CNC milling machines to Pakistan is exactly the kind of transaction that triggers scrutiny.
+
+The catch-all is triggered in three situations under Article 4 of the EU Dual-Use Regulation: if the exporter has been informed by the competent authority that the items are or may be intended for weapons of mass destruction (WMD) — nuclear, chemical, biological. If the exporter is aware that the items are intended for military end-use in an embargoed country. Or if the exporter is aware that the items are intended for use as parts or components of military items exported without authorization.
+
+CNC milling machines are particularly sensitive because they have clear weapons-relevant applications — precision machining of missile and nuclear weapon components. Pakistan's status as a non-NPT nuclear state means extra scrutiny applies.
+
+Even if no one has formally informed you, Article 4(2) places a "due diligence" obligation on you: if you ARE AWARE or HAVE GROUNDS TO SUSPECT that the items may be intended for a prohibited end-use, you must notify your national export control authority before exporting.
+
+Indicators that should trigger your concern: unusual specifications for the stated end-use, reluctance to provide end-user certificates, routing through intermediaries, or the end-user's proximity to military or nuclear programs.
+
+Contact your national export control authority (e.g., BAFA in Germany, ECJU in the UK) for guidance. The penalty for catch-all violations is the same as for listed items.`,
+    citations: [
+      'EU Regulation 2021/821 Article 4 — Catch-all controls',
+      'EU Regulation 2021/821 Annex I — Dual-use control list',
+      'EU Regulation 2021/821 Article 4(2) — Due diligence obligation',
+      'Wassenaar Arrangement — Machine tools controls',
+    ],
+    tags: ['Export Controls', 'EU Dual-Use'],
+  },
+  {
+    slug: 'confirmation-misconception-damaged-goods',
+    title: 'Your LC Is Confirmed — Does That Mean the Bank Refunds You If Goods Arrive Damaged?',
+    description: 'Confirmation means the confirming bank adds its own payment obligation. It does NOT mean insurance, quality guarantee, or goods protection.',
+    question: 'I\'m importing generators from China. The LC is confirmed by Standard Chartered Lagos. If the generators arrive damaged, Standard Chartered will refund me since they confirmed the LC, right? That\'s what confirmation means?',
+    answer: `No — that is not what confirmation means, and this is one of the most dangerous misconceptions in trade finance.
+
+Confirmation under UCP 600 Article 8 means the confirming bank adds its own irrevocable undertaking to honour or negotiate a complying presentation, in addition to the issuing bank's undertaking. It protects the BENEFICIARY (seller) against issuing bank risk and country risk — not the APPLICANT (buyer) against defective goods.
+
+You are the applicant. Confirmation benefits the Chinese seller, not you. If the seller presents compliant documents — a clean bill of lading, a commercial invoice matching the LC terms, an insurance certificate — the confirming bank MUST pay, regardless of whether the goods are actually damaged. The bank examines documents, not generators.
+
+Under UCP 600 Article 5, banks deal with documents and not with goods. Even if the generators arrive in pieces, the bank's obligation depends solely on whether the documents presented are compliant. A clean bill of lading means the carrier received the goods in apparent good order — it doesn't guarantee they arrive that way.
+
+Your protection against damaged goods comes from: cargo insurance (claim against the insurer), the sales contract (claim against the seller), and the carrier's liability under the bill of lading (claim against the shipping line).
+
+The confirming bank owes you nothing as the applicant. Confirmation is a beneficiary protection mechanism — it's about ensuring the seller gets paid, not ensuring the buyer gets good goods.`,
+    citations: [
+      'UCP600 Article 8 — Confirming bank undertaking',
+      'UCP600 Article 5 — Documents vs goods, services, performance',
+      'UCP600 Article 7 — Issuing bank undertaking',
+      'UCP600 Article 34 — Disclaimer on goods',
+    ],
+    tags: ['UCP600'],
+  },
+  {
+    slug: 'methyl-bromide-phosphine-fumigation-certificate-lc',
+    title: 'LC Requires Methyl Bromide Fumigation — But It\'s Banned. Can You Use Phosphine Instead?',
+    description: 'When an LC requires a specific chemical treatment that regulations have banned, you can\'t substitute — even with a superior alternative. Amend the LC first.',
+    question: 'My LC for rice exports to the EU requires both a phytosanitary certificate AND a fumigation certificate showing methyl bromide treatment. But the EU banned methyl bromide under the Montreal Protocol. My fumigation company uses phosphine instead. Can I present a fumigation certificate showing phosphine treatment when the LC specifically says methyl bromide?',
+    answer: `No — you cannot present a phosphine fumigation certificate when the LC specifically requires methyl bromide. The bank will examine the document against the LC terms, and "phosphine" is not "methyl bromide." This is a discrepancy regardless of the regulatory reality.
+
+Under UCP 600 Article 14(a), the bank examines documents to determine whether they appear on their face to constitute a complying presentation. The LC says methyl bromide. Your certificate says phosphine. The bank sees a mismatch and refuses.
+
+The irony is real: the EU banned methyl bromide for plant protection use under EU Regulation 1005/2009 (implementing the Montreal Protocol). So the LC is requiring something that's illegal in the destination country. But the bank doesn't interpret regulations — it reads documents against credit terms.
+
+This is a classic "impossible LC condition" scenario. Your options: request an LC amendment immediately — change "methyl bromide" to "phosphine" or to a general "fumigation certificate showing treatment with an approved fumigant." This is the only clean solution. Or present the phosphine certificate and seek a discrepancy waiver — the buyer presumably knows methyl bromide is banned and should accept phosphine. But they're not obligated to waive.
+
+Do not attempt to obtain a methyl bromide fumigation certificate — using a banned substance would violate environmental regulations and potentially create criminal liability.
+
+Flag this to your buyer now. The LC amendment is the correct path.`,
+    citations: [
+      'UCP600 Article 14(a) — Face compliance examination',
+      'UCP600 Article 14(d) — Data consistency',
+      'EU Regulation 1005/2009 — Ozone depleting substances',
+      'UCP600 Article 10 — Amendment procedure',
+    ],
+    tags: ['UCP600', 'Regulatory'],
+  },
+  {
+    slug: 'urc-522-documentary-collections-basics',
+    title: 'Documentary Collections Under URC 522 — How D/P and D/A Actually Work',
+    description: 'Documentary collections are cheaper and simpler than LCs, but offer less protection. URC 522 governs the process — here\'s what you need to know.',
+    question: 'I\'m new to trade finance. My buyer doesn\'t want to open an LC because of the cost. They suggested documentary collection instead. What\'s the difference between D/P and D/A under URC 522, and how much protection do I actually get as the seller?',
+    answer: `Documentary collections are governed by URC 522 (Uniform Rules for Collections). They're simpler and cheaper than LCs because there's no bank payment guarantee — the banks act as intermediaries, not as obligors.
+
+D/P (Documents against Payment): the presenting bank releases shipping documents to the buyer ONLY when the buyer pays. You retain control of the goods (through the bill of lading) until payment is received. If the buyer refuses to pay, the goods remain yours — but they're sitting in a foreign port, and you need to arrange return shipment or find another buyer.
+
+D/A (Documents against Acceptance): the presenting bank releases documents when the buyer ACCEPTS a time draft (bill of exchange). The buyer gets the documents — and therefore the goods — immediately, but pays later (30, 60, 90 days). You carry credit risk: if the buyer accepts the draft but doesn't pay at maturity, your recourse is against the buyer under the draft, not against the bank.
+
+The critical difference from an LC: under a collection, NO BANK IS OBLIGATED TO PAY YOU. The banks merely handle document delivery per your instructions. Under an LC, the issuing bank guarantees payment against compliant documents.
+
+D/P gives you reasonable security — you keep the documents until you have the money. D/A gives you almost no security — you've handed over the goods on a promise to pay later.
+
+Collections work well with trusted buyers, repeat relationships, and commodity trades where the goods are easily resold if the buyer defaults.`,
+    citations: [
+      'URC 522 Article 1 — Application and definitions',
+      'URC 522 Article 7 — Release of documents',
+      'URC 522 Article 10 — Payment without delay',
+      'URC 522 Article 4 — Collection instruction',
+    ],
+    tags: ['URC 522', 'Collections'],
+  },
+  {
+    slug: 'vessel-ais-gaps-dark-activity-sanctions',
+    title: 'AIS Gaps, Flag Changes, and Ship-to-Ship Transfers — Sanctions Red Flags for Marine Insurance',
+    description: 'When a vessel goes dark, changes flags, or conducts unplanned STS transfers, it\'s signalling potential sanctions evasion. Here\'s what insurers and banks should watch for.',
+    question: 'We insure cargo vessels. One of our insured vessels has shown the following behaviour: three AIS gaps totalling 18 days, two flag changes from Liberia to Cameroon to Palau, and a ship-to-ship transfer off Malaysia that wasn\'t in the voyage plan. The vessel now wants to load Russian crude at Novorossiysk. Should we continue to insure this vessel?',
+    answer: `This vessel is exhibiting a textbook pattern of deceptive shipping practices associated with sanctions evasion. Each indicator alone warrants investigation — together, they constitute a serious red flag cluster that should trigger an immediate risk review.
+
+AIS gaps (18 days total): vessels disable their Automatic Identification System to conceal their location, typically during sanctioned port calls or illicit ship-to-ship transfers. OFAC, the EU, and the UK have all issued guidance identifying AIS manipulation as a primary sanctions evasion indicator.
+
+Flag hopping (Liberia → Cameroon → Palau): changing flags, especially to jurisdictions with weaker oversight, is a classic indicator of sanctions evasion. Palau in particular has appeared on recent lists of flags associated with shadow fleet vessels carrying sanctioned oil.
+
+Unplanned STS transfer: ship-to-ship transfers outside designated STS zones, without prior notification, are a primary method for commingling or laundering sanctioned cargo — particularly Russian crude oil.
+
+Loading Russian crude at Novorossiysk: Russian oil exports are subject to the G7/EU/Australia price cap. Transporting Russian crude above the cap without proper attestation violates sanctions.
+
+Our assessment: continuing to insure this vessel creates significant legal exposure. You risk violating sanctions regulations (OFAC, EU, UK), voiding your own reinsurance coverage, and potential secondary sanctions designation.
+
+Recommended actions: suspend coverage pending a full investigation. Require the vessel owner to explain each AIS gap with port records. Verify the STS transfer cargo and counterparty. Check the vessel against consolidated sanctions lists. Consult your sanctions compliance officer before any decision to reinstate.`,
+    citations: [
+      'OFAC Advisory on Deceptive Shipping Practices (2020, updated 2023)',
+      'EU Council Decision 2022/2367 — Russian oil price cap',
+      'UK OFSI Maritime Guidance — AIS manipulation indicators',
+      'IMO SOLAS Regulation V/19 — AIS requirements',
+    ],
+    tags: ['Sanctions', 'Maritime'],
+  },
+  {
+    slug: 'distressed-beneficiary-typo-bank-rejection',
+    title: 'Bank Rejected Documents Over a Typo — Can You Sue?',
+    description: 'A single-letter typo in the beneficiary address led to document rejection. The bank may be right — but there\'s nuance in ISBP 745 about misspellings.',
+    question: 'I just lost $40,000 because the bank rejected my documents over a typo in the beneficiary address. One letter wrong in the street name. I\'ve been shipping to this buyer for 5 years with no problems. This is the same bank that always accepted my documents. Now suddenly they find a problem? Is there anything I can do? Can I sue the bank?',
+    answer: `Take a breath. This is a serious situation but you have more options than you think.
+
+First, the legal question: ISBP 745 Paragraph A22 states that a misspelling or typing error that does not affect the meaning of a word or the sentence in which it occurs does not make a document discrepant. A single-letter error in a street name — where the rest of the address is correct and the beneficiary is clearly identifiable — has a strong argument for falling within this provision.
+
+However, banks have discretion in applying this standard, and some take a strict position. The question is whether the typo genuinely created ambiguity about the beneficiary's identity, or whether it was an obvious error that anyone reading the document would recognise.
+
+Your options, in order of urgency: request a discrepancy waiver from the applicant through the bank — if the buyer is willing to accept (and you say you've been shipping together for 5 years), this resolves it immediately. If the presentation period hasn't expired, correct the document and re-present. Challenge the rejection by citing ISBP 745 Paragraph A22 — put it in writing to the bank, referencing the specific paragraph.
+
+Can you sue the bank? Theoretically yes, but litigation is slow, expensive, and uncertain. You'd need to prove the bank breached its examination standard under UCP 600 Article 14 — that the typo clearly fell within the ISBP 745 tolerance and the bank acted unreasonably.
+
+The harder truth: past acceptance of your documents doesn't create precedent. Each presentation is examined independently. A bank that overlooked issues before can start examining strictly at any time.`,
+    citations: [
+      'ISBP745 Paragraph A22 — Misspelling and typing errors',
+      'UCP600 Article 14(a) — Standard for examination',
+      'UCP600 Article 14(d) — Data in documents',
+      'UCP600 Article 16 — Refusal and waiver',
+    ],
+    tags: ['UCP600', 'ISBP745'],
+  },
 ]
