@@ -685,6 +685,94 @@ class RuleRetriever:
                 break
         return results
 
+    async def _fetch_checklists(self, query: str, seen_ids: set[str]) -> List[RetrievedRule]:
+        """Fetch examination checklists from RulHub when user asks for step-by-step guidance."""
+        client = await self._get_rulhub_client()
+        if client is None or not hasattr(client, "get_checklists"):
+            return []
+        try:
+            packs = await client.get_checklists(limit=3)
+        except Exception:
+            return []
+
+        results: List[RetrievedRule] = []
+        query_lower = query.lower()
+        for pack in packs:
+            content = pack.get("raw", {}).get("content", {}) if isinstance(pack.get("raw"), dict) else {}
+            steps = content.get("steps", [])
+            if not steps:
+                continue
+            # Build a summary of the checklist steps
+            step_texts = [str(s.get("description", ""))[:150] for s in steps[:5] if isinstance(s, dict)]
+            excerpt = " | ".join(step_texts) if step_texts else str(pack.get("text", ""))[:500]
+            if not excerpt.strip():
+                continue
+            pid = str(pack.get("rule_id", "")) or f"checklist-{pack.get('filename', 'unknown')}"
+            if pid in seen_ids:
+                continue
+            seen_ids.add(pid)
+            results.append(
+                RetrievedRule(
+                    rule_id=pid,
+                    rulebook="tfrules-checklist",
+                    reference=str(pack.get("filename", "examination checklist")),
+                    title=str(steps[0].get("title", "Examination Checklist") if steps else "Checklist"),
+                    excerpt=excerpt[:500],
+                    domain="icc", jurisdiction="global", document_type="other",
+                    similarity_score=0.45, rerank_score=0.45,
+                    metadata={"_source": "rulhub_checklist"},
+                )
+            )
+            if len(results) >= 1:
+                break
+        return results
+
+    async def _fetch_glossary_term(self, query: str, seen_ids: set[str]) -> List[RetrievedRule]:
+        """Fetch glossary definition when user asks 'what is X'."""
+        client = await self._get_rulhub_client()
+        if client is None or not hasattr(client, "get_glossary"):
+            return []
+        try:
+            packs = await client.get_glossary()
+        except Exception:
+            return []
+        if not packs:
+            return []
+
+        # Extract the search term from the query
+        query_lower = query.lower().strip().rstrip("?")
+        for prefix in ("what is ", "what are ", "define ", "meaning of ", "what does "):
+            if query_lower.startswith(prefix):
+                query_lower = query_lower[len(prefix):].strip()
+                break
+
+        # Search through glossary terms
+        content = packs[0].get("raw", {}).get("content", {}) if isinstance(packs[0].get("raw"), dict) else {}
+        terms = content.get("terms", [])
+        for term_entry in terms:
+            if not isinstance(term_entry, dict):
+                continue
+            term = str(term_entry.get("term", "")).lower()
+            definition = str(term_entry.get("definition", ""))
+            if term and (term in query_lower or query_lower in term):
+                tid = f"glossary-{term.replace(' ', '_')}"
+                if tid in seen_ids:
+                    continue
+                seen_ids.add(tid)
+                return [
+                    RetrievedRule(
+                        rule_id=tid,
+                        rulebook="tfrules-glossary",
+                        reference=f"Glossary: {term_entry.get('term', '')}",
+                        title=str(term_entry.get("term", "")),
+                        excerpt=definition,
+                        domain="icc", jurisdiction="global", document_type="other",
+                        similarity_score=0.9, rerank_score=0.9,
+                        metadata={"_source": "rulhub_glossary", "category": term_entry.get("category")},
+                    )
+                ]
+        return []
+
     async def _retrieve_from_rulhub(self, query: str, top_k: int) -> List[RetrievedRule]:
         """Primary retrieval: RulHub API semantic search."""
         client = await self._get_rulhub_client()
@@ -822,6 +910,19 @@ class RuleRetriever:
             )
             if intel_candidates:
                 merged.extend(intel_candidates)
+
+        # ── Stage 3c: Checklists (step-by-step guides for "what to check" queries) ──
+        query_lower = query.lower()
+        if any(kw in query_lower for kw in ("checklist", "what to check", "step by step", "examination steps", "what should i check")):
+            checklist_results = await self._fetch_checklists(query, seen)
+            if checklist_results:
+                merged.extend(checklist_results)
+
+        # ── Stage 3d: Glossary (definition queries) ──
+        if any(query_lower.startswith(p) for p in ("what is ", "what are ", "define ", "meaning of ", "what does ")):
+            glossary_result = await self._fetch_glossary_term(query, seen)
+            if glossary_result:
+                merged.extend(glossary_result)
 
         # ── Stage 4: Anchor rules (foundational safety net) ──
         selected = self._select_results(merged, target_top_k, document_breadth)

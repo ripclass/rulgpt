@@ -198,6 +198,14 @@ class RulHubClient:
         except RulHubClientError:
             return []
 
+    async def get_checklists(self, limit: int = 5) -> list[dict[str, Any]]:
+        """Fetch examination checklists — step-by-step verification guides."""
+        return await self.get_intelligence(domain="checklists", limit=limit)
+
+    async def get_glossary(self) -> list[dict[str, Any]]:
+        """Fetch the trade finance glossary pack."""
+        return await self.get_intelligence(domain="glossary", limit=1)
+
     async def search_rules(
         self,
         query: str,
