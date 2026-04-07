@@ -206,56 +206,68 @@ export function PreviewLanding({
         </div>
         
         <div className="relative z-10 w-full mx-auto max-w-7xl px-6 lg:px-12 pt-20">
-          <div className="max-w-4xl relative">
+          <div className="max-w-4xl mx-auto text-center relative">
             <div className="animate-fade-up blur-0" style={{ animationDuration: '1000ms' }}>
-              {/* Massive Industrial Typography */}
-              <h1 className="text-[12vw] sm:text-[8vw] md:text-7xl lg:text-[110px] font-bold tracking-tighter text-white leading-[0.9] uppercase mix-blend-screen">
+              <h1 className="text-[12vw] sm:text-[8vw] md:text-7xl lg:text-[90px] font-bold tracking-tighter text-white leading-[0.9] uppercase">
                 Cited Rules.<br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-200 to-neutral-500">Not Opinion.</span>
               </h1>
             </div>
             
-            <p className="mt-8 max-w-xl text-lg md:text-2xl text-neutral-300 leading-relaxed font-light animate-fade-up" style={{ animationDelay: '200ms', animationFillMode: 'both' }}>
+            <p className="mt-8 max-w-xl text-lg md:text-2xl text-neutral-300 leading-relaxed font-light animate-fade-up mx-auto" style={{ animationDelay: '200ms', animationFillMode: 'both' }}>
               Trade finance rules have been locked behind paywalls and closed bank manuals for decades. Ask any question — get a cited, verifiable answer. Free.
             </p>
 
-            {/* Hero query input — type and go straight to chat */}
-            <div className="mt-10 max-w-2xl animate-fade-up" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
+            {/* Hero query input — real chat input, centered */}
+            <div className="mt-10 w-full max-w-2xl mx-auto animate-fade-up" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
               <form
                 onSubmit={(e) => {
                   e.preventDefault()
                   if (heroQuery.trim()) onSubmitQuery(heroQuery.trim())
                 }}
-                className="relative"
               >
-                <input
-                  type="text"
-                  value={heroQuery}
-                  onChange={(e) => setHeroQuery(e.target.value)}
-                  placeholder="Ask about any trade finance rule..."
-                  className="w-full h-14 md:h-16 rounded-sm bg-white/10 backdrop-blur-sm border border-white/20 px-6 pr-14 text-base md:text-lg text-white placeholder-neutral-400 outline-none transition focus:border-[#FF4F00] focus:bg-white/[0.12] focus:ring-1 focus:ring-[#FF4F00]/30"
-                />
-                <button
-                  type="submit"
-                  disabled={!heroQuery.trim()}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-sm bg-[#FF4F00] text-white transition hover:bg-[#E64600] disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  <SendHorizonal className="h-5 w-5" />
-                </button>
+                <div className="relative flex flex-col rounded-2xl bg-white/10 backdrop-blur-sm hover:bg-white/[0.12] focus-within:bg-white/[0.14] focus-within:ring-1 focus-within:ring-white/20 transition-all duration-300">
+                  <textarea
+                    value={heroQuery}
+                    onChange={(e) => setHeroQuery(e.target.value)}
+                    placeholder="Ask about any trade finance rule..."
+                    rows={3}
+                    className="w-full min-h-[100px] resize-none border-0 bg-transparent px-5 pt-5 pb-14 text-[15px] font-medium text-white placeholder-neutral-400 focus:outline-none"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault()
+                        if (heroQuery.trim()) onSubmitQuery(heroQuery.trim())
+                      }
+                    }}
+                  />
+                  <div className="absolute bottom-3 right-4 flex items-center gap-3">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                      {heroQuery.length} / 500
+                    </span>
+                    <button
+                      type="submit"
+                      disabled={!heroQuery.trim()}
+                      className="flex items-center justify-center p-2 rounded-full bg-[#FF4F00] text-white transition hover:bg-[#E64600] disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      <SendHorizonal className="h-4 w-4 relative left-[1px]" />
+                    </button>
+                  </div>
+                </div>
               </form>
 
-              {/* Quick suggestions */}
-              <div className="mt-4 flex flex-wrap gap-2">
+              {/* Suggested queries — same style as chat page */}
+              <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {[
-                  'What does UCP600 say about partial shipments?',
-                  'Is Iran sanctioned under OFAC?',
-                  'CIF vs FOB — who arranges insurance?',
+                  'My LC says "Cotton Woven Shirts" but my invoice says "Cotton Woven Dress Shirts". The bank rejected it. Is the word "Dress" really a discrepancy under UCP 600?',
+                  'I shipped on June 10 but the BL on-board date says June 11 because the carrier delayed. The LC last shipment date is June 10. Is this late shipment?',
+                  'I\'m exporting wooden furniture from Vietnam to Australia. The raw timber was imported from Malaysia. Does that count as originating material under RCEP cumulation rules?',
+                  'We received an LC for crude oil from UAE to China but the unit price is 40% below market. The beneficiary was incorporated 3 months ago. What TBML red flags should we check?',
                 ].map((q) => (
                   <button
                     key={q}
                     type="button"
                     onClick={() => onSubmitQuery(q)}
-                    className="text-xs text-neutral-400 border border-white/10 rounded-sm px-3 py-1.5 transition hover:text-white hover:border-white/30 hover:bg-white/5"
+                    className="h-auto whitespace-normal rounded-xl px-4 py-4 text-left text-sm border border-white/10 text-neutral-300 transition hover:bg-white/5 hover:border-white/20 hover:text-white"
                   >
                     {q}
                   </button>
