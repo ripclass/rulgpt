@@ -95,7 +95,7 @@ function UserMenu({
       {open && (
         <div className="absolute bottom-full left-0 right-0 mb-2 rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#141414] shadow-xl py-1 z-50">
           <Link
-            to="/#pricing"
+            to="/pricing"
             onClick={() => setOpen(false)}
             className="flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/5 transition"
           >

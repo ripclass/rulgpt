@@ -37,7 +37,7 @@ export function PublicPageShell({ eyebrow, title, description, children }: Publi
 
           <nav className="hidden items-center gap-8 md:flex">
             <Link
-              to="/#pricing"
+              to="/pricing"
               className="text-[13px] font-medium transition-colors text-neutral-400 hover:text-white uppercase tracking-widest"
             >
               Pricing

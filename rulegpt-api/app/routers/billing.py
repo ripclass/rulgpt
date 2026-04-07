@@ -6,6 +6,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
+from app.config import settings
 from app.schemas.billing import (
     BillingConfigStatusResponse,
     BillingSubscriptionResponse,
@@ -24,31 +25,31 @@ billing_client = StripeClient()
 @router.get("/status", response_model=BillingConfigStatusResponse)
 async def billing_status() -> BillingConfigStatusResponse:
     stripe_configured = bool(billing_client.secret_key)
-    starter_monthly_price_configured = bool(billing_client.starter_monthly_price_id)
-    starter_annual_price_configured = bool(billing_client.starter_annual_price_id)
-    pro_monthly_price_configured = bool(billing_client.pro_monthly_price_id)
-    pro_annual_price_configured = bool(billing_client.pro_annual_price_id)
+    professional_monthly = bool(settings.STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID)
+    professional_annual = bool(settings.STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID)
+    enterprise_monthly = bool(settings.STRIPE_ENTERPRISE_MONTHLY_PRICE_ID)
+    enterprise_annual = bool(settings.STRIPE_ENTERPRISE_ANNUAL_PRICE_ID)
     webhook_secret_configured = bool(billing_client.webhook_secret)
     checkout_ready = (
         stripe_configured
-        and starter_monthly_price_configured
-        and starter_annual_price_configured
-        and pro_monthly_price_configured
-        and pro_annual_price_configured
+        and professional_monthly
+        and professional_annual
+        and enterprise_monthly
+        and enterprise_annual
     )
     webhook_ready = stripe_configured and webhook_secret_configured
 
     blockers: list[str] = []
     if not stripe_configured:
         blockers.append("Stripe secret key is missing.")
-    if not starter_monthly_price_configured:
-        blockers.append("Starter monthly Stripe price ID is missing.")
-    if not starter_annual_price_configured:
-        blockers.append("Starter annual Stripe price ID is missing.")
-    if not pro_monthly_price_configured:
-        blockers.append("Pro monthly Stripe price ID is missing.")
-    if not pro_annual_price_configured:
-        blockers.append("Pro annual Stripe price ID is missing.")
+    if not professional_monthly:
+        blockers.append("Professional monthly Stripe price ID is missing.")
+    if not professional_annual:
+        blockers.append("Professional annual Stripe price ID is missing.")
+    if not enterprise_monthly:
+        blockers.append("Enterprise monthly Stripe price ID is missing.")
+    if not enterprise_annual:
+        blockers.append("Enterprise annual Stripe price ID is missing.")
     if not webhook_secret_configured:
         blockers.append("Stripe webhook secret is missing.")
 
@@ -56,13 +57,13 @@ async def billing_status() -> BillingConfigStatusResponse:
         stripe_configured=stripe_configured,
         secret_key_configured=stripe_configured,
         webhook_secret_configured=webhook_secret_configured,
-        starter_monthly_price_configured=starter_monthly_price_configured,
-        starter_annual_price_configured=starter_annual_price_configured,
-        pro_monthly_price_configured=pro_monthly_price_configured,
-        pro_annual_price_configured=pro_annual_price_configured,
+        professional_monthly_price_configured=professional_monthly,
+        professional_annual_price_configured=professional_annual,
+        enterprise_monthly_price_configured=enterprise_monthly,
+        enterprise_annual_price_configured=enterprise_annual,
         checkout_ready=checkout_ready,
         webhook_ready=webhook_ready,
-        supported_plans=["starter", "pro"],
+        supported_plans=["professional", "enterprise"],
         supported_intervals=["monthly", "annual"],
         blockers=blockers,
     )
@@ -89,7 +90,7 @@ async def create_checkout_session(
     payload: CheckoutSessionCreateRequest | None = None,
     _user_id=Depends(require_authenticated_user),
 ) -> CheckoutSessionResponse:
-    payload = payload or CheckoutSessionCreateRequest(plan="pro", interval="monthly")
+    payload = payload or CheckoutSessionCreateRequest(plan="professional", interval="monthly")
     claims = getattr(request.state, "auth_claims", {}) or {}
     customer_email = payload.customer_email or claims.get("email")
     frontend_base = _frontend_base_url(request)
@@ -125,9 +126,9 @@ async def get_subscription(
     _user_id=Depends(require_authenticated_user),
 ) -> BillingSubscriptionResponse:
     tier = getattr(request.state, "user_tier", "free")
-    normalized_tier = tier if tier in {"starter", "pro"} else "free"
+    normalized_tier = tier if tier in {"professional", "enterprise"} else "free"
     return BillingSubscriptionResponse(
-        status="active" if normalized_tier in {"starter", "pro"} else "inactive",
+        status="active" if normalized_tier in {"professional", "enterprise"} else "inactive",
         tier=normalized_tier,
     )
 

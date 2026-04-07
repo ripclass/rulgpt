@@ -10,7 +10,7 @@ from pydantic import AnyUrl, BaseModel, Field
 
 
 BillingInterval = Literal["monthly", "annual"]
-BillingPlan = Literal["starter", "pro"]
+BillingPlan = Literal["professional", "enterprise"]
 
 
 class CheckoutSessionCreateRequest(BaseModel):
@@ -40,7 +40,7 @@ class BillingWebhookResponse(BaseModel):
 
 class BillingSubscriptionResponse(BaseModel):
     status: Literal["active", "inactive"]
-    tier: Literal["free", "starter", "pro"]
+    tier: Literal["free", "professional", "enterprise"]
     current_period_end: datetime | None = None
     cancel_at_period_end: bool | None = None
 
@@ -49,10 +49,10 @@ class BillingConfigStatusResponse(BaseModel):
     stripe_configured: bool
     secret_key_configured: bool
     webhook_secret_configured: bool
-    starter_monthly_price_configured: bool
-    starter_annual_price_configured: bool
-    pro_monthly_price_configured: bool
-    pro_annual_price_configured: bool
+    professional_monthly_price_configured: bool
+    professional_annual_price_configured: bool
+    enterprise_monthly_price_configured: bool
+    enterprise_annual_price_configured: bool
     checkout_ready: bool
     webhook_ready: bool
     supported_plans: list[BillingPlan]
