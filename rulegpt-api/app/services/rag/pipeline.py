@@ -130,15 +130,12 @@ def select_model(
     ) and len(query.split()) < 12
     is_simple_lookup = num_rules <= 2 and num_domains <= 1
 
-    # --- Tier-specific routing ---
-    tier = user_tier.strip().lower() if user_tier else "professional"
+    # --- 3-tier routing ---
+    tier = user_tier.strip().lower() if user_tier else "free"
 
     if tier in ("free", "anonymous"):
+        # 100% Haiku
         model: RoutingTier = "haiku"
-
-    elif tier == "starter":
-        # 40% Haiku / 60% Sonnet
-        model = "haiku" if (is_definition and is_simple_lookup) else "sonnet"
 
     elif tier == "professional":
         # 30% Haiku / 60% Sonnet / 10% Opus
@@ -151,7 +148,7 @@ def select_model(
         else:
             model = "sonnet"
 
-    elif tier == "expert":
+    elif tier == "enterprise":
         # 20% Haiku / 60% Sonnet / 20% Opus
         if is_sanctions or is_tbml:
             model = "opus"
@@ -165,7 +162,15 @@ def select_model(
             model = "sonnet"
 
     else:
-        model = "sonnet"
+        # Legacy tiers (starter, pro, expert) → professional routing
+        if is_sanctions or involves_sanctioned or is_tbml:
+            model = "opus"
+        elif num_domains >= 3:
+            model = "opus"
+        elif is_definition and is_simple_lookup:
+            model = "haiku"
+        else:
+            model = "sonnet"
 
     _log.info(
         "[ROUTING] tier=%s model=%s | rules=%d domains=%d sanctions=%s tbml=%s "

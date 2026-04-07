@@ -30,12 +30,10 @@ class StripeClient:
         # Price ID → tier mapping (used by webhook to determine user tier)
         self._price_to_tier: dict[str, str] = {}
         for price_id, tier in [
-            (settings.STRIPE_STARTER_MONTHLY_PRICE_ID, "starter"),
-            (settings.STRIPE_STARTER_ANNUAL_PRICE_ID, "starter"),
             (settings.STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID, "professional"),
             (settings.STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID, "professional"),
-            (settings.STRIPE_EXPERT_MONTHLY_PRICE_ID, "expert"),
-            (settings.STRIPE_EXPERT_ANNUAL_PRICE_ID, "expert"),
+            (settings.STRIPE_ENTERPRISE_MONTHLY_PRICE_ID, "enterprise"),
+            (settings.STRIPE_ENTERPRISE_ANNUAL_PRICE_ID, "enterprise"),
         ]:
             if price_id:
                 self._price_to_tier[price_id] = tier
@@ -54,20 +52,20 @@ class StripeClient:
         normalized_plan = str(plan or "").strip().lower()
         normalized = str(interval or "").strip().lower()
         price_matrix: dict[str, dict[str, str | None]] = {
-            "starter": {
-                "monthly": settings.STRIPE_STARTER_MONTHLY_PRICE_ID,
-                "annual": settings.STRIPE_STARTER_ANNUAL_PRICE_ID,
-            },
             "professional": {
                 "monthly": settings.STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID,
                 "annual": settings.STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID,
             },
-            "expert": {
-                "monthly": settings.STRIPE_EXPERT_MONTHLY_PRICE_ID,
-                "annual": settings.STRIPE_EXPERT_ANNUAL_PRICE_ID,
+            "enterprise": {
+                "monthly": settings.STRIPE_ENTERPRISE_MONTHLY_PRICE_ID,
+                "annual": settings.STRIPE_ENTERPRISE_ANNUAL_PRICE_ID,
             },
-            # Legacy alias
+            # Legacy aliases
             "pro": {
+                "monthly": settings.STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID,
+                "annual": settings.STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID,
+            },
+            "starter": {
                 "monthly": settings.STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID,
                 "annual": settings.STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID,
             },
@@ -149,7 +147,7 @@ class StripeClient:
 
     def _resolve_event_tier(self, event_object: dict[str, Any]) -> str:
         """Determine user tier from Stripe event — check price ID first, then metadata."""
-        _VALID_TIERS = {"starter", "professional", "expert"}
+        _VALID_TIERS = {"professional", "enterprise"}
 
         def _metadata_value(container: Any, key: str) -> Any:
             if isinstance(container, dict):
@@ -178,9 +176,11 @@ class StripeClient:
             normalized = str(candidate or "").strip().lower()
             if normalized in _VALID_TIERS:
                 return normalized
-            # Legacy mapping
-            if normalized == "pro":
+            # Legacy mappings
+            if normalized in ("pro", "starter"):
                 return "professional"
+            if normalized == "expert":
+                return "enterprise"
         return "professional"  # default for paid users
 
     @staticmethod

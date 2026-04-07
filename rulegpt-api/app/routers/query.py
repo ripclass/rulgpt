@@ -99,15 +99,15 @@ def _tier_monthly_limit(tier: str) -> int:
     normalized = str(tier or "").strip().lower()
     if normalized in {"anonymous", "free"}:
         return settings.FREE_TIER_MONTHLY_LIMIT
-    if normalized == "starter":
-        return settings.STARTER_TIER_MONTHLY_LIMIT
     if normalized == "professional":
         return settings.PROFESSIONAL_TIER_MONTHLY_LIMIT
-    if normalized == "expert":
-        return settings.EXPERT_TIER_MONTHLY_LIMIT
-    # Legacy tier names
-    if normalized == "pro":
+    if normalized == "enterprise":
+        return settings.ENTERPRISE_TIER_MONTHLY_LIMIT
+    # Legacy aliases
+    if normalized in {"pro", "starter"}:
         return settings.PROFESSIONAL_TIER_MONTHLY_LIMIT
+    if normalized == "expert":
+        return settings.ENTERPRISE_TIER_MONTHLY_LIMIT
     return settings.FREE_TIER_MONTHLY_LIMIT
 
 
