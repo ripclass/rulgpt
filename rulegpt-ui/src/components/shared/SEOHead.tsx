@@ -6,16 +6,13 @@ interface SEOHeadProps {
   path: string
   type?: 'website' | 'article'
   ogImage?: string
-  tags?: string[]
 }
 
 const BASE_URL = 'https://www.tfrules.com'
 
-export function SEOHead({ title, description, path, type = 'website', ogImage, tags }: SEOHeadProps) {
+export function SEOHead({ title, description, path, type = 'website', ogImage }: SEOHeadProps) {
   const url = `${BASE_URL}${path}`
-  const ogParams = new URLSearchParams({ title })
-  if (tags?.length) ogParams.set('tags', tags.join(','))
-  const image = ogImage || `${BASE_URL}/api/og?${ogParams.toString()}`
+  const image = ogImage || `${BASE_URL}/og-image.png`
 
   return (
     <Helmet>

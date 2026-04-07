@@ -182,7 +182,6 @@ function BlogPostPage({ post }: { post: BlogPost }) {
         description={post.description}
         path={`/blog/${post.slug}`}
         type="article"
-        tags={post.tags}
       />
 
       {/* ── HERO ── */}
