@@ -1,7 +1,7 @@
 import type { Citation, Message } from '@/types'
 import { UserMessage } from '@/components/chat/UserMessage'
 import { RuleGPTMessage } from '@/components/chat/RuleGPTMessage'
-import { LoadingDots } from '@/components/shared/LoadingDots'
+import { ThinkingIndicator } from '@/components/chat/ThinkingIndicator'
 
 interface ChatThreadProps {
   messages: Message[]
@@ -44,18 +44,7 @@ export function ChatThread({
           </div>
         ),
       )}
-      {isLoading ? (
-        <div className="flex justify-start chat-message-enter">
-          <div className="w-full relative px-6 py-5 border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#1A1A1A] shadow-sm rounded-sm transition-colors">
-            {/* Minimal left accent line for system messages */}
-            <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-neutral-200 dark:bg-white/10 rounded-l-sm" />
-            <div className="flex items-center gap-3 text-[13px] font-semibold tracking-wider uppercase text-neutral-500 dark:text-neutral-400">
-              <LoadingDots />
-              <span className="animate-pulse">Retrieving rules...</span>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {isLoading ? <ThinkingIndicator /> : null}
 
       {reachedLimit ? (
         <div className="flex justify-start chat-message-enter mt-2">
