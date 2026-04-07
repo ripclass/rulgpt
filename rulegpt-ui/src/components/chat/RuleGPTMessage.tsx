@@ -20,7 +20,7 @@ export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: Ru
     <div className="flex justify-start mb-6">
       <article className="group relative w-full rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#1A1A1A] px-6 py-6 shadow-sm transition-colors">
         {/* Minimal left accent line for system messages */}
-        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00261C] rounded-l-sm" />
+        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00261C] dark:bg-[#B2F273] rounded-l-sm" />
 
         <div className="mb-4 flex flex-wrap items-center justify-between gap-4 border-b border-neutral-100 dark:border-white/5 pb-4 transition-colors">
           <div className="flex items-center gap-2">

@@ -98,7 +98,7 @@ export function AuthDialogShell({
           <button 
             type="button"
             onClick={() => onOpenChange(false)} 
-            className="absolute right-4 top-4 z-50 flex h-8 w-8 items-center justify-center rounded-sm bg-black/20 text-white hover:bg-black/40 transition md:bg-black/40 md:hover:bg-[#00261C]"
+            className="absolute right-4 top-4 z-50 flex h-8 w-8 items-center justify-center rounded-sm bg-black/20 text-white hover:bg-black/40 transition md:bg-black/40 md:hover:bg-[#00261C] dark:bg-[#B2F273]"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -115,8 +115,8 @@ export function AuthDialogShell({
             <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">{copy.description}</p>
 
             {blockers.length > 0 ? (
-              <div className="mt-6 rounded-sm border border-[#B2F273]/20 bg-[#00261C]/5 px-4 py-3">
-                <p className="text-xs font-bold uppercase tracking-widest text-[#B2F273]">Auth Blockers</p>
+              <div className="mt-6 rounded-sm border border-[#00261C] dark:border-[#B2F273]/20 bg-[#00261C] dark:bg-[#B2F273]/5 px-4 py-3">
+                <p className="text-xs font-bold uppercase tracking-widest text-[#00261C] dark:text-[#B2F273]">Auth Blockers</p>
                 <ul className="mt-2 text-xs text-neutral-600 dark:text-neutral-400 list-disc list-inside">
                   {blockers.map((blocker) => (
                     <li key={blocker}>{blocker}</li>
@@ -224,7 +224,7 @@ export function AuthDialogShell({
 
               <button
                 type="submit"
-                className="mt-2 flex h-11 w-full items-center justify-center rounded-sm bg-[#00261C] text-[13px] font-bold uppercase tracking-widest text-white transition hover:bg-[#B2F273] hover:text-neutral-900 disabled:bg-neutral-300 disabled:text-neutral-500 dark:disabled:bg-neutral-700 dark:disabled:text-neutral-400 disabled:cursor-not-allowed"
+                className="mt-2 flex h-11 w-full items-center justify-center rounded-sm bg-[#00261C] dark:bg-[#B2F273] text-[13px] font-bold uppercase tracking-widest text-white transition hover:bg-[#B2F273] hover:text-neutral-900 dark:hover:bg-[#00261C] dark:hover:text-white disabled:bg-neutral-300 disabled:text-neutral-500 dark:disabled:bg-neutral-700 dark:disabled:text-neutral-400 disabled:cursor-not-allowed"
                 disabled={isLoading || !email || !password}
               >
                 {isLoading ? copy.submitBusy : copy.submitIdle}
@@ -262,7 +262,7 @@ export function AuthDialogShell({
 
             <div className="relative z-10 p-12 flex flex-col justify-end w-full h-full">
               <div className="inline-flex items-center gap-2 mb-4">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#00261C] animate-pulse" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[#00261C] dark:bg-[#B2F273] animate-pulse" />
                 <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">Engine Connected</span>
               </div>
               <p className="text-white font-medium max-w-sm text-sm opacity-90 leading-relaxed drop-shadow-md">
