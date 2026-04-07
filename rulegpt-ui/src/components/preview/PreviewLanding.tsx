@@ -196,7 +196,7 @@ export function PreviewLanding({
         {/* Background image + overlays */}
         <div className="absolute inset-0 z-0">
           <img
-            src="/hero-bg.png"
+            src="/hero-bg.jpg"
             alt=""
             className="w-full h-full object-cover object-center opacity-40"
           />
