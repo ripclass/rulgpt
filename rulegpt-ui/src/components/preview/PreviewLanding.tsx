@@ -193,16 +193,16 @@ export function PreviewLanding({
           HERO (Cinematic, Immersive, Full Screen)
           ────────────────────────────────────────────────────────── */}
       <section className="relative w-full min-h-screen md:h-screen md:min-h-[700px] flex items-center bg-[#050B14] overflow-hidden py-24 md:py-0">
-        {/* Background Image Setup (Fixed Parallax style) */}
-        <div className="absolute inset-0 z-0 opacity-60">
-          <img 
-            src="/hero-bg.png" 
-            alt="Abstract Global Trade" 
-            className="w-full h-full object-cover object-center"
-          />
-          {/* Gradients to blend the image into the edges */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-black/40 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-black/20" />
+        {/* Abstract geometric background — pure CSS, no image */}
+        <div className="absolute inset-0 z-0">
+          {/* Grid lines */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:60px_60px]" />
+          {/* Amber accent glow — top right */}
+          <div className="absolute -top-32 right-1/4 w-[600px] h-[600px] bg-[#FF4F00]/8 blur-[150px] rounded-full mix-blend-screen" />
+          {/* Secondary cool glow — bottom left */}
+          <div className="absolute -bottom-40 -left-20 w-[500px] h-[500px] bg-[#1a3a5c]/30 blur-[120px] rounded-full" />
+          {/* Subtle radial fade from center */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#050B14_70%)]" />
         </div>
         
         <div className="relative z-10 w-full mx-auto max-w-7xl px-6 lg:px-12 pt-20">
