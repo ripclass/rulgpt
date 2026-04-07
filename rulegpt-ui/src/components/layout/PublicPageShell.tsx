@@ -25,7 +25,7 @@ export function PublicPageShell({ eyebrow, title, description, children }: Publi
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
         
         {/* Subtle orange ambient glow */}
-        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-[#B2F273]/10 blur-[120px] rounded-full pointer-events-none mix-blend-screen" />
+        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-[#00261C]/10 blur-[120px] rounded-full pointer-events-none mix-blend-screen" />
 
         <header className="relative z-30 mx-auto max-w-7xl px-6 lg:px-12 flex items-center justify-between pb-12">
           <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
@@ -59,7 +59,7 @@ export function PublicPageShell({ eyebrow, title, description, children }: Publi
             </button>
             <Link
               to="/chat"
-              className="h-10 px-5 flex items-center justify-center rounded-sm bg-[#B2F273] text-[12px] font-bold uppercase tracking-widest text-neutral-900 transition hover:bg-[#9AD65E] shadow-xl shadow-[#B2F273]/20"
+              className="h-10 px-5 flex items-center justify-center rounded-sm bg-[#00261C] text-[12px] font-bold uppercase tracking-widest text-white transition hover:bg-[#B2F273] hover:text-neutral-900 shadow-xl shadow-[#B2F273]/20"
             >
               Console &rarr;
             </Link>
@@ -69,7 +69,7 @@ export function PublicPageShell({ eyebrow, title, description, children }: Publi
         <section className="relative z-20 mx-auto max-w-7xl px-6 lg:px-12 pt-16">
           <div className="max-w-4xl">
             {eyebrow ? (
-              <p className="inline-block mb-6 text-[11px] font-bold uppercase tracking-[0.2em] text-[#B2F273] border border-[#B2F273]/20 bg-[#B2F273]/10 px-4 py-1.5 rounded-sm">
+              <p className="inline-block mb-6 text-[11px] font-bold uppercase tracking-[0.2em] text-[#B2F273] border border-[#B2F273]/20 bg-[#00261C]/10 px-4 py-1.5 rounded-sm">
                 {eyebrow}
               </p>
             ) : null}

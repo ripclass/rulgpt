@@ -81,7 +81,7 @@ export function Pricing() {
           onClick={() => setInterval('monthly')}
           className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-sm transition ${
             interval === 'monthly'
-              ? 'bg-[#B2F273] text-neutral-900'
+              ? 'bg-[#00261C] text-white'
               : 'bg-neutral-100 dark:bg-white/5 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-white/10'
           }`}
         >
@@ -92,7 +92,7 @@ export function Pricing() {
           onClick={() => setInterval('annual')}
           className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-sm transition ${
             interval === 'annual'
-              ? 'bg-[#B2F273] text-neutral-900'
+              ? 'bg-[#00261C] text-white'
               : 'bg-neutral-100 dark:bg-white/5 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-white/10'
           }`}
         >
@@ -122,7 +122,7 @@ export function Pricing() {
               }`}
             >
               {plan.badge && (
-                <span className="absolute -top-3 left-4 bg-[#B2F273] text-neutral-900 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-sm">
+                <span className="absolute -top-3 left-4 bg-[#00261C] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-sm">
                   {plan.badge}
                 </span>
               )}
@@ -154,7 +154,7 @@ export function Pricing() {
                 to={plan.href}
                 className={`mt-6 block w-full rounded-sm px-4 py-2.5 text-center text-xs font-bold uppercase tracking-widest transition ${
                   plan.featured
-                    ? 'bg-[#B2F273] text-neutral-900 hover:bg-[#9AD65E]'
+                    ? 'bg-[#00261C] text-white hover:bg-[#B2F273] hover:text-neutral-900'
                     : 'bg-neutral-100 dark:bg-white/5 text-neutral-900 dark:text-white hover:bg-neutral-200 dark:hover:bg-white/10'
                 }`}
               >
