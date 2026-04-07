@@ -130,7 +130,6 @@ export function PreviewLanding({
           <div className={`hidden items-center gap-10 md:flex text-[15px] font-medium transition-colors duration-300 ${isNavDarkTheme ? 'text-neutral-300' : 'text-neutral-600'}`}>
             <a href="#how" className={`transition duration-200 ${isNavDarkTheme ? 'hover:text-white' : 'hover:text-neutral-900'}`}>How it works</a>
             <a href="#pricing" className={`transition duration-200 ${isNavDarkTheme ? 'hover:text-white' : 'hover:text-neutral-900'}`}>Pricing</a>
-            <Link to="/blog" className={`transition duration-200 ${isNavDarkTheme ? 'hover:text-white' : 'hover:text-neutral-900'}`}>Blog</Link>
             
             <div className={`h-4 w-px ${isNavDarkTheme ? 'bg-white/20' : 'bg-neutral-200'}`} />
 
@@ -167,7 +166,6 @@ export function PreviewLanding({
           <nav className="flex flex-col gap-10 text-4xl sm:text-5xl font-bold uppercase tracking-widest text-neutral-900 mt-4">
             <a href="#how" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">How it works</a>
             <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">Pricing</a>
-            <Link to="/blog" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">Blog</Link>
             <Link to="/faq" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">FAQ</Link>
             <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="border-b border-neutral-100 pb-6 transition hover:text-[#FF4F00]">Contact</Link>
           </nav>
