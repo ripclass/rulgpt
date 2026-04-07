@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SEOHead } from '@/components/shared/SEOHead'
 import { Check } from 'lucide-react'
 
 type Interval = 'monthly' | 'annual'
@@ -69,6 +70,8 @@ export function Pricing() {
   const [interval, setInterval] = useState<Interval>('monthly')
 
   return (
+    <>
+    <SEOHead title="Pricing — TFRules" description="Free, Professional, and Enterprise plans for cited trade finance rule answers. From $0 to $199/month." path="/pricing" />
     <PublicPageShell
       eyebrow="Pricing"
       title="Expert trade finance answers. Simple pricing."
@@ -199,5 +202,6 @@ export function Pricing() {
         </div>
       </section>
     </PublicPageShell>
+    </>
   )
 }

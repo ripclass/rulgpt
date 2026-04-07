@@ -1,7 +1,10 @@
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SEOHead } from '@/components/shared/SEOHead'
 
 export function Terms() {
   return (
+    <>
+    <SEOHead title="Terms of Use — TFRules" description="Terms and conditions for using tfrules.com. Rules explanation only — not legal advice, not document validation." path="/terms" />
     <PublicPageShell
       eyebrow="Terms"
       title="Terms of use"
@@ -26,5 +29,6 @@ export function Terms() {
         </div>
       </section>
     </PublicPageShell>
+    </>
   )
 }

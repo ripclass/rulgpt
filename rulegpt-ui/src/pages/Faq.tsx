@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SEOHead } from '@/components/shared/SEOHead'
 
 const faqs = [
   {
@@ -29,6 +30,8 @@ export function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
+    <>
+    <SEOHead title="FAQ — TFRules" description="Frequently asked questions about tfrules.com. How it works, what it covers, accuracy, pricing, and data handling." path="/faq" />
     <PublicPageShell
       eyebrow="FAQ"
       title="Questions"
@@ -61,5 +64,6 @@ export function Faq() {
         ))}
       </section>
     </PublicPageShell>
+    </>
   )
 }

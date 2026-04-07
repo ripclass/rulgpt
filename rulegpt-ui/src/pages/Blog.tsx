@@ -2,11 +2,17 @@ import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, MessageSquare } from 'lucide-react'
 import { PublicFooter } from '@/components/shared/PublicFooter'
 import { RuxMark } from '@/components/shared/RuxMascot'
+import { SEOHead } from '@/components/shared/SEOHead'
 import { blogPosts, type BlogPost } from '@/data/blogPosts'
 
 function BlogIndex() {
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#171717] transition-colors">
+      <SEOHead
+        title="Trade Finance Rules Blog — TFRules"
+        description="Expert explanations of UCP600, ISBP745, sanctions, FTAs, and trade compliance rules — with exact citations. No opinion, just rules."
+        path="/blog"
+      />
       <header className="bg-[#050B14] py-16 pb-32">
         <div className="mx-auto max-w-4xl px-6">
           <Link to="/" className="flex items-center gap-3 mb-10 hover:opacity-80 transition">
@@ -54,6 +60,13 @@ function BlogIndex() {
 function BlogPostPage({ post }: { post: BlogPost }) {
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#171717] transition-colors">
+      <SEOHead
+        title={`${post.title} — TFRules`}
+        description={post.description}
+        path={`/blog/${post.slug}`}
+        type="article"
+        tags={post.tags}
+      />
       <header className="bg-[#050B14] py-12 pb-24">
         <div className="mx-auto max-w-3xl px-6">
           <Link to="/blog" className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition mb-8">

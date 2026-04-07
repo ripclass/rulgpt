@@ -1,4 +1,5 @@
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SEOHead } from '@/components/shared/SEOHead'
 
 const contacts = [
   {
@@ -20,6 +21,8 @@ const contacts = [
 
 export function Contact() {
   return (
+    <>
+    <SEOHead title="Contact — TFRules" description="Get in touch with the tfrules team. General enquiries, support, and billing." path="/contact" />
     <PublicPageShell
       eyebrow="Contact"
       title="Support should be easy to find"
@@ -57,5 +60,6 @@ export function Contact() {
         </div>
       </section>
     </PublicPageShell>
+    </>
   )
 }

@@ -1,7 +1,10 @@
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SEOHead } from '@/components/shared/SEOHead'
 
 export function Privacy() {
   return (
+    <>
+    <SEOHead title="Privacy Policy — TFRules" description="How tfrules.com collects, uses, and protects your data. No tracking beyond what's needed to serve cited trade finance answers." path="/privacy" />
     <PublicPageShell
       eyebrow="Privacy"
       title="Privacy policy"
@@ -26,5 +29,6 @@ export function Privacy() {
         </div>
       </section>
     </PublicPageShell>
+    </>
   )
 }
