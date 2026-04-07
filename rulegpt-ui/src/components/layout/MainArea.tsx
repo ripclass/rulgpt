@@ -172,6 +172,7 @@ export function MainArea({
                 onUpgrade={onUpgrade}
                 onCitationClick={onCitationClick}
                 onSave={onSaveMessage}
+                onFollowup={(q) => void onSubmitQuery(q)}
               />
             </div>
           </section>

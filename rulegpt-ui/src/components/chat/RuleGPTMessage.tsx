@@ -13,9 +13,10 @@ interface RuleGPTMessageProps {
   canSave?: boolean
   onCitationClick: (citation: Citation) => void
   onSave: (queryId: string) => void
+  onFollowup?: (query: string) => void
 }
 
-export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: RuleGPTMessageProps) {
+export function RuleGPTMessage({ message, canSave, onCitationClick, onSave, onFollowup }: RuleGPTMessageProps) {
   return (
     <div className="flex justify-start mb-6">
       <article className="group relative w-full rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#1A1A1A] px-6 py-6 shadow-sm transition-colors">
@@ -61,11 +62,18 @@ export function RuleGPTMessage({ message, canSave, onCitationClick, onSave }: Ru
         {message.suggestedFollowups && message.suggestedFollowups.length > 0 ? (
           <div className="mt-6 border-t border-neutral-100 dark:border-white/5 pt-5 transition-colors">
             <p className="mb-3 text-[11px] font-semibold tracking-wider text-neutral-500 uppercase">Suggested Topics</p>
-            <ul className="list-disc space-y-2 pl-5 text-[14px] leading-6 text-neutral-600 dark:text-neutral-400">
+            <div className="space-y-2">
               {message.suggestedFollowups.map((item) => (
-                <li key={item} className="hover:text-neutral-900 dark:hover:text-white transition-colors cursor-pointer">{item}</li>
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => onFollowup?.(item)}
+                  className="block w-full text-left text-[14px] leading-6 text-neutral-600 dark:text-neutral-400 hover:text-[#FF4F00] dark:hover:text-[#FF4F00] transition-colors cursor-pointer py-1 px-3 rounded-sm hover:bg-neutral-50 dark:hover:bg-white/5"
+                >
+                  {item}
+                </button>
               ))}
-            </ul>
+            </div>
           </div>
         ) : null}
 

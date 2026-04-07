@@ -13,6 +13,7 @@ interface ChatThreadProps {
   onUpgrade?: () => void
   onCitationClick: (citation: Citation) => void
   onSave: (queryId: string) => void
+  onFollowup?: (query: string) => void
 }
 
 export function ChatThread({
@@ -25,6 +26,7 @@ export function ChatThread({
   onUpgrade,
   onCitationClick,
   onSave,
+  onFollowup,
 }: ChatThreadProps) {
   return (
     <section className="space-y-6">
@@ -40,6 +42,7 @@ export function ChatThread({
               canSave={canSave}
               onCitationClick={onCitationClick}
               onSave={onSave}
+              onFollowup={onFollowup}
             />
           </div>
         ),
