@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, LogOut, Sun, Moon, ChevronUp, Zap } from 'lucide-react'
+import { Plus, LogOut, Sun, Moon, ChevronUp, Zap, Settings } from 'lucide-react'
 import { QueryHistory } from '@/components/shared/QueryHistory'
 import { SavedAnswers } from '@/components/shared/SavedAnswers'
 import { FreeTierCounter } from '@/components/shared/FreeTierCounter'
@@ -41,12 +41,18 @@ function UserMenu({
   isAuthenticated,
   userEmail,
   tier,
+  usedCount,
+  remaining,
+  limitValue,
   onOpenLogin,
   onLogout,
 }: {
   isAuthenticated: boolean
   userEmail?: string | null
   tier: SessionTier
+  usedCount: number
+  remaining: number
+  limitValue: number
   onOpenLogin: () => void
   onLogout: () => void
 }) {
@@ -91,11 +97,40 @@ function UserMenu({
 
   return (
     <div className="mt-6 pt-5 border-t border-neutral-200 dark:border-white/10 relative" ref={menuRef}>
+      {/* Usage bar */}
+      {isAuthenticated && limitValue > 0 && (
+        <div className="mb-3 px-1">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+              {usedCount} / {limitValue} queries
+            </span>
+            <span className="text-[10px] text-neutral-400 dark:text-neutral-500">
+              {remaining} left
+            </span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-neutral-200 dark:bg-white/10 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                remaining <= 0 ? 'bg-red-500' : usedCount / limitValue > 0.8 ? 'bg-amber-500' : 'bg-[#FF4F00]'
+              }`}
+              style={{ width: `${Math.min(100, (usedCount / limitValue) * 100)}%` }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Dropdown menu — opens upward */}
       {open && (
         <div className="absolute bottom-full left-0 right-0 mb-2 rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#141414] shadow-xl py-1 z-50">
           <Link
-            to="/pricing"
+            to="/settings"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/5 transition"
+          >
+            <Settings className="h-3.5 w-3.5" /> Settings
+          </Link>
+          <Link
+            to="/upgrade"
             onClick={() => setOpen(false)}
             className="flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/5 transition"
           >
@@ -131,7 +166,7 @@ function UserMenu({
             {userEmail ?? 'User'}
           </p>
           <p className={`text-[10px] font-semibold uppercase tracking-wider ${
-            tier === 'professional' || tier === 'enterprise' // legacy: was 'starter' || 'pro'
+            tier === 'professional' || tier === 'enterprise'
               ? 'text-[#FF4F00]'
               : 'text-neutral-400 dark:text-neutral-500'
           }`}>
@@ -223,6 +258,9 @@ export function Sidebar({
         isAuthenticated={isAuthenticated}
         userEmail={userEmail}
         tier={tier}
+        usedCount={usedCount}
+        remaining={remaining}
+        limitValue={limitValue}
         onOpenLogin={onOpenLogin}
         onLogout={onLogout}
       />

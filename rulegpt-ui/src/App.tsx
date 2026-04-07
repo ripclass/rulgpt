@@ -6,6 +6,7 @@ import { Home } from '@/pages/Home'
 import { Landing } from '@/pages/Landing'
 import { Pricing } from '@/pages/Pricing'
 import { Upgrade } from '@/pages/Upgrade'
+import { Settings } from '@/pages/Settings'
 import { Faq } from '@/pages/Faq'
 import { Contact } from '@/pages/Contact'
 import { Privacy } from '@/pages/Privacy'
@@ -117,6 +118,7 @@ export default function App() {
           <Route path="/landing" element={<Navigate to="/" replace />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/upgrade" element={<Upgrade />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy" element={<Privacy />} />
