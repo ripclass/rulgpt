@@ -263,7 +263,7 @@ class RAGPipeline:
         self.retriever = retriever or RuleRetriever()
         self.generator = generator or AnswerGenerator()
 
-    async def process_query(self, query: str, session: Any, language: str = "en") -> QueryResult:
+    async def process_query(self, query: str, session: Any, language: str = "en", user_tier: str = "free") -> QueryResult:
         if not query or not query.strip():
             raise ValueError("Query cannot be empty.")
         if len(query) > 500:
@@ -356,9 +356,7 @@ class RAGPipeline:
         # Stage 2.5: tier-based model routing (after retrieval)
         from app.config import settings as _settings
         if _settings.RULEGPT_ENABLE_SMART_ROUTING and retrieved_rules:
-            # Default all users to "professional" tier until pricing tiers go live
-            effective_tier = "professional"
-            routing_tier = select_model(effective_tier, query, retrieved_rules)
+            routing_tier = select_model(user_tier, query, retrieved_rules)
         else:
             routing_tier = "sonnet"
 
@@ -370,7 +368,7 @@ class RAGPipeline:
                     query=query,
                     retrieved_rules=retrieved_rules,
                     classifier_output=classifier_output,
-                    user_tier="anonymous",
+                    user_tier=user_tier,
                     routing_tier=routing_tier,
                 )
             except TypeError:
@@ -378,7 +376,7 @@ class RAGPipeline:
                     query=query,
                     retrieved_rules=retrieved_rules,
                     classifier_output=classifier_output,
-                    user_tier="anonymous",
+                    user_tier=user_tier,
                 )
             answer = str(generation.get("answer", "")).strip() or NO_RULE_MESSAGE
             model_used = str(generation.get("model_used", "fallback"))
@@ -394,7 +392,7 @@ class RAGPipeline:
                     query=query,
                     retrieved_rules=[],
                     classifier_output=classifier_output,
-                    user_tier="anonymous",
+                    user_tier=user_tier,
                     routing_tier="sonnet",
                 )
                 answer = str(generation.get("answer", "")).strip() or NO_RULE_MESSAGE
@@ -453,7 +451,7 @@ class RAGPipeline:
         )
 
 
-async def process_query(query: str, session: Any, language: str = "en") -> QueryResult:
+async def process_query(query: str, session: Any, language: str = "en", user_tier: str = "free") -> QueryResult:
     """Stable backend-facing entrypoint."""
     pipeline = RAGPipeline()
-    return await pipeline.process_query(query=query, session=session, language=language)
+    return await pipeline.process_query(query=query, session=session, language=language, user_tier=user_tier)

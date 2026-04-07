@@ -101,8 +101,13 @@ def _tier_monthly_limit(tier: str) -> int:
         return settings.FREE_TIER_MONTHLY_LIMIT
     if normalized == "starter":
         return settings.STARTER_TIER_MONTHLY_LIMIT
+    if normalized == "professional":
+        return settings.PROFESSIONAL_TIER_MONTHLY_LIMIT
+    if normalized == "expert":
+        return settings.EXPERT_TIER_MONTHLY_LIMIT
+    # Legacy tier names
     if normalized == "pro":
-        return settings.PRO_TIER_MONTHLY_LIMIT
+        return settings.PROFESSIONAL_TIER_MONTHLY_LIMIT
     return settings.FREE_TIER_MONTHLY_LIMIT
 
 
@@ -152,14 +157,14 @@ async def _maybe_await(result):
     return result
 
 
-async def _call_rag_pipeline(query_text: str, db_session: Session, language: str) -> dict | None:
+async def _call_rag_pipeline(query_text: str, db_session: Session, language: str, user_tier: str = "free") -> dict | None:
     try:
         from app.services.rag.pipeline import process_query
     except Exception:
         return None
 
     try:
-        raw = await _maybe_await(process_query(query=query_text, session=db_session, language=language))
+        raw = await _maybe_await(process_query(query=query_text, session=db_session, language=language, user_tier=user_tier))
     except Exception:
         return None
 
@@ -214,7 +219,7 @@ async def process_query_request(
         )
 
     started = _utc_now()
-    rag = await _call_rag_pipeline(payload.query, db, payload.language)
+    rag = await _call_rag_pipeline(payload.query, db, payload.language, user_tier=tier)
     citations = _coerce_citations((rag or {}).get("citations"))
 
     answer = (rag or {}).get("answer")

@@ -9,7 +9,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
-SessionTier = Literal["anonymous", "free", "starter", "pro"]
+SessionTier = Literal["anonymous", "free", "starter", "professional", "expert", "pro"]
 ConfidenceBand = Literal["high", "medium", "low"]
 
 

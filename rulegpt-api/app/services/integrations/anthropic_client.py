@@ -127,7 +127,11 @@ class AnthropicClient:
         async def _op() -> Any:
             return await client.messages.create(
                 model=model,
-                system=system_prompt,
+                system=[{
+                    "type": "text",
+                    "text": system_prompt,
+                    "cache_control": {"type": "ephemeral"},
+                }],
                 max_tokens=max_tokens,
                 temperature=temperature,
                 messages=[{"role": "user", "content": user_prompt}],

@@ -21,23 +21,24 @@ class StripeClient:
         *,
         secret_key: str | None = None,
         webhook_secret: str | None = None,
-        starter_monthly_price_id: str | None = None,
-        starter_annual_price_id: str | None = None,
-        pro_monthly_price_id: str | None = None,
-        pro_annual_price_id: str | None = None,
         supabase_auth: SupabaseAuthService | None = None,
     ) -> None:
         self.secret_key = secret_key or settings.STRIPE_SECRET_KEY
         self.webhook_secret = webhook_secret or settings.STRIPE_WEBHOOK_SECRET
-        self.starter_monthly_price_id = (
-            starter_monthly_price_id or settings.STRIPE_STARTER_MONTHLY_PRICE_ID
-        )
-        self.starter_annual_price_id = (
-            starter_annual_price_id or settings.STRIPE_STARTER_ANNUAL_PRICE_ID
-        )
-        self.pro_monthly_price_id = pro_monthly_price_id or settings.STRIPE_PRO_MONTHLY_PRICE_ID
-        self.pro_annual_price_id = pro_annual_price_id or settings.STRIPE_PRO_ANNUAL_PRICE_ID
         self.supabase_auth = supabase_auth or SupabaseAuthService()
+
+        # Price ID → tier mapping (used by webhook to determine user tier)
+        self._price_to_tier: dict[str, str] = {}
+        for price_id, tier in [
+            (settings.STRIPE_STARTER_MONTHLY_PRICE_ID, "starter"),
+            (settings.STRIPE_STARTER_ANNUAL_PRICE_ID, "starter"),
+            (settings.STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID, "professional"),
+            (settings.STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID, "professional"),
+            (settings.STRIPE_EXPERT_MONTHLY_PRICE_ID, "expert"),
+            (settings.STRIPE_EXPERT_ANNUAL_PRICE_ID, "expert"),
+        ]:
+            if price_id:
+                self._price_to_tier[price_id] = tier
 
     def _require_secret_key(self) -> str:
         if not self.secret_key:
@@ -52,19 +53,28 @@ class StripeClient:
     def _price_id_for_plan_and_interval(self, plan: str, interval: str) -> str:
         normalized_plan = str(plan or "").strip().lower()
         normalized = str(interval or "").strip().lower()
-        price_matrix = {
+        price_matrix: dict[str, dict[str, str | None]] = {
             "starter": {
-                "monthly": self.starter_monthly_price_id,
-                "annual": self.starter_annual_price_id,
+                "monthly": settings.STRIPE_STARTER_MONTHLY_PRICE_ID,
+                "annual": settings.STRIPE_STARTER_ANNUAL_PRICE_ID,
             },
+            "professional": {
+                "monthly": settings.STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID,
+                "annual": settings.STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID,
+            },
+            "expert": {
+                "monthly": settings.STRIPE_EXPERT_MONTHLY_PRICE_ID,
+                "annual": settings.STRIPE_EXPERT_ANNUAL_PRICE_ID,
+            },
+            # Legacy alias
             "pro": {
-                "monthly": self.pro_monthly_price_id,
-                "annual": self.pro_annual_price_id,
+                "monthly": settings.STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID,
+                "annual": settings.STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID,
             },
         }
 
         if normalized_plan not in price_matrix:
-            raise ValueError("Unsupported billing plan.")
+            raise ValueError(f"Unsupported billing plan: {normalized_plan}")
         if normalized not in {"monthly", "annual"}:
             raise ValueError("Unsupported billing interval.")
 
@@ -137,28 +147,41 @@ class StripeClient:
             raise ValueError("Stripe webhook is missing a Supabase user reference.")
         return UUID(str(candidate))
 
-    @staticmethod
-    def _resolve_event_tier(event_object: dict[str, Any]) -> str:
+    def _resolve_event_tier(self, event_object: dict[str, Any]) -> str:
+        """Determine user tier from Stripe event — check price ID first, then metadata."""
+        _VALID_TIERS = {"starter", "professional", "expert"}
+
         def _metadata_value(container: Any, key: str) -> Any:
             if isinstance(container, dict):
                 return (container.get("metadata") or {}).get(key)
             return None
 
+        # Try to resolve from price ID (most reliable)
+        items = event_object.get("items", {}).get("data", [])
+        if not items:
+            lines = event_object.get("lines", {})
+            items = lines.get("data", []) if isinstance(lines, dict) else []
+        for item in items:
+            price = item.get("price", {}) if isinstance(item, dict) else {}
+            price_id = price.get("id") if isinstance(price, dict) else None
+            if price_id and price_id in self._price_to_tier:
+                return self._price_to_tier[price_id]
+
+        # Fallback: check metadata
         candidates = [
             (event_object.get("metadata") or {}).get("rulegpt_tier"),
             (event_object.get("metadata") or {}).get("rulegpt_plan"),
             _metadata_value(event_object.get("subscription_details"), "rulegpt_tier"),
-            _metadata_value(event_object.get("subscription_details"), "rulegpt_plan"),
             _metadata_value(event_object.get("subscription"), "rulegpt_tier"),
-            _metadata_value(event_object.get("subscription"), "rulegpt_plan"),
-            _metadata_value(event_object.get("lines"), "rulegpt_tier"),
-            _metadata_value(event_object.get("lines"), "rulegpt_plan"),
         ]
         for candidate in candidates:
             normalized = str(candidate or "").strip().lower()
-            if normalized in {"starter", "pro"}:
+            if normalized in _VALID_TIERS:
                 return normalized
-        return "pro"
+            # Legacy mapping
+            if normalized == "pro":
+                return "professional"
+        return "professional"  # default for paid users
 
     @staticmethod
     def _tier_for_subscription_status(status: str | None, paid_tier: str) -> str:

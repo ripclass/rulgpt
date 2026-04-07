@@ -37,10 +37,10 @@ class Settings(BaseSettings):
         r"^https://([a-z0-9-]+\.)*vercel\.app$|^https://([a-z0-9-]+\.)?tfrules\.com$"
     )
 
-    FREE_TIER_MONTHLY_LIMIT: int = 20
-    STARTER_TIER_MONTHLY_LIMIT: int = 500
-    PRO_TIER_MONTHLY_LIMIT: int = 2000
-    PRO_TIER_API_LIMIT: int = 10000
+    FREE_TIER_MONTHLY_LIMIT: int = 5
+    STARTER_TIER_MONTHLY_LIMIT: int = 150
+    PROFESSIONAL_TIER_MONTHLY_LIMIT: int = 500
+    EXPERT_TIER_MONTHLY_LIMIT: int = 2000
 
     RATE_LIMIT_PER_MIN_ANON: int = 30
     RATE_LIMIT_PER_MIN_AUTH: int = 120
@@ -76,10 +76,12 @@ class Settings(BaseSettings):
 
     STRIPE_SECRET_KEY: str | None = None
     STRIPE_WEBHOOK_SECRET: str | None = None
-    STRIPE_STARTER_MONTHLY_PRICE_ID: str | None = None
-    STRIPE_STARTER_ANNUAL_PRICE_ID: str | None = None
-    STRIPE_PRO_MONTHLY_PRICE_ID: str | None = None
-    STRIPE_PRO_ANNUAL_PRICE_ID: str | None = None
+    STRIPE_STARTER_MONTHLY_PRICE_ID: str = "price_1TJO1eBG8gnvAJXagDm1kzCP"
+    STRIPE_STARTER_ANNUAL_PRICE_ID: str = "price_1TJO1hBG8gnvAJXaoLabrdv0"
+    STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID: str = "price_1TJO1kBG8gnvAJXaaFBhJwNS"
+    STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID: str = "price_1TJO1mBG8gnvAJXanIAadKPD"
+    STRIPE_EXPERT_MONTHLY_PRICE_ID: str = "price_1TJO1oBG8gnvAJXadQbhGp6g"
+    STRIPE_EXPERT_ANNUAL_PRICE_ID: str = "price_1TJO1qBG8gnvAJXaOdjTLjva"
 
     ADMIN_SECRET: str | None = None
 

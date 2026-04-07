@@ -1,10 +1,10 @@
-export type SessionTier = 'anonymous' | 'free' | 'starter' | 'pro'
+export type SessionTier = 'anonymous' | 'free' | 'starter' | 'professional' | 'expert' | 'pro'
 export type ConfidenceBand = 'high' | 'medium' | 'low'
 export type LanguageCode = 'en' | 'bn' | 'hi'
 export type MessageRole = 'user' | 'assistant'
 export type DomainType = 'icc' | 'sanctions' | 'fta' | 'customs' | 'bank_specific' | 'other'
 export type BillingInterval = 'monthly' | 'annual'
-export type BillingPlan = 'starter' | 'pro'
+export type BillingPlan = 'starter' | 'professional' | 'expert'
 
 export interface QueryRequest {
   query: string
