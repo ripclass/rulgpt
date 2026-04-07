@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import type { SessionSummary } from '@/types'
+import type { SessionSummary, SessionTier } from '@/types'
 
 export function useHistory(
   userId?: string,
-  tier: 'anonymous' | 'free' | 'starter' | 'pro' = 'anonymous',
+  tier: SessionTier = 'anonymous',
   accessToken?: string | null,
   enabled = true,
 ) {

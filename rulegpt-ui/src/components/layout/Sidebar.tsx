@@ -131,7 +131,7 @@ function UserMenu({
             {userEmail ?? 'User'}
           </p>
           <p className={`text-[10px] font-semibold uppercase tracking-wider ${
-            tier === 'pro' || tier === 'starter'
+            tier === 'professional' || tier === 'enterprise' // legacy: was 'starter' || 'pro'
               ? 'text-[#FF4F00]'
               : 'text-neutral-400 dark:text-neutral-500'
           }`}>

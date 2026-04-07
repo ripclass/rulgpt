@@ -12,7 +12,7 @@ interface PreviewLandingProps {
   onOpenLogin: () => void
   onOpenSignup: () => void
   onOpenChat: () => void
-  onStartCheckout: (plan: 'starter' | 'pro', interval: 'monthly' | 'annual') => void
+  onStartCheckout: (plan: 'professional' | 'enterprise', interval: 'monthly' | 'annual') => void
   isCheckingOut?: boolean
 }
 
@@ -470,11 +470,11 @@ export function PreviewLanding({
                 </ul>
               </div>
               <button
-                onClick={() => isAuthenticated ? onStartCheckout('starter', billingInterval) : onOpenLogin()}
+                onClick={() => isAuthenticated ? onStartCheckout('professional', billingInterval) : onOpenLogin()}
                 disabled={isCheckingOut}
                 className="mt-12 w-full bg-[#FF4F00] py-4 font-bold text-white uppercase tracking-wider text-sm transition hover:bg-[#E64600] shadow-lg shadow-[#FF4F00]/20 disabled:opacity-50"
               >
-                {isCheckingOut ? 'Redirecting...' : isAuthenticated ? 'Get Starter' : 'Sign in to upgrade'}
+                {isCheckingOut ? 'Redirecting...' : isAuthenticated ? 'Get Professional' : 'Sign in to upgrade'}
               </button>
             </div>
 
@@ -498,11 +498,11 @@ export function PreviewLanding({
                 </ul>
               </div>
               <button
-                onClick={() => isAuthenticated ? onStartCheckout('pro', billingInterval) : onOpenLogin()}
+                onClick={() => isAuthenticated ? onStartCheckout('enterprise', billingInterval) : onOpenLogin()}
                 disabled={isCheckingOut}
                 className="mt-12 w-full border border-neutral-200 py-4 font-semibold text-neutral-900 uppercase tracking-wider text-sm transition hover:bg-neutral-50 disabled:opacity-50"
               >
-                {isCheckingOut ? 'Redirecting...' : isAuthenticated ? 'Get Pro' : 'Sign in to upgrade'}
+                {isCheckingOut ? 'Redirecting...' : isAuthenticated ? 'Get Enterprise' : 'Sign in to upgrade'}
               </button>
             </div>
           </FadeInView>

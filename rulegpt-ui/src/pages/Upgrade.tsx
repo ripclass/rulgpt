@@ -19,28 +19,30 @@ const PLAN_COPY: Record<
     features: string[]
   }
 > = {
-  starter: {
-    title: 'Starter',
-    monthlyLabel: '$9 / month',
-    annualLabel: '$90 / year',
-    blurb: 'For daily operators who need cited answers, synced history, and saved work.',
+  professional: {
+    title: 'Professional',
+    monthlyLabel: '$79 / month',
+    annualLabel: '$790 / year',
+    blurb: 'For trade finance professionals who need cited answers, full model access, and saved work.',
     features: [
       '500 queries / month',
-      'Synced history',
-      'Saved answers',
-      'JSON export',
+      'Haiku + Sonnet + Opus models',
+      'Sanctions queries routed to Opus',
+      'Session history & saved answers',
+      'Priority support',
     ],
   },
-  pro: {
-    title: 'Pro',
-    monthlyLabel: '$19 / month',
-    annualLabel: '$190 / year',
-    blurb: 'For teams that need higher volume, priority routing, and full session export.',
+  enterprise: {
+    title: 'Enterprise',
+    monthlyLabel: '$199 / month',
+    annualLabel: '$1,990 / year',
+    blurb: 'For banks and trading houses that need higher volume and expanded Opus access.',
     features: [
       '2,000 queries / month',
-      'Everything in Starter',
-      'Priority model routing',
-      'Session export',
+      'Everything in Professional',
+      'Lower Opus routing threshold',
+      'Full session export',
+      'Dedicated account support',
     ],
   },
 }
@@ -52,7 +54,9 @@ export function Upgrade() {
   const navigate = useNavigate()
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null)
   const [isCheckingOut, setIsCheckingOut] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState<BillingPlan>(auth.currentTier === 'starter' ? 'pro' : 'starter')
+  const [selectedPlan, setSelectedPlan] = useState<BillingPlan>(
+    auth.currentTier === 'professional' ? 'enterprise' : 'professional',
+  )
   const [billingInterval, setBillingInterval] = useState<BillingInterval>('monthly')
 
   const hasBearerToken = Boolean(auth.accessToken)
@@ -79,8 +83,9 @@ export function Upgrade() {
       void auth
         .refreshSession()
         .then((status) => {
-          if (status?.tier === 'starter' || status?.tier === 'pro') {
-            setCheckoutMessage(`Checkout completed. Your account is now ${status.tier}.`)
+          const tier = status?.tier
+          if (tier === 'professional' || tier === 'enterprise') {
+            setCheckoutMessage(`Checkout completed. Your account is now ${tier}.`)
           } else {
             setCheckoutMessage('Checkout completed. Sign out and back in if your tier still looks stale.')
           }
@@ -139,8 +144,9 @@ export function Upgrade() {
         window.location.href = nextUrl
         return
       }
-      if (response.tier === 'starter' || response.tier === 'pro') {
-        auth.setTier(response.tier)
+      const tier = response.tier
+      if (tier === 'professional' || tier === 'enterprise') {
+        auth.setTier(tier)
       }
       setCheckoutMessage(response.message ?? 'Checkout session created.')
     } catch (error) {
@@ -160,7 +166,7 @@ export function Upgrade() {
     <PublicPageShell
       eyebrow="Upgrade"
       title="Choose your plan."
-      description="One avoided discrepancy fee covers a year of Starter. Simple, transparent pricing."
+      description="One avoided discrepancy fee covers a year of Professional. Simple, transparent pricing."
     >
       {checkoutMessage ? (
         <div className="mb-8 rounded-sm border border-[#FF4F00]/20 bg-[#FF4F00]/5 px-5 py-4">
@@ -172,7 +178,7 @@ export function Upgrade() {
         <div className="mb-8 rounded-sm border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-[#121212] p-5">
           <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">Configuration blockers</p>
           <ul className="mt-3 space-y-2 text-[13px] font-medium text-neutral-600 dark:text-neutral-400">
-            {billingStatus.data.blockers.map((blocker) => (
+            {billingStatus.data.blockers.map((blocker: string) => (
               <li key={blocker}>&ndash; {blocker}</li>
             ))}
           </ul>
@@ -181,7 +187,7 @@ export function Upgrade() {
 
       {/* Plan Selection */}
       <div className="grid gap-4 md:grid-cols-2">
-        {(['starter', 'pro'] as const).map((plan) => {
+        {(['professional', 'enterprise'] as const).map((plan) => {
           const planCopy = PLAN_COPY[plan]
           const selected = selectedPlan === plan
           return (
@@ -213,7 +219,7 @@ export function Upgrade() {
               </div>
               <p className="mt-4 text-[13px] leading-relaxed font-medium text-neutral-500 dark:text-neutral-400">{planCopy.blurb}</p>
               <ul className="mt-5 space-y-2.5">
-                {planCopy.features.map((feature) => (
+                {planCopy.features.map((feature: string) => (
                   <li key={feature} className="flex items-center gap-3 text-[13px] font-medium text-neutral-600 dark:text-neutral-300">
                     <Check className="h-4 w-4 text-[#FF4F00] shrink-0" /> {feature}
                   </li>

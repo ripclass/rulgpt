@@ -9,6 +9,7 @@ import type {
   RuleDetails,
   SavedAnswer,
   SessionSummary,
+  SessionTier,
 } from '@/types'
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ?? 'http://localhost:8000'
@@ -39,7 +40,7 @@ export interface AuthStatusResponse {
   jwt_verification_ready: boolean
   admin_user_sync_ready: boolean
   authenticated: boolean
-  tier: 'anonymous' | 'free' | 'starter' | 'pro'
+  tier: SessionTier
   user_id: string | null
   auth_issuer: string | null
   auth_error: string | null
@@ -151,7 +152,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 
 export interface RequestIdentity {
   userId?: string
-  tier?: 'anonymous' | 'free' | 'starter' | 'pro'
+  tier?: SessionTier
   accessToken?: string | null
 }
 

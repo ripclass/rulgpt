@@ -13,7 +13,7 @@ export function ApiAccess() {
   const auth = useAuth()
   const usage = useQuery({
     queryKey: ['usage', auth.user?.id, auth.tier],
-    enabled: Boolean(auth.user) && auth.tier === 'pro',
+    enabled: Boolean(auth.user) && auth.tier === 'enterprise', // legacy: was 'pro'
     queryFn: async (): Promise<UsageResponse> => {
       const response = await fetch(`${API_BASE_URL}/api/usage`, {
         headers: {
@@ -44,8 +44,8 @@ export function ApiAccess() {
         </p>
 
         <div className="mt-8 rounded-sm border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-[#121212] p-4 text-[13px] font-medium text-neutral-600 dark:text-neutral-400">
-          {auth.tier !== 'pro' ? (
-            <p>Upgrade to Pro to unlock API usage metrics.</p>
+          {auth.tier !== 'enterprise' ? ( // legacy: was 'pro'
+            <p>Upgrade to Enterprise to unlock API usage metrics.</p>
           ) : usage.isLoading ? (
             <p>Loading usage...</p>
           ) : usage.error ? (
