@@ -88,8 +88,8 @@ export function PublicPageShell({ eyebrow, title, description, children }: Publi
       {/* 
         CONTENT BLOCK: Pulls up into the dark hero to create depth.
       */}
-      <main className="relative z-30 mx-auto w-full max-w-7xl px-6 lg:px-12 -mt-24 mb-24 flex-grow">
-        <div className="bg-white dark:bg-[#0A0A0A] border border-neutral-200 dark:border-white/10 rounded-sm shadow-2xl p-6 md:p-12 min-h-[400px]">
+      <main className="relative z-30 mx-auto w-full max-w-4xl px-6 -mt-24 mb-24 flex-grow">
+        <div className="bg-white dark:bg-[#0A0A0A] border border-neutral-200 dark:border-white/10 rounded-sm shadow-2xl p-6 md:p-10 min-h-[400px]">
           {children}
         </div>
       </main>
