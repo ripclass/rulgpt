@@ -34,9 +34,9 @@ async def get_usage(
 ) -> UsageResponse:
     # Placeholder usage details until API key accounting is wired.
     return UsageResponse(
-        tier="pro",
+        tier="professional",
         api_queries_used=0,
-        api_queries_limit=settings.PRO_TIER_API_LIMIT,
+        api_queries_limit=settings.ENTERPRISE_TIER_MONTHLY_LIMIT,
     )
 
 
