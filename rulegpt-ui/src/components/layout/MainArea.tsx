@@ -15,6 +15,7 @@ interface MainAreaProps {
   previewMode?: boolean
   reachedLimit?: boolean
   isAuthenticated?: boolean
+  userEmail?: string | null
   onOpenSignup?: () => void
   onUpgrade?: () => void
   onSubmitQuery: (query: string) => Promise<void>
@@ -34,6 +35,7 @@ export function MainArea({
   previewMode,
   reachedLimit,
   isAuthenticated,
+  userEmail,
   onOpenSignup,
   onUpgrade,
   onSubmitQuery,
@@ -69,10 +71,15 @@ export function MainArea({
             <div className="flex w-full flex-col items-center text-center">
               <RuxMark className="h-12 w-12 mb-6 shadow-sm rounded-sm" />
               <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                Verify any rule.
+                {(() => {
+                  const hour = new Date().getHours()
+                  const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+                  const name = userEmail?.split('@')[0]
+                  return name ? `${timeGreeting}, ${name}.` : `${timeGreeting}.`
+                })()}
               </h2>
               <p className="mt-4 max-w-xl text-lg font-light text-neutral-500 leading-relaxed">
-                Connect directly into the trade finance consensus. The engine parses UCP600, ISBP745, Incoterms, global sanctions, and FTAs in real-time.
+                Ask about any trade finance rule — ICC, sanctions, FTAs, customs, Incoterms. Cited answers in seconds.
               </p>
             </div>
             
