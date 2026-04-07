@@ -455,4 +455,230 @@ Prevention for next time: inspect packaging at the port before the carrier loads
     ],
     tags: ['UCP600', 'Transport'],
   },
+  {
+    slug: 'eucp-mixed-presentation-electronic-paper',
+    title: 'eUCP — Can You Mix Electronic and Paper Documents in an LC Presentation?',
+    description: 'If your LC is subject to eUCP, you can present electronic documents. But mixing paper and electronic in one presentation has specific rules.',
+    question: 'Our client wants to present LC documents electronically. The LC is subject to UCP600 but doesn\'t mention eUCP. Can they present electronic documents anyway? What if some documents are electronic and some are paper — is a mixed presentation allowed?',
+    answer: `If the LC is subject to UCP 600 but does not incorporate eUCP, electronic presentation is not permitted. The credit must expressly state that it is subject to the Supplement to UCP 600 for Electronic Presentation (eUCP Version 2.0) for electronic documents to be acceptable.
+
+When eUCP does apply, mixed presentations — partly electronic, partly paper — are explicitly allowed. eUCP Article e5 states that a presentation may consist of only electronic records, only paper documents, or a combination of both. This is one of the key practical features of eUCP.
+
+Each electronic record must be in a format that the credit specifies, or if the credit is silent on format, in a format that can be authenticated and examined. The electronic record must be capable of being examined for compliance with the credit terms, just like a paper document.
+
+Important: the 21-day presentation period and other UCP 600 time limits still apply. The place for presentation of electronic records is the electronic address specified in the credit. For paper documents in a mixed presentation, the physical place specified in the credit applies.
+
+If your client wants to present electronically, the first step is to request an LC amendment incorporating eUCP 2.0 and specifying acceptable formats and the electronic address for presentation. Without that amendment, electronic documents will be refused.`,
+    citations: [
+      'eUCP 2.0 Article e1 — Scope of eUCP',
+      'eUCP 2.0 Article e5 — Mixed presentations',
+      'eUCP 2.0 Article e3 — Format',
+      'UCP600 Article 6(d)(ii) — Place for presentation',
+    ],
+    tags: ['eUCP', 'UCP600'],
+  },
+  {
+    slug: 'swift-mt700-field-39a-about-tolerance',
+    title: 'SWIFT MT700 "ABOUT" in Field 39A — Does the 10% Tolerance Apply?',
+    description: 'When an LC shows "ABOUT" in the tolerance field but an exact amount in 32B, UCP 600 Article 30(a) governs. The answer depends on where "about" appears.',
+    question: 'I\'m examining an LC received via SWIFT MT700. Field 39A shows "ABOUT" but Field 32B has an exact amount of USD 500,000.00 with no tolerance indicator. Field 39B is empty. Is the amount subject to the 10% "about" tolerance or is the exact amount the limit?',
+    answer: `The 10% tolerance applies. Under UCP 600 Article 30(a), the word "about" used in connection with the amount of the credit allows a tolerance not to exceed 10% more or 10% less than the amount to which it refers.
+
+Field 39A in the MT700 is specifically the "Percentage Credit Amount Tolerance" field. When it shows "ABOUT," it is expressing a tolerance on the credit amount in Field 32B. So your credit amount is USD 500,000.00 with a +/- 10% tolerance, meaning drawings from USD 450,000 to USD 550,000 would be within the credit terms.
+
+This is a common source of confusion because Field 32B shows a precise figure. But the SWIFT message structure separates the base amount (32B) from the tolerance (39A). They work together — the tolerance in 39A modifies the amount in 32B.
+
+If instead the LC used Field 39B (Maximum Credit Amount), that would be an absolute cap — no tolerance above that figure regardless of what 39A says.
+
+One important nuance: the 10% tolerance on the amount does not automatically create a 10% tolerance on quantity. If the credit specifies a quantity in units (not "about"), the quantity must be exact (subject to the 5% tolerance under Article 30(b) only if the credit doesn't state quantity in units).
+
+Check the quantity fields separately from the amount tolerance.`,
+    citations: [
+      'UCP600 Article 30(a) — "About" tolerance (10%)',
+      'UCP600 Article 30(b) — Quantity tolerance (5%)',
+      'SWIFT MT700 Field 39A — Percentage credit amount tolerance',
+      'SWIFT MT700 Field 39B — Maximum credit amount',
+    ],
+    tags: ['UCP600', 'SWIFT'],
+  },
+  {
+    slug: 'back-to-back-lc-document-mismatch',
+    title: 'Back-to-Back LC — What If Your Supplier\'s Documents Don\'t Match the Master LC?',
+    description: 'In a back-to-back LC structure, the second beneficiary\'s documents must work for both credits. When descriptions don\'t match, you have a problem.',
+    question: 'I have two LCs — a master LC from my buyer and a back-to-back LC I opened for my supplier. My supplier shipped and I received their documents under the back-to-back LC. But when I compare their documents with what the master LC requires, the goods description doesn\'t match exactly. Can I amend my supplier\'s documents before presenting under the master LC?',
+    answer: `You cannot amend your supplier's documents — but you can substitute specific documents, and that's the standard mechanism for back-to-back LCs.
+
+As the first beneficiary, you are entitled to substitute your own invoice (and draft, if applicable) for your supplier's. This is the same principle as transferable LC invoice substitution under Article 38, applied commercially in back-to-back structures. Your substituted invoice must match the master LC's goods description exactly.
+
+However, you can only substitute invoices and drafts. You cannot alter the bill of lading, certificate of origin, inspection certificate, or any other third-party document. If those documents show a goods description that conflicts with the master LC, you have a discrepancy that substitution cannot fix.
+
+This is the fundamental risk of back-to-back LCs: the second credit's terms must be carefully structured so that the documents produced under it will also satisfy the first credit. If you opened the back-to-back LC with a different goods description than the master, the mismatch was baked in from the start.
+
+Your options now: present under the master LC with the discrepancy and request a waiver from the applicant. Or ask your supplier to have the shipping line or issuer of the conflicting document reissue it with corrected wording — if timing permits.
+
+Prevention: when opening the back-to-back LC, mirror the master LC's goods description word for word.`,
+    citations: [
+      'UCP600 Article 38(h) — Invoice substitution',
+      'UCP600 Article 14(d) — Data consistency',
+      'UCP600 Article 18(c) — Invoice goods description',
+      'ISBP745 Paragraph C3 — Description correspondence',
+    ],
+    tags: ['UCP600'],
+  },
+  {
+    slug: 'insurance-coverage-short-cif-110-percent',
+    title: 'Insurance Coverage Below 110% CIF Value — Is That a Discrepancy?',
+    description: 'UCP 600 Article 28 requires insurance coverage of at least 110% of CIF value. Fall short and the bank will refuse — even if the premium is astronomical.',
+    question: 'I\'m shipping LNG from Qatar to Pakistan. My LC requires marine cargo insurance including war risk and SRCC. The insurance broker says war risk premium for Pakistan has tripled since last month. If I get the insurance but it doesn\'t cover the full CIF value plus 10% because the premium is too high, can I present with lower coverage?',
+    answer: `No. Under UCP 600 Article 28(f)(ii), the insurance document must indicate a minimum coverage of 110% of the CIF or CIP value of the goods. If the credit doesn't specify the coverage amount, this 110% minimum is mandatory. There is no exception for high premiums.
+
+The bank will examine the insurance certificate on its face. If the insured amount is less than 110% of the CIF invoice value, the presentation is discrepant. The reason for the shortfall — premium cost, market conditions, availability — is irrelevant to the documentary examination.
+
+War risk and SRCC (Strikes, Riots and Civil Commotion) are separate coverage components. If the LC specifically requires them, they must appear on the insurance document as covered risks. An insurance certificate that covers marine risks but excludes war risk when the LC requires it is discrepant.
+
+Your practical options: absorb the higher premium and obtain full coverage — this is the cost of CIF compliance. Negotiate with the buyer to amend the LC to reduce the insurance requirement (unlikely if the buyer needs full coverage). Request the buyer to switch the trade terms to FOB, making insurance the buyer's responsibility. Or present with the shortfall and seek a discrepancy waiver — risky if the buyer uses it as leverage.
+
+The premium increase is a commercial problem. The 110% rule is a documentary requirement. They live in different worlds.`,
+    citations: [
+      'UCP600 Article 28(f)(ii) — Minimum 110% coverage',
+      'UCP600 Article 28(h) — War risk and SRCC',
+      'UCP600 Article 28(a) — Insurance document requirements',
+      'ISBP745 Paragraphs K1-K15 — Insurance documents',
+    ],
+    tags: ['UCP600', 'Insurance'],
+  },
+  {
+    slug: 'ucp600-five-banking-days-examination',
+    title: 'The 5 Banking Day Rule — Can You Demand Payment If the Bank Is Late?',
+    description: 'Under UCP 600 Article 14(b), banks get a maximum of 5 banking days to examine documents. Exceed that and the preclusion rule kicks in.',
+    question: 'My advising bank is taking too long to check my documents. It\'s been 7 banking days. Under UCP600, the bank only has 5 banking days. Can I demand payment since they\'ve exceeded the time limit?',
+    answer: `Not quite — but you're close to a powerful argument. Under UCP 600 Article 14(b), a nominated bank, confirming bank, or issuing bank has a maximum of five banking days following the day of presentation to determine whether a presentation is complying.
+
+If the bank fails to act within five banking days, the preclusion rule under Article 16(f) applies: the bank is precluded from claiming that the documents do not constitute a complying presentation. In other words, the bank loses the right to refuse — not because it must pay automatically, but because it can no longer raise discrepancies.
+
+Important distinction: the advising bank and the issuing/confirming bank have different roles. If your advising bank is also the nominated bank for examination, the five-day rule applies. If it's merely advising (forwarding the LC), it may not be bound by Article 14(b) in the same way — its role is to check apparent authenticity, not examine for compliance.
+
+Also, "banking days" excludes weekends and public holidays at the place of the bank doing the examination. Count carefully — seven calendar days might be exactly five banking days depending on the week.
+
+If the bank genuinely exceeded five banking days for examination and then tries to refuse, cite Article 16(f) preclusion. This is the strongest card a beneficiary holds under UCP 600.`,
+    citations: [
+      'UCP600 Article 14(b) — 5 banking days for examination',
+      'UCP600 Article 16(f) — Preclusion rule',
+      'UCP600 Article 2 — Definition of banking day',
+      'UCP600 Article 9 — Advising bank obligations',
+    ],
+    tags: ['UCP600'],
+  },
+  {
+    slug: 'revocable-letter-of-credit-ucp600',
+    title: 'Can a Bank Issue a Revocable Letter of Credit Under UCP 600?',
+    description: 'UCP 600 eliminated revocable credits entirely. Every credit subject to UCP 600 is irrevocable — the word doesn\'t even need to appear.',
+    question: 'Can a bank issue a revocable letter of credit under UCP600? My textbook mentions revocable credits but I can\'t find the article.',
+    answer: `No. UCP 600 eliminated revocable credits entirely. Under UCP 600 Article 2, a credit is defined as "any arrangement, however named or described, that is irrevocable." There is no provision for revocable credits.
+
+This was a deliberate change from UCP 500, where both revocable and irrevocable credits existed. Under the old UCP 500 Article 6, a credit could be revocable or irrevocable, and if the credit didn't state which, it was deemed irrevocable. In practice, revocable credits were almost never used because they offered the beneficiary no security — the issuing bank could amend or cancel without notice.
+
+UCP 600, effective July 2007, simply removed the concept. Article 3 states that a credit is irrevocable even if there is no indication to that effect. You don't need to write "irrevocable" on the credit — it's irrevocable by definition under UCP 600.
+
+Your textbook is likely referencing UCP 500 or earlier versions. Any credit issued after July 2007 subject to UCP 600 cannot be revocable. If someone tries to issue a "revocable LC subject to UCP 600," the instrument is contradictory — UCP 600 doesn't recognise the concept.
+
+If a bank wants the ability to cancel a credit, they would need to structure it outside of UCP 600 — which would significantly reduce its commercial value and marketability.`,
+    citations: [
+      'UCP600 Article 2 — Definition of credit (irrevocable)',
+      'UCP600 Article 3 — Interpretations (irrevocable by default)',
+      'UCP600 Article 10(a) — Amendment requires agreement',
+    ],
+    tags: ['UCP600'],
+  },
+  {
+    slug: 'gsp-form-a-vs-rex-eu-preferential-tariff',
+    title: 'GSP Form A Is Being Phased Out — What Replaces It for EU Exports?',
+    description: 'The EU replaced GSP Form A with the REX self-certification system. If your LC still requires Form A, you may need an amendment.',
+    question: 'I export garments from Cambodia to the EU using GSP Form A for preferential tariff. My buyer says the EU is phasing out Form A and replacing it with REX. My LC still requires "GSP Form A issued by competent authority." Can I present a REX self-certification statement instead?',
+    answer: `You cannot present a REX statement if the LC specifically requires "GSP Form A issued by competent authority." The bank examines documents against the LC terms, not against what trade regulations currently require. A REX statement is a fundamentally different document — it's a self-certification by a registered exporter, not a certificate issued by a government authority.
+
+Your buyer is correct about the regulatory change. The EU has been transitioning GSP beneficiary countries from the Form A system (certificate issued by a competent government authority) to the REX system (self-certification by exporters registered in a database). Cambodia transitioned to REX in 2020.
+
+But regulatory reality and LC documentary requirements are separate universes. The LC says what it says. If it requires Form A, the bank needs Form A. Presenting a REX statement against a Form A requirement is a discrepancy.
+
+Your options: request an LC amendment changing the document requirement from "GSP Form A" to "Statement on origin by a registered exporter (REX)" or to a more general "proof of preferential origin." This is the clean solution. Or present the REX statement and request a discrepancy waiver — the buyer presumably knows Form A is no longer available and should accept.
+
+Flag this to your buyer immediately. Many LCs issued for GSP countries still contain outdated Form A language — it's a common oversight.`,
+    citations: [
+      'EU GSP Regulation 978/2012 — Preferential origin rules',
+      'EU REX Regulation 2015/2447 — Registered exporter system',
+      'UCP600 Article 14(a) — Examination on face of documents',
+      'UCP600 Article 14(d) — Data consistency with credit terms',
+    ],
+    tags: ['FTA', 'EU GSP'],
+  },
+  {
+    slug: 'urdg-758-guarantee-reduction-completed-work',
+    title: 'Can You Reduce a URDG 758 Guarantee as Work Progresses?',
+    description: 'Under URDG 758, a guarantee amount can only be reduced if the guarantee text provides for it. Completed work alone doesn\'t reduce your exposure.',
+    question: 'I have a performance guarantee for 10% of contract value. The project is 70% complete and accepted by the employer. Under URDG 758, can I ask for the guarantee amount to be reduced proportionally to reflect completed work? The guarantee text doesn\'t mention reduction.',
+    answer: `If the guarantee text doesn't provide for reduction, the amount stays at 100% until expiry — regardless of how much work you've completed.
+
+Under URDG 758 Article 25(a), the amount of a guarantee is reduced only as provided in the guarantee itself, or by presentation of a document specified in the guarantee for that purpose, or by an amendment agreed between all parties. There is no automatic reduction based on project progress.
+
+This is one of the harshest realities of demand guarantees: you can be 99% complete, but the beneficiary can still demand the full guarantee amount if you haven't built reduction mechanics into the guarantee text.
+
+The guarantee is independent of the underlying contract. The fact that the employer has accepted 70% of the work is a CONTRACT matter, not a GUARANTEE matter. The guarantee doesn't know or care about contract progress.
+
+Your options now: request the beneficiary to agree to an amendment reducing the guarantee amount — they're under no obligation to agree. Or negotiate a partial release if your guarantee text happens to include a reduction clause you may have overlooked (check carefully).
+
+For future contracts: always insist on a reduction clause in the guarantee text. Standard wording links reductions to milestone certificates or progress payment certificates. For example: "The guarantee amount shall be reduced by the value stated in each interim payment certificate accepted by the employer." Without such a clause, your bank's obligation remains at the full amount.`,
+    citations: [
+      'URDG 758 Article 25(a) — Reduction of guarantee amount',
+      'URDG 758 Article 25(b) — Reduction by presentation',
+      'URDG 758 Article 5 — Independence of guarantee',
+      'URDG 758 Article 11 — Amendments',
+    ],
+    tags: ['URDG 758', 'Guarantees'],
+  },
+  {
+    slug: 'lc-currency-depreciation-who-bears-risk',
+    title: 'Your LC Currency Crashed — Do You Still Have to Ship at the Original Amount?',
+    description: 'When the LC currency depreciates sharply between issuance and shipment, the beneficiary bears the exchange rate risk. The LC amount doesn\'t auto-adjust.',
+    question: 'My LC is denominated in Egyptian Pounds. When the LC was issued, EGP was 30 to the dollar. Now it\'s 50 to the dollar. My goods cost hasn\'t changed in dollar terms but the EGP amount in the LC is now worth 40% less than when we agreed the deal. The LC amount hasn\'t been amended. Do I have to ship at the original EGP amount?',
+    answer: `Yes — the LC amount is fixed in the currency stated. UCP 600 does not contain any mechanism for automatic currency adjustment, revaluation, or exchange rate protection. The credit says what it says, and the bank will honour up to that EGP amount regardless of what happened to the exchange rate.
+
+This is a commercial risk that sits entirely with you as the beneficiary. When you agreed to an EGP-denominated LC, you accepted EGP currency risk. The 40% depreciation means the EGP amount now buys fewer dollars — that's your loss unless you hedged.
+
+The LC is a documentary instrument. It doesn't reference exchange rates, commodity prices, or market conditions. It references an amount, a currency, documents, and terms. If the amount is EGP 15,000,000 and you present compliant documents, the bank pays EGP 15,000,000. What that's worth in dollars is not the bank's concern.
+
+Your options: request an LC amendment increasing the EGP amount to reflect current exchange rates — the buyer must agree and the issuing bank must consent. Negotiate with the buyer outside the LC for a price adjustment — this is a contract matter. Or absorb the loss and ship — sometimes the relationship is worth more than the currency hit.
+
+For future contracts: denominate LCs in a stable currency (USD, EUR) or include a currency adjustment clause in your commercial contract. The LC itself won't protect you from FX risk.`,
+    citations: [
+      'UCP600 Article 2 — Credit defined by its terms',
+      'UCP600 Article 18(b) — Invoice amount and credit currency',
+      'UCP600 Article 10 — Amendments',
+    ],
+    tags: ['UCP600', 'Trade Finance'],
+  },
+  {
+    slug: 'chittagong-chattogram-port-rename-discrepancy',
+    title: 'Chittagong or Chattogram? When a Port Rename Creates an LC Discrepancy',
+    description: 'Bangladesh renamed Chittagong to Chattogram in 2018. If your LC says one and your B/L says the other, the bank may call it a discrepancy.',
+    question: 'My LC expires tomorrow. I have all documents ready but my bill of lading has a discrepancy — the port of loading shows "Chittagong" but the LC says "Chattogram." It\'s the same port, renamed in 2018. Can I present with this discrepancy and ask for a waiver? Or is there another option?',
+    answer: `This is the same port — Bangladesh officially renamed Chittagong to Chattogram in 2018. But whether the bank treats it as a discrepancy depends on how strictly they examine and whether they recognise the name change.
+
+Under UCP 600 Article 14(d), data in a document must not conflict with data in the credit. Strictly read, "Chittagong" and "Chattogram" are different strings. A conservative bank may call it a discrepancy. A pragmatic bank familiar with the name change may not.
+
+ISBP 745 Paragraph A22 provides some relief: "a misspelling or typing error that does not affect the meaning of a word or the sentence in which it occurs does not make a document discrepant." However, this is not technically a misspelling — it's a name change. The argument is strong but not bulletproof.
+
+Given your LC expires tomorrow, you have limited options: present the documents as they are. If the bank raises the discrepancy, immediately request a waiver from the applicant. Since the buyer presumably knows the port hasn't moved, they should waive. Or contact the shipping line urgently and ask if they can reissue the B/L with "Chattogram" — but with one day left, this is unlikely.
+
+The safest play: present now, disclose the issue proactively, and seek the waiver simultaneously. Don't wait — expiry is a hard deadline with no extensions.
+
+For future LCs: always check that port names in the credit match current official names. Chittagong/Chattogram, Bombay/Mumbai, Madras/Chennai, Peking/Beijing — these rebrands catch people regularly.`,
+    citations: [
+      'UCP600 Article 14(d) — Data consistency',
+      'ISBP745 Paragraph A22 — Misspelling and typing errors',
+      'UCP600 Article 6(d) — Expiry date',
+      'UCP600 Article 16 — Discrepancy waiver process',
+    ],
+    tags: ['UCP600', 'Transport'],
+  },
 ]
