@@ -438,9 +438,9 @@ export function PreviewLanding({
                 <div className="mt-6 mb-2">
                   <span className="text-5xl font-semibold tracking-tight text-neutral-900">$0</span>
                 </div>
-                <p className="text-sm text-neutral-500 border-b border-neutral-100 pb-8 uppercase font-mono tracking-wide">20 queries / mo</p>
+                <p className="text-sm text-neutral-500 border-b border-neutral-100 pb-8 uppercase font-mono tracking-wide">5 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-600">
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-neutral-300 shrink-0" /> Full citation access</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-neutral-300 shrink-0" /> Citation-backed answers</li>
                   <li className="flex gap-4"><Check className="h-5 w-5 text-neutral-300 shrink-0" /> No account required</li>
                 </ul>
               </div>
@@ -449,14 +449,14 @@ export function PreviewLanding({
               </button>
             </div>
 
-            {/* Starter */}
+            {/* Professional */}
             <div className="bg-neutral-900 p-10 border border-neutral-800 shadow-2xl relative md:-mt-4 md:mb-4 flex flex-col justify-between transform transition-transform hover:-translate-y-2">
               <div>
-                <div className="absolute top-0 right-10 -translate-y-1/2 bg-[#FF4F00] text-white px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-lg">Popular</div>
-                <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400">Starter</h3>
+                <div className="absolute top-0 right-10 -translate-y-1/2 bg-[#FF4F00] text-white px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-lg">Most Popular</div>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400">Professional</h3>
                 <div className="mt-6 mb-2">
                   <span className="text-5xl font-semibold tracking-tight text-white">
-                    {billingInterval === 'monthly' ? '$9' : '$90'}
+                    {billingInterval === 'monthly' ? '$79' : '$790'}
                   </span>
                   <span className="text-neutral-500 font-medium">
                     {billingInterval === 'monthly' ? '/mo' : '/yr'}
@@ -464,9 +464,9 @@ export function PreviewLanding({
                 </div>
                 <p className="text-sm text-neutral-400 border-b border-neutral-800 pb-8 uppercase font-mono tracking-wide">500 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-300">
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Synced history</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Saved answers</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> JSON export</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Haiku + Sonnet + Opus AI</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Sanctions routed to Opus</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Session history &amp; saved answers</li>
                 </ul>
               </div>
               <button
@@ -478,13 +478,13 @@ export function PreviewLanding({
               </button>
             </div>
 
-            {/* Pro */}
+            {/* Enterprise */}
             <div className="bg-white p-10 border border-neutral-200 shadow-sm flex flex-col justify-between group hover:border-neutral-300 transition-colors">
               <div>
-                <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400">Pro</h3>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400">Enterprise</h3>
                 <div className="mt-6 mb-2">
                   <span className="text-5xl font-semibold tracking-tight text-neutral-900">
-                    {billingInterval === 'monthly' ? '$19' : '$190'}
+                    {billingInterval === 'monthly' ? '$199' : '$1,990'}
                   </span>
                   <span className="text-neutral-400 font-medium">
                     {billingInterval === 'monthly' ? '/mo' : '/yr'}
@@ -492,9 +492,9 @@ export function PreviewLanding({
                 </div>
                 <p className="text-sm text-neutral-500 border-b border-neutral-100 pb-8 uppercase font-mono tracking-wide">2,000 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-600">
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Priority model routing</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Session export</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Extended history</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Expanded Opus access</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Full session export</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Dedicated account support</li>
                 </ul>
               </div>
               <button
@@ -507,7 +507,7 @@ export function PreviewLanding({
             </div>
           </FadeInView>
           <FadeInView delay={400}>
-            <p className="mt-16 text-center text-sm font-medium tracking-wide text-neutral-400 uppercase">One avoided discrepancy fee covers a year of Starter.</p>
+            <p className="mt-16 text-center text-sm font-medium tracking-wide text-neutral-400 uppercase">One avoided discrepancy fee covers a year of Professional.</p>
           </FadeInView>
         </div>
       </section>

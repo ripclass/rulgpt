@@ -4,6 +4,8 @@ import { useLocation } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Home } from '@/pages/Home'
 import { Landing } from '@/pages/Landing'
+import { Pricing } from '@/pages/Pricing'
+import { Upgrade } from '@/pages/Upgrade'
 import { Faq } from '@/pages/Faq'
 import { Contact } from '@/pages/Contact'
 import { Privacy } from '@/pages/Privacy'
@@ -113,8 +115,8 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/chat" element={<Home />} />
           <Route path="/landing" element={<Navigate to="/" replace />} />
-          <Route path="/pricing" element={<Navigate to="/#pricing" replace />} />
-          <Route path="/upgrade" element={<Navigate to="/#pricing" replace />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/upgrade" element={<Upgrade />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy" element={<Privacy />} />
