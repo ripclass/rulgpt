@@ -16,6 +16,7 @@ interface MainAreaProps {
   reachedLimit?: boolean
   isAuthenticated?: boolean
   userEmail?: string | null
+  userName?: string | null
   onOpenSignup?: () => void
   onUpgrade?: () => void
   onSubmitQuery: (query: string) => Promise<void>
@@ -36,6 +37,7 @@ export function MainArea({
   reachedLimit,
   isAuthenticated,
   userEmail,
+  userName,
   onOpenSignup,
   onUpgrade,
   onSubmitQuery,
@@ -79,7 +81,7 @@ export function MainArea({
               <RuxMark className="h-12 w-12 mb-6 shadow-sm rounded-sm" />
               {(() => {
                 const hour = new Date().getHours()
-                const name = userEmail?.split('@')[0]
+                const name = userName?.split(' ')[0] || (userEmail?.split('@')[0]) || null
                 let greeting: string
                 let subtext: string
 

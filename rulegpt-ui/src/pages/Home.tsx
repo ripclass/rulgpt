@@ -387,6 +387,7 @@ export function Home() {
         reachedLimit={tierLimit.reachedLimit}
         isAuthenticated={auth.isAuthenticated}
         userEmail={auth.user?.email ?? null}
+        userName={auth.user?.name ?? null}
         onOpenSignup={() => authModal.openSignup()}
         onUpgrade={() => {
           resetSession()

@@ -118,5 +118,6 @@ export interface Message {
 export interface AuthUser {
   id: string
   email: string
+  name?: string | null
   tier: SessionTier
 }

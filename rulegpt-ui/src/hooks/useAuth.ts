@@ -49,9 +49,12 @@ function envFlag(name: string): string | undefined {
 function deriveSessionUser(session: Session, fallbackUser: AuthUser | null, preserveTier: boolean): AuthUser | null {
   const email = session.user.email ?? fallbackUser?.email
   if (!email) return null
+  const meta = session.user.user_metadata ?? {}
+  const name = meta.full_name ?? meta.name ?? meta.display_name ?? fallbackUser?.name ?? null
   return {
     id: session.user.id,
     email,
+    name,
     tier: preserveTier ? fallbackUser?.tier ?? 'free' : 'free',
   }
 }
@@ -175,6 +178,7 @@ export function useAuth() {
           ? {
               id: data.user.id,
               email: data.user.email ?? email,
+              name: data.user.user_metadata?.full_name ?? data.user.user_metadata?.name ?? null,
               tier: hadBearerToken ? user?.tier ?? 'free' : 'free',
             }
           : null
@@ -216,6 +220,7 @@ export function useAuth() {
           const nextUser: AuthUser = {
             id: data.user.id,
             email: data.user.email,
+            name: data.user.user_metadata?.full_name ?? data.user.user_metadata?.name ?? null,
             tier: user?.tier ?? 'free',
           }
           setUser(nextUser)
@@ -266,6 +271,7 @@ export function useAuth() {
         const nextUser: AuthUser = {
           id: session.user.id,
           email: session.user.email,
+          name: session.user.user_metadata?.full_name ?? session.user.user_metadata?.name ?? user?.name ?? null,
           tier: user?.tier ?? 'free',
         }
         setUser(nextUser)
