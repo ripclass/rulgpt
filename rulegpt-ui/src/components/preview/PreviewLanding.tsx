@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { Check, ArrowRight, Menu, X, Globe, Shield, BookOpen, Clock, FileText, Database, Scale, Box } from 'lucide-react'
+import { Check, ArrowRight, Menu, X, Globe, Shield, BookOpen, Clock, FileText, Database, Scale, Box, SendHorizonal } from 'lucide-react'
 import { RuxMark } from '@/components/shared/RuxMascot'
 import { PublicFooter } from '@/components/shared/PublicFooter'
 import type { SessionTier } from '@/types'
@@ -12,6 +12,7 @@ interface PreviewLandingProps {
   onOpenLogin: () => void
   onOpenSignup: () => void
   onOpenChat: () => void
+  onSubmitQuery: (query: string) => void
   onStartCheckout: (plan: 'professional' | 'enterprise', interval: 'monthly' | 'annual') => void
   isCheckingOut?: boolean
 }
@@ -63,12 +64,14 @@ export function PreviewLanding({
   onOpenLogin,
   onOpenSignup,
   onOpenChat,
+  onSubmitQuery,
   onStartCheckout,
   isCheckingOut,
 }: PreviewLandingProps) {
   const [scrolled, setScrolled] = useState(false)
   const [heroPassed, setHeroPassed] = useState(false)
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'annual'>('monthly')
+  const [heroQuery, setHeroQuery] = useState('')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
 
@@ -215,11 +218,49 @@ export function PreviewLanding({
             <p className="mt-8 max-w-xl text-lg md:text-2xl text-neutral-300 leading-relaxed font-light animate-fade-up" style={{ animationDelay: '200ms', animationFillMode: 'both' }}>
               Trade finance rules have been locked behind paywalls and closed bank manuals for decades. Ask any question — get a cited, verifiable answer. Free.
             </p>
-            
-            <div className="mt-12 flex flex-col sm:flex-row gap-5 animate-fade-up" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
-              <button onClick={onOpenChat} className="flex h-14 md:h-16 items-center justify-center rounded-sm bg-[#FF4F00] px-8 md:px-10 text-base md:text-lg font-bold uppercase tracking-widest text-white transition-all hover:bg-[#E64600] active:scale-[0.98] w-full sm:w-auto shadow-2xl shadow-[#FF4F00]/20">
-                {isAuthenticated ? 'Open Chat' : 'Try it free'}
-              </button>
+
+            {/* Hero query input — type and go straight to chat */}
+            <div className="mt-10 max-w-2xl animate-fade-up" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (heroQuery.trim()) onSubmitQuery(heroQuery.trim())
+                }}
+                className="relative"
+              >
+                <input
+                  type="text"
+                  value={heroQuery}
+                  onChange={(e) => setHeroQuery(e.target.value)}
+                  placeholder="Ask about any trade finance rule..."
+                  className="w-full h-14 md:h-16 rounded-sm bg-white/10 backdrop-blur-sm border border-white/20 px-6 pr-14 text-base md:text-lg text-white placeholder-neutral-400 outline-none transition focus:border-[#FF4F00] focus:bg-white/[0.12] focus:ring-1 focus:ring-[#FF4F00]/30"
+                />
+                <button
+                  type="submit"
+                  disabled={!heroQuery.trim()}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-sm bg-[#FF4F00] text-white transition hover:bg-[#E64600] disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <SendHorizonal className="h-5 w-5" />
+                </button>
+              </form>
+
+              {/* Quick suggestions */}
+              <div className="mt-4 flex flex-wrap gap-2">
+                {[
+                  'What does UCP600 say about partial shipments?',
+                  'Is Iran sanctioned under OFAC?',
+                  'CIF vs FOB — who arranges insurance?',
+                ].map((q) => (
+                  <button
+                    key={q}
+                    type="button"
+                    onClick={() => onSubmitQuery(q)}
+                    className="text-xs text-neutral-400 border border-white/10 rounded-sm px-3 py-1.5 transition hover:text-white hover:border-white/30 hover:bg-white/5"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>

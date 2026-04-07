@@ -73,6 +73,10 @@ export function Landing() {
         track('landing_open_chat_clicked')
         navigate('/chat')
       }}
+      onSubmitQuery={(query) => {
+        track('landing_hero_query_submitted', { query_length: query.length })
+        navigate('/chat', { state: { initialQuery: query } })
+      }}
       onStartCheckout={startCheckout}
       isCheckingOut={isCheckingOut}
     />
