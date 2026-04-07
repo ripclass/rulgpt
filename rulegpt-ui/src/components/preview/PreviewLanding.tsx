@@ -192,7 +192,7 @@ export function PreviewLanding({
       {/* ──────────────────────────────────────────────────────────
           HERO (Cinematic, Immersive, Full Screen)
           ────────────────────────────────────────────────────────── */}
-      <section className="relative w-full h-screen min-h-[700px] flex items-center bg-[#050B14] overflow-hidden">
+      <section className="relative w-full min-h-screen md:h-screen md:min-h-[700px] flex items-center bg-[#050B14] overflow-hidden py-24 md:py-0">
         {/* Background Image Setup (Fixed Parallax style) */}
         <div className="absolute inset-0 z-0 opacity-60">
           <img 
@@ -208,7 +208,7 @@ export function PreviewLanding({
         <div className="relative z-10 w-full mx-auto max-w-7xl px-6 lg:px-12 pt-20">
           <div className="max-w-4xl mx-auto text-center relative">
             <div className="animate-fade-up blur-0" style={{ animationDuration: '1000ms' }}>
-              <h1 className="text-[12vw] sm:text-[8vw] md:text-7xl lg:text-[90px] font-bold tracking-tighter text-white leading-[0.9] uppercase">
+              <h1 className="text-[10vw] sm:text-[8vw] md:text-7xl lg:text-[90px] font-bold tracking-tighter text-white leading-[0.9] uppercase">
                 Cited Rules.<br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-200 to-neutral-500">Not Opinion.</span>
               </h1>
@@ -255,23 +255,20 @@ export function PreviewLanding({
                 </div>
               </form>
 
-              {/* Suggested queries — same style as chat page */}
+              {/* Suggested queries */}
               <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {[
-                  'My LC says "Cotton Woven Shirts" but my invoice says "Cotton Woven Dress Shirts". The bank rejected it. Is the word "Dress" really a discrepancy under UCP 600?',
-                  'I shipped on June 10 but the BL on-board date says June 11 because the carrier delayed. The LC last shipment date is June 10. Is this late shipment?',
-                  'I\'m exporting wooden furniture from Vietnam to Australia. The raw timber was imported from Malaysia. Does that count as originating material under RCEP cumulation rules?',
-                  'We received an LC for crude oil from UAE to China but the unit price is 40% below market. The beneficiary was incorporated 3 months ago. What TBML red flags should we check?',
-                ].map((q) => (
-                  <button
-                    key={q}
-                    type="button"
-                    onClick={() => onSubmitQuery(q)}
-                    className="h-auto whitespace-normal rounded-xl px-4 py-4 text-left text-sm border border-white/10 text-neutral-300 transition hover:bg-white/5 hover:border-white/20 hover:text-white"
-                  >
-                    {q}
-                  </button>
-                ))}
+                <button type="button" onClick={() => onSubmitQuery('My LC says "Cotton Woven Shirts" but my invoice says "Cotton Woven Dress Shirts". Is "Dress" a discrepancy under UCP 600?')} className="h-auto whitespace-normal rounded-xl px-4 py-3 sm:py-4 text-left text-sm border border-white/10 text-neutral-300 transition hover:bg-white/5 hover:border-white/20 hover:text-white">
+                  Is "Dress Shirts" vs "Shirts" a discrepancy under UCP 600?
+                </button>
+                <button type="button" onClick={() => onSubmitQuery('I shipped on June 10 but the BL on-board date says June 11. The LC last shipment date is June 10. Is this late shipment?')} className="h-auto whitespace-normal rounded-xl px-4 py-3 sm:py-4 text-left text-sm border border-white/10 text-neutral-300 transition hover:bg-white/5 hover:border-white/20 hover:text-white">
+                  BL date is one day after LC shipment deadline. Late shipment?
+                </button>
+                <button type="button" onClick={() => onSubmitQuery('Does RCEP allow cumulation of Malaysian inputs for Vietnamese exports to Australia?')} className="hidden sm:block h-auto whitespace-normal rounded-xl px-4 py-4 text-left text-sm border border-white/10 text-neutral-300 transition hover:bg-white/5 hover:border-white/20 hover:text-white">
+                  Does RCEP allow cumulation of Malaysian inputs for Vietnamese exports?
+                </button>
+                <button type="button" onClick={() => onSubmitQuery('We received an LC for crude oil from UAE to China at 40% below market. What TBML red flags should we check?')} className="hidden sm:block h-auto whitespace-normal rounded-xl px-4 py-4 text-left text-sm border border-white/10 text-neutral-300 transition hover:bg-white/5 hover:border-white/20 hover:text-white">
+                  Crude oil LC at 40% below market — what TBML red flags?
+                </button>
               </div>
             </div>
           </div>
