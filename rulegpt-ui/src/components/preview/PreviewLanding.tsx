@@ -493,7 +493,7 @@ export function PreviewLanding({
                 </div>
                 <p className="text-sm text-neutral-500 border-b border-neutral-100 pb-8 uppercase font-mono tracking-wide">5 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-600">
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-neutral-300 shrink-0" /> Citation-backed answers</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-neutral-300 shrink-0" /> Cited answers from 5,400+ rules</li>
                   <li className="flex gap-4"><Check className="h-5 w-5 text-neutral-300 shrink-0" /> No account required</li>
                 </ul>
               </div>
@@ -517,9 +517,10 @@ export function PreviewLanding({
                 </div>
                 <p className="text-sm text-neutral-400 border-b border-neutral-800 pb-8 uppercase font-mono tracking-wide">500 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-300">
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Haiku + Sonnet + Opus AI</li>
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Sanctions routed to Opus</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Deep analysis on complex queries</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Sanctions &amp; TBML expert-grade answers</li>
                   <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Session history &amp; saved answers</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Priority support</li>
                 </ul>
               </div>
               <button
@@ -545,7 +546,8 @@ export function PreviewLanding({
                 </div>
                 <p className="text-sm text-neutral-500 border-b border-neutral-100 pb-8 uppercase font-mono tracking-wide">2,000 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-600">
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Expanded Opus access</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Everything in Professional</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Maximum depth on every query</li>
                   <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Full session export</li>
                   <li className="flex gap-4"><Check className="h-5 w-5 text-[#FF4F00] shrink-0" /> Dedicated account support</li>
                 </ul>
