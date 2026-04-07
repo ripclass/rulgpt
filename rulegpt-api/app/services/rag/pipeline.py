@@ -361,8 +361,7 @@ class RAGPipeline:
         # Stage 2.5: tier-based model routing (after retrieval)
         from app.config import settings as _settings
         if _settings.RULEGPT_ENABLE_SMART_ROUTING and retrieved_rules:
-            # TEMP: force professional routing for benchmark testing
-            routing_tier = select_model("professional", query, retrieved_rules)
+            routing_tier = select_model(user_tier, query, retrieved_rules)
         else:
             routing_tier = "sonnet"
 
