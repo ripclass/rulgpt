@@ -48,15 +48,10 @@ export function MobileDrawer({
             <SavedAnswers items={savedAnswers} onDelete={onDeleteSaved} />
           )}
         </div>
-        <div className="mt-3 flex gap-2">
-          <Button asChild variant="outline" className="w-full border-border text-muted-foreground hover:text-foreground hover:bg-surface-raised">
-            <Link to="/api-access" onClick={() => onOpenChange(false)}>
-              API Access
-            </Link>
-          </Button>
-          <Button asChild className="w-full rounded-full bg-foreground text-background hover:bg-foreground/90">
+        <div className="mt-3">
+          <Button asChild className="w-full rounded-sm bg-[#FF4F00] text-white hover:bg-[#E64600]">
             <Link to="/upgrade" onClick={() => onOpenChange(false)}>
-              Upgrade
+              Upgrade plan
             </Link>
           </Button>
         </div>
