@@ -71,6 +71,56 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://www.tfrules.com/blog/ucp600-article-16-discrepancy-refusal</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/compliant-commercial-invoice-isbp745</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/transferable-lc-invoice-substitution-ucp600</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/documentary-collections-dp-release-before-payment</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/standby-lc-isp98-vs-urdg-758</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/red-clause-lc-advance-payment</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/fob-shanghai-vs-fob-shanghai-port-discrepancy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/lc-amendment-acceptance-ucp600-article-10</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/deferred-payment-lc-forfaiting-early-payment</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.tfrules.com/blog/clean-bill-of-lading-damaged-packaging</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://www.tfrules.com/upgrade</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

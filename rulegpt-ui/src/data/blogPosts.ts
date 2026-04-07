@@ -223,4 +223,236 @@ The cost of a discrepancy is a fee and a negotiation. The cost of fraud is your 
     ],
     tags: ['UCP600', 'Fraud'],
   },
+  {
+    slug: 'ucp600-article-16-discrepancy-refusal',
+    title: 'Your Bank Refused Your LC Documents — Now What? UCP 600 Article 16 Explained',
+    description: 'When a bank finds discrepancies in your LC presentation, Article 16 dictates exactly what happens next. The bank\'s obligations are strict — and so are yours.',
+    question: 'I presented documents under my LC and the bank sent a refusal notice listing three discrepancies. I disagree with two of them. What are my options? How does UCP600 handle discrepancies?',
+    answer: `Under UCP 600 Article 16, when a bank determines that a presentation does not comply, it may refuse to honour or negotiate. But the bank must follow a rigid procedure — and if it doesn't, it loses the right to claim non-compliance.
+
+The bank has a maximum of five banking days after the day of presentation to examine documents and decide. If it refuses, it must give a single notice of refusal to the presenter, by telecommunication or other expeditious means, no later than the close of the fifth banking day. That notice must state each discrepancy for which the bank refuses, and whether it is holding documents pending further instructions, or returning them.
+
+If the bank fails to act within five banking days, or sends a defective notice (missing discrepancies, no disposition statement), it is precluded from claiming non-compliance. This is the "preclusion rule" — one of the most powerful protections for beneficiaries under UCP 600.
+
+Your options when you receive a refusal: you can correct the documents and re-present (if time allows before expiry). You can ask the bank to seek a waiver from the applicant — the applicant can choose to accept the discrepancies. Or you can challenge the discrepancies if they're invalid — banks do sometimes get it wrong.
+
+Check the five-day clock carefully. If the bank sent the refusal on day six, they're precluded — and you should push back.`,
+    citations: [
+      'UCP600 Article 16(a) — Right to refuse',
+      'UCP600 Article 16(b) — Single notice of refusal',
+      'UCP600 Article 16(c) — Notice requirements and disposition',
+      'UCP600 Article 16(f) — Preclusion rule',
+    ],
+    tags: ['UCP600'],
+  },
+  {
+    slug: 'compliant-commercial-invoice-isbp745',
+    title: 'What Makes a Commercial Invoice Compliant Under an LC? ISBP 745 Explained',
+    description: 'The commercial invoice is the most scrutinised document in any LC presentation. ISBP 745 sets out exactly what banks check — and where most discrepancies hide.',
+    question: 'How does ISBP 745 define a compliant commercial invoice? I keep getting discrepancies on my invoices and I don\'t understand what the bank is looking for.',
+    answer: `The commercial invoice is where most LC presentations fail — and ISBP 745 paragraphs C1 through C14 spell out exactly what banks examine.
+
+First, the invoice must appear to have been issued by the beneficiary named in the credit. It must be made out to the applicant (or as the credit requires). It must describe the goods, services, or performance in a way that corresponds to the description in the credit — and this is where it gets strict. The goods description on the invoice must mirror the LC terms. Other documents can use a general description consistent with the LC, but the invoice must match.
+
+The invoice amount must not exceed the amount available under the credit. If the LC specifies a unit price, the invoice must show that unit price. Quantity and unit price multiplied must equal the invoiced amount.
+
+The invoice need not be signed unless the credit requires it. It need not be dated before the transport document, but it must be dated no later than the date of presentation.
+
+Common traps: showing trade terms (FOB, CIF) differently from the LC. Showing a description that paraphrases instead of mirrors the credit. Including charges not contemplated by the credit terms. Using abbreviations the LC doesn't use.
+
+The safest approach: copy the goods description from the LC word for word onto your invoice.`,
+    citations: [
+      'ISBP745 Paragraphs C1-C14 — Commercial Invoice',
+      'UCP600 Article 18(a) — Invoice issued by beneficiary',
+      'UCP600 Article 18(c) — Goods description must correspond',
+      'ISBP745 Paragraph C3 — Goods description correspondence',
+    ],
+    tags: ['UCP600', 'ISBP745'],
+  },
+  {
+    slug: 'transferable-lc-invoice-substitution-ucp600',
+    title: 'Transferable LC — Can You Substitute Your Invoice to Keep Your Margin?',
+    description: 'Under UCP 600 Article 38, the first beneficiary of a transferable LC can substitute their invoice. But the mechanics are precise and the risks are real.',
+    question: 'My buyer issued a transferable LC in my favour. I want to transfer it to my supplier. My supplier will ship directly to the buyer. But I want to keep my commission — can I substitute my invoice for a higher amount than my supplier\'s to capture the margin?',
+    answer: `Yes, invoice substitution is the standard mechanism for capturing your margin in a transferable LC — but it works the opposite way from what you described.
+
+Under UCP 600 Article 38(h), the first beneficiary (you) has the right to substitute your own invoice and draft for those of the second beneficiary (your supplier). Your invoice will show the FULL LC amount (what the buyer pays). Your supplier's invoice shows their lower price. The difference is your margin.
+
+The mechanics: your supplier presents their documents to the transferring bank. The bank notifies you that documents are ready. You then substitute your invoice (and draft, if any) for your supplier's. The bank forwards your invoice — not your supplier's — to the issuing bank.
+
+Critical timing: if you fail to substitute your invoice on first demand, the transferring bank has the right to forward the second beneficiary's documents as received. You'd lose your margin and the buyer would see your supplier's price.
+
+Two things to watch: your substituted invoice amount cannot exceed the original credit amount. And the description of goods must match exactly — you can only change the price, not the goods.
+
+This is the whole point of transferable credits — you act as a middleman without the buyer and supplier knowing each other's pricing.`,
+    citations: [
+      'UCP600 Article 38(h) — Invoice substitution right',
+      'UCP600 Article 38(a) — Definition of transferable credit',
+      'UCP600 Article 38(d) — Transfer conditions',
+      'UCP600 Article 38(i) — First beneficiary failure to substitute',
+    ],
+    tags: ['UCP600'],
+  },
+  {
+    slug: 'documentary-collections-dp-release-before-payment',
+    title: 'D/P Collections — Can the Bank Release Documents Before Payment?',
+    description: 'Under URC 522, documents against payment means exactly that. The presenting bank cannot release documents for inspection before the buyer pays.',
+    question: 'I\'m shipping coffee to a buyer in Germany on D/P terms. I gave my bank the documents with instructions to release them against payment. The buyer\'s bank says the buyer wants to inspect the coffee before paying. Can the German bank release the documents for inspection before payment?',
+    answer: `No. Under URC 522, D/P (documents against payment) means the presenting bank must not release documents until payment is received. This is non-negotiable.
+
+URC 522 Article 7(a) states that collections should not contain bills of exchange payable at a future date with instructions that documents be delivered against payment. The rules are explicit: D/P means payment first, documents second.
+
+The buyer's request to "inspect before paying" is commercially understandable but documentarily impermissible under your collection instructions. If the German bank releases documents before payment, they breach the collection instruction and become liable to you.
+
+The buyer cannot inspect the actual goods using the documents — they need the bill of lading to take delivery from the shipping line. So releasing documents "for inspection" effectively gives them control of the goods without paying.
+
+Your options: refuse the request and insist on D/P terms as instructed. If the buyer genuinely needs to inspect quality, suggest a pre-shipment inspection at origin (before you ship) — common in commodity trades. Or negotiate a change to D/A (documents against acceptance) if you trust the buyer, though this shifts risk to you.
+
+The whole point of D/P is that you retain control of the goods through the documents until you have the money.`,
+    citations: [
+      'URC 522 Article 7(a) — Release of documents',
+      'URC 522 Article 1 — Application of URC',
+      'URC 522 Article 10 — Payment without delay',
+    ],
+    tags: ['URC 522', 'Collections'],
+  },
+  {
+    slug: 'standby-lc-isp98-vs-urdg-758',
+    title: 'Standby LC — ISP98 or URDG 758? Can You Choose?',
+    description: 'Standby letters of credit are not locked to ISP98. They can be governed by URDG 758, UCP 600, or ISP98 — and the choice matters more than most people realise.',
+    question: 'We received a standby letter of credit from a US bank that says "subject to ISP98." Our client wants it governed by URDG 758. Can we have a standby subject to URDG instead of ISP98? Or do standbys always follow ISP98?',
+    answer: `Standbys do not always follow ISP98. A standby letter of credit can be governed by ISP98, URDG 758, or even UCP 600 — it depends on what the issuing bank agrees to state in the instrument.
+
+ISP98 (International Standby Practices) was specifically designed for standbys and is the default choice of most US and many international banks. URDG 758 was designed for demand guarantees but explicitly states in Article 1(a) that it applies to demand guarantees "including standby letters of credit to which it is made applicable."
+
+So yes, you can request a standby subject to URDG 758 — but the issuing bank must agree. US banks overwhelmingly prefer ISP98. Asking a US bank to issue under URDG 758 may meet resistance or require negotiation.
+
+Key differences that matter: under ISP98, the examination period is 3 business days (extendable to 7 by statement in the standby). Under URDG 758, it's 5 business days. URDG 758 has the extend-or-pay mechanism (Article 23) — ISP98 does not. ISP98 has more detailed rules about standby-specific issues like syndication and transfer.
+
+The practical question: what problem are you solving by switching? If the beneficiary wants extend-or-pay rights, URDG 758 makes sense. If it's a standard financial standby, ISP98 is well-understood and battle-tested.`,
+    citations: [
+      'ISP98 Rule 1.01 — Scope and application',
+      'URDG 758 Article 1(a) — Application to standbys',
+      'ISP98 Rule 5.01 — Examination period (3 business days)',
+      'URDG 758 Article 20(a) — Examination period (5 business days)',
+    ],
+    tags: ['ISP98', 'URDG 758'],
+  },
+  {
+    slug: 'red-clause-lc-advance-payment',
+    title: 'Red Clause LC — How Pre-Shipment Advance Payment Works',
+    description: 'A red clause LC lets the beneficiary draw an advance before shipping. The issuing bank pays — and the applicant carries the risk if the supplier doesn\'t perform.',
+    question: 'My supplier in Kenya needs advance payment to harvest and process the coffee before shipment. Someone mentioned a "red clause LC" that allows this. How does it work? Is the advance payment at risk if the supplier doesn\'t ship?',
+    answer: `A red clause LC includes a special clause (historically printed in red ink) that authorises the advising or nominated bank to make an advance payment to the beneficiary before they present shipping documents.
+
+How it works: the LC states a maximum advance amount and the conditions for drawing it — typically, the beneficiary provides a simple receipt or undertaking to ship the goods. The beneficiary gets cash upfront to fund production, harvesting, or procurement. When they ship, they present the full set of documents and the advance is deducted from the final payment.
+
+The critical risk point: if the supplier takes the advance and fails to ship, the issuing bank is still obligated to reimburse the bank that made the advance. The issuing bank then looks to the applicant (buyer) for reimbursement. In other words, the applicant bears the risk of the supplier not performing.
+
+This is why red clause LCs are rare outside established trading relationships — particularly in commodities like coffee, wool, and cotton where the supplier genuinely needs working capital to prepare the goods.
+
+Green clause LCs go one step further: they allow the advance against warehouse receipts, giving the buyer some security over stored goods. A red clause offers no such collateral — just the beneficiary's promise to ship.
+
+Make sure your buyer understands they're effectively providing an unsecured advance to the supplier, guaranteed by their own bank.`,
+    citations: [
+      'UCP600 Article 2 — Definitions (Credit)',
+      'UCP600 Article 7 — Issuing bank undertaking',
+      'UCP600 Article 12 — Nomination and undertaking',
+    ],
+    tags: ['UCP600', 'Trade Finance'],
+  },
+  {
+    slug: 'fob-shanghai-vs-fob-shanghai-port-discrepancy',
+    title: '"FOB Shanghai" vs "FOB Shanghai Port" — Is the Bank Manufacturing Discrepancies?',
+    description: 'When your invoice says "FOB Shanghai" but the LC says "FOB Shanghai Port," the bank will call it a discrepancy. They\'re not wrong — even if you think they are.',
+    question: 'My bank rejected my supplier\'s documents because the commercial invoice shows "FOB Shanghai" but the LC says "FOB Shanghai Port." The word "Port" is missing. This is obviously the same place! Isn\'t the bank manufacturing discrepancies to avoid paying?',
+    answer: `The bank is not manufacturing a discrepancy — they're applying UCP 600 Article 14(d), which requires documents to be examined on their face and that the data in any document must not conflict with data in that document, any other stipulated document, or the credit.
+
+Under ISBP 745, the goods description on the commercial invoice must correspond with the description in the credit. If the LC says "FOB Shanghai Port" and your invoice says "FOB Shanghai," the bank sees a data difference. Banks examine documents on their face — they don't interpret whether two terms are commercially identical.
+
+Is "FOB Shanghai" the same as "FOB Shanghai Port" in the real world? Almost certainly yes. But LC practice is not about commercial reality — it's about documentary compliance. The bank's job is to check whether the documents say what the LC says they should say. Adding or omitting a word is a data discrepancy.
+
+ICC Banking Commission opinions have consistently held that banks are not required to apply commercial knowledge or geography to interpret terms. If the LC says "Port," the document must say "Port."
+
+The fix is simple for next time: copy the trade terms from the LC exactly — character for character — onto the invoice. For this presentation, request a waiver from the applicant through the bank. If the buyer accepts the discrepancy, the bank will process payment.
+
+The lesson: in LC practice, precision is not pedantry — it's the system working as designed.`,
+    citations: [
+      'UCP600 Article 14(d) — Data consistency across documents',
+      'UCP600 Article 18(c) — Invoice goods description',
+      'ISBP745 Paragraph C3 — Correspondence of description',
+      'ISBP745 Paragraph A22 — Misspelling and typing errors',
+    ],
+    tags: ['UCP600', 'ISBP745'],
+  },
+  {
+    slug: 'lc-amendment-acceptance-ucp600-article-10',
+    title: 'LC Amendment — Do You Need to Accept Before Shipping?',
+    description: 'Under UCP 600 Article 10, an amendment is not binding until the beneficiary accepts it. Silence is not acceptance — but shipping under amended terms might be.',
+    question: 'The issuing bank sent an LC amendment extending the shipment date by 30 days and increasing the amount by $50,000. I haven\'t formally accepted the amendment yet. Can I ship under the amended terms, or do I need to accept first? What happens if I ship under original terms while the amendment is outstanding?',
+    answer: `Under UCP 600 Article 10(c), an amendment does not bind the beneficiary until they communicate acceptance to the bank that advised the amendment. Until you accept, the credit terms remain as they were before the amendment.
+
+However — and this is the practical trap — Article 10(c) also states that a beneficiary's presentation that complies with the credit AND any not-yet-accepted amendment will be deemed to be notification of acceptance. In other words, if you ship using the extended dates and present documents that only comply with the amended terms, you've implicitly accepted the amendment.
+
+So you have three options: formally accept the amendment (notify the advising bank), then ship under the new terms. Or reject the amendment and ship under the original terms — within the original shipment date and amount. Or do nothing — the amendment sits in limbo until you act or your presentation resolves it.
+
+You cannot cherry-pick. Article 10(e) states that partial acceptance of an amendment is not allowed and will be deemed rejection. If the amendment extends the shipment date AND increases the amount, you accept both or neither.
+
+If you ship under the original terms, ensure everything complies with the pre-amendment credit. If you ship under amended terms without formally accepting, your compliant presentation acts as acceptance.
+
+Best practice: accept or reject promptly. Ambiguity helps nobody.`,
+    citations: [
+      'UCP600 Article 10(a) — Amendment consent requirements',
+      'UCP600 Article 10(c) — Beneficiary acceptance',
+      'UCP600 Article 10(e) — Partial acceptance not allowed',
+    ],
+    tags: ['UCP600'],
+  },
+  {
+    slug: 'deferred-payment-lc-forfaiting-early-payment',
+    title: 'Deferred Payment LC — Can You Get Paid Before Maturity?',
+    description: 'Your deferred payment LC means waiting 90 or 180 days for payment. Forfaiting lets you sell that receivable for immediate cash — but know the risks.',
+    question: 'I have a deferred payment LC — payment is due 90 days after B/L date. I presented documents 2 weeks ago and the issuing bank confirmed the presentation complies. But I need the money now, not in 76 days. Can the issuing bank pay me early? Can anyone pay me early?',
+    answer: `The issuing bank is not obligated to pay you before maturity — their undertaking under UCP 600 Article 7(c) is to pay at maturity. However, they may agree to a discounted early payment as a commercial arrangement. This is at their discretion.
+
+Your better option is forfaiting — selling the deferred payment receivable to a third party (a forfaiter) at a discount. Since the issuing bank has already confirmed the presentation complies, you have an irrevocable payment obligation from the issuing bank maturing on a known date. That's a tradeable asset.
+
+How forfaiting works: a forfaiter (bank or specialised firm) buys your receivable at a discount reflecting the time value and the issuing bank's credit risk. You get cash immediately, minus the discount. The forfaiter collects from the issuing bank at maturity. Critically, forfaiting is WITHOUT RECOURSE — once the forfaiter buys the receivable, the risk is theirs.
+
+Under URF 800 (ICC Uniform Rules for Forfaiting), the forfaiter requires the payment obligation (the LC or accepted draft), evidence of compliant presentation, and any required transfer documentation.
+
+The discount rate depends on the issuing bank's country risk, credit rating, the tenor (76 days in your case is short — good for you), and the currency.
+
+For a 76-day tenor with a compliant presentation already confirmed, forfaiting should be straightforward. Contact your bank's trade finance desk or a forfaiting house.`,
+    citations: [
+      'UCP600 Article 7(c) — Issuing bank deferred payment undertaking',
+      'UCP600 Article 12(b) — Nominated bank undertaking',
+      'URF 800 Article 3 — Forfaiting transaction requirements',
+      'URF 800 Article 7 — Without recourse',
+    ],
+    tags: ['UCP600', 'URF 800', 'Forfaiting'],
+  },
+  {
+    slug: 'clean-bill-of-lading-damaged-packaging',
+    title: 'Is a "Damaged Carton" Remark on the B/L a Discrepancy?',
+    description: 'A clause noting damaged packaging makes the B/L "unclean." Banks will refuse it — even if the goods inside are perfectly fine.',
+    question: 'My bank says my B/L is not clean because there\'s a remark about "damaged carton." But the carton is only the packaging, not the goods. The goods inside are perfect. Can the bank really reject for this?',
+    answer: `Yes, the bank can and will reject it. Under UCP 600 Article 27, banks will only accept a clean transport document — one that bears no clause or notation expressly declaring a defective condition of the goods AND/OR THE PACKAGING.
+
+The word "packaging" is explicit in the rule. A notation about "damaged carton," "torn packaging," "crushed box," or similar remarks makes the B/L claused (unclean), regardless of whether the goods inside are undamaged.
+
+This is one of the most frustrating discrepancies for exporters because the distinction between goods and packaging feels commercially irrelevant. But the rule exists for a reason — the bank and the buyer cannot verify the condition of goods inside damaged packaging from the documents alone.
+
+ISBP 745 reinforces this: a transport document bearing a clause or notation that expressly declares a defective condition of the packaging is not acceptable. The carrier's remark is a statement of fact at the time of loading, and the bank must take it at face value.
+
+Your options: have the shipping line remove the remark and issue a clean B/L — this requires the carrier to be satisfied the goods are properly packed. If the damage happened at the port, have the goods repacked before loading and get a clean B/L. If the claused B/L is already issued, present it and request a discrepancy waiver from the applicant.
+
+Prevention for next time: inspect packaging at the port before the carrier loads. Once the remark is on the B/L, it's too late.`,
+    citations: [
+      'UCP600 Article 27 — Clean transport document',
+      'ISBP745 Paragraph D2 — Clean transport documents',
+      'UCP600 Article 20(a) — Bill of lading requirements',
+    ],
+    tags: ['UCP600', 'Transport'],
+  },
 ]
