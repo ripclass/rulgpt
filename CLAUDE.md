@@ -1,8 +1,28 @@
 # CLAUDE.md — RuleGPT Codebase Reference
 
+## RESUME — START HERE
+
+**Last updated: 2026-04-08.** Site is live at tfrules.com. Production-ready.
+
+What's done:
+- RAG pipeline live: 4,459 rules, benchmark 4.7/5.0 across 70 golden queries
+- 65 blog posts at /blog covering all golden queries (search + tag filters)
+- Per-page SEO meta tags via react-helmet-async
+- Hero image (aerial port at night), auth modal image (trade docs desk)
+- Pricing tiers, Stripe, RulHub API, prompt caching, E2E tests — all done
+- Repo cleaned: README rewritten, LICENSE/SECURITY/CHANGELOG created, stale docs deleted
+
+What's next:
+- Monitor Google indexing of 65 blog posts
+- Write more blog content beyond golden queries
+- Dynamic OG images per page (Edge Function failed on Vite SPA, needs alternative approach)
+- Code-split blog data (65 posts in one JS bundle — getting large)
+
+For full session history: read `H:\OBS\OpenClawMemory\Projects\tfrules\Handoffs\tfrules Handoff 2026-04-07.md`
+
 ## WHAT THIS IS
 
-RuleGPT is a citation-first conversational AI for trade finance rules. Users ask questions about ICC standards (UCP600, ISBP745), sanctions (OFAC), FTAs (RCEP, CPTPP), customs, and bank-specific LC rules. They get short, grounded answers with exact rule citations. No account needed for first 20 queries per month.
+RuleGPT is a citation-first conversational AI for trade finance rules. Users ask questions about ICC standards (UCP600, ISBP745), sanctions (OFAC), FTAs (RCEP, CPTPP), customs, and bank-specific LC rules. They get short, grounded answers with exact rule citations. No account needed for first 5 queries per month.
 
 Built by a Codex agent from a product brief. This document describes what was actually built, not what was planned.
 
