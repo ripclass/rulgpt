@@ -3,10 +3,10 @@ import { Button } from '@/components/ui/button'
 import type { SessionTier } from '@/types'
 
 export function UpgradeCTA({ tier }: { tier: SessionTier }) {
-  if (tier === 'enterprise') return null // legacy: was 'pro'
-  const ctaLabel = tier === 'professional' ? 'Upgrade to Enterprise' : 'Plans from $79/mo' // legacy: 'starter' → 'professional', '$9/mo' → '$79/mo'
+  if (tier === 'enterprise') return null
+  const ctaLabel = tier === 'professional' ? 'Upgrade to Enterprise' : 'Plans from $79/mo'
   const helperText =
-    tier === 'professional' // legacy: was 'starter'
+    tier === 'professional'
       ? 'Need higher volume, priority model routing, or session export? Move up to Enterprise.'
       : 'Synced history, saved answers, and exports when the free tier is no longer enough.'
   return (

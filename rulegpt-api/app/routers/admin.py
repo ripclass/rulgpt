@@ -161,20 +161,20 @@ async def analytics_queries(
         )
         or 0
     )
-    pro = int(
+    paid = int(
         db.scalar(
             select(func.count(RuleGPTQuery.id))
             .join(RuleGPTSession, RuleGPTSession.id == RuleGPTQuery.session_id)
-            .where(RuleGPTSession.tier == "pro")
+            .where(RuleGPTSession.tier.in_(("professional", "enterprise")))
         )
         or 0
     )
-    registered = max(total - anonymous - pro, 0)
+    registered = max(total - anonymous - paid, 0)
     return AnalyticsQueriesResponse(
         total_queries=total,
         anonymous_queries=anonymous,
         registered_queries=registered,
-        pro_queries=pro,
+        paid_queries=paid,
     )
 
 

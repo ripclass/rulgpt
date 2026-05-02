@@ -18,14 +18,14 @@ describe('api auth transport', () => {
     const { api, API_BASE_URL, setApiAccessToken } = await import('@/lib/api')
 
     setApiAccessToken('stored-token')
-    await api.getHistory({ userId: 'user-1', tier: 'pro' })
+    await api.getHistory({ userId: 'user-1', tier: 'professional' })
 
     expect(fetchMock).toHaveBeenCalledTimes(1)
     const historyInit = fetchMock.mock.calls[0][1] as RequestInit
     const historyHeaders = new Headers(historyInit.headers)
     expect(historyHeaders.get('Authorization')).toBe('Bearer stored-token')
     expect(historyHeaders.get('x-user-id')).toBe('user-1')
-    expect(historyHeaders.get('x-user-tier')).toBe('pro')
+    expect(historyHeaders.get('x-user-tier')).toBe('professional')
 
     fetchMock.mockClear()
     await fetch(`${API_BASE_URL}/api/usage`)

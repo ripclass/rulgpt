@@ -12,7 +12,7 @@ from app.models.query import RuleGPTQuery
 from app.models.saved import RuleGPTSavedAnswer
 from app.schemas.export import ExportPayloadResponse, SessionExportPayloadResponse
 
-from .deps import require_authenticated_user, require_pro_user
+from .deps import require_authenticated_user, require_paid_user
 
 router = APIRouter(prefix="/api", tags=["export"])
 
@@ -48,7 +48,7 @@ async def export_single_query(
 @router.get("/export/session/{session_id}", response_model=SessionExportPayloadResponse)
 async def export_session(
     session_id: str,
-    _=Depends(require_pro_user),
+    _=Depends(require_paid_user),
     db: Session = Depends(get_db),
 ) -> SessionExportPayloadResponse:
     queries = db.scalars(

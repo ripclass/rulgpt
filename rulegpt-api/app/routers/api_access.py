@@ -11,7 +11,7 @@ from app.middleware.tier_check import auth_service
 from app.schemas.admin import AuthStatusResponse, UsageResponse
 from app.schemas.query import QueryRequest, QueryResponse
 
-from .deps import require_pro_user
+from .deps import require_enterprise_user
 from .query import process_query_request
 
 router = APIRouter(prefix="/api", tags=["api-access"])
@@ -21,7 +21,7 @@ router = APIRouter(prefix="/api", tags=["api-access"])
 async def api_v1_query(
     payload: QueryRequest,
     request: Request,
-    _=Depends(require_pro_user),
+    _=Depends(require_enterprise_user),
     db: Session = Depends(get_db),
 ) -> QueryResponse:
     return await process_query_request(payload=payload, request=request, db=db)
@@ -30,11 +30,11 @@ async def api_v1_query(
 @router.get("/usage", response_model=UsageResponse)
 async def get_usage(
     request: Request,
-    _=Depends(require_pro_user),
+    _=Depends(require_enterprise_user),
 ) -> UsageResponse:
     # Placeholder usage details until API key accounting is wired.
     return UsageResponse(
-        tier="professional",
+        tier="enterprise",
         api_queries_used=0,
         api_queries_limit=settings.ENTERPRISE_TIER_MONTHLY_LIMIT,
     )

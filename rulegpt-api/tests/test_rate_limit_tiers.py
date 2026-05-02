@@ -34,11 +34,11 @@ def auth_tokens(monkeypatch):
                 "issuer": "https://example.supabase.co/auth/v1",
                 "authenticated": True,
             }
-        if token == "pro-token":
+        if token == "professional-token":
             return {
                 "user_id": uuid4(),
-                "tier": "pro",
-                "claims": {"email": "pro@example.com"},
+                "tier": "professional",
+                "claims": {"email": "professional@example.com"},
                 "issuer": "https://example.supabase.co/auth/v1",
                 "authenticated": True,
             }
@@ -72,9 +72,9 @@ def test_free_requests_use_auth_limit(auth_tokens):
     assert client.get("/limited", headers=headers).status_code == 429
 
 
-def test_pro_requests_use_auth_limit(auth_tokens):
+def test_professional_requests_use_auth_limit(auth_tokens):
     client = TestClient(_build_app())
-    headers = {"Authorization": "Bearer pro-token"}
+    headers = {"Authorization": "Bearer professional-token"}
     assert client.get("/limited", headers=headers).status_code == 200
     assert client.get("/limited", headers=headers).status_code == 200
     assert client.get("/limited", headers=headers).status_code == 200

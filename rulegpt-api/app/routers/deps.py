@@ -10,9 +10,13 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 
 
+PAID_TIERS = frozenset({"professional", "enterprise"})
+VALID_TIERS = frozenset({"anonymous", "free"}) | PAID_TIERS
+
+
 def get_request_tier(request: Request) -> str:
     tier = getattr(request.state, "user_tier", "anonymous")
-    return tier if tier in {"anonymous", "free", "starter", "pro"} else "anonymous"
+    return tier if tier in VALID_TIERS else "anonymous"
 
 
 def get_request_user_id(request: Request) -> UUID | None:
@@ -31,13 +35,26 @@ def require_authenticated_user(request: Request) -> UUID:
     return user_id
 
 
-def require_pro_user(request: Request) -> UUID:
+def require_paid_user(request: Request) -> UUID:
+    """Require a Professional or Enterprise subscription."""
     user_id = require_authenticated_user(request)
     tier = get_request_tier(request)
-    if tier != "pro":
+    if tier not in PAID_TIERS:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Pro subscription required.",
+            detail="A Professional or Enterprise subscription is required.",
+        )
+    return user_id
+
+
+def require_enterprise_user(request: Request) -> UUID:
+    """Require an Enterprise subscription specifically (e.g. API key access)."""
+    user_id = require_authenticated_user(request)
+    tier = get_request_tier(request)
+    if tier != "enterprise":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="An Enterprise subscription is required.",
         )
     return user_id
 

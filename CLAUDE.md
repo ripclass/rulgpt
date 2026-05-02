@@ -297,26 +297,30 @@ This mapping is in `rulegpt-api/app/services/integrations/openrouter.py`.
 
 As actually implemented:
 
-**Tiers:** `anonymous`, `free`, `starter`, `pro`
+**Tiers:** `anonymous`, `free`, `professional`, `enterprise`
 
 **Monthly query limits:**
-- Anonymous: 20 queries per calendar month per session (`FREE_TIER_MONTHLY_LIMIT`)
-- Free: 20 queries per calendar month
-- Starter: 500 queries per calendar month (`STARTER_TIER_MONTHLY_LIMIT`)
-- Pro: 2,000 queries per calendar month (`PRO_TIER_MONTHLY_LIMIT`)
-- Pro API: 10,000 queries (`PRO_TIER_API_LIMIT`)
+- Anonymous: 5 queries per calendar month per IP (`FREE_TIER_MONTHLY_LIMIT`)
+- Free: 5 queries per calendar month
+- Professional: 500 queries per calendar month (`PROFESSIONAL_TIER_MONTHLY_LIMIT`)
+- Enterprise: 2,000 queries per calendar month (`ENTERPRISE_TIER_MONTHLY_LIMIT`)
 
-Enforced in `routers/query.py:_anonymous_queries_this_month()`. When exceeded, returns HTTP 429 with message "Anonymous monthly query limit reached. Please register to continue."
+Enforced in `routers/query.py:_tier_monthly_limit()`. When exceeded, returns HTTP 429 with a tier-specific message.
 
 **Per-minute rate limiting:** In-memory sliding window in `middleware/rate_limit.py`:
-- Anonymous: 30 requests/minute
-- Authenticated (free/starter/pro): 120 requests/minute
+- Anonymous: 30 requests/minute (`RATE_LIMIT_PER_MIN_ANON`)
+- Authenticated (free/professional/enterprise): 120 requests/minute (`RATE_LIMIT_PER_MIN_AUTH`)
 - Key: IP + fingerprint + tier + path
 - Exempt paths: /health, /docs, /openapi.json
 
 **Important:** Rate limiting is in-memory only. It resets on server restart and does not work across multiple backend instances.
 
-**Note:** Pro API usage counting returns hardcoded 0 (`api_access.py:31`). Real counting not yet implemented.
+**Pro API tier:** `/api/v1/query` and `/api/usage` are gated by `require_enterprise_user` (`deps.py`). Usage counting currently returns hardcoded 0 (`api_access.py:31`); real counting needs API key issuance first.
+
+**Tier dependencies (`app/routers/deps.py`):**
+- `require_authenticated_user` — any signed-in user
+- `require_paid_user` — `professional` or `enterprise` (used by `export.py` session export)
+- `require_enterprise_user` — `enterprise` only (used by `api_access.py` programmatic API)
 
 ## AUTH
 
@@ -432,19 +436,18 @@ Enforced in `routers/query.py:_anonymous_queries_this_month()`. When exceeded, r
 **Stripe (optional until billing goes live):**
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
-- `STRIPE_STARTER_MONTHLY_PRICE_ID`
-- `STRIPE_STARTER_ANNUAL_PRICE_ID`
-- `STRIPE_PRO_MONTHLY_PRICE_ID`
-- `STRIPE_PRO_ANNUAL_PRICE_ID`
+- `STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID`
+- `STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID`
+- `STRIPE_ENTERPRISE_MONTHLY_PRICE_ID`
+- `STRIPE_ENTERPRISE_ANNUAL_PRICE_ID`
 
 **Admin:**
 - `ADMIN_SECRET` — shared secret for admin endpoints. Required in production.
 
 **Rate limiting:**
-- `FREE_TIER_MONTHLY_LIMIT` — default: 20
-- `STARTER_TIER_MONTHLY_LIMIT` — default: 500
-- `PRO_TIER_MONTHLY_LIMIT` — default: 2000
-- `PRO_TIER_API_LIMIT` — default: 10000
+- `FREE_TIER_MONTHLY_LIMIT` — default: 5
+- `PROFESSIONAL_TIER_MONTHLY_LIMIT` — default: 500
+- `ENTERPRISE_TIER_MONTHLY_LIMIT` — default: 2000
 - `RATE_LIMIT_PER_MIN_ANON` — default: 30
 - `RATE_LIMIT_PER_MIN_AUTH` — default: 120
 
@@ -609,6 +612,11 @@ DATE: 2026-04-05
 LESSON: CLAUDE.md drifted significantly from codebase reality.
 CONTEXT: Full audit revealed 12+ factual errors: tiers changed from 3→4 (starter added), anonymous limit 10→20, design system flipped from light cream/burnt orange to dark obsidian/amber, fonts changed from Inter/Space Grotesk to DM Sans/Fraunces, render.yaml existed but wasn't documented, Stripe Starter price IDs existed in config but not render.yaml, local rules path was already fixed to None. No CI/CD existed at all.
 ACTION: Update CLAUDE.md after every significant session. Cross-check against actual config.py, not memory. Added GitHub Actions CI/CD (backend-ci, frontend-ci, deploy-gate).
+
+DATE: 2026-05-02
+LESSON: A half-done rename is worse than a not-yet-started one — paying customers were silently downgraded to free tier.
+CONTEXT: Pricing page + Stripe products had been renamed from `starter`/`pro` → `professional`/`enterprise`, but `tier_check.py` `VALID_TIERS`, `deps.get_request_tier`, `supabase_auth.set_user_tier`, and `supabase_auth._tier_from_claims` still hardcoded the old set `{"free", "starter", "pro"}`. A real Professional checkout would: (1) Stripe webhook computes `tier="professional"`, (2) `set_user_tier` rejects it as "Unsupported tier", (3) even if it wrote, `tier_check` would normalize the JWT claim down to `"free"`, (4) `require_pro_user` (checking `tier != "pro"`) would 403 the paying customer. Net: customer pays $79/mo, gets free tier UX.
+ACTION: When renaming a vocabulary that crosses module boundaries (auth, billing, middleware, frontend), grep the entire repo for both old and new names *before* claiming the rename is done. Update tests in the same commit — tests are the canary that catches half-done renames. Use a `PAID_TIERS` named constant in `deps.py` so adding a tier doesn't require touching every gate function.
 
 ## SUCCESS CRITERIA
 

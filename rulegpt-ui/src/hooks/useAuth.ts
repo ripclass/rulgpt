@@ -76,9 +76,10 @@ export function useAuth() {
     if (!status?.authenticated) {
       return status
     }
-    const normalizedTier = status.tier === 'professional' || status.tier === 'enterprise' || status.tier === 'free' // legacy: was 'starter' || 'pro'
-      ? status.tier
-      : 'free'
+    const normalizedTier =
+      status.tier === 'professional' || status.tier === 'enterprise' || status.tier === 'free'
+        ? status.tier
+        : 'free'
     setUser((current) => {
       if (!current) return current
       const nextUser = {

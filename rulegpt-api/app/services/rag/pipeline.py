@@ -85,10 +85,10 @@ def select_model(
 ) -> RoutingTier:
     """Select Claude model based on user subscription tier + query complexity.
 
-    Tiers: free → Haiku only | starter → Haiku/Sonnet | professional →
-    Haiku/Sonnet/Opus | expert → Haiku/Sonnet/Opus (lower Opus threshold).
-
-    Before pricing tiers are live, all users default to "professional".
+    Tiers:
+      free / anonymous → Haiku only
+      professional     → Haiku / Sonnet / Opus (Opus on sanctions, TBML, multi-domain)
+      enterprise       → Haiku / Sonnet / Opus (lower Opus threshold)
     """
     import logging
     _log = logging.getLogger("rulegpt.routing")
@@ -162,15 +162,8 @@ def select_model(
             model = "sonnet"
 
     else:
-        # Legacy tiers (starter, pro, expert) → professional routing
-        if is_sanctions or involves_sanctioned or is_tbml:
-            model = "opus"
-        elif num_domains >= 3:
-            model = "opus"
-        elif is_definition and is_simple_lookup:
-            model = "haiku"
-        else:
-            model = "sonnet"
+        # Unknown tier → conservative default: free-tier Haiku-only routing
+        model = "haiku"
 
     _log.info(
         "[ROUTING] tier=%s model=%s | rules=%d domains=%d sanctions=%s tbml=%s "

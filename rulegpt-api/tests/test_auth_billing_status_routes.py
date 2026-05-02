@@ -21,11 +21,11 @@ def _build_app() -> FastAPI:
 @pytest.fixture
 def auth_configured(monkeypatch):
     async def _fake_verify_jwt(token: str):
-        if token == "pro-token":
+        if token == "professional-token":
             return {
                 "user_id": uuid4(),
-                "tier": "pro",
-                "claims": {"email": "pro@example.com"},
+                "tier": "professional",
+                "claims": {"email": "professional@example.com"},
                 "issuer": "https://example.supabase.co/auth/v1",
                 "authenticated": True,
             }
@@ -41,24 +41,26 @@ def auth_configured(monkeypatch):
 
 @pytest.fixture
 def billing_configured(monkeypatch):
+    from app.config import settings
+
     monkeypatch.setattr(billing.billing_client, "secret_key", "sk_test")
     monkeypatch.setattr(billing.billing_client, "webhook_secret", "whsec_test")
-    monkeypatch.setattr(billing.billing_client, "starter_monthly_price_id", "price_starter_monthly")
-    monkeypatch.setattr(billing.billing_client, "starter_annual_price_id", "price_starter_annual")
-    monkeypatch.setattr(billing.billing_client, "pro_monthly_price_id", "price_pro_monthly")
-    monkeypatch.setattr(billing.billing_client, "pro_annual_price_id", "price_pro_annual")
+    monkeypatch.setattr(settings, "STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID", "price_professional_monthly")
+    monkeypatch.setattr(settings, "STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID", "price_professional_annual")
+    monkeypatch.setattr(settings, "STRIPE_ENTERPRISE_MONTHLY_PRICE_ID", "price_enterprise_monthly")
+    monkeypatch.setattr(settings, "STRIPE_ENTERPRISE_ANNUAL_PRICE_ID", "price_enterprise_annual")
     yield
 
 
 def test_auth_status_reflects_verified_request_state(auth_configured):
     client = TestClient(_build_app())
 
-    response = client.get("/api/auth/status", headers={"Authorization": "Bearer pro-token"})
+    response = client.get("/api/auth/status", headers={"Authorization": "Bearer professional-token"})
 
     assert response.status_code == 200
     data = response.json()
     assert data["authenticated"] is True
-    assert data["tier"] == "pro"
+    assert data["tier"] == "professional"
     assert data["jwt_verification_ready"] is True
     assert data["admin_user_sync_ready"] is True
     assert data["blockers"] == []
@@ -94,17 +96,19 @@ def test_billing_status_reports_checkout_and_webhook_readiness(billing_configure
     assert data["checkout_ready"] is True
     assert data["webhook_ready"] is True
     assert data["blockers"] == []
-    assert data["supported_plans"] == ["starter", "pro"]
+    assert data["supported_plans"] == ["professional", "enterprise"]
     assert data["supported_intervals"] == ["monthly", "annual"]
 
 
 def test_billing_status_reports_missing_stripe_blockers(monkeypatch):
+    from app.config import settings
+
     monkeypatch.setattr(billing.billing_client, "secret_key", "")
     monkeypatch.setattr(billing.billing_client, "webhook_secret", "")
-    monkeypatch.setattr(billing.billing_client, "starter_monthly_price_id", "")
-    monkeypatch.setattr(billing.billing_client, "starter_annual_price_id", "")
-    monkeypatch.setattr(billing.billing_client, "pro_monthly_price_id", "")
-    monkeypatch.setattr(billing.billing_client, "pro_annual_price_id", "")
+    monkeypatch.setattr(settings, "STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID", "")
+    monkeypatch.setattr(settings, "STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID", "")
+    monkeypatch.setattr(settings, "STRIPE_ENTERPRISE_MONTHLY_PRICE_ID", "")
+    monkeypatch.setattr(settings, "STRIPE_ENTERPRISE_ANNUAL_PRICE_ID", "")
 
     client = TestClient(_build_app())
 
@@ -115,8 +119,8 @@ def test_billing_status_reports_missing_stripe_blockers(monkeypatch):
     assert data["checkout_ready"] is False
     assert data["webhook_ready"] is False
     assert "Stripe secret key is missing." in data["blockers"]
-    assert "Starter monthly Stripe price ID is missing." in data["blockers"]
-    assert "Starter annual Stripe price ID is missing." in data["blockers"]
-    assert "Pro monthly Stripe price ID is missing." in data["blockers"]
-    assert "Pro annual Stripe price ID is missing." in data["blockers"]
+    assert "Professional monthly Stripe price ID is missing." in data["blockers"]
+    assert "Professional annual Stripe price ID is missing." in data["blockers"]
+    assert "Enterprise monthly Stripe price ID is missing." in data["blockers"]
+    assert "Enterprise annual Stripe price ID is missing." in data["blockers"]
     assert "Stripe webhook secret is missing." in data["blockers"]

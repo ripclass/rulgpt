@@ -162,7 +162,7 @@ export function Home() {
     void auth
       .refreshSession()
       .then((status) => {
-        if (status?.tier === 'professional' || status?.tier === 'enterprise') { // legacy: was 'starter' || 'pro'
+        if (status?.tier === 'professional' || status?.tier === 'enterprise') {
           toast.success(`Billing updated. Your account is now ${status.tier}.`)
         } else {
           toast.success('Checkout completed. Refreshing your account status...')

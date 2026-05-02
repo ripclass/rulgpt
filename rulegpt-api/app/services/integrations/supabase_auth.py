@@ -78,7 +78,7 @@ class SupabaseAuthService:
         ]
         for candidate in candidates:
             normalized = str(candidate or "").strip().lower()
-            if normalized in {"free", "starter", "pro"}:
+            if normalized in {"free", "professional", "enterprise"}:
                 return normalized
         return "free"
 
@@ -224,7 +224,7 @@ class SupabaseAuthService:
 
     async def set_user_tier(self, user_id: str | UUID, tier: str) -> dict[str, Any]:
         normalized_tier = str(tier or "").strip().lower()
-        if normalized_tier not in {"free", "starter", "pro"}:
+        if normalized_tier not in {"free", "professional", "enterprise"}:
             raise ValueError("Unsupported tier.")
 
         return await self.update_user_metadata(

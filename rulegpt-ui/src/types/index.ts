@@ -1,4 +1,4 @@
-export type SessionTier = 'anonymous' | 'free' | 'professional' | 'enterprise' | 'starter' | 'pro' | 'expert'
+export type SessionTier = 'anonymous' | 'free' | 'professional' | 'enterprise'
 export type ConfidenceBand = 'high' | 'medium' | 'low'
 export type LanguageCode = 'en' | 'bn' | 'hi'
 export type MessageRole = 'user' | 'assistant'

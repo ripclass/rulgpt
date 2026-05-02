@@ -60,15 +60,6 @@ class StripeClient:
                 "monthly": settings.STRIPE_ENTERPRISE_MONTHLY_PRICE_ID,
                 "annual": settings.STRIPE_ENTERPRISE_ANNUAL_PRICE_ID,
             },
-            # Legacy aliases
-            "pro": {
-                "monthly": settings.STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID,
-                "annual": settings.STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID,
-            },
-            "starter": {
-                "monthly": settings.STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID,
-                "annual": settings.STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID,
-            },
         }
 
         if normalized_plan not in price_matrix:
@@ -176,11 +167,6 @@ class StripeClient:
             normalized = str(candidate or "").strip().lower()
             if normalized in _VALID_TIERS:
                 return normalized
-            # Legacy mappings
-            if normalized in ("pro", "starter"):
-                return "professional"
-            if normalized == "expert":
-                return "enterprise"
         return "professional"  # default for paid users
 
     @staticmethod
@@ -230,7 +216,7 @@ class StripeClient:
                 "event_type": event_type,
                 "user_id": str(user_id),
                 "tier": tier,
-                "action": "upgraded" if tier == "pro" else "downgraded",
+                "action": "upgraded" if tier in {"professional", "enterprise"} else "downgraded",
                 "supabase_user": updated,
             }
 

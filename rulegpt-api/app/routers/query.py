@@ -97,16 +97,9 @@ def _anonymous_queries_this_month_by_ip(db: Session, client_ip: str) -> int:
 
 def _tier_monthly_limit(tier: str) -> int:
     normalized = str(tier or "").strip().lower()
-    if normalized in {"anonymous", "free"}:
-        return settings.FREE_TIER_MONTHLY_LIMIT
     if normalized == "professional":
         return settings.PROFESSIONAL_TIER_MONTHLY_LIMIT
     if normalized == "enterprise":
-        return settings.ENTERPRISE_TIER_MONTHLY_LIMIT
-    # Legacy aliases
-    if normalized in {"pro", "starter"}:
-        return settings.PROFESSIONAL_TIER_MONTHLY_LIMIT
-    if normalized == "expert":
         return settings.ENTERPRISE_TIER_MONTHLY_LIMIT
     return settings.FREE_TIER_MONTHLY_LIMIT
 
@@ -144,10 +137,10 @@ def _limit_reached_message(tier: str) -> str:
         return "Anonymous monthly query limit reached. Please register to continue."
     if normalized == "free":
         return "Free monthly query limit reached. Upgrade to continue."
-    if normalized == "starter":
-        return "Starter monthly query limit reached. Upgrade to Pro or wait for the next cycle."
-    if normalized == "pro":
-        return "Pro monthly query limit reached. Contact support if you need a higher limit."
+    if normalized == "professional":
+        return "Professional monthly query limit reached. Upgrade to Enterprise or wait for the next cycle."
+    if normalized == "enterprise":
+        return "Enterprise monthly query limit reached. Contact support if you need a higher limit."
     return "Monthly query limit reached."
 
 

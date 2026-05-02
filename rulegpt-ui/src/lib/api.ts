@@ -51,10 +51,10 @@ export interface BillingConfigStatusResponse {
   stripe_configured: boolean
   secret_key_configured: boolean
   webhook_secret_configured: boolean
-  starter_monthly_price_configured: boolean
-  starter_annual_price_configured: boolean
-  pro_monthly_price_configured: boolean
-  pro_annual_price_configured: boolean
+  professional_monthly_price_configured: boolean
+  professional_annual_price_configured: boolean
+  enterprise_monthly_price_configured: boolean
+  enterprise_annual_price_configured: boolean
   checkout_ready: boolean
   webhook_ready: boolean
   supported_plans: BillingPlan[]

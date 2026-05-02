@@ -17,7 +17,7 @@ class AnalyticsQueriesResponse(BaseModel):
     total_queries: int
     anonymous_queries: int
     registered_queries: int
-    pro_queries: int
+    paid_queries: int
 
 
 class AnalyticsConversionResponse(BaseModel):
