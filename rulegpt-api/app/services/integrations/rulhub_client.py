@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import os
 import re
 import time
@@ -18,8 +19,31 @@ except ImportError:  # pragma: no cover - dependency may not exist in all enviro
     httpx = None  # type: ignore
 
 
+logger = logging.getLogger(__name__)
+
+DEFAULT_RULHUB_API_VERSION = "2026-04-28"
+
+
 class RulHubClientError(RuntimeError):
-    """Raised when RulHub operations fail."""
+    """Raised when RulHub operations fail.
+
+    Carries the structured RulHub error envelope (when present) so callers
+    can branch on `error_code` (e.g. `API_KEY_REQUIRED`) or surface the
+    failing schema field from `error_detail.sample_violations`.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        status_code: int | None = None,
+        error_code: str | None = None,
+        error_detail: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+        self.error_code = error_code
+        self.error_detail = dict(error_detail) if error_detail else None
 
 
 class _TransientHTTPError(Exception):
@@ -354,7 +378,10 @@ class RulHubClient:
 
         url = f"{self.base_url}{path}"
         client = self._get_or_create_client()
-        headers: dict[str, str] = {"Accept": "application/json"}
+        headers: dict[str, str] = {
+            "Accept": "application/json",
+            "RulHub-Version": os.getenv("RULHUB_API_VERSION", DEFAULT_RULHUB_API_VERSION),
+        }
         if self.api_key:
             headers["X-API-Key"] = self.api_key
 
@@ -384,17 +411,55 @@ class RulHubClient:
                     break
                 await asyncio.sleep(self.backoff_seconds * (2 ** (attempt - 1)))
             except httpx.HTTPStatusError as exc:
-                status_code = exc.response.status_code
-                body_preview = exc.response.text[:500]
-                raise RulHubClientError(
-                    f"RulHub request failed with status {status_code} for {method} {path}: {body_preview}"
-                ) from exc
+                raise self._build_error_from_response(method, path, exc.response) from exc
             except ValueError as exc:
                 raise RulHubClientError(f"RulHub response was not valid JSON for {method} {path}") from exc
 
         raise RulHubClientError(
             f"RulHub request failed after {self.max_retries} attempts for {method} {path}: {last_error}"
         ) from last_error
+
+    def _build_error_from_response(
+        self, method: str, path: str, response: httpx.Response
+    ) -> RulHubClientError:
+        """Parse the RulHub error envelope and emit a structured log line.
+
+        RulHub 4xx responses use a `{"detail": {...}}` envelope. Two known shapes:
+          - AuthError:        {detail: {error_code, message}}
+          - SchemaViolation:  {detail: {error, schema, violation_count, sample_violations}}
+        """
+        status_code = response.status_code
+        error_code, error_detail = _parse_rulhub_error_envelope(response)
+
+        if error_detail:
+            sample_violations = error_detail.get("sample_violations") or []
+            first_violation = sample_violations[0] if sample_violations else {}
+            logger.warning(
+                "RulHub %s %s failed with %s: error=%r error_code=%r violation_path=%r violation_message=%r",
+                method,
+                path,
+                status_code,
+                error_detail.get("error") or error_detail.get("message"),
+                error_code,
+                first_violation.get("path") if isinstance(first_violation, Mapping) else None,
+                first_violation.get("message") if isinstance(first_violation, Mapping) else None,
+            )
+        else:
+            logger.warning(
+                "RulHub %s %s failed with %s (no structured envelope): %s",
+                method,
+                path,
+                status_code,
+                response.text[:200],
+            )
+
+        body_preview = response.text[:500]
+        return RulHubClientError(
+            f"RulHub request failed with status {status_code} for {method} {path}: {body_preview}",
+            status_code=status_code,
+            error_code=error_code,
+            error_detail=error_detail,
+        )
 
     def _get_or_create_client(self) -> httpx.AsyncClient:
         if self._client is None:
@@ -447,6 +512,30 @@ class RulHubClient:
             "source_hint": source_hint,
         }
         return normalized
+
+
+def _parse_rulhub_error_envelope(
+    response: httpx.Response,
+) -> tuple[str | None, dict[str, Any] | None]:
+    """Extract `(error_code, detail_dict)` from a RulHub structured 4xx body.
+
+    Returns `(None, None)` when the body is not JSON or doesn't follow the
+    `{"detail": {...}}` shape, so callers can fall back to the raw text.
+    """
+    try:
+        body = response.json()
+    except (ValueError, json.JSONDecodeError):
+        return None, None
+    if not isinstance(body, Mapping):
+        return None, None
+    detail = body.get("detail")
+    if not isinstance(detail, Mapping):
+        return None, None
+    detail_dict = dict(detail)
+    error_code = detail_dict.get("error_code")
+    if not isinstance(error_code, str):
+        error_code = None
+    return error_code, detail_dict
 
 
 def _read_json_file(path: Path) -> Any:

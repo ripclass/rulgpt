@@ -1,20 +1,21 @@
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 
 import httpx
 import pytest
 
-from app.services.integrations.rulhub_client import RulHubClient
+from app.services.integrations.rulhub_client import RulHubClient, RulHubClientError
 
 
 @pytest.mark.asyncio
 async def test_get_rules_normalizes_payload_and_sends_api_key() -> None:
-    seen_auth_headers: list[str | None] = []
+    seen_api_keys: list[str | None] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
-        seen_auth_headers.append(request.headers.get("Authorization"))
+        seen_api_keys.append(request.headers.get("X-API-Key"))
         if request.url.path == "/v1/rules":
             payload = {
                 "rules": [
@@ -48,7 +49,95 @@ async def test_get_rules_normalizes_payload_and_sends_api_key() -> None:
     assert rules[0]["rule_id"] == "UCP600_14D"
     assert rules[0]["text"].startswith("Banks must examine")
     assert rules[0]["conditions"] == {"type": "time_constraint"}
-    assert seen_auth_headers[0] == "Bearer test-api-key"
+    assert seen_api_keys[0] == "test-api-key"
+
+
+@pytest.mark.asyncio
+async def test_request_sends_rulhub_version_header(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("RULHUB_API_VERSION", raising=False)
+    seen_versions: list[str | None] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen_versions.append(request.headers.get("RulHub-Version"))
+        return httpx.Response(200, json={"rules": []})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
+        client = RulHubClient(
+            base_url="https://api.rulhub.com",
+            api_key="rh_test_xyz",
+            client=http_client,
+        )
+        await client.get_rules()
+
+    assert seen_versions == ["2026-04-28"]
+
+
+@pytest.mark.asyncio
+async def test_400_with_structured_envelope_is_logged_and_surfaced(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            400,
+            json={
+                "detail": {
+                    "error": "schema validation failed",
+                    "schema": "rule.v2",
+                    "violation_count": 1,
+                    "sample_violations": [
+                        {"path": "/jurisdiction", "message": "must be ISO-3166 alpha-2"}
+                    ],
+                }
+            },
+        )
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
+        client = RulHubClient(
+            base_url="https://api.rulhub.com",
+            api_key="rh_test_xyz",
+            client=http_client,
+            max_retries=1,
+            backoff_seconds=0.0,
+        )
+        with caplog.at_level(logging.WARNING, logger="app.services.integrations.rulhub_client"):
+            with pytest.raises(RulHubClientError) as exc_info:
+                await client._request_json("GET", "/v1/rules", params={"page": 1})
+
+    err = exc_info.value
+    assert err.status_code == 400
+    assert err.error_detail is not None
+    assert err.error_detail["error"] == "schema validation failed"
+    assert err.error_detail["sample_violations"][0]["path"] == "/jurisdiction"
+    # Log line should name the violating field so engineers find the schema break fast.
+    assert "/jurisdiction" in caplog.text
+    assert "schema validation failed" in caplog.text
+
+
+@pytest.mark.asyncio
+async def test_401_surfaces_api_key_required_error_code() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            401,
+            json={
+                "detail": {
+                    "error_code": "API_KEY_REQUIRED",
+                    "message": "Missing X-API-Key header",
+                }
+            },
+        )
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
+        client = RulHubClient(
+            base_url="https://api.rulhub.com",
+            client=http_client,
+            max_retries=1,
+            backoff_seconds=0.0,
+        )
+        with pytest.raises(RulHubClientError) as exc_info:
+            await client._request_json("GET", "/v1/rules")
+
+    assert exc_info.value.status_code == 401
+    assert exc_info.value.error_code == "API_KEY_REQUIRED"
 
 
 @pytest.mark.asyncio
