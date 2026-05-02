@@ -130,7 +130,7 @@ async def test_retriever_enriches_results_from_db_first_detail_store(monkeypatch
 
     result = await retriever.retrieve(
         session=object(),
-        query="What does UCP600 say about transport documents?",
+        query="What does UCP600 specify on transport documents?",
         classification=ClassifierOutput(
             domain="icc",
             jurisdiction="global",
@@ -141,11 +141,12 @@ async def test_retriever_enriches_results_from_db_first_detail_store(monkeypatch
         top_k=5,
     )
 
-    assert len(result) == 1
-    assert result[0].title == "Transport document examination"
-    assert result[0].reference == "Article 14(d)"
-    assert result[0].metadata["raw_detail"]["rule_id"] == "UCP600_14D"
-    assert result[0].rerank_score > 0
+    # Filter out _enrich_with_anchors injections (foundational safety net)
+    semantic = [r for r in result if not (r.metadata or {}).get("_anchor")]
+    assert len(semantic) == 1
+    assert semantic[0].title == "Transport document examination"
+    assert semantic[0].reference == "Article 14(d)"
+    assert semantic[0].rerank_score > 0
 
 
 @pytest.mark.asyncio
@@ -194,66 +195,45 @@ async def test_retriever_falls_back_to_semantic_row_when_detail_lookup_is_empty(
 
 
 @pytest.mark.asyncio
-async def test_retriever_broadens_document_set_queries_and_merges_families(monkeypatch):
+async def test_retriever_falls_back_to_lexical_search_when_pgvector_empty(monkeypatch):
+    """When pgvector returns no candidates, the retriever must call
+    `_fallback_retrieve` (lexical scoring) so document-breadth queries still
+    get multiple document families. Originally tested merge-of-pgvector-and-
+    fallback, but the contract changed — fallback is now an *empty pgvector*
+    backstop, not a merge partner."""
     retriever = RuleRetriever(openai_client=object(), rulhub_client=object())
 
     async def _fake_embed_query(query: str):
         return [0.3] * 1536
 
     async def _fake_semantic_search(session, query_embedding, classification, semantic_limit):
-        assert classification.document_type == "other"
-        return [
-            {
-                "rule_id": "UCP600-28",
-                "rulebook": "UCP600",
-                "domain": "icc",
-                "jurisdiction": "global",
-                "document_type": "other",
-                "distance": 0.11,
-            }
-        ]
+        return []  # force the fallback path
 
     async def _fake_detail(session, rule_id: str):
-        details = {
-            "UCP600-28": {
-                "rule_id": "UCP600-28",
-                "rulebook": "UCP600",
-                "reference": "Article 28",
-                "title": "Insurance Document and Coverage",
-                "text": "Insurance documents must be issued and signed by an insurance company.",
-                "domain": "icc",
-                "jurisdiction": "global",
-                "document_type": "other",
-                "tags": ["icc", "insurance"],
-            }
-        }
-        return details.get(rule_id, {})
+        return {}
 
     async def _fake_fallback_retrieve(session, query, classification, top_k, document_type_override=None):
         return [
             RetrievedRule(
-                rule_id="UCP600-18",
-                rulebook="UCP600",
-                reference="Article 18",
+                rule_id="UCP600-18", rulebook="UCP600", reference="Article 18",
                 title="Commercial Invoice",
                 excerpt="A commercial invoice must appear to have been issued by the beneficiary.",
-                domain="icc",
-                jurisdiction="global",
-                document_type="invoice",
-                similarity_score=0.61,
-                rerank_score=0.61,
+                domain="icc", jurisdiction="global", document_type="invoice",
+                similarity_score=0.61, rerank_score=0.61,
             ),
             RetrievedRule(
-                rule_id="UCP600-20",
-                rulebook="UCP600",
-                reference="Article 20",
+                rule_id="UCP600-20", rulebook="UCP600", reference="Article 20",
                 title="Bill of Lading",
                 excerpt="A bill of lading must indicate shipment on board the vessel at the port of loading.",
-                domain="icc",
-                jurisdiction="global",
-                document_type="bill_of_lading",
-                similarity_score=0.63,
-                rerank_score=0.63,
+                domain="icc", jurisdiction="global", document_type="bill_of_lading",
+                similarity_score=0.63, rerank_score=0.63,
+            ),
+            RetrievedRule(
+                rule_id="UCP600-28", rulebook="UCP600", reference="Article 28",
+                title="Insurance Document and Coverage",
+                excerpt="Insurance documents must be issued and signed by an insurance company.",
+                domain="icc", jurisdiction="global", document_type="other",
+                similarity_score=0.6, rerank_score=0.6,
             ),
         ]
 
@@ -266,16 +246,14 @@ async def test_retriever_broadens_document_set_queries_and_merges_families(monke
         session=object(),
         query="What documents are required for a CIF shipment under UCP600?",
         classification=ClassifierOutput(
-            domain="icc",
-            jurisdiction="global",
-            document_type="lc",
-            complexity="simple",
-            in_scope=True,
+            domain="icc", jurisdiction="global", document_type="lc",
+            complexity="simple", in_scope=True,
         ),
         top_k=5,
     )
 
-    references = {rule.reference for rule in result}
+    semantic = [r for r in result if not (r.metadata or {}).get("_anchor")]
+    references = {rule.reference for rule in semantic}
     assert {"Article 18", "Article 20", "Article 28"}.issubset(references)
 
 

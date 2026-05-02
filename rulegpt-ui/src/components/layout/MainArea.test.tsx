@@ -25,8 +25,9 @@ describe('MainArea', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByText('Preview')).toBeInTheDocument()
-    expect(screen.getByText('Ask about any trade finance rule.')).toBeInTheDocument()
+    expect(screen.getByText('Preview Node')).toBeInTheDocument()
+    // Subtext on the empty-state hero (unauthenticated copy).
+    expect(screen.getByText(/The rule you need, cited and explained/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'What documents are required for a CIF shipment under UCP600?' })).toBeEnabled()
     expect(screen.getByRole('button', { name: /send/i })).toBeInTheDocument()
   })

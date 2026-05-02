@@ -83,6 +83,7 @@ export function QueryInput({
             </span>
             <button
               type="submit"
+              aria-label="Send"
               className="flex items-center justify-center p-2 rounded-full bg-neutral-900 text-white transition-all hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-400"
               disabled={disabled || !value.trim() || isTooLong}
             >

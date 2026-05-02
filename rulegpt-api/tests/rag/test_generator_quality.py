@@ -20,9 +20,12 @@ class _FakeAnthropicClient:
         max_tokens: int = 0,
         temperature: float = 0.0,
     ):
+        # 3+ unknown references trips the hallucination-rejection threshold
+        # (see `answer_mentions_unknown_references` in generator.py).
         return (
             "## Insurance documents under UCP600\n\n"
-            "According to [UCP600 Article 18], insurance cover notes are not accepted.\n\n"
+            "According to [UCP600 Article 18], [UCP600 Article 19], and "
+            "[UCP600 Article 20], insurance cover notes are not accepted.\n\n"
             "**Follow-up questions you might have:**\n"
             "1. Do you want more detail?\n"
             "2. Should I compare this with CIP?\n"
@@ -168,7 +171,7 @@ def test_compose_grounded_answer_surfaces_fta_scope_before_origin_mechanics():
 
 
 @pytest.mark.asyncio
-async def test_generator_uses_shorter_token_budget_for_simple_queries():
+async def test_generator_uses_baseline_token_budget_for_simple_queries():
     client = _BudgetCaptureAnthropicClient()
     generator = AnswerGenerator(anthropic_client=client, openai_client=object())
 
@@ -179,7 +182,8 @@ async def test_generator_uses_shorter_token_budget_for_simple_queries():
     )
 
     assert result["answer"]
-    assert client.max_tokens == 180
+    # Single-question, single-rule, single-domain ICC query → bare base budget.
+    assert client.max_tokens == 600
 
 
 @pytest.mark.asyncio
@@ -187,18 +191,36 @@ async def test_generator_allows_longer_budget_when_query_needs_more_detail():
     client = _BudgetCaptureAnthropicClient()
     generator = AnswerGenerator(anthropic_client=client, openai_client=object())
 
+    # Mix domains so multi-domain bonus (+300) is added on top of 5+ rules (+200) + sanctions (+300).
+    icc_rule = _insurance_rule()
+    sanctions_rule = RetrievedRule(
+        rule_id="OFAC-IRAN-1", rulebook="OFAC", reference="50 CFR 560",
+        title="Iran Transactions", excerpt="US persons may not engage in transactions with Iran.",
+        domain="sanctions", jurisdiction="us", document_type="other",
+        similarity_score=0.8, rerank_score=0.78,
+    )
+    fta_rule = RetrievedRule(
+        rule_id="RCEP-1", rulebook="RCEP", reference="Article 3",
+        title="RCEP origin", excerpt="Goods qualify if wholly obtained.",
+        domain="fta", jurisdiction="rcep", document_type="other",
+        similarity_score=0.7, rerank_score=0.7,
+    )
+
     result = await generator.generate(
         query="What are OFAC requirements for trading with UAE counterparties?",
-        retrieved_rules=[_insurance_rule()] * 6,
+        retrieved_rules=[icc_rule, sanctions_rule, fta_rule, sanctions_rule, sanctions_rule, sanctions_rule],
         classifier_output=ClassifierOutput(domain="sanctions", jurisdiction="global", document_type="other", complexity="simple"),
     )
 
     assert result["answer"]
-    assert client.max_tokens == 360
+    # base 600 + 5+ rules (+200) + sanctions (+300) + 3 domains (+300) = 1400
+    assert client.max_tokens == 1400
 
 
-def test_suggested_followups_default_to_one_for_simple_queries():
-    followups = AnswerGenerator.suggested_followups(
+def test_static_followups_default_to_one_for_simple_queries():
+    # `suggested_followups` is now async + LLM-backed (3 contextual followups).
+    # Length-based behavior moved to `_static_followups` (the offline fallback).
+    followups = AnswerGenerator._static_followups(
         "How does UCP600 handle insurance documents?",
         ClassifierOutput(domain="icc", jurisdiction="global", document_type="other", complexity="simple"),
     )
@@ -206,8 +228,8 @@ def test_suggested_followups_default_to_one_for_simple_queries():
     assert len(followups) == 1
 
 
-def test_suggested_followups_expand_for_fta_queries():
-    followups = AnswerGenerator.suggested_followups(
+def test_static_followups_expand_for_fta_queries():
+    followups = AnswerGenerator._static_followups(
         "Does my garment qualify for RCEP preferential tariff from Bangladesh?",
         ClassifierOutput(domain="fta", jurisdiction="rcep", document_type="other", complexity="simple"),
     )
