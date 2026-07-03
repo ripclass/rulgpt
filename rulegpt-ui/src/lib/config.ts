@@ -5,5 +5,6 @@ function readBooleanEnv(name: string, defaultValue = false) {
 }
 
 export function isPreviewModeEnabled() {
-  return readBooleanEnv('VITE_PREVIEW_MODE', true)
+  // Live by default (2026-07 Phase 4 launch) — set VITE_PREVIEW_MODE=true to force the product-shell preview.
+  return readBooleanEnv('VITE_PREVIEW_MODE', false)
 }

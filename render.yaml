@@ -46,6 +46,20 @@ services:
       # is already "rulhub".
       - key: RETRIEVAL_BACKEND
         value: local
+      - key: RULGPT_RETRIEVAL_CACHE_TTL
+        value: "1800"
+      - key: RULGPT_RERANK_EMBEDDINGS
+        value: "true"
+      # Daily quota windows (Task 4.1).
+      - key: ANONYMOUS_DAILY_LIMIT
+        value: "2"
+      - key: FREE_TIER_DAILY_LIMIT
+        value: "5"
+      # MT700 interpreter (Task 4.2) daily call caps.
+      - key: MT700_DAILY_LIMIT_ANON
+        value: "3"
+      - key: MT700_DAILY_LIMIT_AUTH
+        value: "10"
       - key: DATABASE_URL
         sync: false
       - key: SECRET_KEY
@@ -88,5 +102,14 @@ services:
         value: price_1TJQ1LBG8gnvAJXafcNqUOOv
       - key: STRIPE_ENTERPRISE_ANNUAL_PRICE_ID
         value: price_1TJQ1NBG8gnvAJXaZZlHHCmh
+      # Pro $29/mo checkout SKU (Task 4.3) — marketing label only, maps to the
+      # internal "professional" tier. Not yet created in Stripe.
+      - key: STRIPE_PRO_MONTHLY_PRICE_ID
+        sync: false
+      # One-off artifact checkout prices (Task 4.4). Not yet created in Stripe.
+      - key: STRIPE_CASE_NOTE_PRICE_ID
+        sync: false
+      - key: STRIPE_DRAFT_PRICE_ID
+        sync: false
       - key: ADMIN_SECRET
         sync: false
