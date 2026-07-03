@@ -6,7 +6,7 @@ import { blogPosts } from '../src/data/blogPosts'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const distDir = join(__dirname, '..', 'dist')
-const BASE_URL = 'https://www.tfrules.com'
+const BASE_URL = 'https://rulgpt.com'
 const DEFAULT_OG_IMAGE = `${BASE_URL}/og-image.png`
 
 function escapeHtml(value: string): string {
@@ -102,7 +102,7 @@ function articleJsonLd(post: (typeof blogPosts)[number], canonical: string): str
     },
     publisher: {
       '@type': 'Organization',
-      name: 'TFRules',
+      name: 'RulGPT',
       url: BASE_URL,
       logo: {
         '@type': 'ImageObject',
@@ -126,7 +126,7 @@ let count = 0
 for (const post of blogPosts) {
   const slug = post.slug
   const canonicalPath = `/blog/${slug}`
-  const title = `${post.title} | TFRules`
+  const title = `${post.title} | RulGPT`
   let html = injectMeta(template, {
     title,
     description: post.description,
@@ -142,9 +142,9 @@ for (const post of blogPosts) {
 }
 
 const blogLanding = injectMeta(template, {
-  title: 'Trade Finance Rules Blog | TFRules',
+  title: 'Trade Finance Rules Blog | RulGPT',
   description:
-    'Expert explanations of UCP600, ISBP745, sanctions, FTAs, and trade compliance rules — with exact citations. No opinion, just rules.',
+    'Expert explanations of UCP600, ISBP 821, sanctions, FTAs, and trade compliance rules — with exact citations. No opinion, just rules.',
   canonicalPath: '/blog',
   ogType: 'website',
 })
@@ -154,33 +154,33 @@ writeFileSync(join(distDir, 'blog', 'index.html'), blogLanding, 'utf8')
 const staticRoutes: Array<{ path: string; title: string; description: string }> = [
   {
     path: '/pricing',
-    title: 'Pricing — TFRules',
+    title: 'Pricing | RulGPT',
     description:
       'Free, Professional, and Enterprise plans for cited trade finance rule answers. From $0 to $199 per month.',
   },
   {
     path: '/faq',
-    title: 'FAQ — TFRules',
+    title: 'FAQ | RulGPT',
     description:
-      'Frequently asked questions about tfrules.com. How it works, what it covers, accuracy, pricing, and data handling.',
+      'Frequently asked questions about rulgpt.com. How it works, what it covers, accuracy, pricing, and data handling.',
   },
   {
     path: '/contact',
-    title: 'Contact — TFRules',
+    title: 'Contact | RulGPT',
     description:
-      'Get in touch with the TFRules team. General enquiries, support, and billing for trade finance compliance Q&A.',
+      'Get in touch with the RulGPT team. General enquiries, support, and billing for trade finance compliance Q&A.',
   },
   {
     path: '/privacy',
-    title: 'Privacy Policy — TFRules',
+    title: 'Privacy Policy | RulGPT',
     description:
-      'How tfrules.com collects, uses, and protects your data. No tracking beyond what is needed to serve cited trade finance answers.',
+      'How rulgpt.com collects, uses, and protects your data. No tracking beyond what is needed to serve cited trade finance answers.',
   },
   {
     path: '/terms',
-    title: 'Terms of Use — TFRules',
+    title: 'Terms of Use | RulGPT',
     description:
-      'Terms and conditions for using tfrules.com. Rules explanation only — not legal advice, not document validation.',
+      'Terms and conditions for using rulgpt.com. Rules explanation only — not legal advice, not document validation.',
   },
 ]
 
@@ -196,6 +196,17 @@ for (const route of staticRoutes) {
   writeFileSync(join(outDir, 'index.html'), html, 'utf8')
 }
 
+const sitemapEntries = [
+  ...staticRoutes.map((r) => r.path),
+  '/',
+  '/blog',
+  ...blogPosts.map((p) => `/blog/${p.slug}`),
+]
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapEntries
+  .map((p) => `  <url><loc>${BASE_URL}${p === '/' ? '' : p}</loc></url>`)
+  .join('\n')}\n</urlset>\n`
+writeFileSync(join(distDir, 'sitemap.xml'), sitemap, 'utf8')
+
 console.log(
-  `[prerender] wrote ${count} blog posts + blog landing + ${staticRoutes.length} static routes`
+  `[prerender] wrote ${count} blog posts + blog landing + ${staticRoutes.length} static routes + sitemap.xml (${sitemapEntries.length} urls)`
 )

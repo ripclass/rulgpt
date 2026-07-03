@@ -8,7 +8,7 @@ interface SEOHeadProps {
   ogImage?: string
 }
 
-const BASE_URL = 'https://www.tfrules.com'
+const BASE_URL = 'https://rulgpt.com'
 
 export function SEOHead({ title, description, path, type = 'website', ogImage }: SEOHeadProps) {
   const url = `${BASE_URL}${path}`
@@ -27,7 +27,7 @@ export function SEOHead({ title, description, path, type = 'website', ogImage }:
       <meta property="og:image" content={image} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:site_name" content="TFRules" />
+      <meta property="og:site_name" content="RulGPT" />
 
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
