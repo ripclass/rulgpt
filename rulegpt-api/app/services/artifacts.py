@@ -130,10 +130,17 @@ async def _generate_with_citation_validation(
     user_prompt: str,
     retrieved_rules: list[RetrievedRule],
     max_tokens: int,
-) -> str:
+) -> tuple[str, bool]:
     """Retry-once-then-citations-only degrade, mirroring the pattern used
     for chat generation (`AnswerGenerator.generate`) and the MT700
-    interpreter (`app.routers.interpret._generate_mt700_answer`)."""
+    interpreter (`app.routers.interpret._generate_mt700_answer`).
+
+    Returns `(body_text, degraded)`. `degraded=True` means the LLM path
+    never produced a clean, citation-valid synthesis and the caller fell
+    back to `compose_citations_only_answer` — a non-synthesized artifact.
+    The router uses this to avoid burning a one-off credit on a degraded
+    result (see `app.routers.artifacts`).
+    """
     try:
         first_res = await llm_client.generate_answer(user_prompt, system_prompt, max_tokens=max_tokens, temperature=0.2)
         text = (first_res.text or "").strip()
@@ -142,25 +149,26 @@ async def _generate_with_citation_validation(
             retry_res = await llm_client.generate_answer(user_prompt, strict_prompt, max_tokens=max_tokens, temperature=0.2)
             retry_text = (retry_res.text or "").strip()
             if retry_text and answer_mentions_unknown_references(retry_text, retrieved_rules):
-                return compose_citations_only_answer("artifact", retrieved_rules)
-            return retry_text
+                return compose_citations_only_answer("artifact", retrieved_rules), True
+            return retry_text, False
         if not text:
-            return compose_citations_only_answer("artifact", retrieved_rules)
-        return text
+            return compose_citations_only_answer("artifact", retrieved_rules), True
+        return text, False
     except LLMUnavailableError:
-        return compose_citations_only_answer("artifact", retrieved_rules)
+        return compose_citations_only_answer("artifact", retrieved_rules), True
 
 
 async def generate_case_note(llm_client: Any, query_text: str, answer_text: str, citations: Sequence[dict]) -> dict[str, Any]:
     retrieved_rules = _citations_to_retrieved_rules(citations)
     user_prompt = _build_user_prompt(query_text, answer_text, citations)
-    body = await _generate_with_citation_validation(
+    body, degraded = await _generate_with_citation_validation(
         llm_client, CASE_NOTE_SYSTEM_PROMPT, user_prompt, retrieved_rules, max_tokens=900
     )
     return {
         "title": f"Case note: {query_text[:80]}",
         "body_markdown": body,
         "citations": list(citations),
+        "degraded": degraded,
     }
 
 
@@ -170,7 +178,7 @@ async def generate_draft(
     system_prompt = DRAFT_SYSTEM_PROMPTS[draft_type]
     retrieved_rules = _citations_to_retrieved_rules(citations)
     user_prompt = _build_user_prompt(query_text, answer_text, citations)
-    body = await _generate_with_citation_validation(
+    body, degraded = await _generate_with_citation_validation(
         llm_client, system_prompt, user_prompt, retrieved_rules, max_tokens=700
     )
     return {
@@ -178,4 +186,5 @@ async def generate_draft(
         "body_markdown": body,
         "citations": list(citations),
         "draft_type": draft_type,
+        "degraded": degraded,
     }

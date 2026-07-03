@@ -21,7 +21,12 @@ from app.schemas.query import CitationItem
 from app.services.artifacts import generate_case_note, generate_draft
 from app.services.integrations.llm_client import OpenRouterLLMClient
 
-from .deps import consume_or_require_entitlement, get_request_tier, require_authenticated_user
+from .deps import (
+    consume_or_require_entitlement,
+    get_request_tier,
+    release_entitlement_credit,
+    require_authenticated_user,
+)
 
 router = APIRouter(prefix="/api/artifacts", tags=["artifacts"])
 
@@ -62,11 +67,15 @@ async def create_case_note(
 ) -> ArtifactResponse:
     query_row = _load_owned_query(db, payload.query_id, user_id)
     tier = get_request_tier(request)
-    consume_or_require_entitlement(db, str(user_id), tier, "case_note")
+    entitlement_row = consume_or_require_entitlement(db, str(user_id), tier, "case_note")
 
     result = await generate_case_note(
         llm_client, query_row.query_text, query_row.answer_text, query_row.citations or []
     )
+    credit_consumed = entitlement_row is not None
+    if result.get("degraded") and entitlement_row is not None:
+        release_entitlement_credit(db, entitlement_row)
+        credit_consumed = False
     db.commit()
 
     return ArtifactResponse(
@@ -75,6 +84,7 @@ async def create_case_note(
         citations=_coerce_citations(result["citations"]),
         disclaimer=ARTIFACT_DISCLAIMER_TEXT,
         generated_at=_utc_now(),
+        credit_consumed=credit_consumed,
     )
 
 
@@ -87,11 +97,15 @@ async def create_draft(
 ) -> DraftArtifactResponse:
     query_row = _load_owned_query(db, payload.query_id, user_id)
     tier = get_request_tier(request)
-    consume_or_require_entitlement(db, str(user_id), tier, "draft")
+    entitlement_row = consume_or_require_entitlement(db, str(user_id), tier, "draft")
 
     result = await generate_draft(
         llm_client, query_row.query_text, query_row.answer_text, query_row.citations or [], payload.draft_type
     )
+    credit_consumed = entitlement_row is not None
+    if result.get("degraded") and entitlement_row is not None:
+        release_entitlement_credit(db, entitlement_row)
+        credit_consumed = False
     db.commit()
 
     return DraftArtifactResponse(
@@ -101,4 +115,5 @@ async def create_draft(
         disclaimer=ARTIFACT_DISCLAIMER_TEXT,
         generated_at=_utc_now(),
         draft_type=result["draft_type"],
+        credit_consumed=credit_consumed,
     )

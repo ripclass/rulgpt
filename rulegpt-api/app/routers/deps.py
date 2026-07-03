@@ -127,10 +127,16 @@ def require_admin_user(request: Request):
     return True
 
 
-def consume_or_require_entitlement(db: Session, user_id: str, tier: str, kind: str) -> None:
-    """Pro/enterprise pass free. Otherwise consume one credit or raise 402."""
+def consume_or_require_entitlement(db: Session, user_id: str, tier: str, kind: str) -> RuleGPTEntitlement | None:
+    """Pro/enterprise pass free (returns None — nothing was consumed, so
+    there is nothing for a caller to release later). Otherwise consume one
+    credit or raise 402. Returns the consumed row so a caller whose
+    generation subsequently degrades can undo the consumption via
+    `release_entitlement_credit` — the credit was paid for a synthesized
+    artifact, not a citations-only degrade.
+    """
     if tier in ("professional", "enterprise"):
-        return
+        return None
     row = (
         db.query(RuleGPTEntitlement)
         .filter(
@@ -152,6 +158,19 @@ def consume_or_require_entitlement(db: Session, user_id: str, tier: str, kind: s
             },
         )
     row.consumed += 1
+    db.flush()
+    return row
+
+
+def release_entitlement_credit(db: Session, row: RuleGPTEntitlement | None) -> None:
+    """Undo a consumption recorded by `consume_or_require_entitlement` when
+    the generation it paid for degraded to a non-synthesized artifact.
+    No-op when `row` is None (Pro/enterprise callers never consumed
+    anything, so there's nothing to release).
+    """
+    if row is None:
+        return
+    row.consumed = max(0, row.consumed - 1)
     db.flush()
 
 

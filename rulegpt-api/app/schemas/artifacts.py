@@ -32,6 +32,11 @@ class ArtifactResponse(BaseModel):
     citations: List[CitationItem]
     disclaimer: str = ARTIFACT_DISCLAIMER_TEXT
     generated_at: datetime
+    # True only when a one-off credit was actually consumed for this
+    # generation (clean synthesis, non-Pro/enterprise tier). Always False
+    # for subscription tiers (they never consume credits) and for degraded
+    # (citations-only) generations, where the consumption is released.
+    credit_consumed: bool = False
 
 
 class DraftArtifactResponse(ArtifactResponse):

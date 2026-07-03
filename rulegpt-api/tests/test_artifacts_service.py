@@ -8,6 +8,7 @@ from dataclasses import dataclass
 import pytest
 
 from app.services import artifacts
+from app.services.integrations.llm_client import LLMUnavailableError
 
 
 @dataclass
@@ -89,3 +90,41 @@ async def test_draft_uses_clean_first_answer_without_retry():
     result = await artifacts.generate_draft(llm, "q", "a", CITATIONS, "waiver_request")
     assert result["body_markdown"] == CLEAN
     assert len(llm.calls) == 1
+
+
+# ---------------------------------------------------------------------------
+# `degraded` flag — the router uses this to decide whether a one-off credit
+# should be released (see tests/routers/test_artifacts.py).
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_case_note_clean_answer_is_not_degraded():
+    llm = _ScriptedLLMClient([CLEAN])
+    result = await artifacts.generate_case_note(llm, "q", "a", CITATIONS)
+    assert result["degraded"] is False
+
+
+@pytest.mark.asyncio
+async def test_case_note_persistent_hallucination_is_degraded():
+    llm = _ScriptedLLMClient([HALLUCINATED, HALLUCINATED])
+    result = await artifacts.generate_case_note(llm, "q", "a", CITATIONS)
+    assert result["degraded"] is True
+
+
+@pytest.mark.asyncio
+async def test_draft_clean_retry_after_hallucination_is_not_degraded():
+    llm = _ScriptedLLMClient([HALLUCINATED, CLEAN])
+    result = await artifacts.generate_draft(llm, "q", "a", CITATIONS, "waiver_request")
+    assert result["degraded"] is False
+
+
+class _UnavailableLLMClient:
+    async def generate_answer(self, prompt, system_prompt, model=None, max_tokens=1200, temperature=0.2):
+        raise LLMUnavailableError("all providers failed")
+
+
+@pytest.mark.asyncio
+async def test_draft_llm_unavailable_is_degraded():
+    result = await artifacts.generate_draft(_UnavailableLLMClient(), "q", "a", CITATIONS, "waiver_request")
+    assert result["degraded"] is True

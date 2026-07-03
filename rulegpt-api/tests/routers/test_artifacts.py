@@ -193,6 +193,55 @@ def test_case_note_free_user_with_credit_succeeds_and_consumes_it(fake_llm):
     assert response.status_code == 200
     assert entitlement_row.consumed == 1
     assert db.flush_calls == 1
+    assert response.json()["credit_consumed"] is True
+
+
+def test_case_note_pro_user_response_reports_credit_not_consumed(fake_llm):
+    """Subscription tiers never touch entitlements — the field must still be
+    truthful (False), not just omitted."""
+    user_id = uuid4()
+    query_row = _make_query_row(user_id)
+    db = _FakeDb(query_row=query_row)
+    client = TestClient(_build_app(db))
+
+    response = client.post(
+        "/api/artifacts/case-note",
+        json={"query_id": str(query_row.id)},
+        headers=_dev_headers(user_id, "professional"),
+    )
+
+    assert response.status_code == 200
+    assert response.json()["credit_consumed"] is False
+
+
+def test_case_note_free_user_degraded_generation_does_not_burn_credit(monkeypatch):
+    """A citations-only degrade (LLM unavailable, or persistent hallucination)
+    must not consume the one-off credit the user paid for."""
+    user_id = uuid4()
+    query_row = _make_query_row(user_id)
+    entitlement_row = SimpleNamespace(credits=1, consumed=0)
+    db = _FakeDb(query_row=query_row, entitlement_rows=[entitlement_row])
+    client = TestClient(_build_app(db))
+
+    async def _raise_unavailable(prompt, system_prompt, model=None, max_tokens=1200, temperature=0.2):
+        from app.services.integrations.llm_client import LLMUnavailableError
+
+        raise LLMUnavailableError("all providers failed")
+
+    fake = SimpleNamespace(generate_answer=_raise_unavailable)
+    monkeypatch.setattr(artifacts, "llm_client", fake)
+
+    response = client.post(
+        "/api/artifacts/case-note",
+        json={"query_id": str(query_row.id)},
+        headers=_dev_headers(user_id, "free"),
+    )
+
+    assert response.status_code == 200
+    assert "verified citations" in response.json()["body_markdown"]
+    assert response.json()["credit_consumed"] is False
+    # Consumed then released — net zero, credit still usable.
+    assert entitlement_row.consumed == 0
 
 
 def test_draft_invalid_draft_type_returns_422(fake_llm):
