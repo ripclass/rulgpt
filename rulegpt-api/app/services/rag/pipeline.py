@@ -12,6 +12,7 @@ from .generator import AnswerGenerator, DISCLAIMER_TEXT
 from .models import ClassifierOutput, QueryResult, RetrievedRule
 from .query_intent import has_partial_coverage_language, requires_document_breadth
 from .retriever import RuleRetriever
+from .rulhub_retriever import RetrievalUnavailableError, RulHubRetriever
 
 
 OUT_OF_SCOPE_MESSAGE = "I specialize in trade finance compliance rules. That question sits outside this product's scope."
@@ -19,6 +20,11 @@ OUT_OF_SCOPE_MESSAGE = "I specialize in trade finance compliance rules. That que
 NO_RULE_MESSAGE = (
     "I don't have a specific rule covering that. Here's what related rules say: "
     "no closely matching rule was found in the current ruleset."
+)
+
+RETRIEVAL_UNAVAILABLE_MESSAGE = (
+    "Rule retrieval is temporarily unavailable. Your question was not counted against "
+    "your quota — please try again in a few minutes."
 )
 
 # ---------------------------------------------------------------------------
@@ -258,7 +264,11 @@ class RAGPipeline:
         generator: AnswerGenerator | None = None,
     ) -> None:
         self.classifier = classifier or QueryClassifier()
-        self.retriever = retriever or RuleRetriever()
+        if retriever is not None:
+            self.retriever = retriever
+        else:
+            from app.config import settings as _settings
+            self.retriever = RuleRetriever() if _settings.RETRIEVAL_BACKEND == "local" else RulHubRetriever()
         self.generator = generator or AnswerGenerator()
 
     async def process_query(self, query: str, session: Any, language: str = "en", user_tier: str = "free") -> QueryResult:
@@ -346,6 +356,25 @@ class RAGPipeline:
                 query=query,
                 classification=classifier_output,
                 top_k=8 if requires_document_breadth(query) else 5,
+            )
+        except RetrievalUnavailableError:
+            stage_latency["retriever"] = int((time.perf_counter() - start) * 1000)
+            latency_ms = int((time.perf_counter() - start_total) * 1000)
+            return QueryResult(
+                answer=RETRIEVAL_UNAVAILABLE_MESSAGE,
+                citations=[],
+                confidence_band="low",
+                suggested_followups=[],
+                show_trdr_cta=False,
+                disclaimer=DISCLAIMER_TEXT,
+                classifier_output=classifier_output,
+                retrieved_rule_ids=[],
+                model_used="unavailable",
+                classifier_model=classifier_model,
+                latency_ms=latency_ms,
+                stage_latency_ms=stage_latency,
+                routing_tier="unavailable",
+                fallback_reasons=["retrieval_unavailable"],
             )
         except Exception:
             retrieved_rules = []

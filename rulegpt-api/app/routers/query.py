@@ -81,7 +81,14 @@ def _find_or_create_session(db: Session, request: Request, payload: QueryRequest
 
 
 def _anonymous_queries_this_month_by_ip(db: Session, client_ip: str) -> int:
-    """Count queries across ALL anonymous sessions from this IP this month."""
+    """Count queries across ALL anonymous sessions from this IP this month.
+
+    Excludes routing_tier == "unavailable" — a failed-retrieval turn (RulHub
+    fail-closed) doesn't count against the caller's quota. Uses
+    `is_distinct_from` rather than `!=` so rows with a NULL routing_tier
+    (e.g. pipeline errors unrelated to retrieval) are still counted, not
+    silently dropped by SQL's three-valued NULL comparison logic.
+    """
     month_start = _month_start(_utc_now())
     total = db.scalar(
         select(func.count(RuleGPTQuery.id))
@@ -90,6 +97,7 @@ def _anonymous_queries_this_month_by_ip(db: Session, client_ip: str) -> int:
             RuleGPTSession.client_ip == client_ip,
             RuleGPTSession.tier == "anonymous",
             RuleGPTQuery.created_at >= month_start,
+            RuleGPTQuery.routing_tier.is_distinct_from("unavailable"),
         )
     )
     return int(total or 0)
@@ -105,6 +113,14 @@ def _tier_monthly_limit(tier: str) -> int:
 
 
 def _queries_this_month(db: Session, session_obj: RuleGPTSession, tier: str) -> int:
+    """Count queries this billing month, excluding failed-retrieval turns.
+
+    A routing_tier of "unavailable" means RulHub failed closed and the
+    pipeline returned RETRIEVAL_UNAVAILABLE_MESSAGE without answering the
+    question, so it must not consume the caller's quota. See
+    `_anonymous_queries_this_month_by_ip` for why `is_distinct_from` is used
+    instead of `!=`.
+    """
     month_start = _month_start(_utc_now())
     normalized = str(tier or "").strip().lower()
 
@@ -113,6 +129,7 @@ def _queries_this_month(db: Session, session_obj: RuleGPTSession, tier: str) -> 
             select(func.count(RuleGPTQuery.id)).where(
                 RuleGPTQuery.user_id == session_obj.user_id,
                 RuleGPTQuery.created_at >= month_start,
+                RuleGPTQuery.routing_tier.is_distinct_from("unavailable"),
             )
         )
         return int(total or 0)
@@ -126,6 +143,7 @@ def _queries_this_month(db: Session, session_obj: RuleGPTSession, tier: str) -> 
         select(func.count(RuleGPTQuery.id)).where(
             RuleGPTQuery.session_id == session_obj.id,
             RuleGPTQuery.created_at >= month_start,
+            RuleGPTQuery.routing_tier.is_distinct_from("unavailable"),
         )
     )
     return int(total or 0)

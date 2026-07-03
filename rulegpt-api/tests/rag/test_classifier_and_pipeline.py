@@ -4,7 +4,8 @@ import pytest
 
 from app.services.rag.classifier import QueryClassifier
 from app.services.rag.models import ClassifierOutput, RetrievedRule
-from app.services.rag.pipeline import RAGPipeline
+from app.services.rag.pipeline import RAGPipeline, RETRIEVAL_UNAVAILABLE_MESSAGE
+from app.services.rag.rulhub_retriever import RetrievalUnavailableError
 
 
 @pytest.mark.asyncio
@@ -106,6 +107,29 @@ async def test_pipeline_lc_compliance_query_stays_product_neutral():
     assert "document-review workflow" in result.answer
     assert result.show_trdr_cta is False
     assert result.retrieved_rule_ids == []
+
+
+class _UnavailableRetriever:
+    async def retrieve(self, session, query, classification, top_k=5):
+        raise RetrievalUnavailableError("RulHub is suspended")
+
+
+@pytest.mark.asyncio
+async def test_pipeline_fails_closed_when_retrieval_unavailable():
+    pipeline = RAGPipeline(
+        classifier=_FakeClassifier(),
+        retriever=_UnavailableRetriever(),
+        generator=_FakeGenerator(),
+    )
+    result = await pipeline.process_query(
+        query="What does UCP600 say about transport documents?",
+        session=None,
+        language="en",
+    )
+    assert result.answer == RETRIEVAL_UNAVAILABLE_MESSAGE
+    assert result.routing_tier == "unavailable"
+    assert result.model_used == "unavailable"
+    assert result.citations == []
 
 
 @pytest.mark.asyncio
