@@ -1,10 +1,13 @@
-"""Answer generation service with Claude primary + GPT fallback."""
+"""Answer generation service — OpenRouter LLM primary with a deterministic
+grounded-answer fallback (see `app.services.integrations.llm_client`)."""
 
 from __future__ import annotations
 
 from datetime import date
 import re
 from typing import Any, Dict, List, Optional, Sequence, Tuple
+
+from app.services.integrations.llm_client import LLMResult, LLMUnavailableError, OpenRouterLLMClient
 
 from .models import ClassifierOutput, RetrievedRule
 from .query_intent import (
@@ -233,12 +236,6 @@ DISCLAIMER_TEXT = (
     "Based on published trade finance rules and standards. Not legal advice. "
     "Consult a qualified trade finance professional for your specific transaction."
 )
-
-
-async def _maybe_await(value: Any) -> Any:
-    if hasattr(value, "__await__"):
-        return await value
-    return value
 
 
 def _build_user_prompt(
@@ -559,6 +556,16 @@ def compose_grounded_answer(query: str, rules: Sequence[RetrievedRule], partial_
     return _compose_generic_grounded_answer(rules, partial_coverage=partial_coverage)
 
 
+def compose_citations_only_answer(query: str, rules: Sequence[RetrievedRule]) -> str:
+    """Degrade path when the LLM still hallucinates references after a
+    strict-mode retry — surface the retrieved rules with no synthesis."""
+    lines = ["I can't give a synthesized answer with verified citations for this one. "
+             "Here are the relevant rules:"]
+    for r in rules[:6]:
+        lines.append(f"- [{r.rulebook} {r.reference}] {r.title}: {r.excerpt[:180].rstrip()}…")
+    return "\n".join(lines)
+
+
 def _strip_markdown(answer: str) -> str:
     cleaned_lines: List[str] = []
     for raw_line in answer.splitlines():
@@ -842,99 +849,18 @@ def calculate_token_budget(
 
 
 class AnswerGenerator:
-    """Answer generation with model fallback and deterministic local fallback."""
+    """Answer generation via OpenRouter LLM with retry-once-then-degrade
+    citation validation and a deterministic grounded-answer fallback."""
 
-    def __init__(self, anthropic_client: Optional[Any] = None, openai_client: Optional[Any] = None) -> None:
-        self.anthropic_client = anthropic_client
-        self.openai_client = openai_client
+    def __init__(self, llm_client: Optional[Any] = None, openai_client: Optional[Any] = None) -> None:
+        self.llm_client = llm_client
+        self.openai_client = openai_client  # unused for generation; kept for interface stability
 
-    async def _get_anthropic_client(self) -> Optional[Any]:
-        if self.anthropic_client is not None:
-            return self.anthropic_client
-        try:
-            from app.services.integrations.anthropic_client import AnthropicClient  # type: ignore
-
-            self.anthropic_client = AnthropicClient()
-            return self.anthropic_client
-        except Exception:
-            return None
-
-    async def _get_openai_client(self) -> Optional[Any]:
-        if self.openai_client is not None:
-            return self.openai_client
-        try:
-            from app.services.integrations.openai_client import OpenAIClient  # type: ignore
-
-            self.openai_client = OpenAIClient()
-            return self.openai_client
-        except Exception:
-            return None
-
-    async def _call_generation_method(
-        self,
-        client: Any,
-        query: str,
-        system_prompt: str,
-        retrieved_rules: Sequence[RetrievedRule],
-        complexity: str,
-        classifier_output: ClassifierOutput,
-        max_tokens: int,
-        model: str | None = None,
-    ) -> Optional[str]:
-        prompt = _build_user_prompt(query, retrieved_rules, complexity, classifier_output)
-        if hasattr(client, "generate_answer"):
-            try:
-                output = await _maybe_await(
-                    client.generate_answer(
-                        prompt=prompt,
-                        system_prompt=system_prompt,
-                        max_tokens=max_tokens,
-                        temperature=0.1,
-                        extended_thinking=complexity == "complex",
-                        model=model,
-                    )
-                )
-            except TypeError:
-                output = await _maybe_await(
-                    client.generate_answer(
-                        prompt=prompt,
-                        system_prompt=system_prompt,
-                        max_tokens=max_tokens,
-                        temperature=0.1,
-                        extended_thinking=complexity == "complex",
-                    )
-                )
-            return str(output) if output else None
-        if hasattr(client, "generate_fallback"):
-            try:
-                output = await _maybe_await(
-                    client.generate_fallback(
-                        prompt=prompt,
-                        system_prompt=system_prompt,
-                        max_tokens=max_tokens,
-                        temperature=0.1,
-                        model=model,
-                    )
-                )
-            except TypeError:
-                output = await _maybe_await(
-                    client.generate_fallback(
-                        prompt=prompt,
-                        system_prompt=system_prompt,
-                        max_tokens=max_tokens,
-                        temperature=0.1,
-                    )
-                )
-            return str(output) if output else None
-        if hasattr(client, "generate"):
-            output = await _maybe_await(
-                client.generate(
-                    prompt=prompt,
-                    system_prompt=system_prompt,
-                )
-            )
-            return str(output) if output else None
-        return None
+    def _get_llm_client(self) -> Any:
+        if self.llm_client is not None:
+            return self.llm_client
+        self.llm_client = OpenRouterLLMClient()
+        return self.llm_client
 
     async def generate(
         self,
@@ -945,9 +871,6 @@ class AnswerGenerator:
         routing_tier: str = "sonnet",
     ) -> Dict[str, Any]:
         partial_coverage = assess_partial_coverage(query, retrieved_rules)
-        # Document-breadth deterministic bypass removed — all queries go through
-        # the LLM now. The system prompt handles document-set questions better
-        # than any keyword heuristic.
 
         # Smart routing: template tier — no LLM call
         if routing_tier == "template":
@@ -955,14 +878,6 @@ class AnswerGenerator:
             if _settings.RULEGPT_TEMPLATE_ENGINE_ENABLED:
                 return _template_answer(query, retrieved_rules)
             routing_tier = "haiku"  # fallback if template engine is disabled
-
-        # Resolve model string for the selected tier
-        from app.config import settings as _settings
-        model_for_tier = {
-            "haiku": _settings.RULEGPT_HAIKU_MODEL,
-            "sonnet": _settings.RULEGPT_GENERATOR_MODEL,
-            "opus": _settings.RULEGPT_OPUS_MODEL,
-        }.get(routing_tier, _settings.RULEGPT_GENERATOR_MODEL)
 
         token_budget = calculate_token_budget(query, retrieved_rules, routing_tier)
 
@@ -975,106 +890,64 @@ class AnswerGenerator:
             user_tier=user_tier,
             retrieved_rules=rendered_rules,
         )
-        prompt_tokens_est = len(system_prompt.split()) + len(query.split())
+        prompt = _build_user_prompt(query, retrieved_rules, classifier_output.complexity, classifier_output)
         _log.info(
-            "[GEN] query=%r model=%s tier=%s rules=%d prompt_words_est=%d token_budget=%d",
-            query[:80], model_for_tier, routing_tier, len(retrieved_rules), prompt_tokens_est, token_budget,
+            "[GEN] query=%r tier=%s rules=%d token_budget=%d",
+            query[:80], routing_tier, len(retrieved_rules), token_budget,
         )
 
-        fallback_reasons: list[str] = []
+        llm_client = self._get_llm_client()
+        try:
+            answer_res = await llm_client.generate_answer(prompt, system_prompt, max_tokens=token_budget)
+            answer = normalize_generated_answer(answer_res.text)
+            model_used = answer_res.model
 
-        anthropic = await self._get_anthropic_client()
-        if anthropic is not None:
-            try:
-                answer = await self._call_generation_method(
-                    anthropic,
-                    query=query,
-                    system_prompt=system_prompt,
-                    retrieved_rules=retrieved_rules,
-                    complexity=classifier_output.complexity,
-                    classifier_output=classifier_output,
-                    max_tokens=token_budget,
-                    model=model_for_tier,
+            if answer and answer_mentions_unknown_references(answer, retrieved_rules):
+                _log.warning("[GEN] first attempt hallucinated references, retrying in strict citation mode | query=%r", query[:80])
+                strict_system_prompt = system_prompt + (
+                    "\nSTRICT CITATION MODE: You may cite ONLY the exact [rulebook reference] "
+                    "pairs present in Retrieved rules. Do not mention any other article, "
+                    "publication, paragraph, or rule number."
                 )
-                if answer:
-                    normalized = normalize_generated_answer(answer)
-                    if normalized and not answer_mentions_unknown_references(normalized, retrieved_rules):
-                        return {
-                            "answer": normalized,
-                            "model_used": model_for_tier,
-                            "partial_coverage": partial_coverage,
-                            "routing_tier": routing_tier,
-                        }
-                    elif normalized:
-                        reason = f"Anthropic ({model_for_tier}): answer contained hallucinated references, dropped"
-                        _log.warning("[GEN] %s | query=%r", reason, query[:80])
-                        fallback_reasons.append(reason)
-                    else:
-                        reason = f"Anthropic ({model_for_tier}): answer was empty after normalization"
-                        _log.warning("[GEN] %s | query=%r", reason, query[:80])
-                        fallback_reasons.append(reason)
+                retry_res = await llm_client.generate_answer(prompt, strict_system_prompt, max_tokens=token_budget)
+                retry_answer = normalize_generated_answer(retry_res.text)
+                if retry_answer and answer_mentions_unknown_references(retry_answer, retrieved_rules):
+                    _log.warning("[GEN] retry still hallucinated references, degrading to citations-only | query=%r", query[:80])
+                    answer = compose_citations_only_answer(query, retrieved_rules)
+                    model_used = "citations-only"
+                    answer_res = LLMResult(text=answer, model="citations-only", prompt_tokens=0, completion_tokens=0, cost_usd=0.0)
                 else:
-                    reason = f"Anthropic ({model_for_tier}): returned empty/None"
-                    _log.warning("[GEN] %s | query=%r", reason, query[:80])
-                    fallback_reasons.append(reason)
-            except Exception as exc:
-                reason = f"Anthropic ({model_for_tier}): {type(exc).__name__}: {exc}"
-                _log.error("[GEN] %s | query=%r", reason, query[:80], exc_info=True)
-                fallback_reasons.append(reason)
-        else:
-            fallback_reasons.append("Anthropic client not available")
+                    answer, answer_res = retry_answer, retry_res
+                    model_used = retry_res.model
 
-        openai = await self._get_openai_client()
-        if openai is not None:
-            try:
-                answer = await self._call_generation_method(
-                    openai,
-                    query=query,
-                    system_prompt=system_prompt,
-                    retrieved_rules=retrieved_rules,
-                    complexity=classifier_output.complexity,
-                    classifier_output=classifier_output,
-                    max_tokens=token_budget,
-                    model=model_for_tier,
-                )
-                if answer:
-                    normalized = normalize_generated_answer(answer)
-                    if normalized and not answer_mentions_unknown_references(normalized, retrieved_rules):
-                        return {
-                            "answer": normalized,
-                            "model_used": "gpt-4.1",
-                            "partial_coverage": partial_coverage,
-                            "routing_tier": routing_tier,
-                            "fallback_reasons": fallback_reasons,
-                        }
-                    elif normalized:
-                        reason = "GPT-4.1: answer contained hallucinated references, dropped"
-                        _log.warning("[GEN] %s | query=%r", reason, query[:80])
-                        fallback_reasons.append(reason)
-                    else:
-                        reason = "GPT-4.1: answer was empty after normalization"
-                        _log.warning("[GEN] %s | query=%r", reason, query[:80])
-                        fallback_reasons.append(reason)
-                else:
-                    reason = "GPT-4.1: returned empty/None"
-                    _log.warning("[GEN] %s | query=%r", reason, query[:80])
-                    fallback_reasons.append(reason)
-            except Exception as exc:
-                reason = f"GPT-4.1: {type(exc).__name__}: {exc}"
-                _log.error("[GEN] %s | query=%r", reason, query[:80], exc_info=True)
-                fallback_reasons.append(reason)
-        else:
-            fallback_reasons.append("OpenAI client not available")
+            if not answer:
+                _log.warning("[GEN] answer was empty after normalization, degrading to citations-only | query=%r", query[:80])
+                answer = compose_citations_only_answer(query, retrieved_rules)
+                model_used = "citations-only"
+                answer_res = LLMResult(text=answer, model="citations-only", prompt_tokens=0, completion_tokens=0, cost_usd=0.0)
 
-        _log.error("[GEN] ALL MODELS FAILED, using grounded fallback | reasons=%s | query=%r", fallback_reasons, query[:80])
-        answer = compose_grounded_answer(query, retrieved_rules, partial_coverage=partial_coverage)
-        return {
-            "answer": answer,
-            "model_used": "fallback",
-            "partial_coverage": partial_coverage,
-            "routing_tier": routing_tier,
-            "fallback_reasons": fallback_reasons,
-        }
+            return {
+                "answer": answer,
+                "model_used": model_used,
+                "partial_coverage": partial_coverage,
+                "routing_tier": routing_tier,
+                "cost_usd": answer_res.cost_usd,
+                "generation_model": answer_res.model,
+                "tokens": (answer_res.prompt_tokens, answer_res.completion_tokens),
+            }
+        except LLMUnavailableError as exc:
+            _log.error("[GEN] LLM unavailable, degrading to grounded fallback | error=%s | query=%r", exc, query[:80])
+            answer = compose_grounded_answer(query, retrieved_rules, partial_coverage=partial_coverage)
+            return {
+                "answer": answer,
+                "model_used": "grounded-fallback",
+                "partial_coverage": partial_coverage,
+                "routing_tier": routing_tier,
+                "cost_usd": 0.0,
+                "generation_model": None,
+                "tokens": (0, 0),
+                "fallback_reasons": [f"LLMUnavailableError: {exc}"],
+            }
 
     async def suggested_followups(
         self,
@@ -1084,10 +957,10 @@ class AnswerGenerator:
         partial_coverage: bool = False,
     ) -> List[str]:
         """Generate contextual followup suggestions using a fast LLM call."""
-        # Try a quick Haiku call for contextual suggestions
+        # Try a quick classifier-tier call for contextual suggestions
         try:
-            client = await self._get_anthropic_client()
-            if client is not None and hasattr(client, "generate_answer"):
+            llm_client = self._get_llm_client()
+            if llm_client.is_available:
                 prompt = (
                     f"The user asked: \"{query}\"\n\n"
                     f"The system answered (summary): \"{answer[:300]}\"\n\n"
@@ -1097,15 +970,14 @@ class AnswerGenerator:
                     "not generic. Return ONLY the 3 questions, one per line, no numbering, no bullets."
                 )
                 from app.config import settings as _settings
-                raw = await _maybe_await(
-                    client.generate_answer(
-                        prompt=prompt,
-                        system_prompt="You generate concise follow-up questions for a trade finance Q&A tool. Return exactly 3 questions, one per line.",
-                        max_tokens=150,
-                        temperature=0.3,
-                        model=_settings.RULEGPT_HAIKU_MODEL,
-                    )
+                result = await llm_client.generate_answer(
+                    prompt,
+                    "You generate concise follow-up questions for a trade finance Q&A tool. Return exactly 3 questions, one per line.",
+                    model=_settings.RULGPT_CLASSIFIER_LLM_MODEL,
+                    max_tokens=150,
+                    temperature=0.3,
                 )
+                raw = result.text
                 if raw:
                     lines = [line.strip().lstrip("0123456789.-) ") for line in str(raw).strip().splitlines() if line.strip()]
                     # Filter to reasonable question lengths

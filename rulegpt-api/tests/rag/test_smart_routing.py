@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import pytest
 
+from app.config import settings
 from app.services.rag.models import ClassifierOutput, RetrievedRule
-from app.services.rag.pipeline import _pre_generation_confidence
+from app.services.rag.pipeline import _pre_generation_confidence, select_model
 from app.services.rag.generator import _template_answer
 
 
@@ -110,6 +111,32 @@ class TestSmartRoutingFlags:
 # ---------------------------------------------------------------------------
 # Template answer format tests
 # ---------------------------------------------------------------------------
+
+class TestTemplateGateRouting:
+    """select_model must re-enable the template tier for single-rule direct
+    lookups (e.g. "Article 20") — it was a dead tier before the 2026-07 LLM
+    swap. Disabling the flag should fall back to the normal tier logic."""
+
+    def test_direct_lookup_single_rule_routes_to_template_when_enabled(self, monkeypatch):
+        monkeypatch.setattr(settings, "RULEGPT_TEMPLATE_ENGINE_ENABLED", True)
+        rules = [_rule()]
+        assert select_model("free", "What does Article 20 say?", rules) == "template"
+
+    def test_direct_lookup_single_rule_routes_to_haiku_when_disabled(self, monkeypatch):
+        monkeypatch.setattr(settings, "RULEGPT_TEMPLATE_ENGINE_ENABLED", False)
+        rules = [_rule()]
+        assert select_model("free", "What does Article 20 say?", rules) == "haiku"
+
+    def test_multi_rule_direct_lookup_does_not_route_to_template(self, monkeypatch):
+        monkeypatch.setattr(settings, "RULEGPT_TEMPLATE_ENGINE_ENABLED", True)
+        rules = [_rule(rule_id="r1"), _rule(rule_id="r2")]
+        assert select_model("free", "What does Article 20 say?", rules) == "haiku"
+
+    def test_no_direct_lookup_language_does_not_route_to_template(self, monkeypatch):
+        monkeypatch.setattr(settings, "RULEGPT_TEMPLATE_ENGINE_ENABLED", True)
+        rules = [_rule()]
+        assert select_model("free", "How do LC discrepancies work?", rules) == "haiku"
+
 
 class TestTemplateAnswer:
     def test_basic_template_format(self):

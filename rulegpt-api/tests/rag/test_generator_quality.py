@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from app.services.integrations.llm_client import LLMResult, LLMUnavailableError
 from app.services.rag.generator import (
     AnswerGenerator,
     assess_partial_coverage,
@@ -11,41 +12,84 @@ from app.services.rag.generator import (
 from app.services.rag.models import ClassifierOutput, RetrievedRule
 
 
-class _FakeAnthropicClient:
-    async def generate_answer(
-        self,
-        prompt: str,
-        system_prompt: str,
-        extended_thinking: bool = False,
-        max_tokens: int = 0,
-        temperature: float = 0.0,
-    ):
-        # 3+ unknown references trips the hallucination-rejection threshold
-        # (see `answer_mentions_unknown_references` in generator.py).
-        return (
-            "## Insurance documents under UCP600\n\n"
-            "According to [UCP600 Article 18], [UCP600 Article 19], and "
-            "[UCP600 Article 20], insurance cover notes are not accepted.\n\n"
-            "**Follow-up questions you might have:**\n"
-            "1. Do you want more detail?\n"
-            "2. Should I compare this with CIP?\n"
+class _HallucinatingLLMClient:
+    """Always cites references not in the retrieved rules — 3+ unknown
+    references trips the hallucination-rejection threshold (see
+    `answer_mentions_unknown_references` in generator.py). Returns the same
+    hallucinated text on every call, so a retry does not help."""
+
+    is_available = True
+
+    async def generate_answer(self, prompt, system_prompt, model=None, max_tokens=1200, temperature=0.2):
+        return LLMResult(
+            text=(
+                "## Insurance documents under UCP600\n\n"
+                "According to [UCP600 Article 18], [UCP600 Article 19], and "
+                "[UCP600 Article 20], insurance cover notes are not accepted.\n\n"
+                "**Follow-up questions you might have:**\n"
+                "1. Do you want more detail?\n"
+                "2. Should I compare this with CIP?\n"
+            ),
+            model="fake-hallucinating-model",
+            prompt_tokens=10,
+            completion_tokens=20,
+            cost_usd=0.001,
         )
 
 
-class _BudgetCaptureAnthropicClient:
+class _RetryThenCleanLLMClient:
+    """Hallucinates on the first call, returns a clean grounded answer on
+    the strict-mode retry."""
+
+    is_available = True
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    async def generate_answer(self, prompt, system_prompt, model=None, max_tokens=1200, temperature=0.2):
+        self.calls += 1
+        if self.calls == 1:
+            return LLMResult(
+                text=(
+                    "According to [UCP600 Article 18], [UCP600 Article 19], and "
+                    "[UCP600 Article 20], insurance cover notes are not accepted."
+                ),
+                model="fake-model",
+                prompt_tokens=10,
+                completion_tokens=20,
+                cost_usd=0.001,
+            )
+        return LLMResult(
+            text="Cover notes are not accepted. [UCP600 Article 28]",
+            model="fake-model-retry",
+            prompt_tokens=10,
+            completion_tokens=15,
+            cost_usd=0.0008,
+        )
+
+
+class _UnavailableLLMClient:
+    is_available = False
+
+    async def generate_answer(self, prompt, system_prompt, model=None, max_tokens=1200, temperature=0.2):
+        raise LLMUnavailableError("all models in the chain failed")
+
+
+class _BudgetCaptureLLMClient:
+    is_available = True
+
     def __init__(self) -> None:
         self.max_tokens: int | None = None
 
-    async def generate_answer(
-        self,
-        prompt: str,
-        system_prompt: str,
-        extended_thinking: bool = False,
-        max_tokens: int = 0,
-        temperature: float = 0.0,
-    ):
+    async def generate_answer(self, prompt, system_prompt, model=None, max_tokens=1200, temperature=0.2):
         self.max_tokens = max_tokens
-        return "Cover notes are not accepted. [UCP600 Article 28]"
+        return LLMResult(
+            text="Cover notes are not accepted. [UCP600 Article 28]",
+            model="fake-budget-model",
+            prompt_tokens=5,
+            completion_tokens=10,
+            cost_usd=0.0005,
+        )
 
 
 def _insurance_rule() -> RetrievedRule:
@@ -106,8 +150,8 @@ def _rcep_origin_rule() -> RetrievedRule:
 
 
 @pytest.mark.asyncio
-async def test_generator_rejects_unknown_article_and_uses_grounded_fallback():
-    generator = AnswerGenerator(anthropic_client=_FakeAnthropicClient(), openai_client=object())
+async def test_generator_degrades_to_citations_only_after_retry_still_hallucinates():
+    generator = AnswerGenerator(llm_client=_HallucinatingLLMClient())
     rules = [_insurance_rule()]
 
     result = await generator.generate(
@@ -116,9 +160,45 @@ async def test_generator_rejects_unknown_article_and_uses_grounded_fallback():
         classifier_output=ClassifierOutput(domain="icc", jurisdiction="global", document_type="other"),
     )
 
-    assert result["model_used"] == "fallback"
+    assert result["model_used"] == "citations-only"
+    assert "Here are the relevant rules" in result["answer"]
+    assert "[UCP600 Article 28]" in result["answer"]
+    assert result["cost_usd"] == 0.0
+
+
+@pytest.mark.asyncio
+async def test_generator_uses_retry_answer_when_second_attempt_is_clean():
+    client = _RetryThenCleanLLMClient()
+    generator = AnswerGenerator(llm_client=client)
+    rules = [_insurance_rule()]
+
+    result = await generator.generate(
+        query="How does UCP600 handle insurance documents?",
+        retrieved_rules=rules,
+        classifier_output=ClassifierOutput(domain="icc", jurisdiction="global", document_type="other"),
+    )
+
+    assert client.calls == 2
+    assert result["model_used"] == "fake-model-retry"
     assert "[UCP600 Article 28]" in result["answer"]
     assert "Article 18" not in result["answer"]
+    assert result["cost_usd"] == pytest.approx(0.0008)
+
+
+@pytest.mark.asyncio
+async def test_generator_falls_back_to_grounded_when_llm_unavailable():
+    generator = AnswerGenerator(llm_client=_UnavailableLLMClient())
+    rules = [_insurance_rule()]
+
+    result = await generator.generate(
+        query="How does UCP600 handle insurance documents?",
+        retrieved_rules=rules,
+        classifier_output=ClassifierOutput(domain="icc", jurisdiction="global", document_type="other"),
+    )
+
+    assert result["model_used"] == "grounded-fallback"
+    assert "[UCP600 Article 28]" in result["answer"]
+    assert result["cost_usd"] == 0.0
 
 
 def test_compose_grounded_answer_for_partial_cif_query_is_explicit():
@@ -172,8 +252,8 @@ def test_compose_grounded_answer_surfaces_fta_scope_before_origin_mechanics():
 
 @pytest.mark.asyncio
 async def test_generator_uses_baseline_token_budget_for_simple_queries():
-    client = _BudgetCaptureAnthropicClient()
-    generator = AnswerGenerator(anthropic_client=client, openai_client=object())
+    client = _BudgetCaptureLLMClient()
+    generator = AnswerGenerator(llm_client=client)
 
     result = await generator.generate(
         query="How does UCP600 handle insurance documents?",
@@ -188,8 +268,8 @@ async def test_generator_uses_baseline_token_budget_for_simple_queries():
 
 @pytest.mark.asyncio
 async def test_generator_allows_longer_budget_when_query_needs_more_detail():
-    client = _BudgetCaptureAnthropicClient()
-    generator = AnswerGenerator(anthropic_client=client, openai_client=object())
+    client = _BudgetCaptureLLMClient()
+    generator = AnswerGenerator(llm_client=client)
 
     # Mix domains so multi-domain bonus (+300) is added on top of 5+ rules (+200) + sanctions (+300).
     icc_rule = _insurance_rule()

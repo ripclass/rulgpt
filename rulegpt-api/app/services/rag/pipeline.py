@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import logging
 import re
 import time
 from typing import Any, Dict, List, Literal
@@ -33,12 +35,7 @@ RETRIEVAL_UNAVAILABLE_MESSAGE = (
 
 RoutingTier = Literal["template", "haiku", "sonnet", "opus", "fallback", "grounded"]
 
-_DIRECT_LOOKUP_RE = re.compile(
-    r"(?:what\s+(?:does|is)|explain|show\s+me)\s+"
-    r"(?:ucp\s*600|isbp\s*745|isp\s*98|urdg\s*758|urc\s*522|urr\s*725|eucp|incoterms)"
-    r"\s+(?:article|paragraph|para|section)\s+\w+",
-    re.IGNORECASE,
-)
+_DIRECT_LOOKUP = re.compile(r"\b(article|paragraph|rule|field)\s+\d+[a-z]?\b", re.IGNORECASE)
 
 _FRAUD_TBML_MARKERS = (
     "tbml",
@@ -102,6 +99,16 @@ def select_model(
     if not retrieved_rules:
         _log.info("[ROUTING] 0 rules → fallback")
         return "fallback"
+
+    from app.config import settings as _settings
+
+    if (
+        _settings.RULEGPT_TEMPLATE_ENGINE_ENABLED
+        and len(retrieved_rules) == 1
+        and _DIRECT_LOOKUP.search(query)
+    ):
+        _log.info("[ROUTING] direct lookup, 1 rule → template | query=%r", query[:80])
+        return "template"
 
     query_lower = query.lower()
     num_rules = len(retrieved_rules)
@@ -392,6 +399,7 @@ class RAGPipeline:
 
         # Stage 3: generation
         start = time.perf_counter()
+        generation: Dict[str, Any] = {}
         if retrieved_rules:
             try:
                 generation = await self.generator.generate(
@@ -437,6 +445,19 @@ class RAGPipeline:
                 routing_tier = "fallback"
                 fallback_reasons = ["no rules retrieved, LLM call also failed"]
         stage_latency["generator"] = int((time.perf_counter() - start) * 1000)
+
+        tokens = generation.get("tokens") or (0, 0)
+        prompt_toks, completion_toks = tokens if isinstance(tokens, (tuple, list)) and len(tokens) == 2 else (0, 0)
+        _cost_log = logging.getLogger("rulegpt.cost")
+        _cost_log.info(
+            "llm_cost query_hash=%s tier=%s model=%s prompt_toks=%s completion_toks=%s cost_usd=%s",
+            hashlib.sha1(query.encode()).hexdigest()[:10],
+            routing_tier,
+            generation.get("generation_model"),
+            prompt_toks,
+            completion_toks,
+            f"{generation.get('cost_usd') or 0:.6f}",
+        )
 
         # Stage 4: citations
         start = time.perf_counter()

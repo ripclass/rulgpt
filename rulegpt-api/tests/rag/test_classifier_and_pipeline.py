@@ -10,9 +10,19 @@ from app.services.rag.rulhub_retriever import RetrievalUnavailableError
 import app.services.rag.rulhub_retriever as rulhub_retriever_module
 
 
+class _UnavailableLLMClassifierClient:
+    """Simulates 'no LLM assist available' deterministically — used instead
+    of `anthropic_client=None`, which would otherwise construct a real
+    `OpenRouterLLMClient()` and could make a live call in an environment
+    with a real OPENROUTER_API_KEY set."""
+
+    async def classify(self, query: str, system_prompt: str, max_tokens: int = 256, temperature: float = 0.0):
+        raise RuntimeError("no LLM client configured")
+
+
 @pytest.mark.asyncio
 async def test_classifier_out_of_scope_heuristic():
-    classifier = QueryClassifier(anthropic_client=None)
+    classifier = QueryClassifier(anthropic_client=_UnavailableLLMClassifierClient())
     # Note: a query like "How do I trade Bitcoin?" is intentionally kept
     # in-scope because "trade" overlaps with trade-finance context. We use
     # a query with no trade-context overlap so the heuristic flags it.
@@ -23,7 +33,7 @@ async def test_classifier_out_of_scope_heuristic():
 
 @pytest.mark.asyncio
 async def test_classifier_marks_general_tax_filing_out_of_scope():
-    classifier = QueryClassifier(anthropic_client=None)
+    classifier = QueryClassifier(anthropic_client=_UnavailableLLMClassifierClient())
     result = await classifier.classify("How do I file my taxes?")
     assert result.in_scope is False
 

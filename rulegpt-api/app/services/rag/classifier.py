@@ -318,7 +318,15 @@ def _parse_classifier_payload(payload: Any) -> Optional[Dict[str, Any]]:
 
 
 class QueryClassifier:
-    """Classifier with Anthropic primary and heuristic fallback."""
+    """Classifier with LLM-assisted primary and heuristic fallback.
+
+    The constructor kwarg keeps its original `anthropic_client` name — the
+    2026-07 OpenRouter LLM swap only changed what gets constructed by
+    default (`OpenRouterLLMClient` instead of the old Anthropic wrapper);
+    the `.classify(query, system_prompt, ...)` calling convention this
+    class relies on is unchanged, so callers passing a fake/test double
+    don't need updating.
+    """
 
     def __init__(self, anthropic_client: Optional[Any] = None) -> None:
         self.anthropic_client = anthropic_client
@@ -327,9 +335,9 @@ class QueryClassifier:
         if self.anthropic_client is not None:
             return self.anthropic_client
         try:
-            from app.services.integrations.anthropic_client import AnthropicClient  # type: ignore
+            from app.services.integrations.llm_client import OpenRouterLLMClient
 
-            self.anthropic_client = AnthropicClient()
+            self.anthropic_client = OpenRouterLLMClient()
             return self.anthropic_client
         except Exception:
             return None
