@@ -8,7 +8,7 @@ const STAGES = [
   'Verifying against UCP 600...',
   'Analyzing jurisdiction rules...',
   'Scanning sanctions database...',
-  'Matching ISBP 745 paragraphs...',
+  'Matching ISBP 821 paragraphs...',
   'Building cited answer...',
 ]
 

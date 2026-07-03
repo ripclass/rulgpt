@@ -197,7 +197,7 @@ export function Pricing() {
         <h2 className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">Notes</h2>
         <div className="mt-4 space-y-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
           <p>RulGPT answers from published trade finance rules and standards. It is a first-pass interpretation tool, not a replacement for transaction-level legal review.</p>
-          <p>All plans include access to ICC standards (UCP600, ISBP745, ISP98, URDG758, URC522, URR725), Incoterms 2020, sanctions screening rules, FTA rules of origin, and 48 country-specific regulation sets.</p>
+          <p>All plans include access to ICC standards (UCP600, ISBP 821, ISP98, URDG758, URC522, URR725), Incoterms 2020, sanctions screening rules, FTA rules of origin, and 48 country-specific regulation sets.</p>
           <p>Enterprise customers can contact us for custom API access and volume pricing.</p>
         </div>
       </section>

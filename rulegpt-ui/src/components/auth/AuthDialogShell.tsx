@@ -266,7 +266,7 @@ export function AuthDialogShell({
                 <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">Engine Connected</span>
               </div>
               <p className="text-white font-medium max-w-sm text-sm opacity-90 leading-relaxed drop-shadow-md">
-                Connect directly into the trade finance consensus. The engine parses UCP600, ISBP745, and FTAs in real-time.
+                Connect directly into the trade finance consensus. The engine parses UCP600, ISBP 821, and FTAs in real-time.
               </p>
             </div>
           </div>

@@ -22,7 +22,7 @@ function BlogIndex() {
     <div className="min-h-screen bg-white font-sans text-neutral-900 selection:bg-[#FF4F00] selection:text-white">
       <SEOHead
         title="Trade Finance Rules Blog | RulGPT"
-        description="Expert explanations of UCP600, ISBP745, sanctions, FTAs, and trade compliance rules — with exact citations. No opinion, just rules."
+        description="Expert explanations of UCP600, ISBP 821, sanctions, FTAs, and trade compliance rules — with exact citations. No opinion, just rules."
         path="/blog"
       />
 

@@ -120,7 +120,7 @@ export function Home() {
       'I have a shipment going from Thailand to Canada. Can I use RCEP or CPTPP — or both? Which one gives me a better tariff rate and can I switch between them per shipment?',
     ],
     'Trade Documentation': [
-      'My bill of lading shows "shipped on board" but doesn\'t name the vessel. The LC requires the vessel name. Is this a discrepancy under ISBP745 or can the carrier add it later?',
+      'My bill of lading shows "shipped on board" but doesn\'t name the vessel. The LC requires the vessel name. Is this a discrepancy under ISBP 821 or can the carrier add it later?',
       'The LC requires "marine insurance covering warehouse to warehouse". My policy says "port to port". Is this a valid discrepancy or does the Incoterms coverage handle the difference?',
       'My packing list shows total weight as 10,050 kg but the bill of lading says 10,000 kg. The LC is silent on weight tolerance. Can the bank refuse for this 0.5% difference?',
       'The LC was issued under UCP 600 but the buyer now wants to present documents electronically. Can we switch to eUCP mid-transaction or do we need an amendment?',

@@ -10,7 +10,7 @@ const faqs = [
   },
   {
     q: 'What is the scope of the engine?',
-    a: 'We cover ICC Core (UCP600/ISBP745), current OFAC/EU/UN sanctions, FTA origin rules, central bank regulations of 48 jurisdictions, and granular commodity compliance requirements.',
+    a: 'We cover ICC Core (UCP600/ISBP 821), current OFAC/EU/UN sanctions, FTA origin rules, central bank regulations of 48 jurisdictions, and granular commodity compliance requirements.',
   },
   {
     q: 'What if you don\'t have the rule I need?',

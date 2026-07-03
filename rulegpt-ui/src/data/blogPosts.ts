@@ -26,7 +26,7 @@ Practical advice: tell your supplier they must present a proper insurance certif
     citations: [
       'UCP600 Article 28 — Insurance Document',
       'UCP600 Article 28(f)(ii) — Minimum 110% CIF coverage',
-      'ISBP745 Paragraphs K1-K15 — Insurance documents under LCs',
+      'ISBP 821 Paragraphs K1-K15 — Insurance documents under LCs',
       'Incoterms 2020 — CIF (Cost, Insurance and Freight)',
     ],
     tags: ['UCP600', 'Incoterms'],
@@ -48,7 +48,7 @@ Your options: ask the bank to accept the documents on an approval basis (they co
     citations: [
       'UCP600 Article 14(c) — 21-day presentation period',
       'UCP600 Article 14(b) — 5 banking days examination',
-      'ISBP745 Paragraph D7 — Presentation period',
+      'ISBP 821 Paragraph D7 — Presentation period',
     ],
     tags: ['UCP600'],
   },
@@ -132,7 +132,7 @@ The LC amendment is the clean solution. Don't present and hope — the bank will
     citations: [
       'UCP600 Article 19 — Multimodal Transport Document',
       'UCP600 Article 20 — Bill of Lading',
-      'ISBP745 Paragraphs E1-E8 — Transport Documents',
+      'ISBP 821 Paragraphs E1-E8 — Transport Documents',
       'Incoterms 2020 — Transport document compatibility',
     ],
     tags: ['UCP600', 'Transport'],
@@ -218,7 +218,7 @@ The correct approach: present documents with the real March 18 date and request 
 The cost of a discrepancy is a fee and a negotiation. The cost of fraud is your business, your reputation, and potentially your freedom.`,
     citations: [
       'UCP600 Article 20(a)(ii) — On-board date requirement',
-      'ISBP745 E3 — B/L on-board notation',
+      'ISBP 821 E3 — B/L on-board notation',
       'UCP600 Article 16 — Discrepancy handling',
     ],
     tags: ['UCP600', 'Fraud'],
@@ -246,11 +246,11 @@ Check the five-day clock carefully. If the bank sent the refusal on day six, the
     tags: ['UCP600'],
   },
   {
-    slug: 'compliant-commercial-invoice-isbp745',
-    title: 'What Makes a Commercial Invoice Compliant Under an LC? ISBP 745 Explained',
-    description: 'The commercial invoice is the most scrutinised document in any LC presentation. ISBP 745 sets out exactly what banks check — and where most discrepancies hide.',
-    question: 'How does ISBP 745 define a compliant commercial invoice? I keep getting discrepancies on my invoices and I don\'t understand what the bank is looking for.',
-    answer: `The commercial invoice is where most LC presentations fail — and ISBP 745 paragraphs C1 through C14 spell out exactly what banks examine.
+    slug: 'compliant-commercial-invoice-isbp821',
+    title: 'What Makes a Commercial Invoice Compliant Under an LC? ISBP 821 Explained',
+    description: 'The commercial invoice is the most scrutinised document in any LC presentation. ISBP 821 sets out exactly what banks check — and where most discrepancies hide.',
+    question: 'How does ISBP 821 define a compliant commercial invoice? I keep getting discrepancies on my invoices and I don\'t understand what the bank is looking for.',
+    answer: `The commercial invoice is where most LC presentations fail — and ISBP 821 paragraphs C1 through C14 spell out exactly what banks examine.
 
 First, the invoice must appear to have been issued by the beneficiary named in the credit. It must be made out to the applicant (or as the credit requires). It must describe the goods, services, or performance in a way that corresponds to the description in the credit — and this is where it gets strict. The goods description on the invoice must mirror the LC terms. Other documents can use a general description consistent with the LC, but the invoice must match.
 
@@ -262,12 +262,12 @@ Common traps: showing trade terms (FOB, CIF) differently from the LC. Showing a 
 
 The safest approach: copy the goods description from the LC word for word onto your invoice.`,
     citations: [
-      'ISBP745 Paragraphs C1-C14 — Commercial Invoice',
+      'ISBP 821 Paragraphs C1-C14 — Commercial Invoice',
       'UCP600 Article 18(a) — Invoice issued by beneficiary',
       'UCP600 Article 18(c) — Goods description must correspond',
-      'ISBP745 Paragraph C3 — Goods description correspondence',
+      'ISBP 821 Paragraph C3 — Goods description correspondence',
     ],
-    tags: ['UCP600', 'ISBP745'],
+    tags: ['UCP600', 'ISBP 821'],
   },
   {
     slug: 'transferable-lc-invoice-substitution-ucp600',
@@ -368,7 +368,7 @@ Make sure your buyer understands they're effectively providing an unsecured adva
     question: 'My bank rejected my supplier\'s documents because the commercial invoice shows "FOB Shanghai" but the LC says "FOB Shanghai Port." The word "Port" is missing. This is obviously the same place! Isn\'t the bank manufacturing discrepancies to avoid paying?',
     answer: `The bank is not manufacturing a discrepancy — they're applying UCP 600 Article 14(d), which requires documents to be examined on their face and that the data in any document must not conflict with data in that document, any other stipulated document, or the credit.
 
-Under ISBP 745, the goods description on the commercial invoice must correspond with the description in the credit. If the LC says "FOB Shanghai Port" and your invoice says "FOB Shanghai," the bank sees a data difference. Banks examine documents on their face — they don't interpret whether two terms are commercially identical.
+Under ISBP 821, the goods description on the commercial invoice must correspond with the description in the credit. If the LC says "FOB Shanghai Port" and your invoice says "FOB Shanghai," the bank sees a data difference. Banks examine documents on their face — they don't interpret whether two terms are commercially identical.
 
 Is "FOB Shanghai" the same as "FOB Shanghai Port" in the real world? Almost certainly yes. But LC practice is not about commercial reality — it's about documentary compliance. The bank's job is to check whether the documents say what the LC says they should say. Adding or omitting a word is a data discrepancy.
 
@@ -380,10 +380,10 @@ The lesson: in LC practice, precision is not pedantry — it's the system workin
     citations: [
       'UCP600 Article 14(d) — Data consistency across documents',
       'UCP600 Article 18(c) — Invoice goods description',
-      'ISBP745 Paragraph C3 — Correspondence of description',
-      'ISBP745 Paragraph A22 — Misspelling and typing errors',
+      'ISBP 821 Paragraph C3 — Correspondence of description',
+      'ISBP 821 Paragraph A22 — Misspelling and typing errors',
     ],
-    tags: ['UCP600', 'ISBP745'],
+    tags: ['UCP600', 'ISBP 821'],
   },
   {
     slug: 'lc-amendment-acceptance-ucp600-article-10',
@@ -443,14 +443,14 @@ The word "packaging" is explicit in the rule. A notation about "damaged carton,"
 
 This is one of the most frustrating discrepancies for exporters because the distinction between goods and packaging feels commercially irrelevant. But the rule exists for a reason — the bank and the buyer cannot verify the condition of goods inside damaged packaging from the documents alone.
 
-ISBP 745 reinforces this: a transport document bearing a clause or notation that expressly declares a defective condition of the packaging is not acceptable. The carrier's remark is a statement of fact at the time of loading, and the bank must take it at face value.
+ISBP 821 reinforces this: a transport document bearing a clause or notation that expressly declares a defective condition of the packaging is not acceptable. The carrier's remark is a statement of fact at the time of loading, and the bank must take it at face value.
 
 Your options: have the shipping line remove the remark and issue a clean B/L — this requires the carrier to be satisfied the goods are properly packed. If the damage happened at the port, have the goods repacked before loading and get a clean B/L. If the claused B/L is already issued, present it and request a discrepancy waiver from the applicant.
 
 Prevention for next time: inspect packaging at the port before the carrier loads. Once the remark is on the B/L, it's too late.`,
     citations: [
       'UCP600 Article 27 — Clean transport document',
-      'ISBP745 Paragraph D2 — Clean transport documents',
+      'ISBP 821 Paragraph D2 — Clean transport documents',
       'UCP600 Article 20(a) — Bill of lading requirements',
     ],
     tags: ['UCP600', 'Transport'],
@@ -521,7 +521,7 @@ Prevention: when opening the back-to-back LC, mirror the master LC's goods descr
       'UCP600 Article 38(h) — Invoice substitution',
       'UCP600 Article 14(d) — Data consistency',
       'UCP600 Article 18(c) — Invoice goods description',
-      'ISBP745 Paragraph C3 — Description correspondence',
+      'ISBP 821 Paragraph C3 — Description correspondence',
     ],
     tags: ['UCP600'],
   },
@@ -543,7 +543,7 @@ The premium increase is a commercial problem. The 110% rule is a documentary req
       'UCP600 Article 28(f)(ii) — Minimum 110% coverage',
       'UCP600 Article 28(h) — War risk and SRCC',
       'UCP600 Article 28(a) — Insurance document requirements',
-      'ISBP745 Paragraphs K1-K15 — Insurance documents',
+      'ISBP 821 Paragraphs K1-K15 — Insurance documents',
     ],
     tags: ['UCP600', 'Insurance'],
   },
@@ -666,7 +666,7 @@ For future contracts: denominate LCs in a stable currency (USD, EUR) or include 
 
 Under UCP 600 Article 14(d), data in a document must not conflict with data in the credit. Strictly read, "Chittagong" and "Chattogram" are different strings. A conservative bank may call it a discrepancy. A pragmatic bank familiar with the name change may not.
 
-ISBP 745 Paragraph A22 provides some relief: "a misspelling or typing error that does not affect the meaning of a word or the sentence in which it occurs does not make a document discrepant." However, this is not technically a misspelling — it's a name change. The argument is strong but not bulletproof.
+ISBP 821 Paragraph A22 provides some relief: "a misspelling or typing error that does not affect the meaning of a word or the sentence in which it occurs does not make a document discrepant." However, this is not technically a misspelling — it's a name change. The argument is strong but not bulletproof.
 
 Given your LC expires tomorrow, you have limited options: present the documents as they are. If the bank raises the discrepancy, immediately request a waiver from the applicant. Since the buyer presumably knows the port hasn't moved, they should waive. Or contact the shipping line urgently and ask if they can reissue the B/L with "Chattogram" — but with one day left, this is unlikely.
 
@@ -675,7 +675,7 @@ The safest play: present now, disclose the issue proactively, and seek the waive
 For future LCs: always check that port names in the credit match current official names. Chittagong/Chattogram, Bombay/Mumbai, Madras/Chennai, Peking/Beijing — these rebrands catch people regularly.`,
     citations: [
       'UCP600 Article 14(d) — Data consistency',
-      'ISBP745 Paragraph A22 — Misspelling and typing errors',
+      'ISBP 821 Paragraph A22 — Misspelling and typing errors',
       'UCP600 Article 6(d) — Expiry date',
       'UCP600 Article 16 — Discrepancy waiver process',
     ],
@@ -874,26 +874,26 @@ Recommended actions: suspend coverage pending a full investigation. Require the 
   {
     slug: 'distressed-beneficiary-typo-bank-rejection',
     title: 'Bank Rejected Documents Over a Typo — Can You Sue?',
-    description: 'A single-letter typo in the beneficiary address led to document rejection. The bank may be right — but there\'s nuance in ISBP 745 about misspellings.',
+    description: 'A single-letter typo in the beneficiary address led to document rejection. The bank may be right — but there\'s nuance in ISBP 821 about misspellings.',
     question: 'I just lost $40,000 because the bank rejected my documents over a typo in the beneficiary address. One letter wrong in the street name. I\'ve been shipping to this buyer for 5 years with no problems. This is the same bank that always accepted my documents. Now suddenly they find a problem? Is there anything I can do? Can I sue the bank?',
     answer: `Take a breath. This is a serious situation but you have more options than you think.
 
-First, the legal question: ISBP 745 Paragraph A22 states that a misspelling or typing error that does not affect the meaning of a word or the sentence in which it occurs does not make a document discrepant. A single-letter error in a street name — where the rest of the address is correct and the beneficiary is clearly identifiable — has a strong argument for falling within this provision.
+First, the legal question: ISBP 821 Paragraph A22 states that a misspelling or typing error that does not affect the meaning of a word or the sentence in which it occurs does not make a document discrepant. A single-letter error in a street name — where the rest of the address is correct and the beneficiary is clearly identifiable — has a strong argument for falling within this provision.
 
 However, banks have discretion in applying this standard, and some take a strict position. The question is whether the typo genuinely created ambiguity about the beneficiary's identity, or whether it was an obvious error that anyone reading the document would recognise.
 
-Your options, in order of urgency: request a discrepancy waiver from the applicant through the bank — if the buyer is willing to accept (and you say you've been shipping together for 5 years), this resolves it immediately. If the presentation period hasn't expired, correct the document and re-present. Challenge the rejection by citing ISBP 745 Paragraph A22 — put it in writing to the bank, referencing the specific paragraph.
+Your options, in order of urgency: request a discrepancy waiver from the applicant through the bank — if the buyer is willing to accept (and you say you've been shipping together for 5 years), this resolves it immediately. If the presentation period hasn't expired, correct the document and re-present. Challenge the rejection by citing ISBP 821 Paragraph A22 — put it in writing to the bank, referencing the specific paragraph.
 
-Can you sue the bank? Theoretically yes, but litigation is slow, expensive, and uncertain. You'd need to prove the bank breached its examination standard under UCP 600 Article 14 — that the typo clearly fell within the ISBP 745 tolerance and the bank acted unreasonably.
+Can you sue the bank? Theoretically yes, but litigation is slow, expensive, and uncertain. You'd need to prove the bank breached its examination standard under UCP 600 Article 14 — that the typo clearly fell within the ISBP 821 tolerance and the bank acted unreasonably.
 
 The harder truth: past acceptance of your documents doesn't create precedent. Each presentation is examined independently. A bank that overlooked issues before can start examining strictly at any time.`,
     citations: [
-      'ISBP745 Paragraph A22 — Misspelling and typing errors',
+      'ISBP 821 Paragraph A22 — Misspelling and typing errors',
       'UCP600 Article 14(a) — Standard for examination',
       'UCP600 Article 14(d) — Data in documents',
       'UCP600 Article 16 — Refusal and waiver',
     ],
-    tags: ['UCP600', 'ISBP745'],
+    tags: ['UCP600', 'ISBP 821'],
   },
   {
     slug: 'fca-vs-cif-invoice-mismatch-lc',
@@ -963,7 +963,7 @@ Also note Article 30(a): if "about" or "approximately" appears before the quanti
       'UCP600 Article 30(b) — 5% quantity tolerance',
       'UCP600 Article 30(a) — "About" tolerance (10%)',
       'UCP600 Article 18(b) — Invoice amount not exceeding credit',
-      'ISBP745 Paragraph C7 — Quantity and tolerance',
+      'ISBP 821 Paragraph C7 — Quantity and tolerance',
     ],
     tags: ['UCP600'],
   },
@@ -1002,12 +1002,12 @@ Under UCP 600 Article 20(a)(ii), a bill of lading must indicate that the goods h
 
 The B/L can be converted: if a "received for shipment" B/L bears a separate on-board notation showing the date of loading and the vessel name, it becomes acceptable. The on-board notation must be dated and signed or initialled. The date of the on-board notation becomes the date of shipment.
 
-ISBP 745 paragraphs E1-E8 provide detailed guidance on what constitutes acceptable on-board notations. ICC Banking Commission opinions in the Collected Opinions series (notably R209, R305, and subsequent opinions in the 2009-2019 volumes) have consistently upheld this distinction.
+ISBP 821 paragraphs E1-E8 provide detailed guidance on what constitutes acceptable on-board notations. ICC Banking Commission opinions in the Collected Opinions series (notably R209, R305, and subsequent opinions in the 2009-2019 volumes) have consistently upheld this distinction.
 
-For your internal policy: cite UCP 600 Article 20(a)(ii) as the primary authority, ISBP 745 E1-E8 for examination guidance, and reference the ICC Collected Opinions for supporting interpretation.`,
+For your internal policy: cite UCP 600 Article 20(a)(ii) as the primary authority, ISBP 821 E1-E8 for examination guidance, and reference the ICC Collected Opinions for supporting interpretation.`,
     citations: [
       'UCP600 Article 20(a)(ii) — On-board requirement',
-      'ISBP745 Paragraphs E1-E8 — On-board notation',
+      'ISBP 821 Paragraphs E1-E8 — On-board notation',
       'ICC Banking Commission Collected Opinions — B/L examination',
       'UCP600 Article 20(a)(iii) — Port of loading indication',
     ],
@@ -1269,7 +1269,7 @@ The beneficiary can resubmit a demand that says something like: "The applicant h
     question: 'My commercial invoice is dated March 5. The bill of lading shows on-board date March 3. The certificate of origin is dated March 8. The LC says nothing about document dating sequence. Is there any problem with these dates?',
     answer: `There is no general UCP 600 rule requiring documents to be dated in any particular sequence relative to each other. However, specific rules apply to specific documents that can create date-related discrepancies.
 
-Your invoice dated March 5 with a B/L dated March 3: this is fine. UCP 600 does not require the invoice to be dated before the transport document. ISBP 745 Paragraph A5 confirms that documents may be dated prior to the issuance date of the credit, but must not be dated later than the presentation date.
+Your invoice dated March 5 with a B/L dated March 3: this is fine. UCP 600 does not require the invoice to be dated before the transport document. ISBP 821 Paragraph A5 confirms that documents may be dated prior to the issuance date of the credit, but must not be dated later than the presentation date.
 
 Your certificate of origin dated March 8: also fine in principle — there is no requirement that it be dated before or after the B/L. A certificate of origin can be issued after shipment.
 
@@ -1281,10 +1281,10 @@ Bottom line: your March 5 invoice, March 3 B/L, and March 8 certificate of origi
     citations: [
       'UCP600 Article 28(e) — Insurance document dating',
       'UCP600 Article 14(c) — 21-day presentation period',
-      'ISBP745 Paragraph A5 — Document dating',
+      'ISBP 821 Paragraph A5 — Document dating',
       'UCP600 Article 14(i) — Document dating general',
     ],
-    tags: ['UCP600', 'ISBP745'],
+    tags: ['UCP600', 'ISBP 821'],
   },
   {
     slug: 'nigerian-inspection-certificate-suspended-program',
@@ -1306,7 +1306,7 @@ This situation is more common than people think — government programs change, 
       'UCP600 Article 14(a) — Examination against credit terms',
       'UCP600 Article 10 — Amendment procedure',
       'UCP600 Article 4(a) — Credits independent of contracts',
-      'ISBP745 Paragraph A26 — Documents not required by the credit',
+      'ISBP 821 Paragraph A26 — Documents not required by the credit',
     ],
     tags: ['UCP600', 'Regulatory'],
   },

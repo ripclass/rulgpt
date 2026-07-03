@@ -377,7 +377,7 @@ export function PreviewLanding({
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)] bg-[size:24px_24px] opacity-20" />
                 <div className="flex flex-col gap-3 relative z-10 font-mono text-xs text-neutral-500">
                   <div className="flex gap-4"><span className="text-emerald-500">✔</span> MATCH_FOUND [UCP600] Art. 19</div>
-                  <div className="flex gap-4 opacity-50"><span className="text-neutral-600">⚠</span> SCANNING [ISBP745] Block 4</div>
+                  <div className="flex gap-4 opacity-50"><span className="text-neutral-600">⚠</span> SCANNING [ISBP 821] Block 4</div>
                   <div className="flex gap-4"><span className="text-emerald-500">✔</span> MATCH_FOUND [INCOTERMS_2020] CIF</div>
                 </div>
               </div>
@@ -422,7 +422,7 @@ export function PreviewLanding({
             
             <div className="md:w-2/3 grid sm:grid-cols-2 gap-x-12 gap-y-16">
               {[
-                { i: BookOpen, t: 'ICC Standards', d: 'UCP600, ISBP745, ISP98, URDG758, Incoterms 2020' },
+                { i: BookOpen, t: 'ICC Standards', d: 'UCP600, ISBP 821, ISP98, URDG758, Incoterms 2020' },
                 { i: Globe, t: 'FTA Origin', d: 'RCEP, CPTPP, USMCA, AFCFTA' },
                 { i: FileText, t: 'Jurisdictional Rules', d: '48 country central bank & customs frameworks' },
                 { i: Shield, t: 'Sanctions Data', d: 'OFAC, EU, UN, vessel screening' },
