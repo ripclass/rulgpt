@@ -77,6 +77,9 @@ class Settings(BaseSettings):
     RULHUB_API_KEY: str | None = None
     RULEGPT_LOCAL_RULES_ROOT: str | None = None
 
+    RULGPT_RETRIEVAL_CACHE_TTL: int = 1800     # seconds, in-process retrieval cache
+    RULGPT_RERANK_EMBEDDINGS: bool = True      # embed-rerank RulHub candidates when OPENAI key present
+
     STRIPE_SECRET_KEY: str | None = None
     STRIPE_WEBHOOK_SECRET: str | None = None
     STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID: str = "price_1TJQ0SBG8gnvAJXaWxLicmkA"
