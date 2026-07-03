@@ -165,7 +165,7 @@ Rewritten during the rebrand — this is now a much longer, identity-driven prom
 - Output constraints: no markdown headings, 150-250 words by default, never invent a reference, explicit instruction to refuse confirming/denying FTA membership from general knowledge if the retrieved rules don't explicitly list it (this is a financial-consequences guardrail — got it wrong once in an earlier draft and it was called out specifically)
 
 ### Empty result handling
-Unchanged: when retrieval finds no matching rules, the pipeline still sends the query to the LLM with an empty rules context (marked `partial_coverage=True`) rather than returning a static message — the LLM can offer clearly-marked general guidance. `model_used` reflects whichever OpenRouter model answered (or `"fallback"` if that call also fails).
+When retrieval finds no matching rules, the pipeline fails closed: it returns the static refusal ("I don't have a specific rule covering that...") with `model_used="fallback"`, `routing_tier="fallback"`, `confidence_band="low"`, and empty citations — the LLM is never called for this path ($0 cost). This is a hard launch constraint: retrieval returning nothing usable must never fall through to the model answering from general knowledge.
 
 ### ICE pipeline
 Unchanged. `ice_training_eligible` defaults `False`, set `True` only in `routers/feedback.py` when `thumbs_up` + `confidence_band == "high"` + non-empty citations.

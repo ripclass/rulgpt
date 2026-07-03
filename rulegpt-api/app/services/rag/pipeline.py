@@ -422,28 +422,15 @@ class RAGPipeline:
             routing_tier = str(generation.get("routing_tier", routing_tier))
             fallback_reasons = generation.get("fallback_reasons") or []
         else:
-            # No rules retrieved — still send to LLM with empty rules context.
-            # The LLM can use general knowledge (clearly marked) instead of
-            # returning the useless "no rules found" static message.
-            try:
-                generation = await self.generator.generate(
-                    query=query,
-                    retrieved_rules=[],
-                    classifier_output=classifier_output,
-                    user_tier=user_tier,
-                    routing_tier="sonnet",
-                )
-                answer = str(generation.get("answer", "")).strip() or NO_RULE_MESSAGE
-                model_used = str(generation.get("model_used", "fallback"))
-                partial_coverage = True
-                routing_tier = str(generation.get("routing_tier", "sonnet"))
-                fallback_reasons = generation.get("fallback_reasons") or ["no rules retrieved, sent to LLM with empty context"]
-            except Exception:
-                answer = NO_RULE_MESSAGE
-                model_used = "fallback"
-                partial_coverage = True
-                routing_tier = "fallback"
-                fallback_reasons = ["no rules retrieved, LLM call also failed"]
+            # No rules retrieved — retrieval succeeded but found nothing usable.
+            # Fail closed: refuse rather than answer from the model's general
+            # knowledge. Never call the LLM here (see CLAUDE.md "Empty result
+            # handling") — $0 cost, static message only.
+            answer = NO_RULE_MESSAGE
+            model_used = "fallback"
+            partial_coverage = True
+            routing_tier = "fallback"
+            fallback_reasons = ["no rules retrieved"]
         stage_latency["generator"] = int((time.perf_counter() - start) * 1000)
 
         tokens = generation.get("tokens") or (0, 0)

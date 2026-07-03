@@ -5,7 +5,7 @@ import pytest
 from app.config import get_settings
 from app.services.rag.classifier import QueryClassifier
 from app.services.rag.models import ClassifierOutput, RetrievedRule
-from app.services.rag.pipeline import RAGPipeline, RETRIEVAL_UNAVAILABLE_MESSAGE
+from app.services.rag.pipeline import NO_RULE_MESSAGE, RAGPipeline, RETRIEVAL_UNAVAILABLE_MESSAGE
 from app.services.rag.rulhub_retriever import RetrievalUnavailableError
 import app.services.rag.rulhub_retriever as rulhub_retriever_module
 
@@ -94,13 +94,63 @@ async def test_pipeline_no_rules_graceful_empty_result():
         session=None,
         language="en",
     )
-    # No-rules path now sends to LLM with empty context. With our fake
-    # generator returning model_used="fallback", we verify the flow stays
-    # graceful (low confidence, empty citations, empty retrieved IDs).
+    # Zero rules retrieved -> static refusal, never a model call. See
+    # test_pipeline_zero_rules_refuses_without_calling_llm for the stronger
+    # assertion that the generator is never invoked.
     assert result.citations == []
     assert result.confidence_band == "low"
     assert result.retrieved_rule_ids == []
     assert result.model_used == "fallback"
+    assert result.answer == NO_RULE_MESSAGE
+
+
+class _SpyGenerator:
+    """Records whether generate() was invoked and, if it were called, would
+    return an answer synthesized from the model's general knowledge (no
+    grounding rules) — the behavior the zero-rules path must never reach."""
+
+    def __init__(self) -> None:
+        self.generate_called = False
+
+    async def generate(self, query, retrieved_rules, classifier_output, user_tier="anonymous", routing_tier="sonnet"):
+        self.generate_called = True
+        return {
+            "answer": "General knowledge answer not grounded in any retrieved rule.",
+            "model_used": "sonnet-general-knowledge",
+            "partial_coverage": True,
+            "routing_tier": "sonnet",
+        }
+
+    async def suggested_followups(self, query: str, answer: str, classifier: ClassifierOutput, partial_coverage: bool = False):
+        return ["f1", "f2", "f3"]
+
+    @staticmethod
+    def _static_followups(query: str, classifier: ClassifierOutput, partial_coverage: bool = False):
+        return ["f1", "f2", "f3"]
+
+
+@pytest.mark.asyncio
+async def test_pipeline_zero_rules_refuses_without_calling_llm():
+    """Hard constraint: if retrieval returns nothing usable, the pipeline
+    must fail closed with the static refusal — never call the LLM to answer
+    from general knowledge."""
+    generator = _SpyGenerator()
+    pipeline = RAGPipeline(
+        classifier=_FakeClassifier(),
+        retriever=_FakeRetriever(),
+        generator=generator,
+    )
+    result = await pipeline.process_query(
+        query="What does UCP600 say about transport documents?",
+        session=None,
+        language="en",
+    )
+    assert generator.generate_called is False
+    assert result.answer == NO_RULE_MESSAGE
+    assert result.model_used == "fallback"
+    assert result.routing_tier == "fallback"
+    assert result.confidence_band == "low"
+    assert result.citations == []
 
 
 @pytest.mark.asyncio
