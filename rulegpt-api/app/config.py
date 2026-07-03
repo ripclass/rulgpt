@@ -49,6 +49,9 @@ class Settings(BaseSettings):
     RATE_LIMIT_PER_MIN_AUTH: int = 120
 
     ANTHROPIC_API_KEY: str | None = None
+    # Legacy Claude model fields — harmless, unused after the 2026-07 OpenRouter
+    # LLM swap (see RULGPT_LLM_MODEL below). Kept for now; remove in a later
+    # cleanup once the swap is confirmed stable.
     RULEGPT_CLASSIFIER_MODEL: str = "claude-haiku-4-5-20251001"
     RULEGPT_GENERATOR_MODEL: str = "claude-sonnet-4-6"
     RULEGPT_COMPLEX_MODEL: str = "claude-sonnet-4-6"
@@ -57,6 +60,11 @@ class Settings(BaseSettings):
     RULEGPT_TEMPLATE_ENGINE_ENABLED: bool = True
     RULEGPT_HAIKU_MODEL: str = "claude-haiku-4-5-20251001"
     RULEGPT_OPUS_MODEL: str = "claude-opus-4-6"
+
+    # OpenRouter-routed generation/classification models (2026-07 LLM swap).
+    RULGPT_LLM_MODEL: str = "z-ai/glm-5"  # primary — verified live 2026-07-03: $0.60/$1.92 per 1M, 202k ctx
+    RULGPT_LLM_FALLBACKS: str = "deepseek/deepseek-v4-pro,qwen/qwen3.7-plus"  # $0.435/$0.87 and $0.32/$1.28 per 1M
+    RULGPT_CLASSIFIER_LLM_MODEL: str = "z-ai/glm-4.7-flash"  # heuristic-first; LLM assist — $0.06/$0.40 per 1M
 
     OPENAI_API_KEY: str | None = None
     OPENROUTER_API_KEY: str | None = None
@@ -130,6 +138,9 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.ENVIRONMENT.lower() == "production"
+
+    def llm_fallback_models(self) -> List[str]:
+        return [m.strip() for m in self.RULGPT_LLM_FALLBACKS.split(",") if m.strip()]
 
 
 @lru_cache

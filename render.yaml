@@ -31,6 +31,12 @@ services:
         value: claude-sonnet-4-6
       - key: RULEGPT_COMPLEX_MODEL
         value: claude-sonnet-4-6
+      - key: RULGPT_LLM_MODEL
+        value: z-ai/glm-5
+      - key: RULGPT_LLM_FALLBACKS
+        value: deepseek/deepseek-v4-pro,qwen/qwen3.7-plus
+      - key: RULGPT_CLASSIFIER_LLM_MODEL
+        value: z-ai/glm-4.7-flash
       - key: RULHUB_API_URL
         value: https://api.rulhub.com
       - key: RULHUB_API_VERSION
