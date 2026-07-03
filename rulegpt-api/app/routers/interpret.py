@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import uuid
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -168,6 +169,7 @@ def _persist_mt700_result(
     ip = _client_ip(request)
 
     session_obj = RuleGPTSession(
+        session_token=str(uuid.uuid4()),
         user_id=user_id,
         tier=tier,
         client_ip=ip,

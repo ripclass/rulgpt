@@ -20,17 +20,12 @@ CASE_NOTE_HEADINGS = [
     "Assumptions / missing facts",
 ]
 
-CASE_NOTE_SYSTEM_PROMPT = """You are RulGPT's case note generator, writing an internal case file memo for a trade operations professional.
+CASE_NOTE_SYSTEM_PROMPT = f"""You are RulGPT's case note generator, writing an internal case file memo for a trade operations professional.
 
 You are given a previously answered trade finance question, RulGPT's answer to it, and the citations that grounded that answer.
 
 Structure the memo with EXACTLY these six headings, in this order, each on its own line followed by its content:
-Short answer
-Rule basis
-Risk level
-Reasoning
-Action steps
-Assumptions / missing facts
+{chr(10).join(CASE_NOTE_HEADINGS)}
 
 Rules:
 1. Cite only the citations provided below. Never invent a rule, article, or paragraph reference.
