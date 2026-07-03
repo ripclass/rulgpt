@@ -6,6 +6,14 @@ Last updated: 2026-07-03, alongside the RulGPT launch (Phase 5 of the launch pla
 
 ---
 
+## 0. Pre-cutover: verify the rules corpus is populated
+
+Do this before touching DNS/Vercel — an unpopulated corpus makes the entire launch pointless even if every other step below is done correctly.
+
+Call `GET /api/embed/status` (admin-authenticated) and confirm `report.counts.stored_rules` is **> 0** while `RETRIEVAL_BACKEND=local` (the current Render pin — see §5). This endpoint only counts the local `rulegpt_rules`/`rulegpt_rule_embeddings` tables, so it's only meaningful while retrieval is pinned to `local`; once `RETRIEVAL_BACKEND` flips to `rulhub` (§7), rule content lives in RulHub itself and this count stops being the source of truth.
+
+An empty corpus doesn't error — it silently degrades **every** answer to the static refusal ("I don't have a specific rule covering that...") because the RAG pipeline fails closed on zero retrieved rules (see `CLAUDE.md`, "Empty result handling"). Populate via `scripts/sync_local_rules.py` or `POST /api/embed/sync`, or skip straight to the RulHub flip in §7 if RulHub has already resumed by the time you're cutting over.
+
 ## 1. DNS
 
 Point `rulgpt.com` at Vercel:
@@ -39,6 +47,8 @@ Auth → URL Configuration:
 - Note: `VITE_SUPABASE_LINKEDIN_OAUTH_ENABLED` currently defaults to `false` in `rulegpt-ui/.env.example` — flip it to `true` in Vercel once the LinkedIn app is confirmed working, or leave it off if LinkedIn login isn't ready.
 
 ## 5. Render environment
+
+**Deploy sequencing:** the backend (Render) must finish deploying before the frontend's chat-first UI goes live — the UI calls `/api/interpret` (MT700) and `/api/artifacts` (case notes/drafts), and those routes 404 against an older backend that predates them. On a normal push to `main`, both Render and Vercel deploy off the same commit and this isn't a concern. It only matters if you deploy backend and frontend selectively (e.g. re-running just the Vercel build, or rolling back one side independently) — in that case, deploy Render first and confirm it's live before deploying/promoting the frontend.
 
 Render service `rulegpt-api` already has most Phase 1-4 keys wired in `render.yaml` (either as literal values or `sync: false` placeholders you must fill in via the dashboard). Checklist:
 
@@ -74,6 +84,8 @@ Render service `rulegpt-api` already has most Phase 1-4 keys wired in `render.ya
 **⚠️ Do not reuse an old price ID.** A stale local `.env` used during Phase 4 development had `STRIPE_PRO_MONTHLY_PRICE_ID` pointing at the *old Enterprise* price by copy-paste error. That was caught and fixed locally, but it means: when you create the real Pro price in the Stripe dashboard, copy its ID carefully and double check it against the Products page — don't reuse anything already in `render.yaml`'s `STRIPE_ENTERPRISE_MONTHLY_PRICE_ID` / `STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID` values.
 
 **⚠️ `billing_status` does not gate on the Pro price specifically.** `GET /api/billing/status` computes `checkout_ready` from the four legacy Professional/Enterprise price IDs only — it does **not** check whether `STRIPE_PRO_MONTHLY_PRICE_ID` is set. This means the frontend's Pro upgrade button can render as "ready" even when `STRIPE_PRO_MONTHLY_PRICE_ID` is still empty, and the checkout call will 503 when clicked. Set the Pro price ID before testing the upgrade flow, don't rely on `/api/billing/status` to tell you it's missing.
+
+**⚠️ The four legacy Professional/Enterprise price IDs are hardcoded test-mode defaults, not empty placeholders.** `config.py:101-104` (`STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID`, `STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID`, `STRIPE_ENTERPRISE_MONTHLY_PRICE_ID`, `STRIPE_ENTERPRISE_ANNUAL_PRICE_ID`) ship with real-looking `price_...` string defaults baked into the code, unlike `STRIPE_PRO_MONTHLY_PRICE_ID`/`STRIPE_CASE_NOTE_PRICE_ID`/`STRIPE_DRAFT_PRICE_ID` which default to `None` and fail loudly if unset. Because they have non-empty defaults, the app won't error or warn if Render's env doesn't override them — on the live-key flip (step 6 below), if these four aren't explicitly set to the live-mode price IDs in Render, checkout silently keeps referencing the old test-mode prices against your live Stripe key, which will fail at checkout (test-mode prices don't exist under a live key) instead of failing at boot where you'd notice it immediately.
 
 4. Webhook endpoint: `https://<render-api-url>/api/billing/webhook`
    - Events: `checkout.session.completed`, `customer.subscription.*`, `invoice.payment_failed`
@@ -124,4 +136,4 @@ Do this in order — each step depends on the last:
 - OpenRouter LLM swap — zero Anthropic runtime dependency, cost logging, template tier, citation retry/degrade
 - Daily quota windows, MT700 interpreter, entitlements table, Pro/one-off checkout code, print-to-PDF, advisory disclaimers
 
-**On you, in order:** DNS → Vercel domains/env → Supabase URLs → OAuth app branding → Render env (keys + RulHub flip after 07-05) → Stripe prices + webhook → acceptance run → mailboxes/content spot-checks.
+**On you, in order:** Verify rules corpus is populated → DNS → Vercel domains/env → Supabase URLs → OAuth app branding → Render env (keys + RulHub flip after 07-05) → Stripe prices + webhook → acceptance run → mailboxes/content spot-checks.
