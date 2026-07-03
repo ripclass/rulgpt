@@ -35,6 +35,11 @@ services:
         value: https://api.rulhub.com
       - key: RULHUB_API_VERSION
         value: "2026-04-28"
+      # Deploy-time pin: RulHub API is suspended until 2026-07-05. Flip to
+      # "rulhub" after the live smoke test (see LAUNCH-NOTES.md); code default
+      # is already "rulhub".
+      - key: RETRIEVAL_BACKEND
+        value: local
       - key: DATABASE_URL
         sync: false
       - key: SECRET_KEY
