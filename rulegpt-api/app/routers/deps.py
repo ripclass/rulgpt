@@ -8,10 +8,16 @@ from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.models.entitlement import RuleGPTEntitlement
 
 
 PAID_TIERS = frozenset({"professional", "enterprise"})
 VALID_TIERS = frozenset({"anonymous", "free"}) | PAID_TIERS
+
+# One-off artifact prices — surfaced in the 402 body so the frontend can
+# render the paywall modal without a second round trip.
+ONEOFF_PRICE_USD = {"case_note": 9, "draft": 19}
+PRO_PRICE_USD = 29
 
 
 def get_request_tier(request: Request) -> str:
@@ -100,6 +106,34 @@ def require_admin_user(request: Request):
             detail="Admin permission required.",
         )
     return True
+
+
+def consume_or_require_entitlement(db: Session, user_id: str, tier: str, kind: str) -> None:
+    """Pro/enterprise pass free. Otherwise consume one credit or raise 402."""
+    if tier in ("professional", "enterprise"):
+        return
+    row = (
+        db.query(RuleGPTEntitlement)
+        .filter(
+            RuleGPTEntitlement.user_id == user_id,
+            RuleGPTEntitlement.kind == kind,
+            RuleGPTEntitlement.credits > RuleGPTEntitlement.consumed,
+        )
+        .with_for_update()
+        .first()
+    )
+    if row is None:
+        raise HTTPException(
+            status_code=402,
+            detail={
+                "error": "payment_required",
+                "kind": kind,
+                "price_usd": ONEOFF_PRICE_USD.get(kind),
+                "pro_price_usd": PRO_PRICE_USD,
+            },
+        )
+    row.consumed += 1
+    db.flush()
 
 
 DbSession = Depends(get_db)

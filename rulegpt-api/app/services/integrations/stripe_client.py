@@ -9,6 +9,7 @@ from uuid import UUID
 import stripe
 
 from app.config import settings
+from app.models.entitlement import RuleGPTEntitlement
 
 from .supabase_auth import SupabaseAuthService
 
@@ -27,13 +28,18 @@ class StripeClient:
         self.webhook_secret = webhook_secret or settings.STRIPE_WEBHOOK_SECRET
         self.supabase_auth = supabase_auth or SupabaseAuthService()
 
-        # Price ID → tier mapping (used by webhook to determine user tier)
+        # Price ID → tier mapping (used by webhook to determine user tier).
+        # "Pro" is only a marketing label for the $29/mo SKU — it grants the
+        # same internal `professional` tier as the existing professional
+        # price IDs. Internal tier vocabulary is never renamed (see CLAUDE.md
+        # 2026-05-02 lesson).
         self._price_to_tier: dict[str, str] = {}
         for price_id, tier in [
             (settings.STRIPE_PROFESSIONAL_MONTHLY_PRICE_ID, "professional"),
             (settings.STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID, "professional"),
             (settings.STRIPE_ENTERPRISE_MONTHLY_PRICE_ID, "enterprise"),
             (settings.STRIPE_ENTERPRISE_ANNUAL_PRICE_ID, "enterprise"),
+            (settings.STRIPE_PRO_MONTHLY_PRICE_ID, "professional"),
         ]:
             if price_id:
                 self._price_to_tier[price_id] = tier
@@ -60,6 +66,9 @@ class StripeClient:
                 "monthly": settings.STRIPE_ENTERPRISE_MONTHLY_PRICE_ID,
                 "annual": settings.STRIPE_ENTERPRISE_ANNUAL_PRICE_ID,
             },
+            "pro": {
+                "monthly": settings.STRIPE_PRO_MONTHLY_PRICE_ID,
+            },
         }
 
         if normalized_plan not in price_matrix:
@@ -67,7 +76,7 @@ class StripeClient:
         if normalized not in {"monthly", "annual"}:
             raise ValueError("Unsupported billing interval.")
 
-        price_id = price_matrix[normalized_plan][normalized]
+        price_id = price_matrix[normalized_plan].get(normalized)
         if not price_id:
             raise RuntimeError(
                 f"Stripe price id for {normalized_plan} {normalized} billing is not configured."
@@ -118,6 +127,51 @@ class StripeClient:
             "plan": normalized_plan,
             "interval": str(interval).strip().lower(),
             "tier": normalized_plan,
+        }
+
+    async def create_oneoff_checkout(
+        self,
+        *,
+        user_id: UUID | str,
+        customer_email: str | None,
+        kind: str,
+        success_url: str,
+        cancel_url: str,
+    ) -> dict[str, Any]:
+        """Create a one-off ($9 case note / $19 draft) payment-mode checkout session."""
+
+        normalized_kind = str(kind or "").strip().lower()
+        if normalized_kind not in {"case_note", "draft"}:
+            raise ValueError(f"Unsupported one-off artifact kind: {normalized_kind}")
+
+        price_id = (
+            settings.STRIPE_CASE_NOTE_PRICE_ID
+            if normalized_kind == "case_note"
+            else settings.STRIPE_DRAFT_PRICE_ID
+        )
+        if not price_id:
+            raise RuntimeError(f"Stripe price id for {normalized_kind} is not configured.")
+
+        stripe.api_key = self._require_secret_key()
+        metadata = {"supabase_user_id": str(user_id), "artifact_kind": normalized_kind}
+
+        payload = {
+            "mode": "payment",
+            "line_items": [{"price": price_id, "quantity": 1}],
+            "success_url": success_url,
+            "cancel_url": cancel_url,
+            "client_reference_id": str(user_id),
+            "metadata": metadata,
+        }
+        if customer_email:
+            payload["customer_email"] = customer_email
+
+        session = await asyncio.to_thread(stripe.checkout.Session.create, **payload)
+        return {
+            "session_id": session["id"],
+            "checkout_url": session.get("url"),
+            "kind": normalized_kind,
+            "price_id": price_id,
         }
 
     async def _resolve_event_user_id(self, event_object: dict[str, Any]) -> UUID:
@@ -175,8 +229,47 @@ class StripeClient:
             return paid_tier
         return "free"
 
-    async def handle_webhook(self, payload: bytes, signature: str) -> dict[str, Any]:
-        """Verify a Stripe webhook and sync the Supabase tier metadata."""
+    async def _handle_oneoff_payment(self, event_object: dict[str, Any], db: Any) -> dict[str, Any]:
+        """checkout.session.completed with mode="payment" — grant a one-off entitlement credit.
+
+        Idempotent on `stripe_session_id`: a query-first check handles the
+        common case (Stripe redelivering the same event); the column's
+        unique constraint backstops it against races.
+        """
+        metadata = event_object.get("metadata") or {}
+        user_id = metadata.get("supabase_user_id")
+        kind = metadata.get("artifact_kind")
+        session_id = event_object.get("id")
+        if not user_id or not kind:
+            raise ValueError("Stripe one-off checkout is missing required metadata.")
+
+        existing = db.query(RuleGPTEntitlement).filter_by(stripe_session_id=session_id).first()
+        if existing is None:
+            db.add(
+                RuleGPTEntitlement(
+                    user_id=str(user_id),
+                    kind=str(kind),
+                    credits=1,
+                    consumed=0,
+                    stripe_session_id=session_id,
+                )
+            )
+            db.commit()
+
+        return {
+            "event_type": "checkout.session.completed",
+            "user_id": str(user_id),
+            "tier": None,
+            "action": "entitlement_granted",
+            "kind": str(kind),
+        }
+
+    async def handle_webhook(self, payload: bytes, signature: str, db: Any = None) -> dict[str, Any]:
+        """Verify a Stripe webhook and sync the Supabase tier metadata.
+
+        `db` is a sync SQLAlchemy Session, required only for the one-off
+        (payment-mode) branch — the subscription branches never touch it.
+        """
 
         stripe.api_key = self._require_secret_key()
         event = stripe.Webhook.construct_event(
@@ -189,6 +282,9 @@ class StripeClient:
         event_object = (event.get("data") or {}).get("object") or {}
 
         if event_type == "checkout.session.completed":
+            if str(event_object.get("mode") or "") == "payment":
+                return await self._handle_oneoff_payment(event_object, db)
+
             user_id = await self._resolve_event_user_id(event_object)
             tier = self._resolve_event_tier(event_object)
             updated = await self.supabase_auth.set_user_tier(user_id, tier)

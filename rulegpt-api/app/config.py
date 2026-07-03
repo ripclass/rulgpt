@@ -102,6 +102,9 @@ class Settings(BaseSettings):
     STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID: str = "price_1TJQ1IBG8gnvAJXaBTtfnuA6"
     STRIPE_ENTERPRISE_MONTHLY_PRICE_ID: str = "price_1TJQ1LBG8gnvAJXafcNqUOOv"
     STRIPE_ENTERPRISE_ANNUAL_PRICE_ID: str = "price_1TJQ1NBG8gnvAJXaZZlHHCmh"
+    STRIPE_PRO_MONTHLY_PRICE_ID: str | None = None      # Pro $29/mo — Ripon creates in Stripe
+    STRIPE_CASE_NOTE_PRICE_ID: str | None = None        # $9 one-off
+    STRIPE_DRAFT_PRICE_ID: str | None = None            # $19 one-off
 
     ADMIN_SECRET: str | None = None
 

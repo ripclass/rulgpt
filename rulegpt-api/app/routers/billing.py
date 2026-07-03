@@ -5,12 +5,16 @@ from __future__ import annotations
 from urllib.parse import urlsplit, urlunsplit
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from sqlalchemy.orm import Session
 
 from app.config import settings
+from app.database import get_db
 from app.schemas.billing import (
     BillingConfigStatusResponse,
     BillingSubscriptionResponse,
     BillingWebhookResponse,
+    CheckoutOneoffCreateRequest,
+    CheckoutOneoffResponse,
     CheckoutSessionCreateRequest,
     CheckoutSessionResponse,
 )
@@ -38,6 +42,7 @@ async def billing_status() -> BillingConfigStatusResponse:
         and enterprise_annual
     )
     webhook_ready = stripe_configured and webhook_secret_configured
+    oneoff_prices_configured = bool(settings.STRIPE_CASE_NOTE_PRICE_ID) and bool(settings.STRIPE_DRAFT_PRICE_ID)
 
     blockers: list[str] = []
     if not stripe_configured:
@@ -63,6 +68,7 @@ async def billing_status() -> BillingConfigStatusResponse:
         enterprise_annual_price_configured=enterprise_annual,
         checkout_ready=checkout_ready,
         webhook_ready=webhook_ready,
+        oneoff_prices_configured=oneoff_prices_configured,
         supported_plans=["professional", "enterprise"],
         supported_intervals=["monthly", "annual"],
         blockers=blockers,
@@ -120,6 +126,40 @@ async def create_checkout_session(
     return CheckoutSessionResponse.model_validate(session)
 
 
+@router.post("/checkout-oneoff", response_model=CheckoutOneoffResponse)
+async def create_oneoff_checkout_session(
+    request: Request,
+    payload: CheckoutOneoffCreateRequest,
+    _user_id=Depends(require_authenticated_user),
+) -> CheckoutOneoffResponse:
+    claims = getattr(request.state, "auth_claims", {}) or {}
+    customer_email = payload.customer_email or claims.get("email")
+    frontend_base = _frontend_base_url(request)
+    success_url = str(payload.success_url) if payload.success_url else f"{frontend_base}/upgrade?checkout=success"
+    cancel_url = str(payload.cancel_url) if payload.cancel_url else f"{frontend_base}/upgrade?checkout=cancel"
+
+    try:
+        session = await billing_client.create_oneoff_checkout(
+            user_id=request.state.user_id,
+            customer_email=customer_email,
+            kind=payload.kind,
+            success_url=success_url,
+            cancel_url=cancel_url,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        ) from exc
+
+    return CheckoutOneoffResponse.model_validate(session)
+
+
 @router.get("/subscription", response_model=BillingSubscriptionResponse)
 async def get_subscription(
     request: Request,
@@ -134,7 +174,7 @@ async def get_subscription(
 
 
 @router.post("/webhook", response_model=BillingWebhookResponse)
-async def stripe_webhook(request: Request) -> BillingWebhookResponse:
+async def stripe_webhook(request: Request, db: Session = Depends(get_db)) -> BillingWebhookResponse:
     signature = request.headers.get("stripe-signature")
     if not signature:
         raise HTTPException(
@@ -144,7 +184,7 @@ async def stripe_webhook(request: Request) -> BillingWebhookResponse:
 
     payload = await request.body()
     try:
-        result = await billing_client.handle_webhook(payload=payload, signature=signature)
+        result = await billing_client.handle_webhook(payload=payload, signature=signature, db=db)
     except Exception as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 

@@ -11,6 +11,7 @@ from pydantic import AnyUrl, BaseModel, Field
 
 BillingInterval = Literal["monthly", "annual"]
 BillingPlan = Literal["professional", "enterprise"]
+OneoffArtifactKind = Literal["case_note", "draft"]
 
 
 class CheckoutSessionCreateRequest(BaseModel):
@@ -30,11 +31,26 @@ class CheckoutSessionResponse(BaseModel):
     tier: BillingPlan
 
 
+class CheckoutOneoffCreateRequest(BaseModel):
+    kind: OneoffArtifactKind = Field(description="One-off artifact credit to purchase.")
+    success_url: AnyUrl | None = None
+    cancel_url: AnyUrl | None = None
+    customer_email: str | None = Field(default=None, max_length=320)
+
+
+class CheckoutOneoffResponse(BaseModel):
+    session_id: str
+    checkout_url: str | None = None
+    kind: OneoffArtifactKind
+    price_id: str
+
+
 class BillingWebhookResponse(BaseModel):
     event_type: str
     action: str
     user_id: UUID | None = None
     tier: str | None = None
+    kind: str | None = None
     supabase_user: dict | None = None
 
 
@@ -55,6 +71,7 @@ class BillingConfigStatusResponse(BaseModel):
     enterprise_annual_price_configured: bool
     checkout_ready: bool
     webhook_ready: bool
+    oneoff_prices_configured: bool
     supported_plans: list[BillingPlan]
     supported_intervals: list[BillingInterval]
     blockers: list[str]
