@@ -42,6 +42,53 @@ function mergeSessions(backend: SessionSummary[], local: SessionSummary[]): Sess
   return merged.sort((a, b) => new Date(b.last_active).getTime() - new Date(a.last_active).getTime())
 }
 
+// Static content — module scope so its identity is stable across renders
+// (avoids re-allocating this on every render and needing it in memo deps).
+const categorySuggestions: Record<string, string[]> = {
+  'LC Compliance': [
+    'My invoice says "Men\'s 100% Cotton Woven Dress Shirts" but the LC says "Men\'s 100% Cotton Woven Shirts". The bank rejected it. Is the word "Dress" really a discrepancy under UCP 600?',
+    'The LC requires a full set of 3/3 original bills of lading but the shipping line only issued 2/2. Can the bank accept this or is it an automatic refusal?',
+    'I shipped on June 10 but the bill of lading on-board date says June 11 because the carrier delayed the notation. The LC last shipment date is June 10. Is this a late shipment discrepancy?',
+    'My LC says "insurance for 110% CIF value" but my insurance certificate shows coverage for 110% of the invoice value, and the invoice is FOB. Is this a discrepancy?',
+    'The LC requires documents "in English" but my certificate of origin from the chamber of commerce is bilingual (Arabic and English). Can the bank refuse it?',
+  ],
+  'Customs & HS Codes': [
+    'I\'m exporting garments that are 60% cotton and 40% polyester. The buyer classified it under HS 6205 but my country says 6206. Which classification rule applies and who decides?',
+    'My buyer is a subsidiary of our parent company. Customs is questioning whether the invoice price is arm\'s length. What valuation method should I use for related-party transactions?',
+    'I\'m importing machinery temporarily into Nigeria for a construction project. It\'ll be re-exported in 6 months. What customs regime should I use to avoid paying full duty?',
+    'I\'m shipping frozen seafood to the EU. Customs says I need a health certificate, a catch certificate, and an IUU declaration. Can I clear goods if one document arrives late?',
+    'My HS code was reclassified after shipment and now the duty rate is higher. Can customs retroactively apply the new classification to goods already cleared?',
+  ],
+  'Sanctions': [
+    'We received an LC for crude oil from UAE to China but the unit price is 40% below market. The beneficiary was incorporated 3 months ago. What TBML red flags should we check?',
+    'Our client wants to ship dual-use industrial equipment to Turkey. It\'s not on the EU control list but it is on the US Commerce Control List. We\'re a European bank — which regime applies?',
+    'A vessel in our transaction changed its flag from Iran to Panama 6 months ago. The cargo is legitimate agricultural goods. Do we still need to do enhanced due diligence?',
+    'We\'re processing an LC where the beneficiary\'s name is a close match — but not exact — to an entry on the OFAC SDN list. What\'s the threshold for a "hit" and what should we do?',
+    'Our client wants to ship medical supplies to a country under EU sanctions. There\'s a humanitarian exemption. What documentation do we need to process the LC without violating sanctions?',
+  ],
+  'FTA Rules of Origin': [
+    'I\'m exporting wooden furniture from Vietnam to Australia. The raw timber was imported from Malaysia. Does that count as originating material under RCEP cumulation rules?',
+    'My garment factory in Bangladesh uses fabric from China and buttons from India. Can I still get a RCEP certificate of origin for the finished shirts exported to Japan?',
+    'I\'m shipping auto parts from Mexico to the US under USMCA. The steel in the parts was smelted in Brazil. Does the product still qualify for preferential tariff treatment?',
+    'My buyer in Kenya wants an AFCFTA certificate of origin for textiles I\'m exporting from Ethiopia. What percentage of local content do I need and how do I prove it?',
+    'I have a shipment going from Thailand to Canada. Can I use RCEP or CPTPP — or both? Which one gives me a better tariff rate and can I switch between them per shipment?',
+  ],
+  'Trade Documentation': [
+    'My bill of lading shows "shipped on board" but doesn\'t name the vessel. The LC requires the vessel name. Is this a discrepancy under ISBP 821 or can the carrier add it later?',
+    'The LC requires "marine insurance covering warehouse to warehouse". My policy says "port to port". Is this a valid discrepancy or does the Incoterms coverage handle the difference?',
+    'My packing list shows total weight as 10,050 kg but the bill of lading says 10,000 kg. The LC is silent on weight tolerance. Can the bank refuse for this 0.5% difference?',
+    'The LC was issued under UCP 600 but the buyer now wants to present documents electronically. Can we switch to eUCP mid-transaction or do we need an amendment?',
+    'My multimodal transport document covers shipment from factory in Dhaka to warehouse in Hamburg. The LC only requires a bill of lading. Will the bank accept the multimodal document instead?',
+  ],
+  'Bank Requirements': [
+    'We received documents on Monday. Our examiner found a discrepancy on Wednesday but the senior reviewer disagrees. How many banking days do we have before we must give notice under Article 16?',
+    'We\'re the confirming bank on an LC and the documents have discrepancies. The issuing bank says they\'ll accept on approval basis. Are we obligated to go along or can we refuse independently?',
+    'An LC came through SWIFT MT700 but field 46A lists documents we\'ve never seen before — a "fumigation compliance report". The applicant insists. Can we advise this LC as-is?',
+    'We issued an LC with deferred payment at 90 days from BL date. The beneficiary wants to discount the deferred payment. What are our obligations if we agreed to a deferred payment undertaking?',
+    'Our client wants to transfer the LC to a second beneficiary in another country. The first beneficiary wants to substitute invoices. What are our obligations as the transferring bank under Article 38?',
+  ],
+}
+
 export function Home() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -53,7 +100,9 @@ export function Home() {
   const [mobileDrawerMode, setMobileDrawerMode] = useState<'history' | 'saved'>('history')
   const [activeQuickCategory, setActiveQuickCategory] = useState<string | null>(null)
   const [localSessions, setLocalSessions] = useState<SessionSummary[]>([])
-  const currentSessionIdRef = useRef<string>(`session-${Date.now()}`)
+  // Lazily assigned (in recordHistory, its only reader) rather than during render,
+  // since Date.now() is an impure call and this value is never needed before then.
+  const currentSessionIdRef = useRef<string | null>(null)
   const seededQueryRef = useRef<string | null>(null)
 
   const auth = useAuth()
@@ -98,55 +147,13 @@ export function Home() {
     queriesRemaining: query.queriesRemaining,
   })
 
-  const categorySuggestions: Record<string, string[]> = {
-    'LC Compliance': [
-      'My invoice says "Men\'s 100% Cotton Woven Dress Shirts" but the LC says "Men\'s 100% Cotton Woven Shirts". The bank rejected it. Is the word "Dress" really a discrepancy under UCP 600?',
-      'The LC requires a full set of 3/3 original bills of lading but the shipping line only issued 2/2. Can the bank accept this or is it an automatic refusal?',
-      'I shipped on June 10 but the bill of lading on-board date says June 11 because the carrier delayed the notation. The LC last shipment date is June 10. Is this a late shipment discrepancy?',
-      'My LC says "insurance for 110% CIF value" but my insurance certificate shows coverage for 110% of the invoice value, and the invoice is FOB. Is this a discrepancy?',
-      'The LC requires documents "in English" but my certificate of origin from the chamber of commerce is bilingual (Arabic and English). Can the bank refuse it?',
+  const defaultSuggestions = useMemo(
+    () => suggestions.data?.map((item) => item.text) ?? [
+      'My LC says "Cotton Woven Shirts" but my invoice says "Cotton Woven Dress Shirts". The bank rejected it. Is the word "Dress" really a discrepancy under UCP 600?',
+      'I shipped on June 10 but the BL on-board date says June 11 because the carrier delayed. The LC last shipment date is June 10. Is this late shipment?',
     ],
-    'Customs & HS Codes': [
-      'I\'m exporting garments that are 60% cotton and 40% polyester. The buyer classified it under HS 6205 but my country says 6206. Which classification rule applies and who decides?',
-      'My buyer is a subsidiary of our parent company. Customs is questioning whether the invoice price is arm\'s length. What valuation method should I use for related-party transactions?',
-      'I\'m importing machinery temporarily into Nigeria for a construction project. It\'ll be re-exported in 6 months. What customs regime should I use to avoid paying full duty?',
-      'I\'m shipping frozen seafood to the EU. Customs says I need a health certificate, a catch certificate, and an IUU declaration. Can I clear goods if one document arrives late?',
-      'My HS code was reclassified after shipment and now the duty rate is higher. Can customs retroactively apply the new classification to goods already cleared?',
-    ],
-    'Sanctions': [
-      'We received an LC for crude oil from UAE to China but the unit price is 40% below market. The beneficiary was incorporated 3 months ago. What TBML red flags should we check?',
-      'Our client wants to ship dual-use industrial equipment to Turkey. It\'s not on the EU control list but it is on the US Commerce Control List. We\'re a European bank — which regime applies?',
-      'A vessel in our transaction changed its flag from Iran to Panama 6 months ago. The cargo is legitimate agricultural goods. Do we still need to do enhanced due diligence?',
-      'We\'re processing an LC where the beneficiary\'s name is a close match — but not exact — to an entry on the OFAC SDN list. What\'s the threshold for a "hit" and what should we do?',
-      'Our client wants to ship medical supplies to a country under EU sanctions. There\'s a humanitarian exemption. What documentation do we need to process the LC without violating sanctions?',
-    ],
-    'FTA Rules of Origin': [
-      'I\'m exporting wooden furniture from Vietnam to Australia. The raw timber was imported from Malaysia. Does that count as originating material under RCEP cumulation rules?',
-      'My garment factory in Bangladesh uses fabric from China and buttons from India. Can I still get a RCEP certificate of origin for the finished shirts exported to Japan?',
-      'I\'m shipping auto parts from Mexico to the US under USMCA. The steel in the parts was smelted in Brazil. Does the product still qualify for preferential tariff treatment?',
-      'My buyer in Kenya wants an AFCFTA certificate of origin for textiles I\'m exporting from Ethiopia. What percentage of local content do I need and how do I prove it?',
-      'I have a shipment going from Thailand to Canada. Can I use RCEP or CPTPP — or both? Which one gives me a better tariff rate and can I switch between them per shipment?',
-    ],
-    'Trade Documentation': [
-      'My bill of lading shows "shipped on board" but doesn\'t name the vessel. The LC requires the vessel name. Is this a discrepancy under ISBP 821 or can the carrier add it later?',
-      'The LC requires "marine insurance covering warehouse to warehouse". My policy says "port to port". Is this a valid discrepancy or does the Incoterms coverage handle the difference?',
-      'My packing list shows total weight as 10,050 kg but the bill of lading says 10,000 kg. The LC is silent on weight tolerance. Can the bank refuse for this 0.5% difference?',
-      'The LC was issued under UCP 600 but the buyer now wants to present documents electronically. Can we switch to eUCP mid-transaction or do we need an amendment?',
-      'My multimodal transport document covers shipment from factory in Dhaka to warehouse in Hamburg. The LC only requires a bill of lading. Will the bank accept the multimodal document instead?',
-    ],
-    'Bank Requirements': [
-      'We received documents on Monday. Our examiner found a discrepancy on Wednesday but the senior reviewer disagrees. How many banking days do we have before we must give notice under Article 16?',
-      'We\'re the confirming bank on an LC and the documents have discrepancies. The issuing bank says they\'ll accept on approval basis. Are we obligated to go along or can we refuse independently?',
-      'An LC came through SWIFT MT700 but field 46A lists documents we\'ve never seen before — a "fumigation compliance report". The applicant insists. Can we advise this LC as-is?',
-      'We issued an LC with deferred payment at 90 days from BL date. The beneficiary wants to discount the deferred payment. What are our obligations if we agreed to a deferred payment undertaking?',
-      'Our client wants to transfer the LC to a second beneficiary in another country. The first beneficiary wants to substitute invoices. What are our obligations as the transferring bank under Article 38?',
-    ],
-  }
-
-  const defaultSuggestions = suggestions.data?.map((item) => item.text) ?? [
-    'My LC says "Cotton Woven Shirts" but my invoice says "Cotton Woven Dress Shirts". The bank rejected it. Is the word "Dress" really a discrepancy under UCP 600?',
-    'I shipped on June 10 but the BL on-board date says June 11 because the carrier delayed. The LC last shipment date is June 10. Is this late shipment?',
-  ]
+    [suggestions.data],
+  )
 
   const suggestionTexts = useMemo(
     () => activeQuickCategory && categorySuggestions[activeQuickCategory]
@@ -185,6 +192,9 @@ export function Home() {
   }, [auth, location.pathname, location.search, navigate])
 
   const recordHistory = (item: HistoryItem) => {
+    if (currentSessionIdRef.current === null) {
+      currentSessionIdRef.current = `session-${Date.now()}`
+    }
     const sessionId = currentSessionIdRef.current
     setLocalSessions((prev) => {
       const existing = prev.find(s => s.session_id === sessionId)
@@ -409,6 +419,11 @@ export function Home() {
     if (shouldClearState) {
       navigate(location.pathname, { replace: true, state: null })
     }
+    // authModal and submitQuery are intentionally omitted: they're recreated every
+    // render, and this effect must only react to navigation-state changes (it
+    // clears location.state itself, which is what should trigger a rerun, guarded
+    // by seededQueryRef so a submitted query is never resubmitted).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, location.state, navigate])
 
   return (
@@ -434,7 +449,6 @@ export function Home() {
           void deleteSaved(savedId)
         }}
         onOpenLogin={() => authModal.openLogin()}
-        onOpenSignup={() => authModal.openSignup()}
         onLogout={() => {
           void auth.logout()
           handleNewQuery()
@@ -468,7 +482,6 @@ export function Home() {
             navigate('/upgrade')
           }}
           onSubmitQuery={submitQuery}
-          onNewQuery={handleNewQuery}
           onPickSuggestion={(value) => {
             void submitQuery(value)
           }}

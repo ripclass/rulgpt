@@ -19,5 +19,20 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Test stubs and callback signatures intentionally keep unused params
+      // (e.g. mocked fetch(_input, _init)) to document the shape being mocked.
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
+      ],
+      // shadcn/ui exports variant helpers (buttonVariants) alongside components,
+      // and our context files export their `useX` hook alongside the provider —
+      // both are standard, intentional patterns, not fast-refresh hazards.
+      'react-refresh/only-export-components': [
+        'error',
+        { allowConstantExport: true, allowExportNames: ['buttonVariants', 'useAuthModal', 'useTheme'] },
+      ],
+    },
   },
 ])

@@ -1,10 +1,9 @@
 interface FreeTierCounterProps {
   usedCount: number
   limitValue: number
-  remaining: number
 }
 
-export function FreeTierCounter({ usedCount, limitValue, remaining }: FreeTierCounterProps) {
+export function FreeTierCounter({ usedCount, limitValue }: FreeTierCounterProps) {
   const progress = Math.min(100, (usedCount / limitValue) * 100)
   return (
     <div className="rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#0A0A0A] p-3 shadow-sm transition-colors">

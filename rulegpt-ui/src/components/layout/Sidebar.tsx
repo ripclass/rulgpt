@@ -25,7 +25,6 @@ interface SidebarProps {
   onQuickCategory: (value: string) => void
   onDeleteSaved: (savedId: string) => void
   onOpenLogin: () => void
-  onOpenSignup: () => void
   onLogout: () => void
 }
 
@@ -202,7 +201,6 @@ export function Sidebar({
   onQuickCategory,
   onDeleteSaved,
   onOpenLogin,
-  onOpenSignup,
   onLogout,
 }: SidebarProps) {
   return (
@@ -247,7 +245,7 @@ export function Sidebar({
 
       {tier === 'anonymous' ? (
         <div className="mt-5 border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-[#141414] rounded-sm p-3">
-          <FreeTierCounter usedCount={usedCount} remaining={remaining} limitValue={limitValue} />
+          <FreeTierCounter usedCount={usedCount} limitValue={limitValue} />
         </div>
       ) : null}
 

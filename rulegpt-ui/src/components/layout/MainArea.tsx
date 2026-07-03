@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { ChatThread } from '@/components/chat/ChatThread'
 import { QueryInput } from '@/components/input/QueryInput'
@@ -27,7 +28,6 @@ interface MainAreaProps {
   onPickSuggestion: (value: string) => void
   onCitationClick: (citation: Citation) => void
   onSaveMessage: (queryId: string) => void
-  onNewQuery?: () => void
   onProCheckout?: () => void
   onOneoffCheckout?: (kind: ArtifactKind) => void
 }
@@ -52,7 +52,6 @@ export function MainArea({
   onPickSuggestion,
   onCitationClick,
   onSaveMessage,
-  onNewQuery,
   onProCheckout,
   onOneoffCheckout,
 }: MainAreaProps) {
@@ -64,9 +63,12 @@ export function MainArea({
     'Paste your LC clause or field here...',
     'What does the credit require?',
   ]
+  // Picked once per mount rather than recomputed every render — rotation across
+  // renders was never guaranteed anyway since nothing forces a re-render on the minute.
+  const [placeholderIndex] = useState(() => Math.floor(Date.now() / 60000) % placeholderOptions.length)
   const placeholder = activeQuickCategory
     ? `Ask about ${activeQuickCategory.toLowerCase()}...`
-    : placeholderOptions[Math.floor(Date.now() / 60000) % placeholderOptions.length]
+    : placeholderOptions[placeholderIndex]
 
   return (
     <main className="flex min-h-[100dvh] flex-1 flex-col pb-28 md:pb-0 bg-[#FAFAFA] dark:bg-[#171717] selection:bg-[#FF4F00] selection:text-white relative transition-colors">

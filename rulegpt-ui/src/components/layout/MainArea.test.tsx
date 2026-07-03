@@ -28,7 +28,6 @@ describe('MainArea', () => {
           canSave={false}
           previewMode
           onSubmitQuery={async () => undefined}
-          onNewQuery={() => undefined}
           onPickSuggestion={onPickSuggestion}
           onCitationClick={() => undefined}
           onSaveMessage={() => undefined}
