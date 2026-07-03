@@ -66,6 +66,64 @@ export interface QuerySuggestion {
   text: string
 }
 
+// --- MT700 interpreter (Task 4.6) ---
+
+export interface MT700Field {
+  tag: string
+  name: string
+  content: string
+}
+
+export interface MT700Flag {
+  tag: string
+  name: string
+  note: string
+}
+
+export interface InterpretResponse {
+  fields: MT700Field[]
+  flags: MT700Flag[]
+  answer: string
+  citations: Citation[]
+  disclaimer: string
+  cta_text: string
+  cta_url: string
+}
+
+// --- Case note / draft artifacts (Task 4.6) ---
+
+export type DraftType =
+  | 'bank_response'
+  | 'buyer_email'
+  | 'waiver_request'
+  | 'amendment_request'
+  | 'discrepancy_explanation'
+
+export type ArtifactKind = 'case_note' | 'draft'
+
+export interface ArtifactResponse {
+  title: string
+  body_markdown: string
+  citations: Citation[]
+  disclaimer: string
+  generated_at: string
+  draft_type?: DraftType
+}
+
+export interface PaymentRequiredDetail {
+  error: 'payment_required'
+  kind: ArtifactKind
+  price_usd: number | null
+  pro_price_usd: number
+}
+
+export interface CheckoutOneoffResponse {
+  session_id: string
+  checkout_url?: string | null
+  kind: ArtifactKind
+  price_id: string
+}
+
 export interface RuleDetails {
   rule_id: string
   rulebook: string | null

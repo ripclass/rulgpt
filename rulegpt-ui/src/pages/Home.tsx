@@ -7,7 +7,8 @@ import { MobileDrawer } from '@/components/layout/MobileDrawer'
 import { MobileNav } from '@/components/layout/MobileNav'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { CitationPanel } from '@/components/chat/CitationPanel'
-import { api } from '@/lib/api'
+import { Mt700Interpreter } from '@/components/workbench/Mt700Interpreter'
+import { api, ApiError } from '@/lib/api'
 import { track } from '@/lib/analytics'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthModal } from '@/contexts/AuthModalContext'
@@ -15,7 +16,9 @@ import { useQuery } from '@/hooks/useQuery'
 import { useSession } from '@/hooks/useSession'
 import { useTierLimit } from '@/hooks/useTierLimit'
 import { isPreviewModeEnabled } from '@/lib/config'
-import type { Citation, HistoryItem, Message, RuleDetails, SavedAnswer, SessionSummary } from '@/types'
+import type { ArtifactKind, Citation, HistoryItem, Message, RuleDetails, SavedAnswer, SessionSummary } from '@/types'
+
+type WorkbenchMode = 'ask' | 'mt700'
 
 function buildSessionMessages(session: SessionSummary): Message[] {
   const messages: Message[] = []
@@ -56,6 +59,11 @@ export function Home() {
   const auth = useAuth()
   const { sessionToken, resetSession } = useSession()
   const previewMode = isPreviewModeEnabled()
+
+  const modeParam = new URLSearchParams(location.search).get('mode')
+  const mode: WorkbenchMode = modeParam === 'mt700' ? 'mt700' : 'ask'
+
+  const identity = { userId: auth.user?.id, tier: auth.tier, accessToken: auth.accessToken }
 
   const query = useQuery({
     sessionToken,
@@ -292,6 +300,62 @@ export function Home() {
     }
   }
 
+  const startProCheckout = async () => {
+    if (!auth.isAuthenticated || !auth.user) {
+      authModal.openLogin()
+      return
+    }
+    track('workbench_pro_checkout_attempted', { authenticated: auth.isAuthenticated })
+    try {
+      const origin = window.location.origin
+      const response = await api.createBillingCheckout(
+        {
+          plan: 'pro',
+          interval: 'monthly',
+          success_url: `${origin}/chat?checkout=success`,
+          cancel_url: `${origin}/chat`,
+          customer_email: auth.user.email ?? null,
+        },
+        identity,
+      )
+      const nextUrl = response.checkout_url ?? response.redirect_url ?? response.url ?? null
+      if (nextUrl) {
+        window.location.href = nextUrl
+        return
+      }
+      toast.success(response.message ?? 'Checkout session created.')
+    } catch (error) {
+      toast.error(error instanceof ApiError ? error.message : 'Checkout failed. Try again later.')
+    }
+  }
+
+  const startOneoffCheckout = async (kind: ArtifactKind) => {
+    if (!auth.isAuthenticated || !auth.user) {
+      authModal.openLogin()
+      return
+    }
+    track('workbench_oneoff_checkout_attempted', { kind, authenticated: auth.isAuthenticated })
+    try {
+      const origin = window.location.origin
+      const response = await api.createOneoffCheckout(
+        kind,
+        {
+          success_url: `${origin}/chat?checkout=success`,
+          cancel_url: `${origin}/chat`,
+          customer_email: auth.user.email ?? null,
+        },
+        identity,
+      )
+      if (response.checkout_url) {
+        window.location.href = response.checkout_url
+        return
+      }
+      toast.success('Checkout session created.')
+    } catch (error) {
+      toast.error(error instanceof ApiError ? error.message : 'Checkout failed. Try again later.')
+    }
+  }
+
   const handleNewQuery = () => {
     resetSession()
     query.clearMessages()
@@ -360,6 +424,7 @@ export function Home() {
         usedCount={tierLimit.usedCount}
         remaining={tierLimit.remaining}
         limitValue={tierLimit.limitValue}
+        mode={mode}
         onNewQuery={handleNewQuery}
         onPickHistory={openSession}
         onQuickCategory={(value) => {
@@ -376,35 +441,47 @@ export function Home() {
         }}
       />
 
-      <MainArea
-        messages={query.messages}
-        suggestions={suggestionTexts}
-        isLoading={query.isLoading}
-        error={query.error}
-        canSave={!previewMode && auth.isAuthenticated}
-        activeQuickCategory={activeQuickCategory}
-        previewMode={previewMode}
-        reachedLimit={tierLimit.reachedLimit}
-        isAuthenticated={auth.isAuthenticated}
-        tier={auth.tier}
-        userEmail={auth.user?.email ?? null}
-        userName={auth.user?.name ?? null}
-        onOpenSignup={() => authModal.openSignup()}
-        onUpgrade={() => {
-          navigate('/upgrade')
-        }}
-        onSubmitQuery={submitQuery}
-        onNewQuery={handleNewQuery}
-        onPickSuggestion={(value) => {
-          void submitQuery(value)
-        }}
-        onCitationClick={(citation) => {
-          void openCitation(citation)
-        }}
-        onSaveMessage={(queryId) => {
-          void saveMessage(queryId)
-        }}
-      />
+      {mode === 'mt700' ? (
+        <Mt700Interpreter
+          identity={identity}
+          onCitationClick={(citation) => {
+            void openCitation(citation)
+          }}
+        />
+      ) : (
+        <MainArea
+          messages={query.messages}
+          suggestions={suggestionTexts}
+          isLoading={query.isLoading}
+          error={query.error}
+          canSave={!previewMode && auth.isAuthenticated}
+          identity={identity}
+          activeQuickCategory={activeQuickCategory}
+          previewMode={previewMode}
+          reachedLimit={tierLimit.reachedLimit}
+          isAuthenticated={auth.isAuthenticated}
+          tier={auth.tier}
+          userEmail={auth.user?.email ?? null}
+          userName={auth.user?.name ?? null}
+          onOpenSignup={() => authModal.openSignup()}
+          onUpgrade={() => {
+            navigate('/upgrade')
+          }}
+          onSubmitQuery={submitQuery}
+          onNewQuery={handleNewQuery}
+          onPickSuggestion={(value) => {
+            void submitQuery(value)
+          }}
+          onCitationClick={(citation) => {
+            void openCitation(citation)
+          }}
+          onSaveMessage={(queryId) => {
+            void saveMessage(queryId)
+          }}
+          onProCheckout={() => void startProCheckout()}
+          onOneoffCheckout={(kind) => void startOneoffCheckout(kind)}
+        />
+      )}
 
       <CitationPanel open={citationPanelOpen} rule={selectedRule} onClose={() => setCitationPanelOpen(false)} />
 

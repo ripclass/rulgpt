@@ -1,8 +1,13 @@
 import type {
+  ArtifactKind,
+  ArtifactResponse,
   BillingPlan,
   BillingCheckoutRequest,
   BillingCheckoutResponse,
   BillingSubscriptionResponse,
+  CheckoutOneoffResponse,
+  DraftType,
+  InterpretResponse,
   QueryRequest,
   QueryResponse,
   QuerySuggestion,
@@ -19,10 +24,13 @@ let currentAccessToken: string | null = readStoredAccessToken()
 
 export class ApiError extends Error {
   status: number
+  /** Parsed JSON `detail` field, when the backend sent a structured error body (e.g. the 402 paywall payload). */
+  detail?: unknown
 
-  constructor(message: string, status: number) {
+  constructor(message: string, status: number, detail?: unknown) {
     super(message)
     this.status = status
+    this.detail = detail
   }
 }
 
@@ -138,14 +146,20 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   if (!response.ok) {
     const raw = await response.text()
     let message = raw || `Request failed with status ${response.status}`
+    let detail: unknown
     try {
       const parsed = JSON.parse(raw)
+      detail = parsed.detail
       if (typeof parsed.detail === 'string') message = parsed.detail
       else if (typeof parsed.message === 'string') message = parsed.message
+      else if (parsed.detail && typeof parsed.detail === 'object') {
+        const structuredMessage = (parsed.detail as { error?: string }).error
+        if (structuredMessage) message = structuredMessage
+      }
     } catch {
       // raw text is fine as-is
     }
-    throw new ApiError(message, response.status)
+    throw new ApiError(message, response.status, detail)
   }
 
   if (response.status === 204) {
@@ -212,6 +226,34 @@ export const api = {
     }),
   getBillingSubscription: (identity: RequestIdentity) =>
     request<BillingSubscriptionResponse>('/api/billing/subscription', {
+      headers: identityHeaders(identity),
+    }),
+  interpretMt700: (text: string, identity?: RequestIdentity) =>
+    request<InterpretResponse>('/api/interpret/mt700', {
+      method: 'POST',
+      body: { text },
+      headers: identityHeaders(identity),
+    }),
+  createCaseNote: (queryId: string, identity: RequestIdentity) =>
+    request<ArtifactResponse>('/api/artifacts/case-note', {
+      method: 'POST',
+      body: { query_id: queryId },
+      headers: identityHeaders(identity),
+    }),
+  createDraft: (queryId: string, draftType: DraftType, identity: RequestIdentity) =>
+    request<ArtifactResponse>('/api/artifacts/draft', {
+      method: 'POST',
+      body: { query_id: queryId, draft_type: draftType },
+      headers: identityHeaders(identity),
+    }),
+  createOneoffCheckout: (
+    kind: ArtifactKind,
+    payload: { success_url: string; cancel_url: string; customer_email?: string | null },
+    identity: RequestIdentity,
+  ) =>
+    request<CheckoutOneoffResponse>('/api/billing/checkout-oneoff', {
+      method: 'POST',
+      body: { kind, ...payload },
       headers: identityHeaders(identity),
     }),
 }

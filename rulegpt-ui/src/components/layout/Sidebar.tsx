@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, LogOut, Sun, Moon, ChevronUp, Zap, Settings } from 'lucide-react'
+import { Plus, LogOut, Sun, Moon, ChevronUp, Zap, Settings, MessageSquare, FileText, FolderLock } from 'lucide-react'
 import { QueryHistory } from '@/components/shared/QueryHistory'
 import { SavedAnswers } from '@/components/shared/SavedAnswers'
 import { FreeTierCounter } from '@/components/shared/FreeTierCounter'
@@ -19,6 +19,7 @@ interface SidebarProps {
   usedCount: number
   remaining: number
   limitValue: number
+  mode?: 'ask' | 'mt700'
   onNewQuery: () => void
   onPickHistory: (session: SessionSummary) => void
   onQuickCategory: (value: string) => void
@@ -27,6 +28,11 @@ interface SidebarProps {
   onOpenSignup: () => void
   onLogout: () => void
 }
+
+const modeLinks = [
+  { key: 'ask' as const, label: 'Ask', href: '/chat', icon: MessageSquare },
+  { key: 'mt700' as const, label: 'Interpret MT700', href: '/chat?mode=mt700', icon: FileText },
+]
 
 const quickCategories = [
   'LC Compliance',
@@ -190,6 +196,7 @@ export function Sidebar({
   usedCount,
   remaining,
   limitValue,
+  mode = 'ask',
   onNewQuery,
   onPickHistory,
   onQuickCategory,
@@ -211,6 +218,32 @@ export function Sidebar({
       >
         <Plus className="h-4 w-4" /> New chat
       </button>
+
+      <div className="mt-5 space-y-1">
+        {modeLinks.map((link) => {
+          const Icon = link.icon
+          const isActive = mode === link.key
+          return (
+            <Link
+              key={link.key}
+              to={link.href}
+              className={`flex w-full items-center gap-2.5 rounded-sm px-3 py-2 text-[13px] font-medium transition-all ${
+                isActive
+                  ? 'text-[#FF4F00] bg-[#FF4F00]/10 dark:bg-[#FF4F00]/20'
+                  : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/5'
+              }`}
+            >
+              <Icon className="h-4 w-4" /> {link.label}
+            </Link>
+          )
+        })}
+        <span
+          className="flex w-full cursor-not-allowed items-center gap-2.5 rounded-sm px-3 py-2 text-[13px] font-medium text-neutral-400 dark:text-neutral-600"
+          title="Matters — coming soon"
+        >
+          <FolderLock className="h-4 w-4" /> Matters (soon)
+        </span>
+      </div>
 
       {tier === 'anonymous' ? (
         <div className="mt-5 border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-[#141414] rounded-sm p-3">

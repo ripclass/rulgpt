@@ -2,7 +2,8 @@ import { AlertTriangle } from 'lucide-react'
 import { ChatThread } from '@/components/chat/ChatThread'
 import { QueryInput } from '@/components/input/QueryInput'
 import { SuggestedQueries } from '@/components/input/SuggestedQueries'
-import type { Citation, Message, SessionTier } from '@/types'
+import type { ArtifactKind, Citation, Message, SessionTier } from '@/types'
+import type { RequestIdentity } from '@/lib/api'
 import { RuxMark } from '@/components/shared/RuxMascot'
 import { limitReachedCopy } from '@/lib/copy'
 
@@ -12,6 +13,7 @@ interface MainAreaProps {
   isLoading: boolean
   error: string | null
   canSave: boolean
+  identity?: RequestIdentity
   activeQuickCategory?: string | null
   previewMode?: boolean
   reachedLimit?: boolean
@@ -26,6 +28,8 @@ interface MainAreaProps {
   onCitationClick: (citation: Citation) => void
   onSaveMessage: (queryId: string) => void
   onNewQuery?: () => void
+  onProCheckout?: () => void
+  onOneoffCheckout?: (kind: ArtifactKind) => void
 }
 
 export function MainArea({
@@ -34,6 +38,7 @@ export function MainArea({
   isLoading,
   error,
   canSave,
+  identity,
   activeQuickCategory,
   previewMode,
   reachedLimit,
@@ -48,6 +53,8 @@ export function MainArea({
   onCitationClick,
   onSaveMessage,
   onNewQuery,
+  onProCheckout,
+  onOneoffCheckout,
 }: MainAreaProps) {
   const isEmpty = messages.length === 0
   const placeholderOptions = [
@@ -169,6 +176,7 @@ export function MainArea({
                 messages={messages}
                 isLoading={isLoading}
                 canSave={canSave}
+                identity={identity}
                 reachedLimit={reachedLimit}
                 isAuthenticated={isAuthenticated}
                 tier={tier}
@@ -177,6 +185,8 @@ export function MainArea({
                 onCitationClick={onCitationClick}
                 onSave={onSaveMessage}
                 onFollowup={(q) => void onSubmitQuery(q)}
+                onProCheckout={onProCheckout}
+                onOneoffCheckout={onOneoffCheckout}
               />
             </div>
           </section>

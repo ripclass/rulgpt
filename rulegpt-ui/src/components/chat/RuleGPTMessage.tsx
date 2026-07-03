@@ -1,22 +1,102 @@
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { CitationChip } from '@/components/chat/CitationChip'
 import { ConfidenceBadge } from '@/components/chat/ConfidenceBadge'
 import { DomainTag } from '@/components/chat/DomainTag'
 import { MessageActions } from '@/components/chat/MessageActions'
 import { TRDRHubCTA } from '@/components/conversion/TRDRHubCTA'
-import { api } from '@/lib/api'
-import type { Citation, Message } from '@/types'
+import { ArtifactView } from '@/components/workbench/ArtifactView'
+import { PaywallDialog } from '@/components/workbench/PaywallDialog'
+import { api, ApiError, type RequestIdentity } from '@/lib/api'
+import { useAuthModal } from '@/contexts/AuthModalContext'
+import type { ArtifactKind, ArtifactResponse, Citation, DraftType, Message, PaymentRequiredDetail } from '@/types'
 import { RuxMark } from '@/components/shared/RuxMascot'
+
+function isPaymentRequiredDetail(value: unknown): value is PaymentRequiredDetail {
+  return Boolean(value) && typeof value === 'object' && (value as { error?: unknown }).error === 'payment_required'
+}
 
 interface RuleGPTMessageProps {
   message: Message
   canSave?: boolean
+  identity?: RequestIdentity
   onCitationClick: (citation: Citation) => void
   onSave: (queryId: string) => void
   onFollowup?: (query: string) => void
+  onProCheckout?: () => void
+  onOneoffCheckout?: (kind: ArtifactKind) => void
 }
 
-export function RuleGPTMessage({ message, canSave, onCitationClick, onSave, onFollowup }: RuleGPTMessageProps) {
+export function RuleGPTMessage({
+  message,
+  canSave,
+  identity,
+  onCitationClick,
+  onSave,
+  onFollowup,
+  onProCheckout,
+  onOneoffCheckout,
+}: RuleGPTMessageProps) {
+  const authModal = useAuthModal()
+  const [isGeneratingCaseNote, setIsGeneratingCaseNote] = useState(false)
+  const [generatingDraftType, setGeneratingDraftType] = useState<DraftType | null>(null)
+  const [artifact, setArtifact] = useState<ArtifactResponse | null>(null)
+  const [artifactOpen, setArtifactOpen] = useState(false)
+  const [paywallDetail, setPaywallDetail] = useState<PaymentRequiredDetail | null>(null)
+  const [paywallOpen, setPaywallOpen] = useState(false)
+
+  const handleArtifactError = (error: unknown) => {
+    if (error instanceof ApiError && error.status === 402 && isPaymentRequiredDetail(error.detail)) {
+      setPaywallDetail(error.detail)
+      setPaywallOpen(true)
+      return
+    }
+    const detailMessage = error instanceof ApiError ? error.message : 'Please try again.'
+    toast.error(`Generation failed: ${detailMessage}`)
+  }
+
+  const generateCaseNote = async () => {
+    if (!canSave) {
+      authModal.openLogin()
+      return
+    }
+    if (!message.queryId) {
+      toast.error('Case note unavailable for this message.')
+      return
+    }
+    setIsGeneratingCaseNote(true)
+    try {
+      const response = await api.createCaseNote(message.queryId, identity ?? {})
+      setArtifact(response)
+      setArtifactOpen(true)
+    } catch (error) {
+      handleArtifactError(error)
+    } finally {
+      setIsGeneratingCaseNote(false)
+    }
+  }
+
+  const generateDraft = async (draftType: DraftType) => {
+    if (!canSave) {
+      authModal.openLogin()
+      return
+    }
+    if (!message.queryId) {
+      toast.error('Draft unavailable for this message.')
+      return
+    }
+    setGeneratingDraftType(draftType)
+    try {
+      const response = await api.createDraft(message.queryId, draftType, identity ?? {})
+      setArtifact(response)
+      setArtifactOpen(true)
+    } catch (error) {
+      handleArtifactError(error)
+    } finally {
+      setGeneratingDraftType(null)
+    }
+  }
+
   return (
     <div className="flex justify-start mb-6">
       <article className="group relative w-full rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#1A1A1A] px-6 py-6 shadow-sm transition-colors">
@@ -83,6 +163,11 @@ export function RuleGPTMessage({ message, canSave, onCitationClick, onSave, onFo
           </div>
           <MessageActions
             canSave={canSave}
+            canGenerateArtifacts={canSave}
+            isGeneratingCaseNote={isGeneratingCaseNote}
+            generatingDraftType={generatingDraftType}
+            onGenerateCaseNote={() => void generateCaseNote()}
+            onGenerateDraft={(draftType) => void generateDraft(draftType)}
             onCopy={() => {
               void navigator.clipboard.writeText(message.text)
               toast.success('Answer copied to clipboard.')
@@ -130,6 +215,27 @@ export function RuleGPTMessage({ message, canSave, onCitationClick, onSave, onFo
           </p>
         ) : null}
       </article>
+
+      <ArtifactView
+        open={artifactOpen}
+        artifact={artifact}
+        onOpenChange={setArtifactOpen}
+        onCitationClick={onCitationClick}
+      />
+
+      <PaywallDialog
+        open={paywallOpen}
+        detail={paywallDetail}
+        onOpenChange={setPaywallOpen}
+        onOneoffCheckout={(kind) => {
+          setPaywallOpen(false)
+          onOneoffCheckout?.(kind)
+        }}
+        onProCheckout={() => {
+          setPaywallOpen(false)
+          onProCheckout?.()
+        }}
+      />
     </div>
   )
 }

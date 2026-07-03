@@ -1,4 +1,5 @@
-import type { Citation, Message, SessionTier } from '@/types'
+import type { ArtifactKind, Citation, Message, SessionTier } from '@/types'
+import type { RequestIdentity } from '@/lib/api'
 import { UserMessage } from '@/components/chat/UserMessage'
 import { RuleGPTMessage } from '@/components/chat/RuleGPTMessage'
 import { ThinkingIndicator } from '@/components/chat/ThinkingIndicator'
@@ -8,6 +9,7 @@ interface ChatThreadProps {
   messages: Message[]
   isLoading: boolean
   canSave?: boolean
+  identity?: RequestIdentity
   reachedLimit?: boolean
   isAuthenticated?: boolean
   tier?: SessionTier
@@ -16,12 +18,15 @@ interface ChatThreadProps {
   onCitationClick: (citation: Citation) => void
   onSave: (queryId: string) => void
   onFollowup?: (query: string) => void
+  onProCheckout?: () => void
+  onOneoffCheckout?: (kind: ArtifactKind) => void
 }
 
 export function ChatThread({
   messages,
   isLoading,
   canSave,
+  identity,
   reachedLimit,
   isAuthenticated,
   tier,
@@ -30,6 +35,8 @@ export function ChatThread({
   onCitationClick,
   onSave,
   onFollowup,
+  onProCheckout,
+  onOneoffCheckout,
 }: ChatThreadProps) {
   return (
     <section className="space-y-6">
@@ -43,9 +50,12 @@ export function ChatThread({
             <RuleGPTMessage
               message={message}
               canSave={canSave}
+              identity={identity}
               onCitationClick={onCitationClick}
               onSave={onSave}
               onFollowup={onFollowup}
+              onProCheckout={onProCheckout}
+              onOneoffCheckout={onOneoffCheckout}
             />
           </div>
         ),

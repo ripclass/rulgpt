@@ -499,4 +499,24 @@ html.light {
     --tw-text-opacity: 1;
   }
   .on-parchment .text-secondary { color: var(--color-text-muted); }
+
+  /* ─── Print isolation (ArtifactView "Download PDF") ────────
+     Only the element carrying .artifact-print-area is visible when
+     printing — hides app chrome (nav/sidebar/dialog overlay) regardless
+     of where in the DOM the printed content is portaled to. */
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    .artifact-print-area,
+    .artifact-print-area * {
+      visibility: visible;
+    }
+    .artifact-print-area {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+  }
 }
