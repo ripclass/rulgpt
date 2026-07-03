@@ -71,7 +71,7 @@ export function Pricing() {
 
   return (
     <>
-    <SEOHead title="Pricing — TFRules" description="Free, Professional, and Enterprise plans for cited trade finance rule answers. From $0 to $199/month." path="/pricing" />
+    <SEOHead title="Pricing | RulGPT" description="Free, Professional, and Enterprise plans for cited trade finance rule answers. From $0 to $199/month." path="/pricing" />
     <PublicPageShell
       eyebrow="Pricing"
       title="Expert trade finance answers. Simple pricing."
@@ -171,7 +171,7 @@ export function Pricing() {
       {/* Comparison with alternatives */}
       <section className="mt-12 rounded-sm p-6 bg-white dark:bg-[#121212] border border-neutral-200 dark:border-white/10">
         <h2 className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white mb-4">
-          How tfrules compares
+          How RulGPT compares
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div className="p-4 rounded-sm bg-neutral-50 dark:bg-white/[0.02]">
@@ -185,7 +185,7 @@ export function Pricing() {
             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Teaches rules, doesn't apply them</p>
           </div>
           <div className="p-4 rounded-sm border-2 border-[#FF4F00]">
-            <p className="font-bold text-[#FF4F00]">tfrules Professional</p>
+            <p className="font-bold text-[#FF4F00]">RulGPT Professional</p>
             <p className="text-2xl font-bold text-[#FF4F00] mt-2">$79/mo</p>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Instant answers. 5,400+ rules. 24/7.</p>
           </div>
@@ -196,7 +196,7 @@ export function Pricing() {
       <section className="mt-6 rounded-sm p-6 bg-white dark:bg-[#121212] border border-neutral-200 dark:border-white/10">
         <h2 className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">Notes</h2>
         <div className="mt-4 space-y-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-          <p>tfrules answers from published trade finance rules and standards. It is a first-pass interpretation tool, not a replacement for transaction-level legal review.</p>
+          <p>RulGPT answers from published trade finance rules and standards. It is a first-pass interpretation tool, not a replacement for transaction-level legal review.</p>
           <p>All plans include access to ICC standards (UCP600, ISBP745, ISP98, URDG758, URC522, URR725), Incoterms 2020, sanctions screening rules, FTA rules of origin, and 48 country-specific regulation sets.</p>
           <p>Enterprise customers can contact us for custom API access and volume pricing.</p>
         </div>

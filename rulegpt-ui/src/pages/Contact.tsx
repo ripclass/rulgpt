@@ -4,17 +4,17 @@ import { SEOHead } from '@/components/shared/SEOHead'
 const contacts = [
   {
     label: 'General',
-    value: 'hello@tfrules.com',
+    value: 'hello@rulgpt.com',
     note: 'Product questions, partnerships, and media.',
   },
   {
     label: 'Support',
-    value: 'support@tfrules.com',
+    value: 'support@rulgpt.com',
     note: 'Account issues, bugs, and answer-quality feedback.',
   },
   {
     label: 'Billing',
-    value: 'billing@tfrules.com',
+    value: 'billing@rulgpt.com',
     note: 'Subscription questions and payment issues.',
   },
 ]
@@ -22,11 +22,11 @@ const contacts = [
 export function Contact() {
   return (
     <>
-    <SEOHead title="Contact — TFRules" description="Get in touch with the tfrules team. General enquiries, support, and billing." path="/contact" />
+    <SEOHead title="Contact | RulGPT" description="Get in touch with the RulGPT team. General enquiries, support, and billing." path="/contact" />
     <PublicPageShell
       eyebrow="Contact"
       title="Support should be easy to find"
-      description="tfrules is a trust product. The support path needs to be visible before something goes wrong, not after."
+      description="RulGPT is a trust product. The support path needs to be visible before something goes wrong, not after."
     >
       <section className="grid gap-4 md:grid-cols-3">
         {contacts.map((contact) => (

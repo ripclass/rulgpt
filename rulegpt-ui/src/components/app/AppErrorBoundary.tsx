@@ -36,7 +36,7 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
               className="text-[11px] uppercase tracking-[0.18em]"
               style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-amber)' }}
             >
-              tfrules
+              RulGPT
             </p>
             <h1
               className="display-md mt-3"

@@ -202,7 +202,7 @@ export function Sidebar({
     <aside className="hidden h-[100dvh] sticky top-0 w-64 shrink-0 px-4 py-5 md:flex md:flex-col bg-white dark:bg-[#0A0A0A] border-r border-neutral-200 dark:border-white/10 transition-colors">
       <Link to="/" className="pb-5 border-b border-neutral-100 dark:border-white/5 flex items-center gap-3 hover:opacity-80 transition-opacity">
         <RuxMark className="w-6 h-6 border-none" />
-        <span className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white mt-0.5">tfrules</span>
+        <span className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white mt-0.5">RulGPT</span>
       </Link>
 
       <button

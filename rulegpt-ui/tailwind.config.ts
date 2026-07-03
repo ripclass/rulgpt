@@ -18,10 +18,10 @@ const config: Config = {
       colors: {
         obsidian: '#0A0A0A',
         amber: {
-          DEFAULT: '#D97706',
-          deep: '#B45309',
-          muted: '#78350F',
-          light: '#FEF3C7',
+          DEFAULT: '#FF4F00',
+          deep: '#CC3F00',
+          muted: '#FF7A40',
+          light: '#FFB899',
         },
         parchment: '#FAF7F2',
         ink: '#1A1A1A',

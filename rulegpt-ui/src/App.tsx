@@ -110,7 +110,7 @@ function AppAuthModals() {
 
 export default function App() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="tfrules-theme">
+    <ThemeProvider defaultTheme="light" storageKey="rulgpt-theme">
       <AuthModalProvider>
         <RouteTracker />
         <Routes>

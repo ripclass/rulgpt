@@ -123,7 +123,7 @@ export function PreviewLanding({
           {/* Logo */}
           <Link to="/" className={`flex items-center gap-2.5 z-50 transition-colors duration-300 ${isNavDarkTheme ? 'text-white' : 'text-neutral-900'}`}>
             <div className={isNavDarkTheme ? 'text-white' : 'text-black'}><RuxMark /></div>
-            <span className="text-xl font-medium tracking-tight">tfrules</span>
+            <span className="text-xl font-medium tracking-tight">RulGPT</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -146,7 +146,7 @@ export function PreviewLanding({
               <div className="flex items-center gap-6">
                 <button onClick={onOpenLogin} className={`transition duration-200 ${isNavDarkTheme ? 'hover:text-white' : 'hover:text-neutral-900'}`}>Sign in</button>
                 <button onClick={onOpenChat} className="flex h-11 items-center rounded-sm bg-[#FF4F00] px-6 text-[15px] font-semibold text-white transition hover:bg-[#E64600] uppercase tracking-wide shadow-lg shadow-[#FF4F00]/20">
-                  Try tfrules free
+                  Ask RulGPT free
                 </button>
               </div>
             )}
@@ -312,13 +312,13 @@ export function PreviewLanding({
               </div>
             </FadeInView>
 
-            {/* TFRules Card */}
+            {/* RulGPT Card */}
             <FadeInView delay={200} className="rounded-xl bg-gradient-to-br from-neutral-900 to-[#0A0A0A] p-10 border border-white/10 shadow-[0_0_50px_rgba(255,79,0,0.03)] relative overflow-hidden group">
               <div className="absolute inset-0 bg-[#FF4F00] opacity-0 group-hover:opacity-[0.02] transition-opacity duration-1000" />
               
               <div className="mb-8 flex items-center justify-between">
                 <span className="text-sm font-mono tracking-widest text-white uppercase border border-white/20 bg-white/5 px-3 py-1 rounded flex items-center gap-2">
-                  TFRules Engine
+                  RulHub Engine
                 </span>
                 <Check className="h-6 w-6 text-[#FF4F00]" />
               </div>
@@ -578,7 +578,7 @@ export function PreviewLanding({
               Know the rules. Then validate the documents.
             </h2>
             <p className="mt-6 text-lg text-neutral-500 font-light max-w-2xl mx-auto leading-relaxed">
-              TFRules answers your compliance questions. When you need to validate
+              RulGPT answers your compliance questions. When you need to validate
               actual LCs, invoices, and transport documents against those same rules,
               TRDR Hub runs the full check — with discrepancy reports your bank will accept.
             </p>

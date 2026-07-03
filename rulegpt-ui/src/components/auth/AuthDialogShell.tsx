@@ -108,7 +108,7 @@ export function AuthDialogShell({
           <div className="relative flex flex-col justify-center px-6 py-10 sm:px-12">
             <div className="mb-10 flex items-center gap-3">
               <RuxMark className="h-6 w-6" />
-              <span className="font-bold tracking-tight text-neutral-900 dark:text-white">tfrules</span>
+              <span className="font-bold tracking-tight text-neutral-900 dark:text-white">RulGPT</span>
             </div>
 
             <h2 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">{copy.title}</h2>

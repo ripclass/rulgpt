@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   tfrules.com — Brand Style System
+   rulgpt.com — Brand Style System
    Fraunces (display) · DM Sans (body) · JetBrains Mono (citations)
    ═══════════════════════════════════════════════════════════════ */
 
@@ -15,14 +15,14 @@
 :root {
   /* Primary palette */
   --color-obsidian: #0A0A0A;
-  --color-amber: #D97706;
+  --color-amber: #FF4F00;
   --color-parchment: #FAF7F2;
   --color-ink: #1A1A1A;
 
   /* Secondary palette */
-  --color-amber-deep: #B45309;
-  --color-amber-muted: #78350F;
-  --color-amber-light: #FEF3C7;
+  --color-amber-deep: #CC3F00;
+  --color-amber-muted: #FF7A40;
+  --color-amber-light: #FFB899;
   --color-surface: #111111;
   --color-surface-raised: #1A1A1A;
   --color-border: #2A2A2A;
@@ -31,7 +31,7 @@
 
   /* Semantic */
   --color-confidence-high: #10B981;
-  --color-confidence-medium: #D97706;
+  --color-confidence-medium: #FF4F00;
   --color-confidence-low: #F97316;
   --color-error: #EF4444;
   --color-success: #10B981;

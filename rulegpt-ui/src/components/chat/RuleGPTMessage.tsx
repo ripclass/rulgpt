@@ -27,7 +27,7 @@ export function RuleGPTMessage({ message, canSave, onCitationClick, onSave, onFo
           <div className="flex items-center gap-2">
             <RuxMark className="h-4 w-4" />
             <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">
-              tfrules
+              RulGPT
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -95,9 +95,9 @@ export function RuleGPTMessage({ message, canSave, onCitationClick, onSave, onFo
               toast.error('Save unavailable for this message.')
             }}
             onShare={() => {
-              const text = `${message.text}\n\n— via tfrules.com`
+              const text = `${message.text}\n\n— via rulgpt.com`
               if (navigator.share) {
-                void navigator.share({ title: 'TFRules Answer', text, url: 'https://www.tfrules.com' })
+                void navigator.share({ title: 'RulGPT Answer', text, url: 'https://rulgpt.com' })
               } else {
                 void navigator.clipboard.writeText(text)
                 toast.success('Answer copied for sharing.')

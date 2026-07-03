@@ -6,7 +6,7 @@ import { SEOHead } from '@/components/shared/SEOHead'
 const faqs = [
   {
     q: 'Why not just ask a standard AI model?',
-    a: 'Generative models will give you a confident answer. It may be right. It may be a hallucination. In trade finance, an error means a discrepancy. tfrules operates strictly over a curated topological graph and cites exact articles so you can verify it yourself.',
+    a: 'Generative models will give you a confident answer. It may be right. It may be a hallucination. In trade finance, an error means a discrepancy. RulGPT operates strictly over a curated topological graph and cites exact articles so you can verify it yourself.',
   },
   {
     q: 'What is the scope of the engine?',
@@ -22,7 +22,7 @@ const faqs = [
   },
   {
     q: 'Does this replace legal advice?',
-    a: 'No. tfrules explains published rules and standards. It does not provide legal advice or approve a specific transaction.',
+    a: 'No. RulGPT explains published rules and standards. It does not provide legal advice or approve a specific transaction.',
   },
 ]
 
@@ -31,7 +31,7 @@ export function Faq() {
 
   return (
     <>
-    <SEOHead title="FAQ — TFRules" description="Frequently asked questions about tfrules.com. How it works, what it covers, accuracy, pricing, and data handling." path="/faq" />
+    <SEOHead title="FAQ | RulGPT" description="Frequently asked questions about rulgpt.com. How it works, what it covers, accuracy, pricing, and data handling." path="/faq" />
     <PublicPageShell
       eyebrow="FAQ"
       title="Questions"

@@ -14,7 +14,7 @@ export function RuxMascot({ size = 48, className = '' }: RuxMascotProps) {
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      aria-label="TFRules Logo"
+      aria-label="RulGPT Logo"
     >
       <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#FF4F00" />
       <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="#FF4F00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -32,7 +32,7 @@ export function RuxMark({ className = '' }: { className?: string }) {
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      aria-label="tfrules"
+      aria-label="RulGPT"
     >
       <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#FF4F00" />
       <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="#FF4F00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

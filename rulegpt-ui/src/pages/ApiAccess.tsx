@@ -32,7 +32,7 @@ export function ApiAccess() {
     <main className="mx-auto flex min-h-screen w-full flex-col justify-center px-4 py-10 bg-[#FAFAFA] dark:bg-[#050505] transition-colors">
       <div className="mx-auto w-full max-w-3xl rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#0A0A0A] p-8 md:p-12 shadow-sm">
         <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF4F00]">API Access</p>
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">Programmatic tfrules queries</h1>
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">Programmatic RulGPT queries</h1>
         <p className="mt-2 text-[13px] font-medium text-neutral-600 dark:text-neutral-400">
           Endpoint:{' '}
           <code className="rounded-sm bg-neutral-100 dark:bg-white/5 px-1.5 py-0.5 font-mono text-[#FF4F00]">

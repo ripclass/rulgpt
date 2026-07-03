@@ -21,7 +21,7 @@ function BlogIndex() {
   return (
     <div className="min-h-screen bg-white font-sans text-neutral-900 selection:bg-[#FF4F00] selection:text-white">
       <SEOHead
-        title="Trade Finance Rules Blog — TFRules"
+        title="Trade Finance Rules Blog | RulGPT"
         description="Expert explanations of UCP600, ISBP745, sanctions, FTAs, and trade compliance rules — with exact citations. No opinion, just rules."
         path="/blog"
       />
@@ -37,7 +37,7 @@ function BlogIndex() {
         <header className="relative z-30 mx-auto max-w-7xl px-6 lg:px-12 flex items-center justify-between pb-12">
           <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div className="text-white"><RuxMark className="w-6 h-6 border-none" /></div>
-            <span className="text-xl font-medium tracking-tight text-white">tfrules</span>
+            <span className="text-xl font-medium tracking-tight text-white">RulGPT</span>
           </Link>
           <nav className="hidden items-center gap-8 md:flex">
             <Link to="/pricing" className="text-[13px] font-medium text-neutral-400 hover:text-white uppercase tracking-widest transition">Pricing</Link>
@@ -155,7 +155,7 @@ function BlogIndex() {
         <div className="mx-auto max-w-3xl px-6 text-center">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#FF4F00] mb-4">Have a specific question?</p>
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight uppercase">
-            Ask tfrules directly
+            Ask RulGPT directly
           </h2>
           <p className="mt-4 text-lg text-neutral-400 font-light max-w-lg mx-auto">
             Get a cited answer in seconds, not hours. No account needed.
@@ -178,7 +178,7 @@ function BlogPostPage({ post }: { post: BlogPost }) {
   return (
     <div className="min-h-screen bg-white font-sans text-neutral-900 selection:bg-[#FF4F00] selection:text-white">
       <SEOHead
-        title={`${post.title} — TFRules`}
+        title={`${post.title} | RulGPT`}
         description={post.description}
         path={`/blog/${post.slug}`}
         type="article"
@@ -192,7 +192,7 @@ function BlogPostPage({ post }: { post: BlogPost }) {
         <header className="relative z-30 mx-auto max-w-7xl px-6 lg:px-12 flex items-center justify-between pb-12">
           <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div className="text-white"><RuxMark className="w-6 h-6 border-none" /></div>
-            <span className="text-xl font-medium tracking-tight text-white">tfrules</span>
+            <span className="text-xl font-medium tracking-tight text-white">RulGPT</span>
           </Link>
           <nav className="hidden items-center gap-8 md:flex">
             <Link to="/blog" className="text-[13px] font-medium text-neutral-400 hover:text-white uppercase tracking-widest transition">All Articles</Link>
@@ -250,7 +250,7 @@ function BlogPostPage({ post }: { post: BlogPost }) {
           {/* CTA */}
           <div className="px-6 md:px-10 py-8 bg-[#050B14] text-center">
             <p className="text-lg font-semibold text-white mb-2">Have a specific question?</p>
-            <p className="text-sm text-neutral-400 mb-5">Ask tfrules — get a cited answer in seconds, not hours.</p>
+            <p className="text-sm text-neutral-400 mb-5">Ask RulGPT — get a cited answer in seconds, not hours.</p>
             <Link
               to="/chat"
               className="inline-flex items-center gap-2 rounded-sm bg-[#FF4F00] px-6 py-3 text-sm font-bold uppercase tracking-widest text-white transition hover:bg-[#E64600] shadow-lg shadow-[#FF4F00]/20"

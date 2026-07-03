@@ -32,7 +32,7 @@ export function PublicPageShell({ eyebrow, title, description, children }: Publi
             <div className="text-white">
               <RuxMark className="w-6 h-6 border-none" />
             </div>
-            <span className="text-xl font-medium tracking-tight text-white mt-0.5">tfrules</span>
+            <span className="text-xl font-medium tracking-tight text-white mt-0.5">RulGPT</span>
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">

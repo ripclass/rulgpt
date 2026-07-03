@@ -10,7 +10,7 @@ export function PublicFooter() {
             <div className="text-white">
               <RuxMark className="w-6 h-6 border-none" />
             </div>
-            <span className="text-2xl font-medium tracking-tight">tfrules</span>
+            <span className="text-2xl font-medium tracking-tight">RulGPT</span>
           </Link>
           <p className="text-sm font-light leading-relaxed">
             Absolute verification for global trade finance. Citation-first intelligence.
