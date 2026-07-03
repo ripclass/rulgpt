@@ -1,7 +1,7 @@
 # Golden Queries
 
-Last updated: 2026-03-27
-Purpose: keep RuleGPT honest on the questions that matter most.
+Last updated: 2026-07-03
+Purpose: keep RulGPT honest on the questions that matter most.
 
 ## How To Use This File
 
@@ -222,6 +222,85 @@ Query:
 Expect:
 - states whether this is covered by rules explanation vs document review
 - does not over-claim
+
+Status:
+- Pending
+
+## Additional Coverage (2026-07-03)
+
+Added during the RulGPT relaunch (RulHub-native retrieval + OpenRouter generation) to widen ICC/FTA rulebook coverage beyond the original 15. Checked against GQ-01 through GQ-15 first — none duplicate an existing query.
+
+### GQ-16
+
+Category: ICC / Documentary Credit
+
+Query:
+`Explain what MT700 field 46A controls and how strictly banks apply the documents listed there.`
+
+Expect:
+- field 46A correctly identified as the documents-required field
+- distinguishes what the field controls from how strictly examination applies (UCP600 Article 14 examination standard)
+- no invented field numbers or article citations
+
+Status:
+- Pending
+
+### GQ-17
+
+Category: ICC / Documentary Credit
+
+Query:
+`Under ISBP 821, can the goods description on the invoice differ from the LC wording?`
+
+Expect:
+- correspondence-not-identical standard surfaced (goods description must correspond, need not be word-for-word)
+- ISBP 821-specific paragraph referenced, not a generic UCP600-only answer
+- no overclaiming that any wording difference is automatically acceptable
+
+Status:
+- Pending
+
+### GQ-18
+
+Category: ICC / Documentary Credit
+
+Query:
+`When does a demand under URDG 758 have to be presented, and what makes it non-complying?`
+
+Expect:
+- presentation timing (validity period) and non-complying-demand grounds both addressed
+- URDG 758-specific articles surfaced, not URC522/UCP600 conflated in
+- short, decisive framing before any caveats
+
+Status:
+- Pending
+
+### GQ-19
+
+Category: ICC / Documentary Credit
+
+Query:
+`What changes under eUCP 2.1 when documents are presented electronically?`
+
+Expect:
+- eUCP 2.1 treated as a supplement to UCP600, not a standalone replacement
+- must be expressly incorporated into the credit — this threshold point surfaced, not buried
+- no fabricated eUCP article numbers if coverage is partial
+
+Status:
+- Pending
+
+### GQ-20
+
+Category: FTA / Origin
+
+Query:
+`What proof of origin does RCEP accept for preferential tariff treatment?`
+
+Expect:
+- distinct from GQ-05 (this is a proof-of-origin documentation question, not a membership/threshold question)
+- names the accepted proof-of-origin forms (e.g. certificate of origin, origin declaration) rather than a vague "check the agreement" answer
+- low confidence if the retrieved rules only cover part of the accepted forms
 
 Status:
 - Pending
