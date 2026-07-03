@@ -498,9 +498,9 @@ RULGPT_RERANK_EMBEDDINGS: bool = True      # embed-rerank RulHub candidates when
 - [ ] **Step 1:** Add (spec-mandated names use RULGPT, no E):
 
 ```python
-RULGPT_LLM_MODEL: str = "z-ai/glm-4.7"                     # primary (verified in Task 3.1)
-RULGPT_LLM_FALLBACKS: str = "deepseek/deepseek-chat-v3.1,qwen/qwen3-235b-a22b-instruct"  # comma list, tried in order
-RULGPT_CLASSIFIER_LLM_MODEL: str = "z-ai/glm-4.7"          # heuristic-first; LLM assist via OpenRouter
+RULGPT_LLM_MODEL: str = "z-ai/glm-5"                       # primary — verified live 2026-07-03: $0.60/$1.92 per 1M, 202k ctx
+RULGPT_LLM_FALLBACKS: str = "deepseek/deepseek-v4-pro,qwen/qwen3.7-plus"  # comma list, tried in order ($0.435/$0.87 and $0.32/$1.28)
+RULGPT_CLASSIFIER_LLM_MODEL: str = "z-ai/glm-4.7-flash"    # heuristic-first; LLM assist — $0.06/$0.40 per 1M
 ```
 
 Keep the legacy `RULEGPT_*_MODEL` fields (harmless, unused after this phase) — remove in a later cleanup once stable. Add helper on Settings: `def llm_fallback_models(self) -> list[str]: return [m.strip() for m in self.RULGPT_LLM_FALLBACKS.split(",") if m.strip()]`.
