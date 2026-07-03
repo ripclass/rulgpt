@@ -14,6 +14,7 @@ from app.config import settings
 from app.database import get_db
 from app.models.query import RuleGPTQuery
 from app.models.session import RuleGPTSession
+from app.routers.deps import client_ip as _resolve_client_ip
 from app.schemas.query import DISCLAIMER_TEXT, CitationItem, QueryRequest, QueryResponse
 
 router = APIRouter(prefix="/api", tags=["query"])
@@ -43,10 +44,7 @@ def _get_user_id(request: Request):
 
 
 def _client_ip(request: Request) -> str:
-    forwarded = request.headers.get("x-forwarded-for")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return request.client.host if request.client else "unknown"
+    return _resolve_client_ip(request) or "unknown"
 
 
 def _find_or_create_session(db: Session, request: Request, payload: QueryRequest) -> RuleGPTSession:

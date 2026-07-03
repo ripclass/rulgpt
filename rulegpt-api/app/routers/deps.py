@@ -20,6 +20,25 @@ ONEOFF_PRICE_USD = {"case_note": 9, "draft": 19}
 PRO_PRICE_USD = 29
 
 
+def client_ip(request: Request) -> str | None:
+    """Resolve the caller's real IP, trusting the rightmost X-Forwarded-For hop.
+
+    This is the anon-quota / cost boundary (daily query and MT700 limits are
+    keyed on it), so it must not be spoofable. Render's proxy APPENDS the
+    real client IP to X-Forwarded-For — every entry to the left of the last
+    one is attacker-controlled request data, not the leftmost as a naive
+    reading of the header might suggest. Falls back to `request.client.host`
+    when the header is absent.
+    """
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        hops = [hop.strip() for hop in forwarded.split(",")]
+        hops = [hop for hop in hops if hop]
+        if hops:
+            return hops[-1]
+    return request.client.host if request.client else None
+
+
 def get_request_tier(request: Request) -> str:
     tier = getattr(request.state, "user_tier", "anonymous")
     return tier if tier in VALID_TIERS else "anonymous"

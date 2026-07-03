@@ -13,6 +13,7 @@ from app.config import settings
 from app.database import get_db
 from app.models.query import RuleGPTQuery
 from app.models.session import RuleGPTSession
+from app.routers.deps import client_ip as _resolve_client_ip
 from app.schemas.interpret import (
     MT700_CTA_TEXT,
     MT700_CTA_URL,
@@ -75,10 +76,7 @@ def _day_start(dt: datetime) -> datetime:
 
 
 def _client_ip(request: Request) -> str:
-    forwarded = request.headers.get("x-forwarded-for")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return request.client.host if request.client else "unknown"
+    return _resolve_client_ip(request) or "unknown"
 
 
 def _mt700_calls_today_by_user(db: Session, user_id) -> int:
