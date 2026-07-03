@@ -27,6 +27,13 @@ def _month_start(dt: datetime) -> datetime:
     return datetime(dt.year, dt.month, 1, tzinfo=timezone.utc)
 
 
+def _window_start(window: str, dt: datetime) -> datetime:
+    """Start of the counting window: UTC midnight for "day", 1st of month for "month"."""
+    if window == "day":
+        return dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    return _month_start(dt)
+
+
 def _get_tier(request: Request) -> str:
     return getattr(request.state, "user_tier", "anonymous")
 
@@ -80,40 +87,46 @@ def _find_or_create_session(db: Session, request: Request, payload: QueryRequest
     return db_session
 
 
-def _anonymous_queries_this_month_by_ip(db: Session, client_ip: str) -> int:
-    """Count queries across ALL anonymous sessions from this IP this month.
+def _anonymous_queries_this_month_by_ip(db: Session, client_ip: str, window_start: datetime) -> int:
+    """Count queries across ALL anonymous sessions from this IP within the window.
 
     Excludes routing_tier == "unavailable" — a failed-retrieval turn (RulHub
     fail-closed) doesn't count against the caller's quota. Uses
     `is_distinct_from` rather than `!=` so rows with a NULL routing_tier
     (e.g. pipeline errors unrelated to retrieval) are still counted, not
-    silently dropped by SQL's three-valued NULL comparison logic.
+    silently dropped by SQL's three-valued NULL comparison logic. Also
+    excludes routing_tier == "mt700" — MT700 interpreter calls have their own
+    daily limit and must not consume the chat quota.
     """
-    month_start = _month_start(_utc_now())
     total = db.scalar(
         select(func.count(RuleGPTQuery.id))
         .join(RuleGPTSession, RuleGPTQuery.session_id == RuleGPTSession.id)
         .where(
             RuleGPTSession.client_ip == client_ip,
             RuleGPTSession.tier == "anonymous",
-            RuleGPTQuery.created_at >= month_start,
+            RuleGPTQuery.created_at >= window_start,
             RuleGPTQuery.routing_tier.is_distinct_from("unavailable"),
+            RuleGPTQuery.routing_tier.is_distinct_from("mt700"),
         )
     )
     return int(total or 0)
 
 
-def _tier_monthly_limit(tier: str) -> int:
+def _tier_limit(tier: str) -> tuple[int, str]:
+    """Return (limit, window) for a tier. window is "day" or "month"."""
     normalized = str(tier or "").strip().lower()
     if normalized == "professional":
-        return settings.PROFESSIONAL_TIER_MONTHLY_LIMIT
+        return settings.PROFESSIONAL_TIER_MONTHLY_LIMIT, "month"
     if normalized == "enterprise":
-        return settings.ENTERPRISE_TIER_MONTHLY_LIMIT
-    return settings.FREE_TIER_MONTHLY_LIMIT
+        return settings.ENTERPRISE_TIER_MONTHLY_LIMIT, "month"
+    if normalized == "anonymous":
+        return settings.ANONYMOUS_DAILY_LIMIT, "day"
+    return settings.FREE_TIER_DAILY_LIMIT, "day"
 
 
-def _queries_this_month(db: Session, session_obj: RuleGPTSession, tier: str) -> int:
-    """Count queries this billing month, excluding failed-retrieval turns.
+def _queries_this_month(db: Session, session_obj: RuleGPTSession, tier: str, window_start: datetime) -> int:
+    """Count queries within the tier's counting window, excluding failed-retrieval
+    turns and MT700 interpreter calls.
 
     A routing_tier of "unavailable" means RulHub failed closed and the
     pipeline returned RETRIEVAL_UNAVAILABLE_MESSAGE without answering the
@@ -121,15 +134,15 @@ def _queries_this_month(db: Session, session_obj: RuleGPTSession, tier: str) -> 
     `_anonymous_queries_this_month_by_ip` for why `is_distinct_from` is used
     instead of `!=`.
     """
-    month_start = _month_start(_utc_now())
     normalized = str(tier or "").strip().lower()
 
     if normalized != "anonymous" and session_obj.user_id is not None:
         total = db.scalar(
             select(func.count(RuleGPTQuery.id)).where(
                 RuleGPTQuery.user_id == session_obj.user_id,
-                RuleGPTQuery.created_at >= month_start,
+                RuleGPTQuery.created_at >= window_start,
                 RuleGPTQuery.routing_tier.is_distinct_from("unavailable"),
+                RuleGPTQuery.routing_tier.is_distinct_from("mt700"),
             )
         )
         return int(total or 0)
@@ -137,13 +150,14 @@ def _queries_this_month(db: Session, session_obj: RuleGPTSession, tier: str) -> 
     # Count by IP across all anonymous sessions — prevents new-tab bypass
     ip = session_obj.client_ip
     if ip and ip != "unknown":
-        return _anonymous_queries_this_month_by_ip(db, ip)
+        return _anonymous_queries_this_month_by_ip(db, ip, window_start)
     # Fallback: count by session if IP unavailable
     total = db.scalar(
         select(func.count(RuleGPTQuery.id)).where(
             RuleGPTQuery.session_id == session_obj.id,
-            RuleGPTQuery.created_at >= month_start,
+            RuleGPTQuery.created_at >= window_start,
             RuleGPTQuery.routing_tier.is_distinct_from("unavailable"),
+            RuleGPTQuery.routing_tier.is_distinct_from("mt700"),
         )
     )
     return int(total or 0)
@@ -152,9 +166,15 @@ def _queries_this_month(db: Session, session_obj: RuleGPTSession, tier: str) -> 
 def _limit_reached_message(tier: str) -> str:
     normalized = str(tier or "").strip().lower()
     if normalized == "anonymous":
-        return "Anonymous monthly query limit reached. Please register to continue."
+        return (
+            "You've used your 2 free answers for today. Create a free account for "
+            "5 questions a day — no card needed."
+        )
     if normalized == "free":
-        return "Free monthly query limit reached. Upgrade to continue."
+        return (
+            "You've hit today's 5-question limit. Upgrade to Pro ($29/mo) for "
+            "fair-use Q&A, case notes, and drafts."
+        )
     if normalized == "professional":
         return "Professional monthly query limit reached. Upgrade to Enterprise or wait for the next cycle."
     if normalized == "enterprise":
@@ -221,8 +241,9 @@ async def process_query_request(
 ) -> QueryResponse:
     session_obj = _find_or_create_session(db, request, payload)
     tier = session_obj.tier
-    monthly_limit = _tier_monthly_limit(tier)
-    used_count = _queries_this_month(db, session_obj, tier)
+    monthly_limit, window = _tier_limit(tier)
+    window_start = _window_start(window, _utc_now())
+    used_count = _queries_this_month(db, session_obj, tier, window_start)
     if used_count >= monthly_limit:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -282,7 +303,7 @@ async def process_query_request(
     db.refresh(query_row)
     db.refresh(session_obj)
 
-    queries_remaining = max(0, monthly_limit - _queries_this_month(db, session_obj, tier))
+    queries_remaining = max(0, monthly_limit - _queries_this_month(db, session_obj, tier, window_start))
     return QueryResponse(
         query_id=query_row.id,
         answer=query_row.answer_text,
