@@ -6,10 +6,10 @@ import { useQuery } from '@/hooks/useQuery'
 import { useSession } from '@/hooks/useSession'
 
 const tierLabels: Record<string, { name: string; price: string; description: string }> = {
-  free: { name: 'Free', price: '$0/mo', description: '5 queries per month' },
-  anonymous: { name: 'Free', price: '$0/mo', description: '5 queries per month' },
-  professional: { name: 'Professional', price: '$79/mo', description: '500 queries per month' },
-  enterprise: { name: 'Enterprise', price: '$199/mo', description: '2,000 queries per month' },
+  free: { name: 'Free', price: '$0/mo', description: '5 questions per day' },
+  anonymous: { name: 'Free', price: '$0/mo', description: '5 questions per day' },
+  professional: { name: 'Pro', price: '$29/mo', description: 'Fair-use Q&A, unlimited case notes + drafts' },
+  enterprise: { name: 'Enterprise', price: 'Custom', description: 'Volume & team seats — contact hello@rulgpt.com' },
 }
 
 type SettingsTab = 'account' | 'plan' | 'usage'
