@@ -10,6 +10,19 @@ import pytest
 from app.services.integrations.rulhub_client import RulHubClient, RulHubClientError
 
 
+def make_client(handler, **overrides) -> RulHubClient:
+    """Build a RulHubClient wired to a MockTransport handler for fast, network-free tests."""
+    defaults: dict = {
+        "base_url": "https://api.rulhub.com",
+        "api_key": "test-api-key",
+        "client": httpx.AsyncClient(transport=httpx.MockTransport(handler)),
+        "max_retries": 1,
+        "backoff_seconds": 0.0,
+    }
+    defaults.update(overrides)
+    return RulHubClient(**defaults)
+
+
 @pytest.mark.asyncio
 async def test_get_rules_normalizes_payload_and_sends_api_key() -> None:
     seen_api_keys: list[str | None] = []
@@ -259,4 +272,69 @@ def test_local_filesystem_loader_normalizes_mixed_shapes(tmp_path: Path) -> None
     assert bank["domain"] == "bank_specific"
     assert bank["extra"]["bank_name"] == "HDFC Bank"
     assert bank["extra"]["swift_code"] == "HDFCINBB"
+
+
+@pytest.mark.asyncio
+async def test_search_sends_per_page_not_limit() -> None:
+    captured: dict = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured.update(json.loads(request.content))
+        return httpx.Response(
+            200,
+            json={
+                "query": "q",
+                "results": [],
+                "page": 1,
+                "per_page": 12,
+                "corpus_stats": {"active": 1, "superseded": 0, "total": 1, "matched": 0, "include_superseded": False},
+                "schema_version": "v1.0.0",
+            },
+        )
+
+    client = make_client(handler)
+    await client.search_rules("transhipment", limit=12)
+    assert captured["per_page"] == 12 and "limit" not in captured
+
+
+@pytest.mark.asyncio
+async def test_search_no_fallback_raises() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(503, json={"detail": "suspended"})
+
+    client = make_client(handler)
+    with pytest.raises(RulHubClientError):
+        await client.search_rules("ucp 600 article 20", allow_fallback=False)
+
+
+@pytest.mark.asyncio
+async def test_lookup_rules_builds_query_params() -> None:
+    seen: dict = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["url"] = str(request.url)
+        return httpx.Response(
+            200,
+            json={
+                "query": "",
+                "results": [],
+                "page": 1,
+                "per_page": 20,
+                "corpus_stats": {"active": 0, "superseded": 0, "total": 0, "matched": 0, "include_superseded": False},
+                "schema_version": "v1.0.0",
+            },
+        )
+
+    client = make_client(handler)
+    await client.lookup_rules(source="ucp600", per_page=20)
+    assert "/v1/rules/lookup" in seen["url"] and "source=ucp600" in seen["url"]
+
+
+@pytest.mark.asyncio
+async def test_get_stats_swallows_errors() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(500)
+
+    client = make_client(handler)
+    assert await client.get_stats() is None
 

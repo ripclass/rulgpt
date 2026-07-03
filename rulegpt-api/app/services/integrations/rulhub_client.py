@@ -23,6 +23,20 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_RULHUB_API_VERSION = "2026-04-28"
 
+# POST /v1/rules/search has `additionalProperties: false` — only these filter
+# keys (plus `query` and `per_page`) may appear in the request body.
+_SEARCH_FILTER_KEYS = {
+    "domain",
+    "industry",
+    "sub_domain",
+    "jurisdiction",
+    "document_type",
+    "source",
+    "rule_family",
+    "include_superseded",
+    "page",
+}
+
 
 class RulHubClientError(RuntimeError):
     """Raised when RulHub operations fail.
@@ -161,7 +175,7 @@ class RulHubClient:
                 limit=limit,
             )
 
-    async def get_rule(self, rule_id: str) -> dict[str, Any]:
+    async def get_rule(self, rule_id: str, allow_fallback: bool = True) -> dict[str, Any] | None:
         if not rule_id:
             raise RulHubClientError("rule_id is required")
         path = f"/v1/rules/{quote(rule_id, safe='')}"
@@ -170,7 +184,11 @@ class RulHubClient:
             if not isinstance(payload, Mapping):
                 raise RulHubClientError(f"Invalid rule payload returned for rule_id={rule_id}")
             return self.normalize_rule(payload)
-        except RulHubClientError:
+        except RulHubClientError as exc:
+            if not allow_fallback:
+                if exc.status_code == 404:
+                    return None
+                raise
             local = self._find_local_rule(rule_id)
             if local is not None:
                 return local
@@ -235,20 +253,28 @@ class RulHubClient:
         query: str,
         filters: Mapping[str, Any] | None = None,
         limit: int = 10,
+        allow_fallback: bool = True,
     ) -> list[dict[str, Any]]:
         """Semantic search via RulHub POST /v1/rules/search.
 
-        Falls back to local text matching if the API is unavailable.
+        The v1 search contract is `additionalProperties: false` — the body may
+        only contain `query`, `per_page`, and the whitelisted filter keys below.
+        `limit` is never sent as a body key; it only bounds `per_page`.
+
+        Falls back to local text matching if the API is unavailable and
+        `allow_fallback` is True. When `allow_fallback` is False, transport or
+        HTTP failures propagate as `RulHubClientError` instead — used by
+        fail-closed retrieval paths that must never answer from stale local data.
         """
         if not query or not query.strip():
             return []
 
-        body: dict[str, Any] = {"query": query.strip(), "limit": min(max(1, limit), 50)}
+        body: dict[str, Any] = {"query": query.strip(), "per_page": min(max(1, limit), 100)}
         if filters:
-            if filters.get("domain"):
-                body["domain"] = filters["domain"]
-            if filters.get("jurisdiction"):
-                body["jurisdiction"] = filters["jurisdiction"]
+            for key in _SEARCH_FILTER_KEYS:
+                value = filters.get(key)
+                if value is not None:
+                    body[key] = value
 
         cache_key = f"search:{json.dumps(body, sort_keys=True)}"
         try:
@@ -260,8 +286,53 @@ class RulHubClient:
                 return []
             return [self.normalize_rule(r) for r in results_raw if isinstance(r, Mapping)]
         except RulHubClientError:
+            if not allow_fallback:
+                raise
             # Fall back to old client-side search
             return await self._search_rules_local(query, filters, limit)
+
+    async def lookup_rules(
+        self,
+        *,
+        source: str | None = None,
+        jurisdiction: str | None = None,
+        sub_domain: str | None = None,
+        per_page: int = 20,
+        allow_fallback: bool = True,
+    ) -> list[dict[str, Any]]:
+        """GET /v1/rules/lookup — direct filter lookup (no relevance ranking).
+
+        Used for anchor-rule enrichment where we want a specific, known slice
+        of the corpus rather than a query-ranked search.
+        """
+        params: dict[str, Any] = {"per_page": max(1, min(per_page, 100))}
+        if source:
+            params["source"] = source
+        if jurisdiction:
+            params["jurisdiction"] = jurisdiction
+        if sub_domain:
+            params["sub_domain"] = sub_domain
+
+        cache_key = f"lookup:{json.dumps(params, sort_keys=True)}"
+        try:
+            payload = await self._request_json("GET", "/v1/rules/lookup", params=params, cache_key=cache_key)
+        except RulHubClientError:
+            if not allow_fallback:
+                raise
+            return []
+        results = payload.get("results") if isinstance(payload, dict) else None
+        return results if isinstance(results, list) else []
+
+    async def get_stats(self) -> dict[str, Any] | None:
+        """GET /v1/stats — corpus counts (active/superseded/total) for landing page numbers.
+
+        Never raises: any failure returns None so callers (e.g. /api/stats) degrade gracefully.
+        """
+        try:
+            payload = await self._request_json("GET", "/v1/stats", cache_key="stats")
+        except RulHubClientError:
+            return None
+        return payload if isinstance(payload, dict) else None
 
     async def _search_rules_local(
         self, query: str, filters: Mapping[str, Any] | None = None, limit: int = 10,
@@ -469,49 +540,58 @@ class RulHubClient:
 
     def normalize_rule(self, raw: Mapping[str, Any], source_hint: str | None = None) -> dict[str, Any]:
         """Normalize mixed rule schemas into a stable structure."""
-        text = _first_str(raw, "text", "description", "summary", "details", "narrative")
-        condition = raw.get("condition")
-        conditions = raw.get("conditions")
-        if condition is None and conditions is not None:
-            condition = conditions
-        if conditions is None and condition is not None:
-            conditions = condition
+        return normalize_rule(raw, source_hint=source_hint)
 
-        source = _first_str(raw, "source", "rulebook", "framework", default="unknown")
-        rulebook = _infer_rulebook(raw, source=source, source_hint=source_hint)
-        domain = _canonicalize_domain(
-            _first_str(raw, "domain", default=_infer_domain(raw, source=source, source_hint=source_hint))
-        )
-        jurisdiction = _first_str(raw, "jurisdiction", "country", "country_code", "region", default="global")
-        document_type = _first_str(raw, "document_type", "documentType", "doc_type", default=_infer_document_type(raw))
-        tags = _normalize_tags(raw.get("tags"))
 
-        normalized = {
-            "id": raw.get("id") or raw.get("rule_id"),
-            "rule_id": _first_str(raw, "rule_id", "ruleId", "id", "code"),
-            "source": source,
-            "rulebook": rulebook,
-            "article": _first_str(raw, "article", "paragraph"),
-            "title": _first_str(raw, "title", "name"),
-            "reference": _first_str(raw, "reference", "ref", "citation"),
-            "version": _first_str(raw, "version", "revision", default="unspecified"),
-            "domain": domain,
-            "jurisdiction": jurisdiction,
-            "document_type": document_type,
-            "text": text,
-            "description": text,
-            "condition": condition,
-            "conditions": conditions,
-            "expected_outcome": raw.get("expected_outcome") or raw.get("expectedOutcome") or raw.get("outcome"),
-            "tags": tags,
-            "severity": _first_str(raw, "severity", "risk_level", default="medium"),
-            "deterministic": bool(raw.get("deterministic", True)),
-            "requires_llm": bool(raw.get("requires_llm", False)),
-            "examples": raw.get("examples"),
-            "extra": _extract_extra(raw),
-            "source_hint": source_hint,
-        }
-        return normalized
+def normalize_rule(raw: Mapping[str, Any], source_hint: str | None = None) -> dict[str, Any]:
+    """Normalize mixed rule schemas into a stable structure.
+
+    Module-level so callers outside `RulHubClient` (e.g. `RulHubRetriever`)
+    can normalize raw API rows without needing a client instance.
+    """
+    text = _first_str(raw, "text", "description", "summary", "details", "narrative")
+    condition = raw.get("condition")
+    conditions = raw.get("conditions")
+    if condition is None and conditions is not None:
+        condition = conditions
+    if conditions is None and condition is not None:
+        conditions = condition
+
+    source = _first_str(raw, "source", "rulebook", "framework", default="unknown")
+    rulebook = _infer_rulebook(raw, source=source, source_hint=source_hint)
+    domain = _canonicalize_domain(
+        _first_str(raw, "domain", default=_infer_domain(raw, source=source, source_hint=source_hint))
+    )
+    jurisdiction = _first_str(raw, "jurisdiction", "country", "country_code", "region", default="global")
+    document_type = _first_str(raw, "document_type", "documentType", "doc_type", default=_infer_document_type(raw))
+    tags = _normalize_tags(raw.get("tags"))
+
+    normalized = {
+        "id": raw.get("id") or raw.get("rule_id"),
+        "rule_id": _first_str(raw, "rule_id", "ruleId", "id", "code"),
+        "source": source,
+        "rulebook": rulebook,
+        "article": _first_str(raw, "article", "paragraph"),
+        "title": _first_str(raw, "title", "name"),
+        "reference": _first_str(raw, "reference", "ref", "citation"),
+        "version": _first_str(raw, "version", "revision", default="unspecified"),
+        "domain": domain,
+        "jurisdiction": jurisdiction,
+        "document_type": document_type,
+        "text": text,
+        "description": text,
+        "condition": condition,
+        "conditions": conditions,
+        "expected_outcome": raw.get("expected_outcome") or raw.get("expectedOutcome") or raw.get("outcome"),
+        "tags": tags,
+        "severity": _first_str(raw, "severity", "risk_level", default="medium"),
+        "deterministic": bool(raw.get("deterministic", True)),
+        "requires_llm": bool(raw.get("requires_llm", False)),
+        "examples": raw.get("examples"),
+        "extra": _extract_extra(raw),
+        "source_hint": source_hint,
+    }
+    return normalized
 
 
 def _parse_rulhub_error_envelope(
