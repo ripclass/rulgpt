@@ -48,7 +48,10 @@ class Settings(BaseSettings):
     RATE_LIMIT_PER_MIN_ANON: int = 30
     RATE_LIMIT_PER_MIN_AUTH: int = 120
 
-    ANTHROPIC_API_KEY: str | None = None
+    # ANTHROPIC_API_KEY intentionally removed 2026-07 (Anthropic SDK dropped
+    # from the runtime path). model_config has extra="ignore", so a stale
+    # ANTHROPIC_API_KEY left in an env file or Render dashboard is silently
+    # ignored rather than crashing pydantic-settings.
     # Legacy Claude model fields — harmless, unused after the 2026-07 OpenRouter
     # LLM swap (see RULGPT_LLM_MODEL below). Kept for now; remove in a later
     # cleanup once the swap is confirmed stable.
