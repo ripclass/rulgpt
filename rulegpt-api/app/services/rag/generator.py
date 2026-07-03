@@ -7,7 +7,7 @@ from datetime import date
 import re
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from app.services.integrations.llm_client import LLMResult, LLMUnavailableError, OpenRouterLLMClient
+from app.services.integrations.llm_client import LLMUnavailableError, OpenRouterLLMClient
 
 from .models import ClassifierOutput, RetrievedRule
 from .query_intent import (
@@ -544,7 +544,7 @@ def _compose_document_breadth_answer(query: str, rules: Sequence[RetrievedRule],
 def compose_grounded_answer(query: str, rules: Sequence[RetrievedRule], partial_coverage: bool = False) -> str:
     if not rules:
         return (
-            "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
+            "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset."
         )
 
     if extract_fta_agreement(query):
@@ -554,6 +554,17 @@ def compose_grounded_answer(query: str, rules: Sequence[RetrievedRule], partial_
         return _compose_document_breadth_answer(query, rules, partial_coverage)
 
     return _compose_generic_grounded_answer(rules, partial_coverage=partial_coverage)
+
+
+def _sum_llm_cost(*costs: Optional[float]) -> Optional[float]:
+    """Sum LLMResult.cost_usd values across a retry chain. A cost is only
+    unknown (None) when every call in the chain reported no cost — a single
+    known value among unknowns still counts, so retry spend never gets
+    silently dropped from the accumulated total."""
+    known = [c for c in costs if c is not None]
+    if not known:
+        return None
+    return sum(known)
 
 
 def compose_citations_only_answer(query: str, rules: Sequence[RetrievedRule]) -> str:
@@ -898,9 +909,13 @@ class AnswerGenerator:
 
         llm_client = self._get_llm_client()
         try:
-            answer_res = await llm_client.generate_answer(prompt, system_prompt, max_tokens=token_budget)
-            answer = normalize_generated_answer(answer_res.text)
-            model_used = answer_res.model
+            first_res = await llm_client.generate_answer(prompt, system_prompt, max_tokens=token_budget)
+            answer = normalize_generated_answer(first_res.text)
+            model_used = first_res.model
+            generation_model = first_res.model
+            total_cost = first_res.cost_usd
+            total_prompt_tokens = first_res.prompt_tokens
+            total_completion_tokens = first_res.completion_tokens
 
             if answer and answer_mentions_unknown_references(answer, retrieved_rules):
                 _log.warning("[GEN] first attempt hallucinated references, retrying in strict citation mode | query=%r", query[:80])
@@ -910,30 +925,37 @@ class AnswerGenerator:
                     "publication, paragraph, or rule number."
                 )
                 retry_res = await llm_client.generate_answer(prompt, strict_system_prompt, max_tokens=token_budget)
+                # Both calls were real, billed requests — the retry's cost is
+                # never dropped, even when the retry itself gets discarded
+                # below in favor of the citations-only degrade.
+                total_cost = _sum_llm_cost(total_cost, retry_res.cost_usd)
+                total_prompt_tokens += retry_res.prompt_tokens
+                total_completion_tokens += retry_res.completion_tokens
                 retry_answer = normalize_generated_answer(retry_res.text)
                 if retry_answer and answer_mentions_unknown_references(retry_answer, retrieved_rules):
                     _log.warning("[GEN] retry still hallucinated references, degrading to citations-only | query=%r", query[:80])
                     answer = compose_citations_only_answer(query, retrieved_rules)
                     model_used = "citations-only"
-                    answer_res = LLMResult(text=answer, model="citations-only", prompt_tokens=0, completion_tokens=0, cost_usd=0.0)
+                    generation_model = "citations-only"
                 else:
-                    answer, answer_res = retry_answer, retry_res
+                    answer = retry_answer
                     model_used = retry_res.model
+                    generation_model = retry_res.model
 
             if not answer:
                 _log.warning("[GEN] answer was empty after normalization, degrading to citations-only | query=%r", query[:80])
                 answer = compose_citations_only_answer(query, retrieved_rules)
                 model_used = "citations-only"
-                answer_res = LLMResult(text=answer, model="citations-only", prompt_tokens=0, completion_tokens=0, cost_usd=0.0)
+                generation_model = "citations-only"
 
             return {
                 "answer": answer,
                 "model_used": model_used,
                 "partial_coverage": partial_coverage,
                 "routing_tier": routing_tier,
-                "cost_usd": answer_res.cost_usd,
-                "generation_model": answer_res.model,
-                "tokens": (answer_res.prompt_tokens, answer_res.completion_tokens),
+                "cost_usd": total_cost,
+                "generation_model": generation_model,
+                "tokens": (total_prompt_tokens, total_completion_tokens),
             }
         except LLMUnavailableError as exc:
             _log.error("[GEN] LLM unavailable, degrading to grounded fallback | error=%s | query=%r", exc, query[:80])

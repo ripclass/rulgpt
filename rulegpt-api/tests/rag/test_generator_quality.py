@@ -163,7 +163,9 @@ async def test_generator_degrades_to_citations_only_after_retry_still_hallucinat
     assert result["model_used"] == "citations-only"
     assert "Here are the relevant rules" in result["answer"]
     assert "[UCP600 Article 28]" in result["answer"]
-    assert result["cost_usd"] == 0.0
+    # Both the first attempt AND the strict-mode retry were real, billed
+    # calls (0.001 each) — the degrade must not under-report that spend as $0.
+    assert result["cost_usd"] == pytest.approx(0.002)
 
 
 @pytest.mark.asyncio
@@ -182,7 +184,10 @@ async def test_generator_uses_retry_answer_when_second_attempt_is_clean():
     assert result["model_used"] == "fake-model-retry"
     assert "[UCP600 Article 28]" in result["answer"]
     assert "Article 18" not in result["answer"]
-    assert result["cost_usd"] == pytest.approx(0.0008)
+    # Accumulated cost of both calls (0.001 first attempt + 0.0008 retry),
+    # not just the winning retry's cost — the discarded first attempt was
+    # still a real, billed request.
+    assert result["cost_usd"] == pytest.approx(0.0018)
 
 
 @pytest.mark.asyncio
@@ -199,6 +204,26 @@ async def test_generator_falls_back_to_grounded_when_llm_unavailable():
     assert result["model_used"] == "grounded-fallback"
     assert "[UCP600 Article 28]" in result["answer"]
     assert result["cost_usd"] == 0.0
+
+
+@pytest.mark.asyncio
+async def test_generator_grounded_fallback_with_no_rules_is_a_plain_string():
+    """Regression test: compose_grounded_answer([]) used to return a 1-tuple
+    (trailing comma bug), so when generate() hit LLMUnavailableError with zero
+    retrieved rules, pipeline.py's str(generation["answer"]) rendered the tuple
+    repr — e.g. "('I don't have a specific rule...',)" — straight to the user."""
+    generator = AnswerGenerator(llm_client=_UnavailableLLMClient())
+
+    result = await generator.generate(
+        query="What does UCP600 say about a niche edge case?",
+        retrieved_rules=[],
+        classifier_output=ClassifierOutput(domain="icc", jurisdiction="global", document_type="other"),
+    )
+
+    assert result["model_used"] == "grounded-fallback"
+    assert isinstance(result["answer"], str)
+    assert not result["answer"].startswith("(")
+    assert "no closely matching rule was found" in result["answer"]
 
 
 def test_compose_grounded_answer_for_partial_cif_query_is_explicit():
