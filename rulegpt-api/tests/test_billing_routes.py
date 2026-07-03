@@ -4,6 +4,7 @@ from unittest.mock import ANY, AsyncMock
 from uuid import uuid4
 
 import pytest
+import stripe
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
@@ -133,6 +134,55 @@ def test_checkout_session_succeeds_for_authenticated_user(auth_stub, billing_cli
     assert kwargs["interval"] == "monthly"
     assert kwargs["success_url"] == "https://rulegpt.test/success"
     assert kwargs["cancel_url"] == "https://rulegpt.test/cancel"
+
+
+def test_checkout_session_pro_plan_resolves_price_and_normalizes_tier(auth_stub, monkeypatch):
+    """The plan="pro" $29/mo checkout path — exercised end-to-end through the
+    router and the real StripeClient.create_checkout_session (not the
+    wrapper-level AsyncMock other tests here use, which would bypass exactly
+    the price resolution + tier normalization logic under test).
+
+    Canary for the CLAUDE.md 2026-05-02 tier-vocabulary lesson: "pro" is a
+    checkout-only marketing label — it must resolve the $29/mo price ID, but
+    the resulting tier (both in the response and in the metadata sent to
+    Stripe, which the webhook falls back to if price-ID lookup ever misses)
+    must always be "professional", never "pro".
+    """
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "STRIPE_PRO_MONTHLY_PRICE_ID", "price_pro_monthly_test")
+    monkeypatch.setattr(billing.billing_client, "secret_key", "sk_test")
+
+    captured: dict[str, object] = {}
+
+    def _fake_checkout_create(**kwargs):
+        captured.update(kwargs)
+        return {"id": "cs_pro_1", "url": "https://stripe.test/pro-checkout", "mode": kwargs["mode"], "status": "open"}
+
+    monkeypatch.setattr(stripe.checkout.Session, "create", _fake_checkout_create)
+
+    client = TestClient(_build_app())
+    response = client.post(
+        "/api/billing/checkout",
+        headers={"Authorization": "Bearer free-token"},
+        json={
+            "plan": "pro",
+            "interval": "monthly",
+            "success_url": "https://rulegpt.test/success",
+            "cancel_url": "https://rulegpt.test/cancel",
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["price_id"] == "price_pro_monthly_test"
+    assert data["plan"] == "pro"
+    assert data["tier"] == "professional"
+
+    assert captured["line_items"][0]["price"] == "price_pro_monthly_test"
+    assert captured["metadata"]["rulegpt_tier"] == "professional"
+    assert captured["metadata"]["rulegpt_plan"] == "pro"
+    assert captured["subscription_data"]["metadata"]["rulegpt_tier"] == "professional"
 
 
 def test_subscription_endpoint_reflects_verified_request_tier(auth_stub, billing_client_stub):

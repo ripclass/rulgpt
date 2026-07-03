@@ -18,7 +18,7 @@ export function ArtifactView({ open, artifact, onOpenChange, onCitationClick }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto border-neutral-200 bg-white dark:border-white/10 dark:bg-[#121212] rounded-sm">
+      <DialogContent className="artifact-print-dialog max-h-[85vh] max-w-2xl overflow-y-auto border-neutral-200 bg-white dark:border-white/10 dark:bg-[#121212] rounded-sm">
         <div className="artifact-print-area">
           <DialogHeader>
             <DialogTitle className="text-neutral-900 dark:text-white">{artifact.title}</DialogTitle>

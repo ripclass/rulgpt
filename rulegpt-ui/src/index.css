@@ -518,5 +518,27 @@ html.light {
       top: 0;
       width: 100%;
     }
+
+    /* The artifact's DialogContent ancestor is `fixed` with a `max-h-[85vh]
+       overflow-y-auto` clip (so the dialog scrolls on screen) — printed from
+       an `overflow: auto` box, anything past one viewport height is clipped
+       instead of paginated. Break it out of the clip/fixed-position box so
+       the full artifact flows across printed pages. !important is required:
+       these are Tailwind utility classes with equal selector specificity to
+       this rule, so cascade order (not specificity) would otherwise decide,
+       and Tailwind's own layer is injected before this stylesheet. */
+    .artifact-print-dialog {
+      position: static !important;
+      inset: auto !important;
+      left: auto !important;
+      top: auto !important;
+      transform: none !important;
+      max-height: none !important;
+      max-width: none !important;
+      width: 100% !important;
+      overflow: visible !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
   }
 }

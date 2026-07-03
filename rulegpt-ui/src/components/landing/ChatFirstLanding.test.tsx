@@ -64,7 +64,7 @@ describe('ChatFirstLanding', () => {
     getStats.mockReset()
     getStats.mockRejectedValue(new Error('network error'))
     renderLanding()
-    expect(await screen.findByText(/10,000\+-rule grounded corpus/)).toBeInTheDocument()
+    expect(await screen.findByText(/backed by a 10,000\+-rule grounded corpus/)).toBeInTheDocument()
   })
 
   it('shows the $29 Pro price in the pricing section', async () => {

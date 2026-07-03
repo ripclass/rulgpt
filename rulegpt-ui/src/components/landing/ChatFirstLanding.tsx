@@ -63,6 +63,14 @@ function formatTotalRules(totalRules: number | null | undefined): string {
   return '10,000+'
 }
 
+// Display-only labels — never leak the internal tier vocabulary (anonymous/free/professional/enterprise) to users.
+const TIER_DISPLAY_LABEL: Record<SessionTier, string> = {
+  anonymous: 'Guest',
+  free: 'Free',
+  professional: 'Pro',
+  enterprise: 'Enterprise',
+}
+
 export function ChatFirstLanding({
   isAuthenticated,
   tier,
@@ -126,7 +134,7 @@ export function ChatFirstLanding({
           </h1>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-neutral-300 md:text-lg">
             Cited answers on UCP 600, ISBP 821, URDG 758, ISP98, eUCP 2.1, URC 522, sanctions, FTAs and
-            customs — grounded in a {statsLabel}-rule grounded corpus with verbatim regulatory citations.
+            customs — backed by a {statsLabel}-rule grounded corpus with verbatim regulatory citations.
           </p>
 
           <form
@@ -315,7 +323,7 @@ export function ChatFirstLanding({
               <ArrowRight className="ml-1 inline h-3.5 w-3.5" />
             </p>
           )}
-          <p className="mt-2 text-xs uppercase tracking-widest text-neutral-400">Current plan: {tier}</p>
+          <p className="mt-2 text-xs uppercase tracking-widest text-neutral-400">Current plan: {TIER_DISPLAY_LABEL[tier]}</p>
         </div>
       </section>
 

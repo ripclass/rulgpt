@@ -156,7 +156,7 @@ const staticRoutes: Array<{ path: string; title: string; description: string }> 
     path: '/pricing',
     title: 'Pricing | RulGPT',
     description:
-      'Free, Professional, and Enterprise plans for cited trade finance rule answers. From $0 to $199 per month.',
+      'Free and Pro plans with pay-as-you-go case notes and drafts. From $0 to $29/month.',
   },
   {
     path: '/faq',
