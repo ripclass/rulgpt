@@ -133,6 +133,7 @@ async def test_webhook_payment_mode_creates_entitlement_row(monkeypatch) -> None
                 "object": {
                     "id": "cs_oneoff_123",
                     "mode": "payment",
+                    "payment_status": "paid",
                     "metadata": {"supabase_user_id": str(user_id), "artifact_kind": "case_note"},
                 }
             },
@@ -156,6 +157,38 @@ async def test_webhook_payment_mode_creates_entitlement_row(monkeypatch) -> None
 
 
 @pytest.mark.asyncio
+async def test_webhook_payment_mode_skips_grant_when_payment_not_paid(monkeypatch) -> None:
+    """Async payment methods can complete checkout before the payment
+    actually clears — Stripe fires checkout.session.completed with
+    payment_status="unpaid" in that case. Granting a credit here would let
+    a user get a one-off artifact without ever paying."""
+    user_id = uuid4()
+
+    def _fake_construct_event(*, payload, sig_header, secret):
+        return {
+            "type": "checkout.session.completed",
+            "data": {
+                "object": {
+                    "id": "cs_oneoff_unpaid",
+                    "mode": "payment",
+                    "payment_status": "unpaid",
+                    "metadata": {"supabase_user_id": str(user_id), "artifact_kind": "case_note"},
+                }
+            },
+        }
+
+    monkeypatch.setattr(stripe.Webhook, "construct_event", _fake_construct_event)
+    client = _client()
+    db = _FakeEntitlementDb()
+
+    result = await client.handle_webhook(b'{"id":"evt_oneoff_unpaid"}', "whsec_signature", db)
+
+    assert result["action"] == "skipped_unpaid"
+    assert len(db.rows) == 0
+    assert db.commit_calls == 0
+
+
+@pytest.mark.asyncio
 async def test_webhook_payment_mode_is_idempotent_on_duplicate_event(monkeypatch) -> None:
     user_id = uuid4()
 
@@ -166,6 +199,7 @@ async def test_webhook_payment_mode_is_idempotent_on_duplicate_event(monkeypatch
                 "object": {
                     "id": "cs_oneoff_dup",
                     "mode": "payment",
+                    "payment_status": "paid",
                     "metadata": {"supabase_user_id": str(user_id), "artifact_kind": "draft"},
                 }
             },

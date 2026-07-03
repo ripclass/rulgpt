@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from typing import Any
 from uuid import UUID
 
@@ -12,6 +13,8 @@ from app.config import settings
 from app.models.entitlement import RuleGPTEntitlement
 
 from .supabase_auth import SupabaseAuthService
+
+_billing_log = logging.getLogger("rulegpt.billing")
 
 
 class StripeClient:
@@ -239,6 +242,13 @@ class StripeClient:
         Idempotent on `stripe_session_id`: a query-first check handles the
         common case (Stripe redelivering the same event); the column's
         unique constraint backstops it against races.
+
+        Only grants when `payment_status == "paid"`. Async payment methods
+        (e.g. bank debits, some wallets) can complete checkout before the
+        payment actually settles — Stripe fires this same event with
+        `payment_status="unpaid"` in that case, followed later by a
+        `checkout.session.async_payment_succeeded` event once it clears.
+        Granting on the unpaid event would hand out a free credit.
         """
         metadata = event_object.get("metadata") or {}
         user_id = metadata.get("supabase_user_id")
@@ -246,6 +256,20 @@ class StripeClient:
         session_id = event_object.get("id")
         if not user_id or not kind:
             raise ValueError("Stripe one-off checkout is missing required metadata.")
+
+        payment_status = str(event_object.get("payment_status") or "")
+        if payment_status != "paid":
+            _billing_log.warning(
+                "stripe_oneoff_payment_not_paid session_id=%s kind=%s payment_status=%s",
+                session_id, kind, payment_status,
+            )
+            return {
+                "event_type": "checkout.session.completed",
+                "user_id": str(user_id),
+                "tier": None,
+                "action": "skipped_unpaid",
+                "kind": str(kind),
+            }
 
         existing = db.query(RuleGPTEntitlement).filter_by(stripe_session_id=session_id).first()
         if existing is None:
