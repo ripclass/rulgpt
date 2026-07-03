@@ -1,5 +1,8 @@
 r"""Upload new rule versions to the database. Archives old versions, activates new ones.
 
+DEPRECATED 2026-07: retrieval is RulHub-native (RETRIEVAL_BACKEND=rulhub).
+Local corpus kept only as rollback; do not sync new data. See CHANGELOG.
+
 Usage:
     # Set your production DATABASE_URL first:
     set DATABASE_URL=postgresql://...your-supabase-url...

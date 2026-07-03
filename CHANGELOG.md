@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Rebrand tfrules.com → RulGPT at rulgpt.com
+- Retrieval migrated to RulHub API (`RETRIEVAL_BACKEND=rulhub`, fail-closed). Local pgvector corpus and sync scripts deprecated; tables retained for rollback. Do not drop `rulegpt_rules`/`rulegpt_rule_embeddings` until the RulHub path has run clean for a week in production.
 
 ## v1.0.0 — 2026-04-07
 

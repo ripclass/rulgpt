@@ -1,5 +1,8 @@
 r"""Upload Data_clean rules, excluding ICC letter rules already uploaded.
 
+DEPRECATED 2026-07: retrieval is RulHub-native (RETRIEVAL_BACKEND=rulhub).
+Local corpus kept only as rollback; do not sync new data. See CHANGELOG.
+
 Usage:
     cd rulegpt-api
     set DATABASE_URL=postgresql://...

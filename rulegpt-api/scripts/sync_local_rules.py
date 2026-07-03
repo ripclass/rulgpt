@@ -1,3 +1,9 @@
+"""Sync local JSON rule files into the rulegpt_rules / rulegpt_rule_embeddings tables.
+
+DEPRECATED 2026-07: retrieval is RulHub-native (RETRIEVAL_BACKEND=rulhub).
+Local corpus kept only as rollback; do not sync new data. See CHANGELOG.
+"""
+
 from __future__ import annotations
 
 import argparse
