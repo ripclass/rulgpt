@@ -113,6 +113,16 @@ class RulHubRetriever:
                     results = await self.client.search_rules(q, filters=f or None,
                                                              limit=top_k * 2, allow_fallback=False)
                 except (RulHubClientError, httpx.HTTPError) as exc:
+                    status_code = getattr(exc, "status_code", None)
+                    if status_code is not None and 400 <= status_code < 500:
+                        # 4xx means the request itself is malformed against the RulHub
+                        # contract — a persistent bug, not a transient outage. Flag it
+                        # distinctly so it doesn't read as "RulHub is just down" in logs.
+                        logger.warning(
+                            "RulHub search returned %s for query=%r filters=%r — "
+                            "likely a request-contract violation, not an outage",
+                            status_code, q, f or None,
+                        )
                     errors.append(exc); continue
                 for raw in results:
                     rule = normalize_rule(raw)
@@ -177,13 +187,34 @@ class RulHubRetriever:
             )
         return candidates
 
+    def _get_or_create_openai_client(self):
+        """Lazily wire a real OpenAIClient when rerank is enabled and a key is configured.
+
+        Mirrors `RuleRetriever._get_openai_client`. Returns None (graceful skip —
+        candidates keep their lexical scores) when no OpenAI/OpenRouter key is
+        present. Never raises: a missing key is an expected, common state, not
+        a failure worth logging.
+        """
+        if self.openai_client is not None:
+            return self.openai_client
+        settings = get_settings()
+        if not (settings.OPENAI_API_KEY or settings.OPENROUTER_API_KEY):
+            return None
+        from app.services.integrations.openai_client import OpenAIClient  # type: ignore
+
+        self.openai_client = OpenAIClient()
+        return self.openai_client
+
     async def _maybe_embed_rerank(self, query: str, candidates: List[RetrievedRule]) -> List[RetrievedRule]:
         settings = get_settings()
-        if not settings.RULGPT_RERANK_EMBEDDINGS or self.openai_client is None or not candidates:
+        if not settings.RULGPT_RERANK_EMBEDDINGS or not candidates:
+            return candidates
+        client = self._get_or_create_openai_client()
+        if client is None:
             return candidates
         try:
             texts = [query] + [f"{c.title} {c.excerpt[:300]}" for c in candidates]
-            vectors = await self.openai_client.embed_texts(texts)
+            vectors = await client.embed_texts(texts)
             query_vec = vectors[0]
             for candidate, vector in zip(candidates, vectors[1:]):
                 similarity = _cosine_similarity(query_vec, vector)
@@ -267,3 +298,21 @@ class RulHubRetriever:
                 )
             )
         return selected
+
+
+_DEFAULT_RETRIEVER: RulHubRetriever | None = None
+
+
+def get_rulhub_retriever() -> RulHubRetriever:
+    """Process-wide singleton, mirroring `get_rulhub_client()`.
+
+    `RAGPipeline` is constructed fresh per query (see `pipeline.process_query`), so
+    a bare `RulHubRetriever()` built in `__init__` would give every request its own
+    empty `_TTLCache` — the cache would never actually hit. Routing default
+    construction through this singleton makes the 30-minute cache real across
+    requests within a single backend process.
+    """
+    global _DEFAULT_RETRIEVER
+    if _DEFAULT_RETRIEVER is None:
+        _DEFAULT_RETRIEVER = RulHubRetriever()
+    return _DEFAULT_RETRIEVER

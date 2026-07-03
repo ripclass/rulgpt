@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import pytest
 
+from app.config import get_settings
 from app.services.rag.classifier import QueryClassifier
 from app.services.rag.models import ClassifierOutput, RetrievedRule
 from app.services.rag.pipeline import RAGPipeline, RETRIEVAL_UNAVAILABLE_MESSAGE
 from app.services.rag.rulhub_retriever import RetrievalUnavailableError
+import app.services.rag.rulhub_retriever as rulhub_retriever_module
 
 
 @pytest.mark.asyncio
@@ -107,6 +109,21 @@ async def test_pipeline_lc_compliance_query_stays_product_neutral():
     assert "document-review workflow" in result.answer
     assert result.show_trdr_cta is False
     assert result.retrieved_rule_ids == []
+
+
+def test_pipeline_default_construction_shares_rulhub_retriever_singleton(monkeypatch):
+    """RAGPipeline() is built fresh per query (see pipeline.process_query). Without
+    routing through the shared singleton, each instance would get its own
+    RulHubRetriever with an empty TTL cache, making the cache inert in production."""
+    settings = get_settings()
+    monkeypatch.setattr(settings, "RETRIEVAL_BACKEND", "rulhub")
+    monkeypatch.setattr(rulhub_retriever_module, "_DEFAULT_RETRIEVER", None)
+
+    pipeline_a = RAGPipeline(classifier=_FakeClassifier(), generator=_FakeGenerator())
+    pipeline_b = RAGPipeline(classifier=_FakeClassifier(), generator=_FakeGenerator())
+
+    assert pipeline_a.retriever is pipeline_b.retriever
+    assert pipeline_a.retriever is rulhub_retriever_module.get_rulhub_retriever()
 
 
 class _UnavailableRetriever:

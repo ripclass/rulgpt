@@ -12,7 +12,7 @@ from .generator import AnswerGenerator, DISCLAIMER_TEXT
 from .models import ClassifierOutput, QueryResult, RetrievedRule
 from .query_intent import has_partial_coverage_language, requires_document_breadth
 from .retriever import RuleRetriever
-from .rulhub_retriever import RetrievalUnavailableError, RulHubRetriever
+from .rulhub_retriever import RetrievalUnavailableError, get_rulhub_retriever
 
 
 OUT_OF_SCOPE_MESSAGE = "I specialize in trade finance compliance rules. That question sits outside this product's scope."
@@ -268,7 +268,10 @@ class RAGPipeline:
             self.retriever = retriever
         else:
             from app.config import settings as _settings
-            self.retriever = RuleRetriever() if _settings.RETRIEVAL_BACKEND == "local" else RulHubRetriever()
+            # get_rulhub_retriever() is a process-wide singleton — RAGPipeline is
+            # built fresh per query, so a bare RulHubRetriever() here would give
+            # every request its own empty TTL cache and the cache would never hit.
+            self.retriever = RuleRetriever() if _settings.RETRIEVAL_BACKEND == "local" else get_rulhub_retriever()
         self.generator = generator or AnswerGenerator()
 
     async def process_query(self, query: str, session: Any, language: str = "en", user_tier: str = "free") -> QueryResult:
