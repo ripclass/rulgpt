@@ -19,7 +19,7 @@ from app.exceptions import (
 )
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.middleware.tier_check import TierCheckMiddleware
-from app.routers import admin, api_access, billing, export, feedback, history, query, rules, saved, suggestions, telemetry
+from app.routers import admin, api_access, billing, export, feedback, history, query, rules, saved, stats, suggestions, telemetry
 
 
 @asynccontextmanager
@@ -59,6 +59,7 @@ app.add_exception_handler(Exception, unhandled_exception_handler)
 
 app.include_router(query.router)
 app.include_router(suggestions.router)
+app.include_router(stats.router)
 app.include_router(rules.router)
 app.include_router(history.router)
 app.include_router(saved.router)
