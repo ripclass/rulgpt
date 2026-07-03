@@ -2,8 +2,9 @@ import { AlertTriangle } from 'lucide-react'
 import { ChatThread } from '@/components/chat/ChatThread'
 import { QueryInput } from '@/components/input/QueryInput'
 import { SuggestedQueries } from '@/components/input/SuggestedQueries'
-import type { Citation, Message } from '@/types'
+import type { Citation, Message, SessionTier } from '@/types'
 import { RuxMark } from '@/components/shared/RuxMascot'
+import { limitReachedCopy } from '@/lib/copy'
 
 interface MainAreaProps {
   messages: Message[]
@@ -15,6 +16,7 @@ interface MainAreaProps {
   previewMode?: boolean
   reachedLimit?: boolean
   isAuthenticated?: boolean
+  tier?: SessionTier
   userEmail?: string | null
   userName?: string | null
   onOpenSignup?: () => void
@@ -36,6 +38,7 @@ export function MainArea({
   previewMode,
   reachedLimit,
   isAuthenticated,
+  tier,
   userEmail,
   userName,
   onOpenSignup,
@@ -133,7 +136,7 @@ export function MainArea({
                     <span className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">System Notification</span>
                   </div>
                   <p className="whitespace-pre-wrap leading-relaxed text-[15px] text-neutral-900 dark:text-neutral-100 mb-6">
-                    You have exhausted your free query limit. Register for unlimited queries, or upgrade for synced history, saved answers, and priority routing.
+                    {limitReachedCopy(tier)}
                   </p>
                   <div className="flex flex-wrap items-center gap-3">
                     {isAuthenticated ? null : (
@@ -168,6 +171,7 @@ export function MainArea({
                 canSave={canSave}
                 reachedLimit={reachedLimit}
                 isAuthenticated={isAuthenticated}
+                tier={tier}
                 onOpenSignup={onOpenSignup}
                 onUpgrade={onUpgrade}
                 onCitationClick={onCitationClick}

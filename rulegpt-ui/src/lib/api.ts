@@ -47,6 +47,10 @@ export interface AuthStatusResponse {
   blockers: string[]
 }
 
+export interface StatsResponse {
+  total_rules: number | null
+}
+
 export interface BillingConfigStatusResponse {
   stripe_configured: boolean
   secret_key_configured: boolean
@@ -165,6 +169,7 @@ function identityHeaders(identity?: RequestIdentity) {
 }
 
 export const api = {
+  getStats: () => request<StatsResponse>('/api/stats'),
   getSuggestions: () => request<QuerySuggestion[]>('/api/suggestions'),
   getRule: (ruleId: string) => request<RuleDetails>(`/api/rules/${ruleId}`),
   submitQuery: (payload: QueryRequest, identity?: RequestIdentity) =>

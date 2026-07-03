@@ -5,9 +5,12 @@ interface TierLimitArgs {
   queriesRemaining: number
 }
 
+// Anonymous and free limits reset daily; professional/enterprise stay monthly.
+const DAILY_TIERS: ReadonlySet<SessionTier> = new Set(['anonymous', 'free'])
+
 export function useTierLimit({ tier, queriesRemaining }: TierLimitArgs) {
   const limitByTier: Record<SessionTier, number> = {
-    anonymous: 5,
+    anonymous: 2,
     free: 5,
     professional: 500,
     enterprise: 2000,
@@ -16,6 +19,7 @@ export function useTierLimit({ tier, queriesRemaining }: TierLimitArgs) {
   const hasLimit = queriesRemaining >= 0 && limitValue > 0
   const reachedLimit = hasLimit && queriesRemaining <= 0
   const usedCount = hasLimit ? Math.max(0, limitValue - queriesRemaining) : 0
+  const period = DAILY_TIERS.has(tier) ? 'today' : 'this month'
 
   return {
     hasLimit,
@@ -23,5 +27,6 @@ export function useTierLimit({ tier, queriesRemaining }: TierLimitArgs) {
     limitValue,
     usedCount,
     remaining: queriesRemaining,
+    period,
   }
 }

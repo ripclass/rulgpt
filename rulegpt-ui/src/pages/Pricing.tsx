@@ -1,21 +1,18 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SEOHead } from '@/components/shared/SEOHead'
 import { Check } from 'lucide-react'
 
-type Interval = 'monthly' | 'annual'
-
 const plans = [
   {
     name: 'Free',
-    monthlyPrice: 0,
-    annualPrice: 0,
-    queries: '5 queries/month',
-    models: '100% Haiku',
+    price: '$0',
+    period: '/month',
+    queries: '5 questions/day',
     features: [
       'Citation-backed answers',
       'ICC, sanctions, FTA, customs coverage',
+      'MT700 interpreter',
       'No credit card required',
     ],
     cta: 'Start free',
@@ -24,96 +21,52 @@ const plans = [
     badge: null,
   },
   {
-    name: 'Professional',
-    monthlyPrice: 79,
-    annualPrice: 790,
-    queries: '500 queries/month',
-    models: 'Advanced AI analysis',
+    name: 'Pro',
+    price: '$29',
+    period: '/month',
+    queries: 'Fair-use Q&A',
     features: [
-      'Deep analysis on complex queries',
-      'Sanctions & TBML expert-grade answers',
+      'Fair-use Q&A, no hard daily cap',
       '15,000-rule grounded corpus, 48 jurisdictions',
-      'Session history & saved answers',
+      'Unlimited case notes + drafts',
+      'PDF export',
       'Priority support',
     ],
-    cta: 'Get Professional',
-    href: '/upgrade?plan=professional',
+    cta: 'Get Pro',
+    href: '/upgrade',
     featured: true,
     badge: 'Most Popular',
   },
   {
     name: 'Enterprise',
-    monthlyPrice: 199,
-    annualPrice: 1990,
-    queries: '2,000 queries/month',
-    models: 'Maximum depth AI',
+    price: 'Contact us',
+    period: null,
+    queries: 'Volume & team seats',
     features: [
-      'Everything in Professional',
-      'Maximum depth on every query',
-      'Multi-jurisdiction cross-analysis',
-      'Full session export',
+      'Everything in Pro',
+      'Volume & team seats',
       'Dedicated account support',
     ],
-    cta: 'Get Enterprise',
-    href: '/upgrade?plan=enterprise',
+    cta: 'Contact us',
+    href: 'mailto:hello@rulgpt.com',
     featured: false,
     badge: null,
   },
 ]
 
-function formatPrice(amount: number) {
-  if (amount === 0) return '$0'
-  return `$${amount}`
-}
-
 export function Pricing() {
-  const [interval, setInterval] = useState<Interval>('monthly')
-
   return (
     <>
-    <SEOHead title="Pricing | RulGPT" description="Free, Professional, and Enterprise plans for cited trade finance rule answers. From $0 to $199/month." path="/pricing" />
+    <SEOHead title="Pricing | RulGPT" description="Free, Pro, and Enterprise plans for cited trade finance rule answers. From $0 to $29/month." path="/pricing" />
     <PublicPageShell
       eyebrow="Pricing"
       title="Expert trade finance answers. Simple pricing."
       description="The same ICC, sanctions, and FTA knowledge that costs $500/hr from a consultant — available instantly."
     >
-      {/* Monthly / Annual toggle */}
-      <div className="flex items-center justify-center gap-3 mb-8">
-        <button
-          type="button"
-          onClick={() => setInterval('monthly')}
-          className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-sm transition ${
-            interval === 'monthly'
-              ? 'bg-[#FF4F00] text-white'
-              : 'bg-neutral-100 dark:bg-white/5 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-white/10'
-          }`}
-        >
-          Monthly
-        </button>
-        <button
-          type="button"
-          onClick={() => setInterval('annual')}
-          className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-sm transition ${
-            interval === 'annual'
-              ? 'bg-[#FF4F00] text-white'
-              : 'bg-neutral-100 dark:bg-white/5 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-white/10'
-          }`}
-        >
-          Annual
-          <span className="ml-1.5 text-[10px] font-medium opacity-80">Save 2 months</span>
-        </button>
-      </div>
-
       {/* Pricing cards */}
       <section className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {plans.map((plan) => {
-          const price = interval === 'annual' && plan.annualPrice > 0
-            ? plan.annualPrice
-            : plan.monthlyPrice
-          const period = plan.monthlyPrice === 0 ? '/month' : interval === 'annual' ? '/year' : '/month'
-          const monthlySavings = interval === 'annual' && plan.monthlyPrice > 0
-            ? plan.monthlyPrice * 12 - plan.annualPrice
-            : 0
+          const isExternal = plan.href.startsWith('mailto:')
 
           return (
             <article
@@ -134,15 +87,13 @@ export function Pricing() {
               </h2>
               <div className="mt-4 flex items-baseline gap-1">
                 <span className="text-4xl font-bold tracking-tight text-neutral-900 dark:text-white">
-                  {formatPrice(price)}
+                  {plan.price}
                 </span>
-                <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">{period}</span>
+                {plan.period && (
+                  <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">{plan.period}</span>
+                )}
               </div>
-              {monthlySavings > 0 && (
-                <p className="mt-1 text-xs font-medium text-[#FF4F00]">Save ${monthlySavings}/year</p>
-              )}
               <p className="mt-3 text-xs font-medium text-neutral-500 dark:text-neutral-400">{plan.queries}</p>
-              <p className="mt-1 text-[11px] text-neutral-400 dark:text-neutral-500">AI: {plan.models}</p>
 
               <ul className="mt-5 space-y-2.5 flex-1">
                 {plan.features.map((f) => (
@@ -153,16 +104,25 @@ export function Pricing() {
                 ))}
               </ul>
 
-              <Link
-                to={plan.href}
-                className={`mt-6 block w-full rounded-sm px-4 py-2.5 text-center text-xs font-bold uppercase tracking-widest transition ${
-                  plan.featured
-                    ? 'bg-[#FF4F00] text-white hover:bg-[#E64600]'
-                    : 'bg-neutral-100 dark:bg-white/5 text-neutral-900 dark:text-white hover:bg-neutral-200 dark:hover:bg-white/10'
-                }`}
-              >
-                {plan.cta}
-              </Link>
+              {isExternal ? (
+                <a
+                  href={plan.href}
+                  className="mt-6 block w-full rounded-sm px-4 py-2.5 text-center text-xs font-bold uppercase tracking-widest transition bg-neutral-100 dark:bg-white/5 text-neutral-900 dark:text-white hover:bg-neutral-200 dark:hover:bg-white/10"
+                >
+                  {plan.cta}
+                </a>
+              ) : (
+                <Link
+                  to={plan.href}
+                  className={`mt-6 block w-full rounded-sm px-4 py-2.5 text-center text-xs font-bold uppercase tracking-widest transition ${
+                    plan.featured
+                      ? 'bg-[#FF4F00] text-white hover:bg-[#E64600]'
+                      : 'bg-neutral-100 dark:bg-white/5 text-neutral-900 dark:text-white hover:bg-neutral-200 dark:hover:bg-white/10'
+                  }`}
+                >
+                  {plan.cta}
+                </Link>
+              )}
             </article>
           )
         })}
@@ -185,8 +145,8 @@ export function Pricing() {
             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Teaches rules, doesn't apply them</p>
           </div>
           <div className="p-4 rounded-sm border-2 border-[#FF4F00]">
-            <p className="font-bold text-[#FF4F00]">RulGPT Professional</p>
-            <p className="text-2xl font-bold text-[#FF4F00] mt-2">$79/mo</p>
+            <p className="font-bold text-[#FF4F00]">RulGPT Pro</p>
+            <p className="text-2xl font-bold text-[#FF4F00] mt-2">$29/mo</p>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Instant answers. 15,000-rule grounded corpus. 24/7.</p>
           </div>
         </div>

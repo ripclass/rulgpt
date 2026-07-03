@@ -4,7 +4,7 @@ import type { SessionTier } from '@/types'
 
 export function UpgradeCTA({ tier }: { tier: SessionTier }) {
   if (tier === 'enterprise') return null
-  const ctaLabel = tier === 'professional' ? 'Upgrade to Enterprise' : 'Plans from $79/mo'
+  const ctaLabel = tier === 'professional' ? 'Upgrade to Enterprise' : 'Plans from $29/mo'
   const helperText =
     tier === 'professional'
       ? 'Need higher volume, priority model routing, or session export? Move up to Enterprise.'

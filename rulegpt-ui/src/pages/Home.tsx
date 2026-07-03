@@ -386,6 +386,7 @@ export function Home() {
         previewMode={previewMode}
         reachedLimit={tierLimit.reachedLimit}
         isAuthenticated={auth.isAuthenticated}
+        tier={auth.tier}
         userEmail={auth.user?.email ?? null}
         userName={auth.user?.name ?? null}
         onOpenSignup={() => authModal.openSignup()}

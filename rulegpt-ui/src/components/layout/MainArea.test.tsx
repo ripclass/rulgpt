@@ -1,9 +1,20 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { vi } from 'vitest'
+import { afterEach, beforeEach, vi } from 'vitest'
 import { MainArea } from '@/components/layout/MainArea'
 
 describe('MainArea', () => {
+  beforeEach(() => {
+    // Greeting/subtext copy is time-of-day dependent — pin the clock to evening
+    // (18:00 local) so this test doesn't flake depending on when it runs.
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 0, 1, 18, 0, 0))
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('renders a centered empty-state composer in preview mode', () => {
     const onPickSuggestion = vi.fn()
 

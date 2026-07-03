@@ -112,7 +112,7 @@ export function Settings() {
             {/* Usage */}
             <section id="usage" className="rounded-lg bg-white dark:bg-[#121212] border border-neutral-200 dark:border-white/10 overflow-hidden">
               <div className="px-6 py-4 border-b border-neutral-100 dark:border-white/5">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-neutral-900 dark:text-white">Usage this month</h2>
+                <h2 className="text-xs font-bold uppercase tracking-widest text-neutral-900 dark:text-white">Usage {tierLimit.period}</h2>
               </div>
               <div className="px-6 py-5">
                 <div className="flex items-baseline justify-between mb-3">
@@ -133,7 +133,7 @@ export function Settings() {
                   />
                 </div>
                 <p className="mt-3 text-xs text-neutral-400 dark:text-neutral-500">
-                  Resets at the start of your next billing cycle.
+                  {tierLimit.period === 'today' ? 'Resets at midnight UTC.' : 'Resets at the start of your next billing cycle.'}
                 </p>
               </div>
             </section>

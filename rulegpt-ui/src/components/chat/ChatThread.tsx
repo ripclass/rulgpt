@@ -1,7 +1,8 @@
-import type { Citation, Message } from '@/types'
+import type { Citation, Message, SessionTier } from '@/types'
 import { UserMessage } from '@/components/chat/UserMessage'
 import { RuleGPTMessage } from '@/components/chat/RuleGPTMessage'
 import { ThinkingIndicator } from '@/components/chat/ThinkingIndicator'
+import { limitReachedCopy } from '@/lib/copy'
 
 interface ChatThreadProps {
   messages: Message[]
@@ -9,6 +10,7 @@ interface ChatThreadProps {
   canSave?: boolean
   reachedLimit?: boolean
   isAuthenticated?: boolean
+  tier?: SessionTier
   onOpenSignup?: () => void
   onUpgrade?: () => void
   onCitationClick: (citation: Citation) => void
@@ -22,6 +24,7 @@ export function ChatThread({
   canSave,
   reachedLimit,
   isAuthenticated,
+  tier,
   onOpenSignup,
   onUpgrade,
   onCitationClick,
@@ -57,7 +60,7 @@ export function ChatThread({
               <span className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white">System Notification</span>
             </div>
             <p className="whitespace-pre-wrap leading-relaxed text-[15px] text-neutral-900 dark:text-neutral-100 mb-6">
-              You have exhausted your free query limit. Register for unlimited free queries, or upgrade for synced history, saved answers, and priority routing.
+              {limitReachedCopy(tier)}
             </p>
             <div className="flex flex-wrap items-center gap-3">
               {isAuthenticated ? null : (

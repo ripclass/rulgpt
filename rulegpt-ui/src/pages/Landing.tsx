@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { PreviewLanding } from '@/components/preview/PreviewLanding'
+import { ChatFirstLanding } from '@/components/landing/ChatFirstLanding'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthModal } from '@/contexts/AuthModalContext'
 import { api, ApiError } from '@/lib/api'
 import { track } from '@/lib/analytics'
-import type { BillingPlan } from '@/types'
+import type { CheckoutPlan } from '@/types'
 
 export function Landing() {
   const navigate = useNavigate()
@@ -14,7 +14,7 @@ export function Landing() {
   const authModal = useAuthModal()
   const [isCheckingOut, setIsCheckingOut] = useState(false)
 
-  const startCheckout = async (plan: BillingPlan, interval: 'monthly' | 'annual' = 'monthly') => {
+  const startCheckout = async (plan: CheckoutPlan, interval: 'monthly' | 'annual' = 'monthly') => {
     track('landing_checkout_attempted', { plan, interval, authenticated: auth.isAuthenticated })
 
     if (!auth.isAuthenticated || !auth.accessToken) {
@@ -57,7 +57,7 @@ export function Landing() {
   }
 
   return (
-    <PreviewLanding
+    <ChatFirstLanding
       isAuthenticated={auth.isAuthenticated}
       tier={auth.tier}
       userEmail={auth.user?.email ?? null}

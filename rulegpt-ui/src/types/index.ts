@@ -5,6 +5,9 @@ export type MessageRole = 'user' | 'assistant'
 export type DomainType = 'icc' | 'sanctions' | 'fta' | 'customs' | 'bank_specific' | 'other'
 export type BillingInterval = 'monthly' | 'annual'
 export type BillingPlan = 'professional' | 'enterprise'
+// "pro" is the $29/mo checkout SKU — a marketing label that always maps to
+// the internal "professional" tier. Only valid on checkout requests/responses.
+export type CheckoutPlan = BillingPlan | 'pro'
 
 export interface QueryRequest {
   query: string
@@ -39,13 +42,13 @@ export interface BillingCheckoutResponse {
   redirect_url?: string | null
   url?: string | null
   message?: string | null
-  plan?: BillingPlan | null
+  plan?: CheckoutPlan | null
   tier?: SessionTier
   subscription_status?: string | null
 }
 
 export interface BillingCheckoutRequest {
-  plan: BillingPlan
+  plan: CheckoutPlan
   interval: BillingInterval
   success_url: string
   cancel_url: string

@@ -62,8 +62,8 @@ export function useQuery({ sessionToken, tier, userId, accessToken }: UseQueryOp
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const tierLimits: Record<SessionTier, number> = { anonymous: 5, free: 5, professional: 500, enterprise: 2000 }
-  const [queriesRemaining, setQueriesRemaining] = useState<number>(tierLimits[tier] ?? 20)
+  const tierLimits: Record<SessionTier, number> = { anonymous: 2, free: 5, professional: 500, enterprise: 2000 }
+  const [queriesRemaining, setQueriesRemaining] = useState<number>(tierLimits[tier] ?? 2)
 
   const submitQuery = async (text: string) => {
     const trimmed = text.trim()
