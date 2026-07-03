@@ -29,12 +29,16 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = Field(
         default_factory=lambda: [
             "http://localhost:5173",
-            "https://www.tfrules.com",
+            "https://www.rulgpt.com",
+            "https://rulgpt.com",
+            "https://www.tfrules.com",   # legacy domain kept during 301 transition
             "https://tfrules.com",
         ]
     )
     CORS_ORIGIN_REGEX: str | None = (
-        r"^https://([a-z0-9-]+\.)*vercel\.app$|^https://([a-z0-9-]+\.)?tfrules\.com$"
+        r"^https://([a-z0-9-]+\.)*vercel\.app$"
+        r"|^https://([a-z0-9-]+\.)?rulgpt\.com$"
+        r"|^https://([a-z0-9-]+\.)?tfrules\.com$"
     )
 
     FREE_TIER_MONTHLY_LIMIT: int = 5

@@ -18,9 +18,9 @@ services:
       - key: API_PREFIX
         value: /api
       - key: CORS_ORIGINS
-        value: '["http://localhost:5173","https://www.tfrules.com","https://tfrules.com"]'
+        value: '["http://localhost:5173","https://www.rulgpt.com","https://rulgpt.com","https://www.tfrules.com","https://tfrules.com"]'
       - key: CORS_ORIGIN_REGEX
-        value: ^https://([a-z0-9-]+\.)*vercel\.app$|^https://([a-z0-9-]+\.)?tfrules\.com$
+        value: ^https://([a-z0-9-]+\.)*vercel\.app$|^https://([a-z0-9-]+\.)?rulgpt\.com$|^https://([a-z0-9-]+\.)?tfrules\.com$
       - key: RULEGPT_EMBEDDING_MODEL
         value: text-embedding-3-small
       - key: RULEGPT_FALLBACK_MODEL
