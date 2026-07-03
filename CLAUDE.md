@@ -51,7 +51,7 @@ Four products in the Enso Intelligence ecosystem:
 ## ACTUAL STATE
 
 ### Built and working (code exists, logic is complete)
-- FastAPI backend, 17 router modules, RAG pipeline: classify → retrieve (RulHub-native) → route → generate (OpenRouter) → cite
+- FastAPI backend, 15 router modules, RAG pipeline: classify → retrieve (RulHub-native) → route → generate (OpenRouter) → cite
 - RulHub-native retriever: fail-closed, keyword-variant search, anchor injection, TTL cache singleton, optional embedding re-rank
 - OpenRouter LLM client: config-driven model + fallback chain, per-model retry, cost accounting from response `usage.cost`
 - Tier-based smart routing (`select_model` in `pipeline.py`) + $0 template tier for direct single-rule lookups
@@ -190,8 +190,9 @@ Query → Classifier → RulHub Retriever → select_model(user_tier, query, ret
                                               │                           "haiku" tier if a short definitional lookup
                                               │                           with ≤2 rules/≤1 domain; else "sonnet" tier
                                               │
-                                              └── tier = enterprise     → same shape as professional but with a lower
-                                                                          bar: also escalates to "opus" on ≥5 rules or
+                                              └── tier = enterprise     → opus gate on sanctions/TBML keywords (but NOT
+                                                                          the sanctioned-jurisdiction check professional
+                                                                          has); also escalates to "opus" on ≥5 rules or
                                                                           on fail-severity rules with ≥3 rules
 ```
 
