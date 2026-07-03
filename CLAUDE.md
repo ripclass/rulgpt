@@ -2,7 +2,7 @@
 
 ## RESUME — START HERE
 
-**Last updated: 2026-04-08.** Site is live at tfrules.com. Production-ready.
+**Last updated: 2026-04-08.** Site is live at rulgpt.com (tfrules.com 301-redirects during transition). Production-ready.
 
 What's done:
 - RAG pipeline live: 4,459 rules, benchmark 4.7/5.0 across 70 golden queries
@@ -42,7 +42,7 @@ Four products in the Enso Intelligence ecosystem:
 
 **RULEGPT** (This repo — `J:\Enso Intelligence\rulgpt`)
 - What: This codebase. FastAPI backend + React frontend.
-- Launch domain target: `tfrules.com`
+- Launch domain: `rulgpt.com` (legacy `tfrules.com` 301-redirects during transition)
 
 **ICE** (Future product — not this repo)
 - What: Proprietary trade finance LLM.
@@ -452,8 +452,8 @@ Enforced in `routers/query.py:_tier_monthly_limit()`. When exceeded, returns HTT
 - `RATE_LIMIT_PER_MIN_AUTH` — default: 120
 
 **CORS:**
-- `CORS_ORIGINS` — default: `["http://localhost:5173","https://www.tfrules.com","https://tfrules.com"]`
-- `CORS_ORIGIN_REGEX` — default: `^https://([a-z0-9-]+\.)*vercel\.app$|^https://([a-z0-9-]+\.)?tfrules\.com$`
+- `CORS_ORIGINS` — default: `["http://localhost:5173","https://www.rulgpt.com","https://rulgpt.com","https://www.tfrules.com","https://tfrules.com"]`
+- `CORS_ORIGIN_REGEX` — default: `^https://([a-z0-9-]+\.)*vercel\.app$|^https://([a-z0-9-]+\.)?rulgpt\.com$|^https://([a-z0-9-]+\.)?tfrules\.com$`
 
 ### Frontend (from `rulegpt-ui/.env.example`)
 - `VITE_API_BASE_URL` — backend URL (default: `http://localhost:8000`)
@@ -620,7 +620,7 @@ ACTION: When renaming a vocabulary that crosses module boundaries (auth, billing
 
 ## SUCCESS CRITERIA
 
-**The single test:** A stranger visits rulegpt.com (or tfrules.com), asks "What documents are required for a CIF shipment under UCP600?", gets a cited answer under 5 seconds, no account needed.
+**The single test:** A stranger visits rulgpt.com (or tfrules.com), asks "What documents are required for a CIF shipment under UCP600?", gets a cited answer under 5 seconds, no account needed.
 
 **Performance targets per stage:**
 - Classification: < 500ms

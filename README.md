@@ -1,8 +1,8 @@
-# tfrules.com
+# RulGPT — rulgpt.com
 
 Citation-first AI for trade finance rules. Users ask questions about ICC standards (UCP600, ISBP 821, ISP98, URDG758), sanctions (OFAC), FTAs (RCEP, CPTPP, USMCA), customs, and bank-specific LC rules. They get short, grounded answers with exact rule citations.
 
-**Live at [tfrules.com](https://www.tfrules.com)**
+**Live at [rulgpt.com](https://rulgpt.com)**
 
 ## How It Works
 

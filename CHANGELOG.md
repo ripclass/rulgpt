@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Rebrand tfrules.com → RulGPT at rulgpt.com
+
 ## v1.0.0 — 2026-04-07
 
 Production launch of tfrules.com.

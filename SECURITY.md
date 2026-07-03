@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in tfrules.com, please report it responsibly.
+If you discover a security vulnerability in RulGPT (rulgpt.com), please report it responsibly.
 
 **Email:** security@rulhub.com
 
@@ -17,8 +17,8 @@ We will acknowledge receipt within 48 hours and aim to provide a resolution time
 ## Scope
 
 This policy covers:
-- tfrules.com (frontend and backend)
-- API endpoints at the tfrules.com backend
+- rulgpt.com (frontend and backend)
+- API endpoints at the rulgpt.com backend
 - Authentication and session management
 - Data handling and storage
 
