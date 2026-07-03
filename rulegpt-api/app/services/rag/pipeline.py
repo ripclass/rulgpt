@@ -303,7 +303,7 @@ class RAGPipeline:
                 citations=[],
                 confidence_band="low",
                 suggested_followups=[
-                    "Do you want the UCP600/ISBP745 rules to review before validation?",
+                    "Do you want the UCP600/ISBP 821 rules to review before validation?",
                     "Which document type are you checking first (BL, invoice, insurance)?",
                     "Do you want a discrepancy checklist before you review the documents?",
                 ],

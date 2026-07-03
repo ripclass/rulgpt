@@ -34,7 +34,7 @@ from app.services.rag.embedder import RuleEmbedder, load_rules_from_local_data
 # ICC-core rulebooks that were recently uploaded from a separate source pack.
 # These should NOT be archived or overwritten when uploading Data_clean.
 _ICC_PROTECTED_EXACT = {
-    "UCP600", "ISBP745", "ISP98", "URDG758", "URC522", "URR725",
+    "UCP600", "ISBP745", "ISBP 821", "ISP98", "URDG758", "URC522", "URR725",
     "eUCP 2.1", "Incoterms 2020",
 }
 _ICC_PROTECTED_PREFIXES = (
@@ -62,7 +62,7 @@ def main() -> None:
     parser.add_argument("--yes", "-y", action="store_true", help="Skip confirmation prompt.")
     parser.add_argument(
         "--protect-icc", action="store_true",
-        help="Skip ICC-core rulebooks (UCP600, ISBP745, ISP98, etc.) — don't archive or overwrite them.",
+        help="Skip ICC-core rulebooks (UCP600, ISBP 821, ISP98, etc.) — don't archive or overwrite them.",
     )
     args = parser.parse_args()
 

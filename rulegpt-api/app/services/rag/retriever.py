@@ -761,7 +761,7 @@ class RuleRetriever:
             results.append(
                 RetrievedRule(
                     rule_id=pid,
-                    rulebook="tfrules-checklist",
+                    rulebook="rulgpt-checklist",
                     reference=str(pack.get("filename", "examination checklist")),
                     title=str(steps[0].get("title", "Examination Checklist") if steps else "Checklist"),
                     excerpt=excerpt[:500],
@@ -809,7 +809,7 @@ class RuleRetriever:
                 return [
                     RetrievedRule(
                         rule_id=tid,
-                        rulebook="tfrules-glossary",
+                        rulebook="rulgpt-glossary",
                         reference=f"Glossary: {term_entry.get('term', '')}",
                         title=str(term_entry.get("term", "")),
                         excerpt=definition,

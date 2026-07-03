@@ -651,7 +651,7 @@ def _infer_rulebook(raw: Mapping[str, Any], source: str, source_hint: str | None
     if "ucp600" in probe:
         return "UCP600"
     if "isbp745" in probe or "isbp" in probe:
-        return "ISBP745"
+        return "ISBP 821"
     if "incoterms" in probe:
         return "Incoterms 2020"
     return source

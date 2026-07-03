@@ -51,8 +51,8 @@ _CANONICAL_RULE_KEYS = {
 
 _RULEBOOK_MARKERS: Tuple[Tuple[str, str], ...] = (
     ("ucp600", "UCP600"),
-    ("isbp745", "ISBP745"),
-    ("isbp", "ISBP745"),
+    ("isbp745", "ISBP 821"),
+    ("isbp", "ISBP 821"),
     ("isp98", "ISP98"),
     ("urdg758", "URDG758"),
     ("urc522", "URC522"),

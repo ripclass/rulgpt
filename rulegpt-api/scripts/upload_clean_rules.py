@@ -110,7 +110,7 @@ async def _upload(rules: list, rulebooks: set[str]) -> None:
 
     # Rulebooks that overlap with ICC — don't archive those
     ICC_RULEBOOKS = {
-        "UCP600", "ISBP745", "ISP98", "URDG758", "URC522", "URR725",
+        "UCP600", "ISBP745", "ISBP 821", "ISP98", "URDG758", "URC522", "URR725",
         "eUCP 2.1", "Incoterms 2020", "EU", "UN", "SWIFT",
         "collections_ops_core_v1", "guarantee_ops_core_v1", "standby_ops_core_v1",
     }
