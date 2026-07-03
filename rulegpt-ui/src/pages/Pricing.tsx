@@ -32,7 +32,7 @@ const plans = [
     features: [
       'Deep analysis on complex queries',
       'Sanctions & TBML expert-grade answers',
-      '5,400+ rules, 48 jurisdictions',
+      '15,000-rule grounded corpus, 48 jurisdictions',
       'Session history & saved answers',
       'Priority support',
     ],
@@ -187,7 +187,7 @@ export function Pricing() {
           <div className="p-4 rounded-sm border-2 border-[#FF4F00]">
             <p className="font-bold text-[#FF4F00]">RulGPT Professional</p>
             <p className="text-2xl font-bold text-[#FF4F00] mt-2">$79/mo</p>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Instant answers. 5,400+ rules. 24/7.</p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Instant answers. 15,000-rule grounded corpus. 24/7.</p>
           </div>
         </div>
       </section>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { LoadingDots } from '@/components/shared/LoadingDots'
 
 const STAGES = [
-  'Searching 5,400+ rules...',
+  'Searching the 15,000-rule grounded corpus...',
   'Checking ICC standards...',
   'Cross-referencing citations...',
   'Verifying against UCP 600...',

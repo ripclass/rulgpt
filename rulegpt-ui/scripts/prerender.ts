@@ -196,11 +196,18 @@ for (const route of staticRoutes) {
   writeFileSync(join(outDir, 'index.html'), html, 'utf8')
 }
 
+// Every public, indexable route in src/App.tsx. /settings is excluded — it's auth-gated.
 const sitemapEntries = [
-  ...staticRoutes.map((r) => r.path),
   '/',
+  '/chat',
+  '/pricing',
+  '/upgrade',
   '/blog',
   ...blogPosts.map((p) => `/blog/${p.slug}`),
+  '/faq',
+  '/contact',
+  '/privacy',
+  '/terms',
 ]
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapEntries
   .map((p) => `  <url><loc>${BASE_URL}${p === '/' ? '' : p}</loc></url>`)

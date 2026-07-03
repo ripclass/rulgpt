@@ -1,5 +1,6 @@
 {
   "redirects": [
+    { "source": "/blog/compliant-commercial-invoice-isbp745", "destination": "/blog/compliant-commercial-invoice-isbp821", "permanent": true },
     { "source": "/:path*", "has": [{ "type": "host", "value": "tfrules.com" }], "destination": "https://rulgpt.com/:path*", "permanent": true },
     { "source": "/:path*", "has": [{ "type": "host", "value": "www.tfrules.com" }], "destination": "https://rulgpt.com/:path*", "permanent": true },
     { "source": "/:path*", "has": [{ "type": "host", "value": "www.rulgpt.com" }], "destination": "https://rulgpt.com/:path*", "permanent": true }

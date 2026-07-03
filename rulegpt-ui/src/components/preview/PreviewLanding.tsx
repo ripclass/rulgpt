@@ -493,7 +493,7 @@ export function PreviewLanding({
                 </div>
                 <p className="text-sm text-neutral-500 border-b border-neutral-100 pb-8 uppercase font-mono tracking-wide">5 queries / mo</p>
                 <ul className="mt-8 space-y-5 text-[15px] text-neutral-600">
-                  <li className="flex gap-4"><Check className="h-5 w-5 text-neutral-300 shrink-0" /> Cited answers from 5,400+ rules</li>
+                  <li className="flex gap-4"><Check className="h-5 w-5 text-neutral-300 shrink-0" /> Cited answers from a 15,000-rule grounded corpus with verbatim regulatory citations</li>
                   <li className="flex gap-4"><Check className="h-5 w-5 text-neutral-300 shrink-0" /> No account required</li>
                 </ul>
               </div>
