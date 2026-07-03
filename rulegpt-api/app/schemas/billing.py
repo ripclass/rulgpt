@@ -11,11 +11,15 @@ from pydantic import AnyUrl, BaseModel, Field
 
 BillingInterval = Literal["monthly", "annual"]
 BillingPlan = Literal["professional", "enterprise"]
+# "pro" is the $29/mo checkout SKU — a marketing label only. It always maps
+# to the internal "professional" tier (see stripe_client.py); it is accepted
+# on the request/echoed on the response but never appears in a `tier` field.
+CheckoutPlan = Literal["professional", "enterprise", "pro"]
 OneoffArtifactKind = Literal["case_note", "draft"]
 
 
 class CheckoutSessionCreateRequest(BaseModel):
-    plan: BillingPlan = Field(description="Paid plan to purchase.")
+    plan: CheckoutPlan = Field(description="Paid plan to purchase.")
     interval: BillingInterval = Field(description="Billing cadence for the selected plan.")
     success_url: AnyUrl | None = None
     cancel_url: AnyUrl | None = None
@@ -26,7 +30,7 @@ class CheckoutSessionResponse(BaseModel):
     session_id: str
     checkout_url: str | None = None
     price_id: str
-    plan: BillingPlan
+    plan: CheckoutPlan
     interval: BillingInterval
     tier: BillingPlan
 

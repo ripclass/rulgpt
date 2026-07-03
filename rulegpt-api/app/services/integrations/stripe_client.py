@@ -98,9 +98,13 @@ class StripeClient:
         normalized_plan = str(plan or "").strip().lower()
         price_id = self._price_id_for_plan_and_interval(normalized_plan, interval)
         stripe.api_key = self._require_secret_key()
+        # "pro" is a marketing label for the $29/mo SKU only — the internal
+        # tier vocabulary is never renamed (see CLAUDE.md 2026-05-02 lesson),
+        # so metadata and the response's `tier` field always say "professional".
+        tier_value = "professional" if normalized_plan == "pro" else normalized_plan
         metadata = {
             "supabase_user_id": str(user_id),
-            "rulegpt_tier": normalized_plan,
+            "rulegpt_tier": tier_value,
             "rulegpt_plan": normalized_plan,
             "billing_interval": str(interval).strip().lower(),
         }
@@ -126,7 +130,7 @@ class StripeClient:
             "price_id": price_id,
             "plan": normalized_plan,
             "interval": str(interval).strip().lower(),
-            "tier": normalized_plan,
+            "tier": tier_value,
         }
 
     async def create_oneoff_checkout(
