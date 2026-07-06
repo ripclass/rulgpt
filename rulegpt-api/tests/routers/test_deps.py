@@ -14,15 +14,33 @@ def _fake_request(headers: dict[str, str] | None = None, client_host: str | None
     )
 
 
-def test_client_ip_uses_rightmost_xff_hop():
-    request = _fake_request({"x-forwarded-for": "1.2.3.4, 10.0.0.7"})
-    assert client_ip(request) == "10.0.0.7"
+def test_client_ip_prefers_cf_connecting_ip():
+    """Cloudflare fronts all onrender.com traffic and overwrites any
+    client-supplied CF-Connecting-IP, so it is the spoof-proof source."""
+    request = _fake_request(
+        {
+            "cf-connecting-ip": "203.0.113.50",
+            "x-forwarded-for": "spoofed.entry, 203.0.113.50, 172.69.1.1",
+        }
+    )
+    assert client_ip(request) == "203.0.113.50"
 
 
-def test_client_ip_trusts_the_only_xff_hop_even_with_request_client_present():
-    """In production, a single XFF hop is the one Render's proxy appended —
-    trusting it (not request.client, which is the proxy's own address) is
-    the whole point of rightmost semantics."""
+def test_client_ip_uses_second_from_right_xff_hop():
+    """Production chain is ``client, cf-edge``: the rightmost hop is a
+    rotating Cloudflare edge IP, the second-from-right is the caller."""
+    request = _fake_request({"x-forwarded-for": "203.0.113.50, 172.69.16.2"})
+    assert client_ip(request) == "203.0.113.50"
+
+
+def test_client_ip_spoofed_prefix_still_resolves_the_real_caller():
+    """A client-sent XFF gets appended to by each proxy: the attacker entry
+    sits further left and must never win."""
+    request = _fake_request({"x-forwarded-for": "6.6.6.6, 203.0.113.50, 172.68.3.4"})
+    assert client_ip(request) == "203.0.113.50"
+
+
+def test_client_ip_single_xff_hop_used_as_is():
     request = _fake_request({"x-forwarded-for": "1.2.3.4"}, client_host="10.0.0.1")
     assert client_ip(request) == "1.2.3.4"
 
@@ -33,8 +51,8 @@ def test_client_ip_falls_back_to_request_client_host_without_header():
 
 
 def test_client_ip_ignores_empty_trailing_entries():
-    request = _fake_request({"x-forwarded-for": "1.2.3.4, 10.0.0.7, "})
-    assert client_ip(request) == "10.0.0.7"
+    request = _fake_request({"x-forwarded-for": "203.0.113.50, 172.69.16.2, "})
+    assert client_ip(request) == "203.0.113.50"
 
 
 def test_client_ip_returns_none_without_header_or_client():

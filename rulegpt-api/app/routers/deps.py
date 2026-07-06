@@ -21,21 +21,33 @@ PRO_PRICE_USD = 29
 
 
 def client_ip(request: Request) -> str | None:
-    """Resolve the caller's real IP, trusting the rightmost X-Forwarded-For hop.
+    """Resolve the caller's real IP behind Render's Cloudflare-fronted proxy.
 
     This is the anon-quota / cost boundary (daily query and MT700 limits are
-    keyed on it), so it must not be spoofable. Render's proxy APPENDS the
-    real client IP to X-Forwarded-For — every entry to the left of the last
-    one is attacker-controlled request data, not the leftmost as a naive
-    reading of the header might suggest. Falls back to `request.client.host`
-    when the header is absent.
+    keyed on it), so it must not be spoofable AND must be stable per caller.
+    Verified against production 2026-07-06: requests arrive with the chain
+    ``client[, spoofed…], cf-edge`` — the RIGHTMOST X-Forwarded-For hop is a
+    rotating Cloudflare edge IP (162.158.*/172.68-69.*), so trusting it made
+    every request look like a new caller and the daily limits never fired.
+
+    Order of trust:
+    1. ``CF-Connecting-IP`` — set (and overwritten if client-supplied) by
+       Cloudflare, which fronts all onrender.com traffic. Spoof-proof.
+    2. Second-from-right X-Forwarded-For hop — the peer the edge proxy saw;
+       anything further left is attacker-controlled request data.
+    3. ``request.client.host`` when no proxy headers exist (local dev/tests).
     """
+    cf_ip = request.headers.get("cf-connecting-ip")
+    if cf_ip and cf_ip.strip():
+        return cf_ip.strip()
     forwarded = request.headers.get("x-forwarded-for")
     if forwarded:
         hops = [hop.strip() for hop in forwarded.split(",")]
         hops = [hop for hop in hops if hop]
+        if len(hops) >= 2:
+            return hops[-2]
         if hops:
-            return hops[-1]
+            return hops[0]
     return request.client.host if request.client else None
 
 
