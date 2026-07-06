@@ -66,7 +66,7 @@ Render service `rulegpt-api` already has most Phase 1-4 keys wired in `render.ya
 - `ANTHROPIC_API_KEY` — no longer used anywhere in the runtime. The Anthropic SDK was dropped from the codebase in the 2026-07 OpenRouter swap. `render.yaml` still lists it as a `sync: false` placeholder for now; delete the value from the Render dashboard (or leave it unset — the app ignores unknown env keys either way, it just costs you nothing to remove it).
 
 **Already correct, no action needed:**
-- `RULGPT_LLM_MODEL=z-ai/glm-5`, `RULGPT_LLM_FALLBACKS=deepseek/deepseek-v4-pro,qwen/qwen3.7-plus`, `RULGPT_CLASSIFIER_LLM_MODEL=z-ai/glm-4.7-flash` — verified live against the OpenRouter catalog on 2026-07-03
+- `RULGPT_LLM_MODEL=z-ai/glm-5.2`, `RULGPT_LLM_FALLBACKS=deepseek/deepseek-v4-pro,qwen/qwen3.7-plus`, `RULGPT_CLASSIFIER_LLM_MODEL=z-ai/glm-4.7-flash` — verified live against the OpenRouter catalog on 2026-07-03
 - `ANONYMOUS_DAILY_LIMIT=2`, `FREE_TIER_DAILY_LIMIT=5`, `MT700_DAILY_LIMIT_ANON=3`, `MT700_DAILY_LIMIT_AUTH=10`
 - `RULGPT_RETRIEVAL_CACHE_TTL=1800`, `RULGPT_RERANK_EMBEDDINGS=true`
 - `CORS_ORIGINS` / `CORS_ORIGIN_REGEX` already include both `rulgpt.com` and `tfrules.com`

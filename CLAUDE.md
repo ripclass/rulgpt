@@ -7,7 +7,7 @@
 What's done (2026-07 launch, "RulGPT"):
 - Rebrand: tfrules.com → RulGPT at rulgpt.com (host-level 301 deferred to Vercel's primary-domain setting at DNS cutover — not in `vercel.json`, see `LAUNCH-NOTES.md` for why)
 - Retrieval migrated to RulHub-native: `RETRIEVAL_BACKEND=rulhub` is the code default, fail-closed (no local-data fallback on outage), keyword-variant search, anchor-rule injection, 30-min TTL cache, optional embedding re-rank. Local pgvector path retained only as a rollback (`RETRIEVAL_BACKEND=local`); deploy is currently pinned to `local` in `render.yaml` because RulHub is suspended until 2026-07-05.
-- LLM stack swapped to OpenRouter-only: zero Anthropic SDK dependency in the runtime. Primary `z-ai/glm-5`, fallback chain `deepseek/deepseek-v4-pro` → `qwen/qwen3.7-plus`, classifier `z-ai/glm-4.7-flash`. Tier-based model routing (not the old complexity-matrix), $0 template tier kept, citation retry-once-then-degrade, per-query cost logging.
+- LLM stack swapped to OpenRouter-only: zero Anthropic SDK dependency in the runtime. Primary `z-ai/glm-5.2`, fallback chain `deepseek/deepseek-v4-pro` → `qwen/qwen3.7-plus`, classifier `z-ai/glm-4.7-flash`. Tier-based model routing (not the old complexity-matrix), $0 template tier kept, citation retry-once-then-degrade, per-query cost logging.
 - Daily quota windows: anonymous 2/day (by IP), free 5/day — replacing the old flat monthly-only model for those two tiers. Professional/enterprise stay monthly (500/mo, 2000/mo).
 - Workbench v1: free MT700 SWIFT-message interpreter (own daily limit, doesn't touch chat quota), Case Note ($9 one-off) and Draft ($19 one-off) artifact generation, Pro plan ($29/mo, internal tier name stays `professional`), Stripe one-off entitlements via webhook, print-to-PDF, "Advisory only" disclaimers throughout.
 - Chat-first landing page (hero is the chat input, not marketing copy)
@@ -146,7 +146,7 @@ This inverts what used to be true. As of the 2026-07 relaunch, `RulHubRetriever`
 ### Model configuration (from `app/config.py`)
 
 **Live (OpenRouter-routed, 2026-07 stack):**
-- Primary generation/classification model: `RULGPT_LLM_MODEL` = `z-ai/glm-5` — verified live against the OpenRouter catalog 2026-07-03, $0.60/$1.92 per 1M tokens, 202k context
+- Primary generation/classification model: `RULGPT_LLM_MODEL` = `z-ai/glm-5.2` — verified live against the OpenRouter catalog 2026-07-03, $0.93/$3.00 per 1M tokens — switched from glm-5 to 5.2 on Ripon's call 2026-07-06
 - Fallback chain: `RULGPT_LLM_FALLBACKS` = `deepseek/deepseek-v4-pro,qwen/qwen3.7-plus` ($0.435/$0.87 and $0.32/$1.28 per 1M)
 - Classifier-tier model: `RULGPT_CLASSIFIER_LLM_MODEL` = `z-ai/glm-4.7-flash` ($0.06/$0.40 per 1M) — also used for the fast suggested-followups call
 - Embeddings (optional re-rank only): `RULEGPT_EMBEDDING_MODEL` = `text-embedding-3-small` via OpenAI, gated by `RULGPT_RERANK_EMBEDDINGS`
@@ -324,7 +324,7 @@ Enforced in `routers/query.py:_tier_limit()` / `_queries_this_month()` (the func
 - `RULEGPT_LOCAL_RULES_ROOT` — local JSON rule files path, only used by the local-rollback path and deprecated sync scripts
 
 **LLM / model configuration (live):**
-- `RULGPT_LLM_MODEL` — default `z-ai/glm-5`
+- `RULGPT_LLM_MODEL` — default `z-ai/glm-5.2`
 - `RULGPT_LLM_FALLBACKS` — default `deepseek/deepseek-v4-pro,qwen/qwen3.7-plus` (comma-separated)
 - `RULGPT_CLASSIFIER_LLM_MODEL` — default `z-ai/glm-4.7-flash`
 - `RULEGPT_EMBEDDING_MODEL` — default `text-embedding-3-small` (re-rank only)

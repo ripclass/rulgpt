@@ -33,7 +33,7 @@ Beyond the core Q&A chat, RulGPT ships a small workbench of paid/free verbs buil
 ### Backend (`rulegpt-api/`)
 - Python 3.11, FastAPI, SQLAlchemy, Alembic
 - PostgreSQL + pgvector (Supabase) — retained for the local-retrieval rollback path and application tables (sessions, queries, entitlements, feedback)
-- **OpenRouter** for all LLM calls (classification, generation, MT700, artifacts) — primary `z-ai/glm-5`, fallback chain `deepseek/deepseek-v4-pro` → `qwen/qwen3.7-plus`, classifier `z-ai/glm-4.7-flash`. No Anthropic SDK in the runtime.
+- **OpenRouter** for all LLM calls (classification, generation, MT700, artifacts) — primary `z-ai/glm-5.2`, fallback chain `deepseek/deepseek-v4-pro` → `qwen/qwen3.7-plus`, classifier `z-ai/glm-4.7-flash`. No Anthropic SDK in the runtime.
 - OpenAI `text-embedding-3-small` — optional, used only to re-rank RulHub search candidates by embedding similarity
 - Stripe for subscriptions (Pro $29/mo) and one-off artifact purchases (Case Note $9, Draft $19)
 - Deployed on **Render**
