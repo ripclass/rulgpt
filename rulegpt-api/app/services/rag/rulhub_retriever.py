@@ -24,7 +24,10 @@ class RetrievalUnavailableError(Exception):
 
 
 _STOPWORDS = {"the","a","an","is","are","was","be","of","to","in","on","for","and","or",
-              "can","do","does","what","when","under","my","our","with","by","it","that"}
+              "can","do","does","what","when","under","my","our","with","by","it","that",
+              "if","how","why","who","which","this","these","those","there","from","at",
+              "as","its","his","her","their","will","would","should","could","has","have",
+              "had","not","no","yes","any","all","some","also","still","then","than","but"}
 _EXPANSIONS = {"lc": "letter of credit", "bl": "bill of lading", "mt700": "documentary credit issuance",
                "coo": "certificate of origin", "dc": "documentary credit"}
 _SOURCE_PATTERN = re.compile(r"\b(ucp\s*600|isbp\s*821|urdg\s*758|isp\s*98|urc\s*522|eucp)\b", re.I)
@@ -32,21 +35,86 @@ _DOMAIN_FILTERS = {"icc": {"domain": "icc_core"}, "sanctions": {"domain": "sanct
                    "fta": {"domain": "fta"}, "customs": {"domain": "customs"},
                    "bank_specific": {"sub_domain": "trade_finance"}}
 
+# RulHub's /v1/rules/search is PostgreSQL full-text search that ANDs every
+# token (verified live 2026-07-06: a full natural-language question matched 0
+# rows; "transhipment credit" matched 11; "transhipment" matched 59). The
+# bridge from NL questions to keyword search is therefore a RELAXATION
+# LADDER: rank the query's tokens by domain signal, then search with the top
+# 3, top 2, and finally the single strongest term until enough rows come
+# back. Tokens in this lexicon outrank everything else in the query.
+_DOMAIN_TERMS = {
+    "transhipment", "transshipment", "shipment", "shipments", "presentation",
+    "discrepancy", "discrepancies", "document", "documents", "documentary",
+    "invoice", "invoices", "insurance", "bill", "lading", "credit", "credits",
+    "guarantee", "guarantees", "demand", "expiry", "tolerance", "origin",
+    "tariff", "customs", "sanction", "sanctions", "embargo", "beneficiary",
+    "applicant", "confirmation", "negotiation", "waiver", "amendment",
+    "incoterms", "cif", "fob", "cfr", "fca", "exw", "ucp", "isbp", "urdg",
+    "isp98", "urc", "eucp", "partial", "transferable", "standby", "ofac",
+    "rcep", "cptpp", "usmca", "certificate", "packing", "weight", "charter",
+    "deferred", "acceptance", "honour", "honor", "reimbursement", "nomination",
+    "complying", "examination", "article", "paragraph", "field", "clause",
+    "draft", "drafts", "goods", "freight", "port", "loading", "discharge",
+    "inspection", "cumulation", "preferential", "tbml", "aml",
+}
+
+
+def _content_tokens(query: str) -> list[str]:
+    """Expanded, stopword-free tokens in query order (deduped)."""
+    tokens = re.findall(r"[a-z0-9]+", query.lower())
+    out: list[str] = []
+    for tok in tokens:
+        expanded = _EXPANSIONS.get(tok, tok)
+        for part in expanded.split():
+            if part in _STOPWORDS or len(part) < 2 or part in out:
+                continue
+            out.append(part)
+    return out
+
+
+def _ranked_terms(content: list[str]) -> list[str]:
+    """Domain-lexicon terms first (query order), then 3-4 digit publication
+    numbers (600/758/821…), then remaining tokens longest-first."""
+    domain = [t for t in content if t in _DOMAIN_TERMS]
+    numbers = [t for t in content if t.isdigit() and 3 <= len(t) <= 4 and t not in domain]
+    rest = sorted((t for t in content if t not in domain and t not in numbers),
+                  key=len, reverse=True)
+    return domain + numbers + rest
+
 
 def derive_search_queries(query: str, classification: ClassifierOutput) -> list[str]:
-    """Original query first, then up to 2 keyword variants (expansion + term-only)."""
-    out = [query.strip()[:500]]
-    tokens = re.findall(r"[a-z0-9]+", query.lower())
-    expanded = " ".join(_EXPANSIONS.get(t, t) for t in tokens if t not in _STOPWORDS)
-    if expanded and expanded not in out:
-        out.append(expanded[:500])
+    """Keyword-relaxation ladder for RulHub's AND-token full-text search.
+
+    Most specific first so the retrieve loop can stop early: the full
+    content-token set (only when short enough to plausibly AND-match),
+    top-3 ranked terms, a source-anchored variant, top-2, then the single
+    strongest term. Never returns an empty list.
+    """
+    content = _content_tokens(query)
+    ranked = _ranked_terms(content)
+    out: list[str] = []
+
+    def _push(candidate: str) -> None:
+        candidate = candidate.strip()[:500]
+        if candidate and candidate not in out:
+            out.append(candidate)
+
+    if 2 <= len(content) <= 4:
+        _push(" ".join(content))
+    if len(ranked) >= 3:
+        _push(" ".join(ranked[:3]))
     m = _SOURCE_PATTERN.search(query)
     if m:
-        keywords = " ".join(t for t in tokens if t not in _STOPWORDS)[:400]
-        variant = f"{m.group(0)} {keywords}"[:500]
-        if variant not in out:
-            out.append(variant)
-    return out[:3]
+        source_tokens = _content_tokens(m.group(0))
+        extra = [t for t in ranked if t not in source_tokens][:2]
+        _push(" ".join(source_tokens + extra))
+    if len(ranked) >= 2:
+        _push(" ".join(ranked[:2]))
+    if ranked:
+        _push(ranked[0])
+    if not out:
+        _push(query)
+    return out[:5]
 
 
 def _tokenize(value: str) -> set[str]:

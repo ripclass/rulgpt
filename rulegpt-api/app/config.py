@@ -69,7 +69,7 @@ class Settings(BaseSettings):
     RULEGPT_OPUS_MODEL: str = "claude-opus-4-6"
 
     # OpenRouter-routed generation/classification models (2026-07 LLM swap).
-    RULGPT_LLM_MODEL: str = "z-ai/glm-5"  # primary — verified live 2026-07-03: $0.60/$1.92 per 1M, 202k ctx
+    RULGPT_LLM_MODEL: str = "z-ai/glm-5.2"  # primary — Ripon's pick 2026-07-06 ($0.93/$3.00 per 1M); glm-5 rejected
     RULGPT_LLM_FALLBACKS: str = "deepseek/deepseek-v4-pro,qwen/qwen3.7-plus"  # $0.435/$0.87 and $0.32/$1.28 per 1M
     RULGPT_CLASSIFIER_LLM_MODEL: str = "z-ai/glm-4.7-flash"  # heuristic-first; LLM assist — $0.06/$0.40 per 1M
 

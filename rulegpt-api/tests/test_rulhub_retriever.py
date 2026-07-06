@@ -77,10 +77,56 @@ async def test_dedup_and_hydration():
     assert ids.count("UCP600-31") == 1 and out[0].excerpt.startswith("FULL TEXT")
 
 
-def test_derive_search_queries_variants():
+def test_derive_search_queries_relaxation_ladder():
+    """RulHub FTS ANDs every token (verified live 2026-07-06), so natural
+    questions must degrade into progressively shorter keyword variants."""
+    qs = derive_search_queries(
+        "Is transhipment allowed under UCP 600 if the credit is silent?", CLS
+    )
+    assert 1 <= len(qs) <= 5
+    # No variant repeats the full unanswerable question verbatim.
+    assert all(len(q.split()) <= 5 for q in qs)
+    # The ladder ends in ever-shorter, domain-ranked variants: at least one
+    # two-term variant, then the single strongest domain term last.
+    assert any(len(q.split()) == 2 for q in qs)
+    assert qs[-1] == "transhipment"
+    # ...and low-signal filler like "silent" never outranks domain terms.
+    assert not any("silent" in q for q in qs)
+
+
+def test_derive_search_queries_expands_abbreviations():
     qs = derive_search_queries("Can the LC amount be exceeded by about 10%?", CLS)
-    assert 1 <= len(qs) <= 3 and qs[0].startswith("Can the LC amount")
-    assert any("letter of credit" in q for q in qs[1:])  # lc expansion
+    assert any("letter" in q and "credit" in q for q in qs)  # lc expansion
+    assert qs[-1].strip() != ""
+
+
+def test_derive_search_queries_source_anchored_variant():
+    qs = derive_search_queries("What does UCP 600 article 20 require for a bill of lading?", CLS)
+    assert any(q.startswith("ucp 600") for q in qs)
+
+
+def test_derive_search_queries_never_empty():
+    qs = derive_search_queries("???", CLS)
+    assert qs and all(q.strip() for q in qs)
+
+
+@pytest.mark.asyncio
+async def test_retrieve_reaches_rows_via_relaxed_variant():
+    """An AND-matching backend that only answers short keyword variants must
+    still yield rows — the ladder, not the full question, finds them."""
+
+    class KeywordOnlyClient(FakeClient):
+        async def search_rules(self, query, filters=None, limit=10, allow_fallback=True):
+            self.search_calls.append((query, filters))
+            if len(query.split()) <= 2:  # only terse variants match, like real FTS
+                return [make_row("UCP600-20"), make_row("UCP600-26")]
+            return []
+
+    r = RulHubRetriever(rulhub_client=KeywordOnlyClient(), openai_client=None)
+    out = await r.retrieve(
+        None, "Is transhipment allowed under UCP 600 if the credit is silent?", CLS
+    )
+    assert {x.rule_id for x in out} == {"UCP600-20", "UCP600-26"}
 
 
 @pytest.mark.asyncio
