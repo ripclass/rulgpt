@@ -2,7 +2,7 @@
 
 Citation-first AI for trade finance rules. Users ask questions about ICC standards (UCP600, ISBP 821, ISP98, URDG758), sanctions (OFAC), FTAs (RCEP, CPTPP, USMCA), customs, and bank-specific LC rules. They get short, grounded answers with exact rule citations — plus a workbench for interpreting MT700 messages and turning an answer into a case note or a draft response.
 
-**Launching at [rulgpt.com](https://rulgpt.com)** — domain cutover pending (see `LAUNCH-NOTES.md`); the site currently serves at tfrules.com, which will 301-redirect once rulgpt.com is set as the primary domain.
+**Live at [rulgpt.com](https://rulgpt.com)** — cutover completed 2026-07-03; tfrules.com and all www variants 301-redirect to rulgpt.com.
 
 ## How It Works
 
