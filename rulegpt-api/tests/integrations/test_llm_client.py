@@ -104,3 +104,28 @@ async def test_raises_immediately_when_no_api_key_configured(monkeypatch):
     c = OpenRouterLLMClient()
     with pytest.raises(LLMUnavailableError):
         await c.generate_answer("q", "s")
+
+
+@pytest.mark.asyncio
+async def test_model_override_degrades_through_primary_before_fallbacks():
+    """An opus-escalation override that fails must fall back to the regular
+    primary (RULGPT_LLM_MODEL) before the cheap fallback list."""
+    models_tried = []
+
+    def handler(request):
+        m = json.loads(request.content)["model"]
+        models_tried.append(m)
+        if m == "anthropic/claude-opus-4.8":
+            return httpx.Response(503)
+        return httpx.Response(200, json={
+            "choices": [{"message": {"content": "ok"}}],
+            "usage": {"prompt_tokens": 1, "completion_tokens": 1},
+            "model": m,
+        })
+
+    c = make_llm_client(handler, max_retries=0)
+    res = await c.generate_answer("q", "s", model="anthropic/claude-opus-4.8")
+    assert res.text == "ok"
+    from app.config import settings
+    assert models_tried[0] == "anthropic/claude-opus-4.8"
+    assert models_tried[1] == settings.RULGPT_LLM_MODEL

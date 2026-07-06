@@ -340,3 +340,33 @@ def test_static_followups_expand_for_fta_queries():
     )
 
     assert len(followups) == 2
+
+
+@pytest.mark.asyncio
+async def test_opus_routing_tier_uses_escalation_model():
+    """routing_tier='opus' must pass RULGPT_OPUS_TIER_MODEL as the model
+    override; every other tier passes None (regular chain)."""
+    from app.config import settings
+
+    class _ModelCapturingClient:
+        def __init__(self):
+            self.models = []
+
+        async def generate_answer(self, prompt, system_prompt, model=None, max_tokens=1200, temperature=0.2):
+            self.models.append(model)
+            return LLMResult(
+                text="Cover notes are not accepted [UCP600 Article 18].",
+                model=model or "primary-model",
+                prompt_tokens=100, completion_tokens=50, cost_usd=0.001,
+            )
+
+    client = _ModelCapturingClient()
+    gen = AnswerGenerator(llm_client=client)
+    rules = [_insurance_rule()]
+    cls = ClassifierOutput(domain="icc", jurisdiction="global", document_type="lc")
+
+    await gen.generate("Sanctions exposure on this LC?", rules, cls, routing_tier="opus")
+    assert client.models[-1] == settings.RULGPT_OPUS_TIER_MODEL
+
+    await gen.generate("How do discrepancies work?", rules, cls, routing_tier="sonnet")
+    assert client.models[-1] is None

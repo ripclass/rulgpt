@@ -908,8 +908,17 @@ class AnswerGenerator:
         )
 
         llm_client = self._get_llm_client()
+        # Opus-grade escalation: the "opus" routing tier generates on the
+        # dedicated escalation model; if that provider fails, the client's
+        # fallback chain (GLM-class) still answers — never the reverse.
+        from app.config import settings as _model_settings
+        tier_model = (
+            _model_settings.RULGPT_OPUS_TIER_MODEL if routing_tier == "opus" else None
+        )
         try:
-            first_res = await llm_client.generate_answer(prompt, system_prompt, max_tokens=token_budget)
+            first_res = await llm_client.generate_answer(
+                prompt, system_prompt, model=tier_model, max_tokens=token_budget
+            )
             answer = normalize_generated_answer(first_res.text)
             model_used = first_res.model
             generation_model = first_res.model
@@ -924,7 +933,9 @@ class AnswerGenerator:
                     "pairs present in Retrieved rules. Do not mention any other article, "
                     "publication, paragraph, or rule number."
                 )
-                retry_res = await llm_client.generate_answer(prompt, strict_system_prompt, max_tokens=token_budget)
+                retry_res = await llm_client.generate_answer(
+                    prompt, strict_system_prompt, model=tier_model, max_tokens=token_budget
+                )
                 # Both calls were real, billed requests — the retry's cost is
                 # never dropped, even when the retry itself gets discarded
                 # below in favor of the citations-only degrade.

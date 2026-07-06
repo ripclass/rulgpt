@@ -72,6 +72,11 @@ class Settings(BaseSettings):
     RULGPT_LLM_MODEL: str = "z-ai/glm-5.2"  # primary — Ripon's pick 2026-07-06 ($0.93/$3.00 per 1M); glm-5 rejected
     RULGPT_LLM_FALLBACKS: str = "deepseek/deepseek-v4-pro,qwen/qwen3.7-plus"  # $0.435/$0.87 and $0.32/$1.28 per 1M
     RULGPT_CLASSIFIER_LLM_MODEL: str = "z-ai/glm-4.7-flash"  # heuristic-first; LLM assist — $0.06/$0.40 per 1M
+    # Opus-grade escalation: queries the router flags as high-stakes
+    # (sanctions/TBML, 3+ domains, classifier-complex, fail-severity stacks)
+    # generate on this model instead of RULGPT_LLM_MODEL — for EVERY tier,
+    # free included; daily quotas cap worst-case free spend. ~$5/$25 per 1M.
+    RULGPT_OPUS_TIER_MODEL: str = "anthropic/claude-opus-4.8"
 
     OPENAI_API_KEY: str | None = None
     OPENROUTER_API_KEY: str | None = None

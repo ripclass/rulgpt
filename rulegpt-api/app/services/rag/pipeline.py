@@ -85,13 +85,19 @@ def select_model(
     user_tier: str,
     query: str,
     retrieved_rules: List[RetrievedRule],
+    complexity: str | None = None,
 ) -> RoutingTier:
-    """Select Claude model based on user subscription tier + query complexity.
+    """Select the generation tier from subscription tier + query signals.
 
-    Tiers:
-      free / anonymous → Haiku only
-      professional     → Haiku / Sonnet / Opus (Opus on sanctions, TBML, multi-domain)
-      enterprise       → Haiku / Sonnet / Opus (lower Opus threshold)
+    Tiers map to models in the generator: haiku/sonnet → RULGPT_LLM_MODEL
+    (GLM-5.2, budget differs), opus → RULGPT_OPUS_TIER_MODEL (Opus 4.8).
+
+    The opus escalation gate applies to EVERY subscription tier, free and
+    anonymous included: high-stakes signals (sanctions/TBML, sanctioned
+    jurisdictions, 3+ rule domains, classifier-complex questions, stacked
+    fail-severity rules) deserve the strongest model regardless of who is
+    asking — daily quotas cap the worst-case free-tier spend. Target share
+    ~10-20% of answers; measure via the stored routing_tier analytics.
     """
     import logging
     _log = logging.getLogger("rulegpt.routing")
@@ -114,11 +120,19 @@ def select_model(
     num_rules = len(retrieved_rules)
 
     # --- Signals from retrieved rules ---
+    # Count SUBJECT domains only. RulHub rows carry catalog buckets in
+    # `domain`, and meta buckets (ICC opinions, data-quality rules about a
+    # subject) are commentary on the same subject — an LC-discrepancy answer
+    # citing icc + opinions + data_quality is one domain, not three.
+    _SUBJECT_DOMAINS = {"icc", "fta", "sanctions", "customs", "bank_specific",
+                        "tbml", "incoterms"}
     domains = set()
     for rule in retrieved_rules:
-        d = getattr(rule, "domain", "") or ""
+        d = (getattr(rule, "domain", "") or "").lower()
         top = d.split(".")[0] if d else ""
-        if top and top != "other":
+        if top.startswith("icc"):
+            top = "icc"
+        if top in _SUBJECT_DOMAINS:
             domains.add(top)
     num_domains = len(domains)
 
@@ -143,11 +157,29 @@ def select_model(
     ) and len(query.split()) < 12
     is_simple_lookup = num_rules <= 2 and num_domains <= 1
 
+    # --- Universal opus-grade escalation (all tiers, free included) ---
+    needs_opus_grade = (
+        is_sanctions
+        or involves_sanctioned
+        or is_tbml
+        or num_domains >= 3
+        or complexity == "complex"
+        or (has_fail_severity and num_rules >= 5)
+    )
+    if needs_opus_grade:
+        _log.info(
+            "[ROUTING] opus escalation | tier=%s sanctions=%s tbml=%s "
+            "sanctioned_jurisdiction=%s domains=%d complexity=%s fail_sev=%s | query=%r",
+            user_tier, is_sanctions, is_tbml, involves_sanctioned,
+            num_domains, complexity, has_fail_severity, query[:80],
+        )
+        return "opus"
+
     # --- 3-tier routing ---
     tier = user_tier.strip().lower() if user_tier else "free"
 
     if tier in ("free", "anonymous"):
-        # 100% Haiku
+        # Haiku-budget tier on the primary model
         model: RoutingTier = "haiku"
 
     elif tier == "professional":
@@ -393,7 +425,10 @@ class RAGPipeline:
         # Stage 2.5: tier-based model routing (after retrieval)
         from app.config import settings as _settings
         if _settings.RULEGPT_ENABLE_SMART_ROUTING and retrieved_rules:
-            routing_tier = select_model(user_tier, query, retrieved_rules)
+            routing_tier = select_model(
+                user_tier, query, retrieved_rules,
+                complexity=classifier_output.complexity,
+            )
         else:
             routing_tier = "sonnet"
 

@@ -138,6 +138,52 @@ class TestTemplateGateRouting:
         assert select_model("free", "How do LC discrepancies work?", rules) == "haiku"
 
 
+class TestOpusEscalation:
+    """High-stakes signals escalate ANY tier — free and anonymous included —
+    to the opus tier, which the generator maps to RULGPT_OPUS_TIER_MODEL.
+    Ordinary questions stay on the cheap tiers."""
+
+    def test_sanctions_rules_escalate_free_tier(self):
+        rules = [_rule(rule_id="ofac-1", domain="sanctions"), _rule(rule_id="r2")]
+        assert select_model("free", "Can I ship machine parts to this buyer?", rules) == "opus"
+
+    def test_sanctioned_jurisdiction_escalates_anonymous(self):
+        rules = [_rule()]
+        assert select_model("anonymous", "Can I ship to Iran under this LC?", rules) == "opus"
+
+    def test_classifier_complex_escalates_free_tier(self):
+        rules = [_rule(), _rule(rule_id="r2")]
+        assert select_model("free", "How do these rules interact?", rules,
+                            complexity="complex") == "opus"
+
+    def test_three_domains_escalate_professional(self):
+        rules = [_rule(domain="icc"), _rule(rule_id="r2", domain="fta"),
+                 _rule(rule_id="r3", domain="customs")]
+        assert select_model("professional", "How do these interact?", rules) == "opus"
+
+    def test_ordinary_free_query_stays_haiku(self):
+        rules = [_rule(), _rule(rule_id="r2")]
+        assert select_model("free", "How do LC discrepancies work?", rules,
+                            complexity="simple") == "haiku"
+
+    def test_meta_catalog_buckets_do_not_count_as_domains(self):
+        """RulHub rows carry catalog buckets: icc + opinions + data_quality is
+        ONE subject, not three — must not trip the multi-domain escalation
+        (regression: live RulHub retrieval escalated every ordinary query)."""
+        rules = [_rule(domain="icc"),
+                 _rule(rule_id="r2", domain="opinions"),
+                 _rule(rule_id="r3", domain="data_quality")]
+        assert select_model("free", "How do LC discrepancies work?", rules,
+                            complexity="simple") == "haiku"
+
+    def test_template_gate_still_beats_escalation_signals(self, monkeypatch):
+        """A single-rule direct lookup is a template answer even if the rule
+        happens to carry an escalation signal — $0 beats everything."""
+        monkeypatch.setattr(settings, "RULEGPT_TEMPLATE_ENGINE_ENABLED", True)
+        rules = [_rule(domain="sanctions")]
+        assert select_model("free", "What does Article 20 say?", rules) == "template"
+
+
 class TestTemplateAnswer:
     def test_basic_template_format(self):
         """Template answer has correct structure."""

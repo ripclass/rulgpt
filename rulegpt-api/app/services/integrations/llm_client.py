@@ -67,6 +67,10 @@ class OpenRouterLLMClient:
         temperature: float = 0.2,
     ) -> LLMResult:
         models = [model or settings.RULGPT_LLM_MODEL, *settings.llm_fallback_models()]
+        # An explicit override (e.g. the opus-escalation model) still degrades
+        # through the regular primary before the cheap fallbacks.
+        if model and model != settings.RULGPT_LLM_MODEL:
+            models.insert(1, settings.RULGPT_LLM_MODEL)
         return await self._run_chain(models, prompt, system_prompt, max_tokens, temperature)
 
     async def classify(
