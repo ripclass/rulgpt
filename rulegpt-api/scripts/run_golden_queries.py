@@ -227,7 +227,7 @@ def run_query(client: httpx.Client, query_endpoint: str, query: str) -> dict:
     resp = client.post(
         query_endpoint,
         json={"query": query, "session_token": SESSION_TOKEN},
-        timeout=30.0,
+        timeout=150.0,
     )
     if resp.status_code == 429:
         print("    Rate limited — waiting 10s...")
@@ -235,7 +235,7 @@ def run_query(client: httpx.Client, query_endpoint: str, query: str) -> dict:
         resp = client.post(
             query_endpoint,
             json={"query": query, "session_token": SESSION_TOKEN},
-            timeout=30.0,
+            timeout=150.0,
         )
     resp.raise_for_status()
     return resp.json()
