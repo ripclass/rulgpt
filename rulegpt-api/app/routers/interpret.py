@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.services.rag.prose import sanitize_outbound
 from app.config import settings
 from app.database import get_db
 from app.models.query import RuleGPTQuery
@@ -52,7 +53,7 @@ Rules:
 1. Explain the message field-by-field, but ONLY the fields actually given to you below. Never invent or assume a field that was not parsed.
 2. Call out any risky or soft-clause wording explicitly and explain why it matters to a beneficiary or negotiating bank.
 3. Cite only the retrieved rules provided below. Never invent a rule, article, or paragraph reference.
-4. Write in plain, direct language a trade operations person would use. No legalese, no boilerplate, no markdown headings.
+4. Write in plain, direct language a trade operations person would use. No legalese, no boilerplate, no markdown headings. Do not use em-dashes anywhere; use commas, colons, or periods instead.
 5. End with a short section that starts with the exact line "What to watch:" followed by a short bulleted list of the top risk items in this credit.
 
 Output constraints:
@@ -137,11 +138,11 @@ async def _generate_mt700_answer(fields: list[dict], flags: list[dict], retrieve
     prompt = _build_user_prompt(fields, flags, retrieved_rules)
     try:
         first_res = await llm_client.generate_answer(prompt, MT700_SYSTEM_PROMPT, max_tokens=1200, temperature=0.2)
-        answer = (first_res.text or "").strip()
+        answer = sanitize_outbound((first_res.text or "").strip())
         if answer and answer_mentions_unknown_references(answer, retrieved_rules):
             strict_prompt = MT700_SYSTEM_PROMPT + _STRICT_CITATION_SUFFIX
             retry_res = await llm_client.generate_answer(prompt, strict_prompt, max_tokens=1200, temperature=0.2)
-            retry_answer = (retry_res.text or "").strip()
+            retry_answer = sanitize_outbound((retry_res.text or "").strip())
             if retry_answer and answer_mentions_unknown_references(retry_answer, retrieved_rules):
                 return compose_citations_only_answer("MT700 interpretation", retrieved_rules)
             return retry_answer

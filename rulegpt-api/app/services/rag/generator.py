@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 from app.services.integrations.llm_client import LLMUnavailableError, OpenRouterLLMClient
 
 from .models import ClassifierOutput, RetrievedRule
+from .prose import sanitize_outbound
 from .query_intent import (
     expected_document_families,
     extract_countries,
@@ -224,6 +225,7 @@ User tier: {user_tier}
 ## OUTPUT CONSTRAINTS
 
 - No markdown headings (##, ###) in your response — use bold text or bullets instead.
+- Do not use em-dashes anywhere; use commas, colons, or periods instead.
 - Default answer length: 150-250 words. Go longer only when multiple rule points or jurisdictions genuinely require it.
 - Never invent a rule reference. If a rule isn't in the retrieved set above, say so.
 - Every claim must cite a retrieved rule. If reasoning beyond retrieved rules, mark it explicitly as general guidance.
@@ -769,7 +771,8 @@ def answer_mentions_unknown_references(answer: str, rules: Sequence[RetrievedRul
 
 
 def normalize_generated_answer(answer: str) -> str:
-    return _tighten_answer_voice(_collapse_whitespace(_strip_followup_block(_strip_markdown(answer))))
+    cleaned = _tighten_answer_voice(_collapse_whitespace(_strip_followup_block(_strip_markdown(answer))))
+    return sanitize_outbound(cleaned)
 
 
 def _template_answer(query: str, rules: Sequence[RetrievedRule]) -> Dict[str, Any]:

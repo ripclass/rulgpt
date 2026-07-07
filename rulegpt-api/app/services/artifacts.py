@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from typing import Any, Sequence
 
+from app.services.rag.prose import sanitize_outbound
 from app.services.integrations.llm_client import LLMUnavailableError
 from app.services.rag.generator import answer_mentions_unknown_references, compose_citations_only_answer
 from app.services.rag.models import RetrievedRule
@@ -31,7 +32,7 @@ Rules:
 1. Cite only the citations provided below. Never invent a rule, article, or paragraph reference.
 2. Ground every claim in the stored question, answer, and citations given — do not introduce new facts.
 3. Keep the whole memo to 450 words or fewer.
-4. Write like a trade operations professional writing an internal case file note. No legalese, no filler, no AI-report preambles.
+4. Write like a trade operations professional writing an internal case file note. No legalese, no filler, no AI-report preambles. Do not use em-dashes anywhere; use commas, colons, or periods instead.
 5. Use the exact heading text given above, one per line, immediately followed by that section's content."""
 
 _DRAFT_DESCRIPTIONS: dict[str, str] = {
@@ -166,7 +167,7 @@ async def generate_case_note(llm_client: Any, query_text: str, answer_text: str,
     )
     return {
         "title": f"Case note: {query_text[:80]}",
-        "body_markdown": body,
+        "body_markdown": sanitize_outbound(body, markdown=True),
         "citations": list(citations),
         "degraded": degraded,
     }
@@ -183,7 +184,7 @@ async def generate_draft(
     )
     return {
         "title": f"Draft ({draft_type.replace('_', ' ').title()}): {query_text[:80]}",
-        "body_markdown": body,
+        "body_markdown": sanitize_outbound(body, markdown=True),
         "citations": list(citations),
         "draft_type": draft_type,
         "degraded": degraded,
