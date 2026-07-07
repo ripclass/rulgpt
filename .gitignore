@@ -33,3 +33,9 @@ htmlcov/
 
 # Node (handled by rulegpt-ui/.gitignore but belt-and-suspenders)
 node_modules/
+
+.vercel
+
+# Tool caches / session artifacts
+.playwright-mcp/
+supabase/.temp/

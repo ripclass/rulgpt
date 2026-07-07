@@ -1,0 +1,186 @@
+[
+  {
+    "id": "GQ-16",
+    "title": "Demand Guarantee \u2014 Extend or Pay",
+    "query": "The employer sent an 'extend or pay' demand on my performance guarantee. The guarantee is subject to URDG 758. My bank says they have to pay if I don't extend. Is that right? Can I stop the payment? The underlying contract dispute is still in arbitration.",
+    "answer": "Your bank is essentially correct, and this is one of the hardest realities of URDG 758 guarantees.\n\nThe retrieved rules for this query are SWIFT messaging standards \u2014 they don't contain the URDG 758 articles that govern \"extend or pay\" demands. So what follows is general guidance from my knowledge of URDG 758, which I'm flagging clearly as such.\n\nUnder URDG 758 (Article 23), a complying \"extend or pay\" demand is treated as a valid demand for payment. The guarantor bank must either pay or, if the applicant (you) requests an extension and the beneficiary agrees, extend the guarantee. If you don't instruct your bank to extend \u2014 and the bank can't get the beneficiary to agree to an extension \u2014 the bank is obligated to pay a complying demand. The arbitration in the underlying contract is irrelevant to the bank's obligation. URDG 758 guarantees are independent of the underlying contract by design.\n\nCan you stop the payment? In practice, your only realistic options are:\n\n- Instruct your bank to extend the guarantee (which requires the employer's agreement)\n- Obtain a court injunction \u2014 but courts set an extremely high bar for this, typically requiring clear evidence of fraud, not just a disputed contract claim\n- Pay under protest and pursue recovery through arbitration\n\nThe arbitration outcome does not pause the bank's payment obligation. That's the nature of an on-demand guarantee.\n\nWhat still depends on your transaction: the exact wording of the demand, whether it complies with the guarantee's stated demand requirements, and your jurisdiction's willingness to grant injunctive relief.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1605
+  },
+  {
+    "id": "GQ-17",
+    "title": "Standby LC vs Demand Guarantee Rules",
+    "query": "We received a standby letter of credit from a US bank that says 'subject to ISP98' in the text, but our client wants it to be governed by URDG 758. Can we have a standby subject to URDG instead of ISP98? Or do standbys always follow ISP98?",
+    "answer": "Standbys do not always follow ISP98 \u2014 the rules are clear that ISP98 only applies when the standby expressly incorporates it [ISP98 Rule 1.01]. So the governing ruleset is entirely a matter of what the instrument says. Your standby says \"subject to ISP98,\" which means ISP98 governs this one.\n\nThe short answer to your client's request: yes, a standby can be subject to URDG 758 instead of ISP98 \u2014 but not this one, not as it stands. The instrument is already issued and, critically, it's irrevocable from the moment of issuance [ISP98 Rule 1.06]. The US bank cannot simply switch the governing rules unilaterally.\n\nTo change it to URDG 758, you'd need a formal amendment \u2014 and the bank would have to agree to issue one. That's a commercial negotiation, not a compliance question. Whether the US bank is willing (or even set up operationally) to issue under URDG 758 is another matter entirely; many US banks default to ISP98 precisely because it's the standard framework for US standby practice [ISP98 Rule 1.01, US-ISP98-MODE-001].\n\nPractically speaking: if your client wants URDG 758 governance, that conversation needed to happen before issuance. At this point, your options are to accept the instrument as-is under ISP98, or go back to the applicant and request an amendment \u2014 knowing the bank may decline.\n\nWhat still depends on your transaction: whether the US bank has any appetite to amend, and whether your underlying contract with the applicant gives you leverage to insist on a different governing ruleset.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "medium",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1518
+  },
+  {
+    "id": "GQ-18",
+    "title": "Guarantee Claim Compliance",
+    "query": "We issued a demand guarantee under URDG 758. The beneficiary submitted a demand stating 'the applicant has failed to perform their obligations.' But the guarantee requires the demand to include a statement specifying 'in what respect the applicant is in breach.' Is this demand complying?",
+    "answer": "This demand is not complying, and you are right to reject it.\n\nUnder URDG 758 Article 15(a), a demand must include a statement specifying *in what respect* the applicant is in breach \u2014 not just that a breach occurred. \"The applicant has failed to perform their obligations\" is exactly the kind of bare assertion that falls short. It tells you nothing about the nature of the default: was it a missed delivery date? A failure to meet a technical specification? Abandonment of works? That specificity is required, not optional. [guarantee_ops_core_v1, Rule GOP-PERF-001]\n\nThis is reinforced by the supporting statement requirement under URDG 758 Article 15: every demand must declare both *that* the applicant has breached and *the respect in which* they have done so. That requirement is mandatory unless your guarantee expressly excludes it \u2014 silence does not waive it. [URDG758, Article 15 / Rule URDG758-15B]\n\nWhat you should do: Issue a notice of non-complying demand to the beneficiary within your examination period (5 business days under URDG 758 Article 20), clearly identifying the discrepancy \u2014 the demand fails to specify the nature of the breach as required by the guarantee terms and Article 15. The beneficiary can then re-present a corrected demand before expiry if time permits.\n\nOne important point: once a *complying* demand is received, you must honour it without seeking the applicant's consent. The guarantee is an independent undertaking. [Rule EXC-WAIVE-PROD-003]",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "medium",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1485
+  },
+  {
+    "id": "GQ-19",
+    "title": "D/P Collection \u2014 Bank Obligations",
+    "query": "I'm shipping coffee to a buyer in Germany on D/P terms. I gave my bank the documents with instructions to release them against payment. The buyer's bank says the buyer wants to inspect the coffee before paying. Can the German bank release the documents for inspection before payment?",
+    "answer": "No \u2014 the German bank cannot release the documents for inspection before payment. Full stop.\n\nUnder D/P terms, the presenting bank must only release documents to the buyer upon receipt of payment in full [URC522 Art 7(a), COP-URC-DP-001]. There is no provision for a \"release for inspection\" exception. The documents \u2014 including the bill of lading \u2014 are the security mechanism that gives you control of the goods. Once released, you lose that control entirely, regardless of the buyer's stated intention.\n\nThe buyer's request is understandable from a commercial standpoint, but it's not something the bank can accommodate under the rules you've set. Your collection instruction specified D/P terms, and the presenting bank is bound by those terms [URC522 Art 4(c), URC522-4C]. The bank has no authority to deviate from your instructions without your consent.\n\nWhat you should do: Contact your remitting bank immediately and confirm that your instructions are D/P and that no release before payment is authorised. Your bank should relay this clearly to the German bank.\n\nIf the buyer genuinely wants pre-payment inspection, that's a commercial negotiation between you and them \u2014 not something the bank can unilaterally grant. Options include agreeing to an independent inspection report before shipment, or amending the collection terms, but any change requires your explicit instruction.\n\nDon't let this one slide. Releasing documents before payment on a D/P collection is a serious breach of the collection rules.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1513
+  },
+  {
+    "id": "GQ-20",
+    "title": "eUCP Electronic Presentation",
+    "query": "Our client wants to present LC documents electronically. The LC is subject to UCP600 but doesn't mention eUCP. Can they present electronic documents anyway? What if some documents are electronic and some are paper \u2014 is a mixed presentation allowed?",
+    "answer": "The short answer: no, your client cannot present electronic documents under this LC.\n\neUCP 2.1 is a supplement to UCP 600 \u2014 it only applies when the credit itself expressly incorporates it [eUCP 2.1, Article e1]. If the LC is subject to UCP 600 only and makes no mention of eUCP, the framework for electronic presentation simply doesn't exist for that credit. The bank has no obligation \u2014 and in practice no mechanism \u2014 to accept electronic records in place of paper originals.\n\nThis applies to individual documents too. An electronic bill of lading, for example, is only valid under an LC if the credit explicitly permits electronic documents subject to eUCP [CROSSDOC-EBL-2, eUCP v2.1 e1]. Without that, the eBL won't fly.\n\nOn mixed presentations: the rules for mixed (part electronic, part paper) presentations are also an eUCP concept. A credit that allows both must specifically indicate a separate place for paper document presentation [eUCP 2.1, e6B]. Again, this only becomes relevant once eUCP is incorporated into the credit. Without it, the question of mixed presentation doesn't arise.\n\nWhat your client needs to do: Request an amendment to the LC incorporating eUCP 2.1. The issuing bank and applicant both need to agree. Until that amendment is issued and confirmed, all documents must be presented in paper form.\n\nWhat still depends on your transaction: whether the issuing bank's platform supports eUCP presentations at all \u2014 some banks do not, regardless of what the LC says.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "medium",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1492
+  },
+  {
+    "id": "GQ-21",
+    "title": "Conflicting Dates Across Documents",
+    "query": "I'm preparing documents for an LC presentation. The commercial invoice is dated March 5. The bill of lading shows on-board date March 3. The certificate of origin is dated March 8. The LC says nothing about document dating sequence. Is there any problem with these dates?",
+    "answer": "Two of your three dates are fine. The certificate of origin dated March 8 is the one to watch.\n\nThe B/L (March 3) \u2014 no issue. The B/L shows an on-board date, which is exactly what's required [ISBP745, ISBP 821 Paragraph]. That date also needs to fall on or before the LC's latest shipment date \u2014 confirm that separately, but the dating itself is clean.\n\nThe invoice (March 5) \u2014 fine. It post-dates the B/L by two days, and there's no rule in the retrieved set requiring the invoice to be dated on or before the B/L date. What matters is that it's not dated later than your presentation date [UCP600 Article 14(c)].\n\nThe certificate of origin (March 8) \u2014 this is the grey area. Under ISBP745 Paragraph A11(b), documents other than drafts, insurance documents, and transport documents can satisfy a dating requirement by showing an issuance date or by referencing another document's date. A CO dated after the B/L is common in practice \u2014 it's often issued after shipment. As long as March 8 is on or before your presentation date, there's no rule in the retrieved set that makes this a discrepancy.\n\nThe key rule across all three: no document may be dated later than the date of presentation [UCP600 Article 14(c)]. Make sure you present before or on March 8 at the earliest \u2014 or rather, that all documents are dated no later than your actual presentation date.\n\nWhat still depends on your transaction: whether the B/L date (March 3) falls within the LC's latest shipment date, and whether your LC has any specific dating requirements for the CO that could override the general position above.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "medium",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1591
+  },
+  {
+    "id": "GQ-22",
+    "title": "LC vs Suspended Local Law",
+    "query": "My LC requires a pre-shipment inspection certificate from a Nigerian inspection agent. But the Nigerian government suspended the pre-shipment inspection program (NESREA conformity assessment) last year. My buyer says 'just get any inspection certificate.' The LC still requires it. What do I do?",
+    "answer": "This is a serious situation, and \"just get any inspection certificate\" is not a safe answer \u2014 here's why.\n\nThe core problem is a conflict between what your LC requires and what's now physically possible to obtain. Under UCP 600 Article 14(a), a nominated or issuing bank examines documents to determine whether they comply strictly with the terms of the credit. If your LC specifically calls for a certificate from a Nigerian inspection agent under the NESREA conformity assessment program, a generic third-party inspection certificate from a different body does not comply \u2014 regardless of what your buyer says informally.\n\nThe retrieved rules for this query are empty, so I'm working from general UCP 600 and trade finance practice here \u2014 please treat this as guidance, not a definitive ruling.\n\nYour real options are:\n\n- Amend the LC. This is the correct path. Ask your buyer to instruct the issuing bank to amend Field 46A to accept a certificate from a named alternative inspection body (SGS, Bureau Veritas, Intertek, etc.). This is the only clean fix.\n- Do not present a substitute certificate without an amendment. If you do, the bank will almost certainly raise a discrepancy, and you lose your right to payment under the credit.\n- Document the regulatory change. If the buyer resists amending, put the Nigerian government suspension notice in writing to them. This is a force majeure-adjacent situation \u2014 but that's a legal question, not a banking one.\n\nGet the amendment. That's the answer.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 0,
+    "fallback_reasons": [
+      "no rules retrieved, sent to LLM with empty context"
+    ],
+    "answer_length": 1500
+  },
+  {
+    "id": "GQ-23",
+    "title": "User Who Is Wrong",
+    "query": "My bank is being unreasonable. They rejected my supplier's documents because the commercial invoice shows 'FOB Shanghai' but the LC says 'FOB Shanghai Port.' The word 'Port' is missing. This is obviously the same place! Isn't the bank manufacturing discrepancies to avoid paying?",
+    "answer": "Your frustration is understandable, but I have to be straight with you: the retrieved rules I have don't cover this specific scenario \u2014 \"FOB Shanghai\" vs. \"FOB Shanghai Port\" \u2014 and none of the bank-specific rules retrieved are relevant to your bank or this discrepancy type. So I can't give you a rule-grounded verdict on this particular rejection.\n\nWhat I can tell you from general trade finance knowledge (not from the retrieved rules, so treat this as guidance, not a citation):\n\n- Under UCP 600's standard of examination, banks check whether documents are consistent with each other and with the LC terms on their face. \"Shanghai\" and \"Shanghai Port\" are arguably the same place, and a reasonable examiner would likely see no conflict.\n- However, banks do have discretion in how strictly they read LC terms. Some treat any literal deviation as a discrepancy, even when the commercial reality is obvious.\n- \"Manufacturing discrepancies\" is a serious allegation. It does happen, but it's also true that strict literal examination is technically permitted under the rules \u2014 frustrating as that is.\n\nWhat you should do right now: Ask the bank to cite the specific UCP 600 article or ISBP 745 paragraph that supports this rejection. If they can't, that's a meaningful data point. You can also request a waiver from the applicant \u2014 if they're willing to waive the discrepancy, the bank must pay.\n\nWhat still depends on your transaction: which bank is involved, which country's issuing bank this is, and whether the LC has any specific port description requirements beyond the Incoterm field.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1589
+  },
+  {
+    "id": "GQ-24",
+    "title": "Pharma Cold Chain Documentation",
+    "query": "I'm exporting temperature-sensitive vaccines to Kenya under an LC. The LC requires a 'temperature monitoring certificate showing continuous cold chain maintenance between 2C and 8C.' My monitoring device recorded a spike to 9.2C for 45 minutes during transit. The vaccines are still viable according to our quality team. Will the bank refuse the certificate?",
+    "answer": "The short answer: yes, the bank will almost certainly refuse the certificate \u2014 and this is a serious discrepancy.\n\nHere's the core problem. Your LC specifically requires a certificate showing \"continuous cold chain maintenance between 2\u00b0C and 8\u00b0C.\" Your monitoring data shows a spike to 9.2\u00b0C for 45 minutes. That is a documented, recorded breach of the stated temperature range. The certificate cannot honestly state continuous maintenance within 2\u20138\u00b0C, because the data says otherwise.\n\nThe bank's job under documentary credit practice is to examine documents on their face to see whether they comply with the LC terms. If the certificate accurately reflects the data (as it must), it will show the excursion \u2014 and it won't comply with the LC requirement. If the certificate omits or misrepresents the excursion, that's a falsified document, which creates far worse problems than a discrepancy.\n\nI have to be transparent here: the retrieved rules for this query don't cover temperature certificates, pharmaceutical cold chain requirements, or the specific document compliance rules that apply here (UCP600 Article 14 and ISBP745 would normally govern this, but they weren't retrieved). What I'm telling you is grounded in general trade finance practice, not a retrieved rule \u2014 so treat it as informed guidance, not a cited ruling.\n\nWhat you should do now:\n- Contact the applicant (your Kenyan buyer) immediately and explain the situation honestly\n- Ask them to waive the discrepancy or request an LC amendment that accommodates a documented excursion with a quality team sign-off\n- Get your quality team's viability statement in writing \u2014 it won't fix the LC discrepancy, but it supports a waiver request\n\nWhat still depends on your transaction: which bank is issuing the LC in Kenya, whether the applicant is willing to waive, and whether your LC allows for presentation under reserve.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1888
+  },
+  {
+    "id": "GQ-25",
+    "title": "UAE Gold Trade Sourcing",
+    "query": "I'm importing gold bullion from Uganda to Dubai. My LC is issued by Emirates NBD. What special documentation does UAE require for precious metals imports beyond the standard LC documents? I've heard about conflict minerals requirements but I'm not sure if gold from Uganda triggers anything.",
+    "answer": "Honest answer: the rules I have access to don't cover UAE-specific precious metals import requirements, Emirates NBD's internal LC documentation requirements, or conflict minerals compliance frameworks for gold from Uganda. I can't give you grounded citations on any of those points, and I won't invent them \u2014 getting this wrong has real financial and legal consequences for you.\n\nWhat I can tell you from general trade finance knowledge (not from retrieved rules, so treat this as a starting point, not a final answer):\n\n- UAE / Dubai precious metals imports are regulated by the Dubai Multi Commodities Centre (DMCC) if you're importing into the DMCC free zone, and by UAE Customs / Central Bank rules for mainland imports. DMCC has specific responsible sourcing requirements for gold, including chain-of-custody documentation.\n- Uganda gold has historically attracted scrutiny under conflict minerals frameworks (OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected Areas). Whether your specific shipment triggers documentation requirements depends on the refinery, the supply chain, and your buyer's compliance program.\n- Emirates NBD may have internal precious metals compliance requirements beyond what the LC itself states.\n\nWhat you should do: Contact DMCC directly (dmcc.ae) for their responsible sourcing requirements, and ask Emirates NBD's trade finance desk explicitly what documentation they require for gold bullion from East Africa before you finalize the LC terms.\n\nFor full LC validation against UAE-specific rules, TRDR Hub (trdrhub.com) may be able to help.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 0,
+    "fallback_reasons": [
+      "no rules retrieved, sent to LLM with empty context"
+    ],
+    "answer_length": 1617
+  },
+  {
+    "id": "GQ-26",
+    "title": "MT700 Field Mismatch",
+    "query": "I'm examining an LC received via SWIFT MT700. Field 39A shows 'ABOUT' but Field 32B has an exact amount of USD 500,000.00 with no tolerance indicator. Field 39B is empty. Is the amount subject to the 10% 'about' tolerance or is the exact amount the limit?",
+    "answer": "The \"ABOUT\" in Field 39A does apply, and it gives you a \u00b110% tolerance on the LC amount. So your drawing can range from USD 450,000 to USD 550,000 and remain compliant. [UCP600-30A]\n\nThe exact figure in Field 32B (USD 500,000.00) is the reference amount \u2014 it's not a ceiling that overrides the \"about\" qualifier. Under UCP 600 Art 30, when \"about\" or \"approximately\" is used in relation to the LC amount, the \u00b110% band is explicitly permitted. The word \"about\" in Field 39A is precisely where that qualifier belongs in an MT700 structure, so it's doing its job correctly. [UCP600-30-DERIVED-001]\n\nThe empty Field 39B is a non-issue here. Field 39B is where a bank would state \"MAX\" or a specific maximum drawing amount to cap the tolerance \u2014 since it's blank, no additional restriction applies.\n\nOne practical note: even within the \u00b110% band, your drawing must not exceed the LC amount unless the \"about\" qualifier explicitly permits it, which here it does. [UCP600-30A] Also keep in mind the separate 5% under-drawing tolerance under Art 30(c) still applies if you ship the full quantity \u2014 meaning you could draw as low as USD 475,000 (5% under USD 500,000) even without the \"about\" qualifier, provided full quantity is shipped. [UCP600-30C]\n\nBottom line: Your permissible drawing range is USD 450,000\u2013USD 550,000.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "medium",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1315
+  },
+  {
+    "id": "GQ-27",
+    "title": "Nonsense Question \u2014 UCP600 Art 52",
+    "query": "What does UCP600 Article 52 say about electronic bills of lading?",
+    "answer": "UCP600 does not have an Article 52. The current version of UCP600 has 39 articles \u2014 Article 52 simply doesn't exist in that rulebook, so there's nothing to quote.\n\nThe rules I have retrieved don't cover electronic bills of lading under that reference either.\n\nIf you're looking for the ICC rules on electronic trade documents, the right place to look is eUCP 2.1, which supplements UCP600 specifically for electronic presentations. A reference to ICC-TA890 appears in my retrieved rules under eUCP 2.1, but the excerpt is empty, so I can't give you substantive detail from it here.\n\nFor electronic bills of lading specifically, the practical framework comes from a combination of eUCP 2.1 (which governs electronic document presentation under LCs) and the rules of the eBL platform being used \u2014 BOLERO, essDOCS, WaveBL, etc. \u2014 which the LC itself would need to expressly permit.\n\nIf you were thinking of a different article or a different rulebook, let me know what you're actually trying to resolve \u2014 whether it's eBL acceptance under an LC, on-board notation requirements, or something else \u2014 and I can point you to the right rules directly.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 4,
+    "fallback_reasons": [],
+    "answer_length": 1143
+  },
+  {
+    "id": "GQ-28",
+    "title": "Indonesia-EU EUDR Conflict",
+    "query": "I'm buying palm oil from Indonesia and reselling to the EU. Indonesia requires an export declaration through their iNaTraDe system. The EU's new EUDR (deforestation regulation) requires a due diligence statement proving the palm oil isn't from deforested land. My LC from the European buyer requires both. But my Indonesian supplier says they can't provide the EUDR statement because that's a European requirement, not Indonesian. Who's responsible for the EUDR due diligence statement?",
+    "answer": "Your supplier is technically correct that EUDR is a European regulation \u2014 but that doesn't get you off the hook, and it doesn't resolve your LC problem.\n\nHere's the reality: the EUDR due diligence obligation falls on the operator placing the commodity on the EU market \u2014 which in this chain is you (or your EU buyer), not the Indonesian exporter. The Indonesian supplier has no legal obligation under EUDR. However, you cannot complete your due diligence without traceability data from them \u2014 geolocation of production plots, land use history, etc. That data only exists at the farm/mill level in Indonesia.\n\nSo the responsibility split is:\n- Your Indonesian supplier: Must provide the underlying traceability evidence (plot coordinates, supply chain data) \u2014 this is a commercial obligation you need to build into your purchase contract, not a regulatory one on them.\n- You or your EU buyer: Responsible for compiling and submitting the actual EUDR due diligence statement to the EU Information System before placing the goods on the EU market.\n\nOn the LC side \u2014 if Field 46A requires an EUDR due diligence statement as a presented document, you must present it to get paid. The bank doesn't care who's legally responsible under EU law; it only cares whether the document is presented as required.\n\nI have to be transparent: the retrieved rules I have for this query cover EU-Japan, EU-Korea, and EU-UK origin certification \u2014 none of them address EUDR specifically. The above is general guidance based on EUDR Regulation (EU) 2023/1115. For the definitive compliance position, consult the European Commission's EUDR guidance or a trade compliance lawyer.\n\nWhat still depends on your transaction: exactly how the LC words the EUDR document requirement in Field 46A, and whether your EU buyer (as the importer of record) is taking on the due diligence filing themselves.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1868
+  },
+  {
+    "id": "GQ-29",
+    "title": "Multi-Product Crossover",
+    "query": "I have a deferred payment LC for machinery parts from Japan to Mexico. The LC amount is $1.2 million. I need to know: (1) Under UCP600, when does the issuing bank's payment obligation mature? (2) Can I forfait the deferred payment receivable? (3) What are the USMCA rules of origin implications if the machinery parts contain 30% Chinese components?",
+    "answer": "Three separate questions here \u2014 let me take them in order and be upfront about where my retrieved rules give me solid ground versus where they don't.\n\nQuestion 1 \u2014 When does the issuing bank's payment obligation mature?\n\nThe retrieved rules don't contain the specific UCP 600 article on deferred payment maturity (that's UCP 600 Art 7 and Art 14, beyond what was retrieved). As general guidance: the issuing bank's deferred payment undertaking matures on the date determined by the LC's payment terms \u2014 typically a fixed number of days after shipment date, invoice date, or BL date. The obligation crystallises once the issuing bank accepts a compliant presentation. Your LC's Field 42P will state the exact maturity formula.\n\nQuestion 2 \u2014 Can you forfait the receivable?\n\nYes, and the retrieved rules do cover this. Per [URF800-5C], to forfait a deferred payment LC receivable you need to deliver: a copy of the LC and all amendments, evidence of compliant presentation accepted by the issuing bank, and the issuing bank's undertaking to pay on the deferred payment date. The issuing bank's acceptance of your compliant presentation is effectively the asset being forfaited. Get that acceptance confirmed in writing before approaching a forfaiter.\n\nQuestion 3 \u2014 USMCA rules of origin with 30% Chinese components\n\nThe retrieved rules don't cover USMCA membership or rules of origin. I need to verify the applicable RVC thresholds and tariff classification rules for machinery parts under USMCA \u2014 the rules I have don't explicitly confirm this. Please verify with the USMCA Secretariat or a customs broker before relying on preferential treatment. Getting this wrong could mean denied preferential tariff or customs penalties at the Mexican border.\n\nWhat still depends on your transaction: the exact maturity date formula in Field 42P; whether the issuing bank has issued a formal deferred payment undertaking letter; and the HS code of your machinery parts, which drives the USMCA origin calculation.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 2000
+  },
+  {
+    "id": "GQ-30",
+    "title": "Emotional User \u2014 Lost $40K",
+    "query": "I just lost $40,000 because the bank rejected my documents over a TYPO in the beneficiary address. One letter wrong in the street name. I've been shipping to this buyer for 5 years with no problems. This is the same bank that always accepted my documents. Now suddenly they find a problem? I'm going bankrupt. Is there anything I can do? Can I sue the bank?",
+    "answer": "That's a genuinely awful situation, and I want to give you a straight answer rather than false comfort.\n\nOn the rejection itself: The retrieved rules I have don't include UCP 600 articles directly, so I'll be transparent \u2014 what follows is grounded in general trade finance knowledge, not a retrieved rule. Under UCP 600 Article 14(d), a document address doesn't need to be identical to the LC, as long as it's in the same country. A one-letter typo in a street name is widely considered a non-material discrepancy by many banks. The fact that this same bank accepted your documents for five years is relevant \u2014 it speaks to their established practice with your presentations.\n\nWhat you can actually do right now:\n\n- Request the formal discrepancy notice in writing (if you don't have it already). The bank must specify exactly what they rejected and why.\n- Ask the applicant (your buyer) to waive the discrepancy. Under standard LC practice, the applicant can instruct the issuing bank to pay despite a discrepancy. If your buyer wants the goods, this is the fastest path.\n- Escalate within the bank. Ask to speak to their trade finance supervisor. Banks do reverse decisions, especially on minor typographical issues.\n\nOn suing the bank: That's a legal question, not a trade finance rules question \u2014 I'm not able to advise on litigation. You need a trade finance lawyer, and you need one today given the amounts involved.\n\nWhat still depends on your transaction: which bank issued the LC, the exact LC terms, and whether the address appeared on all required documents or just one.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1581
+  }
+]

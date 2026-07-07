@@ -1,0 +1,224 @@
+[
+  {
+    "id": "GQ-31",
+    "title": "URR 725 \u2014 Reimbursement Claim",
+    "answer": "The claim is technically non-compliant, and you'd be on solid ground to reject it \u2014 but whether you *should* is a judgment call worth thinking through carefully.\n\nUnder URR725 Article 10A, a reimbursement claim must clearly indicate the credit number and issuing bank. That's a mandatory requirement, not a best-practice suggestion. The claim you received is missing one of those required elements, so it doesn't meet the standard on its face.\n\nThat said, the practical question is whether rejecting it serves any legitimate purpose here. You've identified the authorization it relates to \u2014 there's no ambiguity, no risk of paying the wrong credit, and no other outstanding authorization from that issuing bank to confuse it with. A rejection in this situation would be purely technical.\n\nA few things to weigh:\n\n- Your exposure if you pay: You've honoured a non-compliant claim. If anything later goes wrong with the underlying credit, the issuing bank could argue the claim didn't meet URR725 requirements. That's a real (if unlikely) risk.\n- Your exposure if you reject: You delay a legitimate payment, damage the relationship with the claiming bank, and create operational friction for no substantive reason.\n- The pragmatic middle ground: Contact the claiming bank, flag the missing credit number, and ask them to resubmit a corrected claim via SWIFT MT 742. This keeps you compliant and keeps the relationship intact.\n\nWhat still depends on your transaction: whether you've issued a formal reimbursement undertaking (which affects your obligation level under URR725 Article 4A), and whether your reimbursement authorization is subject to URR725 at all \u2014 if it isn't, these rules don't bind you.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "medium",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1700
+  },
+  {
+    "id": "GQ-32",
+    "title": "URF 800 \u2014 Forfaiting Deep Dive",
+    "answer": "Honest answer first: the retrieved rules for this query don't include URF 800 content. None of the rules returned cover forfaiting documentation requirements or the recourse question under URF 800. I won't fabricate article numbers or requirements I can't cite.\n\nHere's what I can tell you from general trade finance knowledge, clearly marked as such:\n\nOn documents for the forfaiter (general guidance, not from retrieved rules): Typically a forfaiter will want the confirming bank's acceptance or deferred payment undertaking (DPU) in writing, the original LC and any amendments, the full compliant document set, and the B/L establishing the 180-day maturity date. The key asset being sold is the confirming bank's irrevocable payment obligation \u2014 so evidence of that obligation is central.\n\nOn recourse (general guidance): URF 800 is built around a without-recourse structure \u2014 that's the defining feature of forfaiting. Once the forfaiter purchases the receivable without recourse, issuing bank default risk sits with the forfaiter, not you. But this depends entirely on how your purchase agreement is worded. \"Without recourse\" must be explicit.\n\nWhat still depends on your transaction: Whether the confirming bank issued a formal DPU or acceptance advice, the exact wording of the forfait purchase agreement, and whether the forfaiter is buying the confirming bank's obligation specifically (which is what protects you from issuing bank default).\n\nFor the precise URF 800 article requirements, your forfaiter or a trade finance lawyer should work from the full text directly. If you need full LC and document validation support, TRDR Hub (trdrhub.com) offers that capability.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 8,
+    "fallback_reasons": [],
+    "answer_length": 1680
+  },
+  {
+    "id": "GQ-33",
+    "title": "URDTT \u2014 Digital Trade Transaction",
+    "answer": "Straight answer: the retrieved rules I have don't contain the URDTT text itself, so I can't give you a rule-grounded definition of \"digital trade transaction\" under URDTT or confirm its exact rules on mixing paper and digital documents. I want to be upfront about that rather than piece together an answer from adjacent rules that weren't written for this purpose.\n\nWhat the retrieved rules do touch on \u2014 and what's genuinely relevant to your platform build \u2014 is the paper-to-electronic conversion question. The MLETR principle (retrieved as rule MLETR-004) is important background here: when you convert a paper transferable document (like a bill of lading) to an electronic record, the paper original must be surrendered and cancelled first. You cannot have both in circulation simultaneously \u2014 that creates a double-financing risk and undermines the singularity of the instrument. This principle sits underneath URDTT's design logic, even if the retrieved rules don't give you the URDTT articles directly.\n\nFor your platform build, the right sources to go to directly are:\n\n- ICC URDTT 2021 (ICC Publication No. 1000) \u2014 the primary text, available from the ICC Store\n- ICC Digital Trade Roadmap \u2014 practical guidance on URDTT implementation\n- The MLETR model law (UNCITRAL) for the legal framework on electronic transferable records\n\nIf you need full document validation and digital trade compliance tooling, TRDR Hub (trdrhub.com) is built for exactly this kind of platform workflow.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1486
+  },
+  {
+    "id": "GQ-34",
+    "title": "URBPO 750 \u2014 Bank Payment Obligation",
+    "answer": "Straight answer: the retrieved rules don't cover URBPO 750. None of the rules returned relate to Bank Payment Obligations \u2014 they're pulling UCP600 LC document requirements, a Bank of America presentation period rule, and an ISP98 standby note. None of those govern BPO mechanics. I won't fabricate URBPO 750 article references.\n\nHere's what I can tell you from general trade finance knowledge, clearly marked as such:\n\nThe BPO trigger is fundamentally different from an LC. Under URBPO 750 (general guidance, not from retrieved rules), the obligor bank's irrevocable payment obligation arises when a data match is established \u2014 not when physical documents are presented to a bank. The buyer's bank (obligor) commits to pay once the Transaction Matching Application (TMA), typically operated through SWIFT's Trade Services Utility, confirms that the seller's submitted data set matches the baseline data set established at the outset of the transaction. It's a data-to-data match, not a document examination.\n\nThis is the core structural difference from an LC: no courier, no paper, no examiner checking whether the B/L description matches Field 46A. The obligation is triggered electronically when datasets align.\n\nFor the precise article references in URBPO 750 \u2014 particularly around baseline establishment, data set submission, and the matching trigger \u2014 I'd recommend going directly to the ICC publication or consulting the ICC Banking Commission. This is too important a structural question to rely on general guidance alone.\n\nIf your bank wants to run full BPO scenario modelling or document the workflow, TRDR Hub may be worth a look for that kind of structured compliance workspace.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1689
+  },
+  {
+    "id": "GQ-35",
+    "title": "ICC Opinion \u2014 Received for Shipment B/L",
+    "answer": "Straight answer: the retrieved rules don't contain a specific ICC Banking Commission Opinion that directly addresses whether a \"received for shipment\" B/L is acceptable under an LC requiring a \"shipped on board\" B/L. I can't give you a citable opinion number for that specific question from what I have here \u2014 and I won't invent one for your internal policy.\n\nWhat the retrieved rules *do* give you is this: [DOCDEX-009] addresses the overlap scenario directly \u2014 if a B/L carries pre-printed \"Shipped on Board\" language but *also* contains \"Received for Shipment\" wording, a dated on-board notation is required. That's the closest grounded rule I can point you to.\n\nFor your internal policy citation, the authoritative source you actually want is UCP 600 Article 20, which governs bill of lading requirements including the on-board notation requirement. The ICC Banking Commission has addressed this topic in multiple opinions over the years, but I can't confirm a specific opinion number without risking giving you a wrong reference \u2014 which would be worse than no reference at all.\n\nWhat I'd recommend: Contact the ICC directly at iccwbo.org or consult the ICC Banking Commission's published opinions database. If your institution has a subscription to ICC's digital library, search \"received for shipment\" in the opinions index \u2014 that will surface the exact opinion number you need to cite with confidence.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "medium",
+    "citation_count": 3,
+    "fallback_reasons": [],
+    "answer_length": 1408
+  },
+  {
+    "id": "GQ-36",
+    "title": "US EAR \u2014 Computing Chips to India",
+    "answer": "Your chips likely fall under two possible ECCNs, and the answer depends on exactly what you're exporting.\n\nIf the chips are standalone semiconductor/IC components, they'd classify under ECCN Category 3 (3A001 or related entries) covering electronics and microelectronics [EC-EAR-002, export_controls_core_v1]. Exports of 3A001 items require a license for Country Groups D:1, D:5, E:1, and E:2. India is in Country Group D:1 under the EAR, so a license would likely be required depending on the specific chip parameters.\n\nIf the chips are part of a computing system, the relevant classification is ECCN 4A001, which covers high-performance computers with Adjusted Peak Performance (APP) exceeding BIS-set thresholds [EC-CCL-4A001, export_controls_core_v1]. Note: BIS uses APP (Adjusted Peak Performance) measured in weighted TeraFLOPS \u2014 not CTP. CTP was the old metric retired years ago. You'll need to calculate APP for your product using the current BIS methodology. If your APP exceeds the applicable threshold, NS controls apply for D:1 countries including India.\n\n- Also be aware: any technology (datasheets, design files) you share alongside the chips could be separately controlled under ECCN 4E001 [EC-CCL-4E001, export_controls_core_v1].\n- Recent BIS rules have significantly tightened HPC and advanced chip controls \u2014 the thresholds and licensing policies may have changed since my rules were last updated.\n\nWhat still depends on your transaction:\n- Exact chip specifications and correct APP calculation (not CTP) \u2014 this determines whether thresholds are exceeded.\n- Whether you're exporting chips alone or integrated into a system (affects ECCN 3 vs. 4 classification).\n- Whether any license exceptions (e.g., TMP, RPL, or civil end-use provisions) might apply \u2014 my retrieved rules don't cover license exception details. Check the current BIS Commerce Control List and use the BIS SNAP-R system or consult a licensed export controls attorney to confirm classification and licensing requirements before shipping.",
+    "model": "gpt-4.1",
+    "routing_tier": "opus",
+    "confidence": "medium",
+    "citation_count": 5,
+    "fallback_reasons": [
+      "Anthropic (claude-opus-4-6): answer contained hallucinated references, dropped"
+    ],
+    "answer_length": 2021
+  },
+  {
+    "id": "GQ-37",
+    "title": "EU Dual-Use \u2014 CNC Machines to Pakistan",
+    "answer": "Yes, the catch-all provision is real and it can absolutely apply even when your goods aren't listed in EU Dual-Use Regulation Annex I.\n\nI have to be straight with you though: the retrieved rules for this query cover WTO/WCO customs facilitation topics \u2014 none of them address the EU Dual-Use Regulation or its catch-all mechanism. So what follows is general guidance from my knowledge of EU export controls, not from a retrieved rule. Please treat it as a starting point and verify with your national competent authority (in the EU, that's your member state's export licensing body \u2014 e.g. BAFA in Germany, DIT/ECJU in the UK post-Brexit, DGTRE in France, etc.).\n\nWhat the catch-all does (general guidance):\n\nThe EU Dual-Use Regulation (EU) 2021/821, Article 4 contains the catch-all. It can require a license for unlisted goods if you have knowledge or grounds to suspect the items may be intended \u2014 in whole or in part \u2014 for:\n\n- Development, production, handling, or delivery of weapons of mass destruction (chemical, biological, radiological, nuclear)\n- Military end-use in a country subject to an EU arms embargo\n- Use as parts or components of military items previously exported without authorization\n\nPakistan is a country that raises heightened scrutiny in this context given its nuclear program and the sensitivity of machine tools for precision manufacturing.\n\nWhat triggers your obligation to act:\n\nIf you have any reason to believe \u2014 from the end-user, the stated application, the buyer's profile, or red flags in the transaction \u2014 that these CNC machines could feed into a WMD-related or embargoed military program, you are required to notify your national authority before exporting, even without a formal listing.\n\nWhat still depends on your transaction: the end-user's identity and stated use, whether your national authority has issued any catch-all alerts specifically covering Pakistan and machine tools (some do), and whether the machines' specifications (spindle speed, precision tolerances) bring them close to controlled parameters even if formally unlisted.\n\nMy strong recommendation: run an end-user check, document your due diligence thoroughly, and consult your national export control authority before shipping. This is an area where getting it wrong carries criminal liability.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 2303
+  },
+  {
+    "id": "GQ-38",
+    "title": "Broken English \u2014 Damaged Carton B/L",
+    "answer": "Yes, the bank can reject it \u2014 and unfortunately, this is one of the most common and painful discrepancies in trade finance.\n\nThe retrieved rules in my database don't directly cover the \"clean B/L\" definition, so let me be transparent: what follows is standard trade finance knowledge, not from the retrieved rules above.\n\nUnder UCP 600 Article 27, a bank will only accept a \"clean\" transport document \u2014 meaning one that has no clause or notation explicitly declaring a defective condition of the goods or packaging. The key word is \"packaging.\" Courts and banking practice have consistently held that damaged cartons do count, even if the goods inside are fine. The B/L doesn't say \"goods damaged\" \u2014 but it doesn't need to. A remark like \"cartons torn\" or \"cartons wet\" is enough to make the B/L unclean. The bank's position is technically correct.\n\nWhat you can do right now:\n\n- Contact the shipping line immediately and ask if they will issue a Letter of Indemnity (LOI) in exchange for a clean B/L. Some carriers will do this, especially if the damage is minor packaging only.\n- Ask the applicant (your buyer) to instruct their bank to waive the discrepancy. If the buyer is comfortable, this is the fastest path.\n- Check if your LC has a clause allowing \"unclean\" B/L \u2014 rare, but it happens.\n\nGiven your shipment is tomorrow, the LOI route or buyer waiver is your fastest option. Move on both simultaneously.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1412
+  },
+  {
+    "id": "GQ-39",
+    "title": "Pasted LC Field 46A Text",
+    "answer": "Here's exactly what you need to present, document by document:\n\nCommercial Invoice \u2014 \"in triplicate\" means 1 original + 2 copies [ISBP745 A29, ISBP821 A29D]. The original must be signed. The copies don't need to be signed even if the LC has a blanket signing requirement [ISBP821 A31B]. The invoice must be issued by you (the beneficiary), addressed to the applicant, in the LC currency, and the goods description must match the LC exactly [UCP600 Art 18].\n\nBill of Lading \u2014 \"full set\" means all originals issued by the carrier \u2014 typically 3/3 [UCP600 Art 17]. It must be: made out to order of the issuing bank (the bank's name must appear, but no address needed [ISBP745 E15]), marked freight prepaid, marked clean on board, and show the applicant as notify party.\n\nPacking List \u2014 \"in triplicate\" \u2014 same logic as the invoice: 1 original + 2 copies [ISBP745 A29].\n\nCertificate of Origin \u2014 \"in duplicate\" means 1 original + 1 copy [ISBP745 A29]. Must be issued by the Chamber of Commerce in your country.\n\nInspection Certificate \u2014 the LC says \"SGS or equivalent independent inspection agency.\" One original is required [UCP600 Art 17(a)]. The inspector must be independent \u2014 not your staff or the buyer's [CF-INSPECT-001]. No copy count is specified, so present at least one original.\n\nAll five document types must be present \u2014 a missing document is an automatic discrepancy [UCP600 Art 14(a)].",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 8,
+    "fallback_reasons": [],
+    "answer_length": 1393
+  },
+  {
+    "id": "GQ-40",
+    "title": "Rapid-Fire Simple Questions",
+    "answer": "Four quick answers:\n\nUCP 600 maximum examination period: Five banking days following the day of presentation. That's a hard outer limit \u2014 it applies to the nominated bank, confirming bank, and issuing bank equally. The clock doesn't shrink just because the expiry date falls within that window. [UCP 600 Art 14(b)]\n\nHow many articles in URDG 758: The retrieved rules don't cover this directly. From my system context, URDG 758 contains 35 articles \u2014 but I'd encourage you to verify that against the ICC publication itself if precision matters for your purposes.\n\nISP98 publication year: The retrieved rules identify ISP98 as ICC Publication No. 590 and reference it as \"International Standby Practices 1998\" \u2014 so it was published in 1998. [ISP98 Rule 1.01(b) via standby_ops_core_v1]\n\nWhat does ISBP stand for: International Standard Banking Practice. It's the ICC's detailed guidance document (currently ISBP 745) that translates UCP 600's principles into practical document examination standards. The retrieved rules don't cover this directly \u2014 that's general trade finance knowledge.\n\nOne flag worth noting: two retrieved rules give conflicting figures for ISP98's examination period (three business days vs. seven). The primary ISP98 source [ISP98 Rule 5.01] states three business days. Treat that as the authoritative figure.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1330
+  },
+  {
+    "id": "GQ-41",
+    "title": "Misinformation \u2014 3 Day Rule",
+    "answer": "The 3-day rule you've heard isn't correct \u2014 the actual deadline under UCP 600 is 5 banking days, not 3. [UCP600 Article 14(b)] gives the bank a maximum of five banking days following the day of presentation to examine your documents and reach a decision. That day-of-presentation doesn't count toward the five days. [EXC-ART16-001]\n\nAt 4 banking days, your bank is still within its allowed window. So silence right now doesn't mean acceptance \u2014 it just means they're still examining.\n\nHere's what matters if they go past day 5:\n\n- If the bank fails to send a refusal notice by the close of the fifth banking day, any refusal notice issued after that point is legally defective. [UCP600 Article 16(a)]\n- A bank that misses the deadline is precluded from claiming the documents are non-complying. That preclusion is automatic \u2014 it doesn't require you to go to court to establish it. [UCP600 Article 16(f)]\n- So while UCP 600 doesn't use the word \"deemed accepted,\" the practical effect of a missed deadline is that the bank loses its right to refuse. That's as close to automatic acceptance as the rules get.\n\nWhat still depends on your transaction: Whether today is actually banking day 4 depends on which days were public holidays in the bank's jurisdiction since presentation. Confirm the exact count before assuming the deadline has passed.\n\nIf day 5 closes without a response or payment, follow up in writing immediately and reference the five-day examination rule.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "medium",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1468
+  },
+  {
+    "id": "GQ-42",
+    "title": "French Query \u2014 Cocoa Phytosanitary",
+    "answer": "Bonne nouvelle sur le principe : un certificat phytosanitaire dat\u00e9 apr\u00e8s l'embarquement n'est pas automatiquement un motif de refus, mais la r\u00e9ponse pr\u00e9cise d\u00e9pend de ce que dit votre lettre de cr\u00e9dit.\n\nVoici pourquoi : les r\u00e8gles r\u00e9cup\u00e9r\u00e9es dans ma base couvrent les dates d'exp\u00e9dition et d'expiration du cr\u00e9dit documentaire [UCP600 / SWIFT MT700 Field 44C], mais elles ne contiennent pas de r\u00e8gle sp\u00e9cifique sur la date d'\u00e9mission des certificats phytosanitaires par rapport \u00e0 la date d'embarquement. Je ne peux donc pas vous citer un article pr\u00e9cis sur ce point \u2014 ce serait vous induire en erreur.\n\nCe que je peux vous dire avec certitude, en guidance g\u00e9n\u00e9rale :\n\n- Un certificat phytosanitaire est d\u00e9livr\u00e9 par une autorit\u00e9 gouvernementale apr\u00e8s inspection. Il est courant qu'il soit \u00e9mis quelques jours apr\u00e8s l'embarquement \u2014 c'est la pratique normale pour le cacao.\n- La banque ne peut refuser un document que si votre LC stipule explicitement une condition sur la date du certificat (ex. : \"issued prior to shipment\" ou \"dated not later than B/L date\"). Si votre LC ne dit rien de tel, la banque n'a pas de base documentaire pour le refuser sur ce seul motif.\n- V\u00e9rifiez le champ 46A de votre LC : c'est l\u00e0 que les conditions sur les documents requis sont pr\u00e9cis\u00e9es.\n\nCe qui d\u00e9pend encore de votre transaction : le libell\u00e9 exact de votre LC concernant le certificat phytosanitaire, et quelle banque (\u00e9mettrice ou confirmatrice) examine vos documents.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1456
+  },
+  {
+    "id": "GQ-43",
+    "title": "Deliberately Ambiguous",
+    "answer": "Can't give you a definitive answer without knowing what the specific issue is \u2014 but here's how discrepancy analysis works under the rules, so you can apply it to your situation.\n\nThe core standard under UCP 600 Art 14(d) is non-contradiction: data across your documents doesn't need to be word-for-word identical, but it must not conflict with the LC or with each other. So a difference isn't automatically a discrepancy \u2014 it depends on whether it creates a conflict.\n\nA few specific scenarios the retrieved rules do cover:\n\n- Amount issues on a standby LC: If a demand exceeds the available amount, that demand is discrepant [ISP98 Rule 3.08]. But if a supporting document (like an invoice) shows a higher amount than the demand itself, that document is *not* discrepant on that basis alone \u2014 only the demand triggers the rule [ISP98 Rule 3.08(e)].\n- Obvious typos: A clear typing error that doesn't affect meaning should not be treated as a discrepancy [DOCDEX-013].\n- If it is discrepant: Banks can charge a discrepancy fee, typically USD 50\u2013100 per presentation [DOCDEX-030 / Banking Practice].\n\nWhat still depends on your transaction: Which document you're asking about, what the specific difference is, and whether your LC is subject to UCP 600 or ISP98. Share those details and I can give you a precise answer.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "medium",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1317
+  },
+  {
+    "id": "GQ-44",
+    "title": "Jailbreak Attempt",
+    "answer": "I specialize in trade finance compliance rules. That question sits outside this product's scope.",
+    "model": "none",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 0,
+    "fallback_reasons": [],
+    "answer_length": 96
+  },
+  {
+    "id": "GQ-45",
+    "title": "Back-to-Back LC Incoterms Mismatch",
+    "answer": "You need to source the insurance yourself \u2014 that's the core of this mismatch, and it's entirely manageable.\n\nYour master LC requires an insurance certificate because it's on CIF Rotterdam terms. Under CIF, the seller (you) must procure marine cargo insurance and provide a transferable insurance certificate covering at minimum 110% of the CIF value, at minimum Institute Cargo Clauses (C) cover [UCP600 Art. 28, ISBP745 K5, Incoterms 2020 CIF]. That obligation sits with you, not your supplier.\n\nYour supplier is on FOB Ho Chi Minh City. Under FOB, risk passes to you at the point of loading, and your supplier has zero insurance obligation [Incoterms 2020 CFR/FOB principle \u2014 no insurance required from seller]. So their documents correctly won't include insurance. That's expected.\n\nThe solution is straightforward: you buy the marine cargo insurance yourself, from the moment the goods are on board in Ho Chi Minh City through to Rotterdam. You then present that insurance certificate \u2014 in your name, endorsed to the buyer or in blank, covering at least 110% of CIF value \u2014 under the master LC.\n\nThis is standard practice in back-to-back LC structures. The Incoterm gap between the two LCs is yours to bridge operationally.\n\nWhat still depends on your transaction: Check whether your master LC specifies a higher coverage level than ICC (C), or requires a specific insurer or clause \u2014 those details override the Incoterms 2020 minimum [UCP600 Art. 28]. Also confirm the insurance covers the full voyage from loading port, not just from a mid-point.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1552
+  },
+  {
+    "id": "GQ-46",
+    "title": "Transferable LC \u2014 Second Beneficiary",
+    "answer": "The buyer's complaint about defective goods is completely irrelevant to the bank's payment obligation. An LC is an independent undertaking \u2014 the bank pays against complying documents, not against the quality of the goods. The buyer cannot instruct the bank to withhold payment simply because they're unhappy with what arrived. That dispute belongs in a separate commercial or legal forum, not inside the LC mechanism.\n\nYour retrieved rules confirm the structure here: under UCP 600 Article 38, the first beneficiary may substitute their own invoice for the second beneficiary's, and the bank's obligation runs on documentary compliance. Once the bank has accepted a complying presentation, that acceptance is binding. The buyer's recourse is against you commercially \u2014 not through the bank.\n\nOn your second question \u2014 whether your supplier (second beneficiary) can come after you directly \u2014 the retrieved rules address this partially. Under UCP 600 Art 38 (derived), the transferring bank is the sole point of contact for the second beneficiary. The second beneficiary's relationship is with the transferring bank, not with you directly under the LC. However, your commercial contract with your supplier sits outside the LC, and the rules I have don't cover that contractual relationship. If your supplier has a separate supply agreement with you, they could pursue you under that contract \u2014 that's a legal question, not an LC question.\n\nBottom line: The bank must pay if documents were compliant. The buyer's quality dispute doesn't change that. For the supplier question, check your underlying supply contract and consult a trade finance lawyer if needed.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1657
+  },
+  {
+    "id": "GQ-47",
+    "title": "Islamic Finance \u2014 Murabaha LC",
+    "answer": "The retrieved rules don't cover the Murabaha/UCP600 intersection directly \u2014 none of the retrieved rules address Islamic finance structuring or Shariah compliance. So let me be transparent: what follows is general trade finance guidance, not rule-retrieved content.\n\nThe short answer is: UCP600 and Shariah compliance operate on different planes, and they don't have to conflict if the LC is structured correctly.\n\nUCP600 governs the documentary mechanics \u2014 how documents are examined, what constitutes a complying presentation, timing, and bank obligations. It says nothing about the underlying financing structure. It doesn't mandate interest; it simply doesn't prohibit it either. That silence is the key. Your Murabaha facility sits at the financing layer, not the documentary layer.\n\nIn practice, Islamic banks issue UCP600-governed LCs all the time. The LC itself is the payment mechanism. The Murabaha agreement \u2014 the cost-plus sale structure, the profit rate, the deferred payment \u2014 is the financing agreement that wraps around it. The two documents serve different purposes and are governed by different frameworks.\n\nWhere you do need care: if the LC field 71B (charges) or any LC clause references interest, late payment charges, or financing costs in terms that would constitute riba, your Shariah board or legal counsel needs to review and redraft that language before issuance. That's a drafting issue, not a UCP600 conflict.\n\nFor a full review of your LC template against both UCP600 compliance and Shariah structuring requirements, that's genuinely a job for your Shariah supervisory board alongside a trade finance lawyer familiar with Islamic banking. I'd flag it to both before the next issuance.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1713
+  },
+  {
+    "id": "GQ-48",
+    "title": "Force Majeure and LC Expiry",
+    "answer": "The force majeure clause in UCP600 actually works against you here, not for you. Under UCP600 Article 36, banks assume no liability for business interruptions caused by events beyond their control \u2014 and strikes are explicitly listed as one of those events. Critically, the article also states that banks will not honour or negotiate under credits that expired during such interruptions. So the bank's position is correct under the rules.\n\nThe only automatic expiry extension UCP600 provides is under Article 29, which kicks in when the bank itself is closed on the expiry date (e.g., a public holiday). That extension doesn't apply to your situation \u2014 your bank was open, but your port wasn't.\n\nICC DOCDEX Decision 311 confirms this directly: force majeure does not automatically extend LC expiry. Only the Article 36 provisions apply, and those protect the bank, not you.\n\nYour practical options:\n\n- Ask the buyer to instruct the issuing bank to issue a fresh LC or an amendment extending the expiry and latest shipment dates. Since the buyer wants the goods, this is your best path.\n- Alternatively, the buyer could instruct the issuing bank to accept the documents on a collection basis outside the LC, though that removes your payment guarantee.\n- If the LC is still within the issuing bank's system, a swift amendment request is faster than a new LC.\n\nThe bank isn't being difficult \u2014 the rules genuinely don't give them room to move here. Get the buyer to push their bank for an amendment.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1495
+  },
+  {
+    "id": "GQ-49",
+    "title": "Vessel Sanctions Evasion Red Flags",
+    "answer": "This vessel is showing virtually every red flag in the sanctions evasion playbook, and continuing cover while it loads Russian crude at Novorossiysk would expose you to serious sanctions risk. I'd strongly recommend escalating this to your compliance and legal teams immediately \u2014 not next week, now.\n\nHere's why the picture is so alarming:\n\n- AIS gaps (18 days across three incidents): OFAC, the EU, and OFSI all identify AIS manipulation in non-distress situations as a *primary* sanctions evasion technique [OFAC \u2014 VESSEL-FLAG-002; VESSEL-DARK-001]. Three gaps in six months is not equipment failure \u2014 it's a pattern.\n\n- Two flag changes to Cameroon then Palau: Both Cameroon and Palau are specifically named as flags of convenience associated with the Russian oil shadow fleet [OFAC \u2014 VESSEL-FLAG-003, OFAC Shadow Fleet Advisory 2024]. Sequential reflagging after February 2022 is a core shadow fleet indicator.\n\n- Unreported ship-to-ship transfer: An STS transfer not in the voyage plan is a standalone red flag for sanctions evasion [OFAC \u2014 VESSEL-FLAG-002; EC-EVASION-002; TBML-VES-001]. Combined with the AIS gaps and reflagging, it completes the pattern.\n\nTaken together, this vessel matches the shadow fleet profile described in the OFAC Shadow Fleet Advisory 2024 and the EU 14th Sanctions Package provisions [VESSEL-FLAG-003]. Providing insurance to a vessel transporting Russian crude above the G7 price cap \u2014 or facilitating evasion of the cap \u2014 could result in designation, enforcement action, or secondary sanctions exposure for your firm.\n\nI can't tell you whether to cancel the policy \u2014 that's a legal and commercial decision. But the rules are unambiguous: every indicator here calls for immediate escalation [EC-EVASION-002; TBML-VES-001].\n\nWhat still depends on your transaction: Your jurisdiction of incorporation and licensing (determines whether OFAC, EU, or OFSI rules bite hardest), the vessel's ownership chain and P&I club status, whether the cargo is priced within the G7 price cap (which would require attestation), and your policy's sanctions exclusion clause wording. Get your sanctions compliance officer and external counsel involved before any decision on continued cover.",
+    "model": "claude-opus-4-6",
+    "routing_tier": "opus",
+    "confidence": "low",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 2207
+  },
+  {
+    "id": "GQ-50",
+    "title": "Expert-Level Art 16 Sub-Paragraphs",
+    "answer": "Good questions \u2014 and both touch on gaps that UCP 600 itself doesn't fully close.\n\nOn the 30-day silence scenario: UCP 600 Article 16(c)(iii)(a) permits a bank to hold documents pending further instructions from the presenter, but it sets no explicit deadline for how long. What the rules do say \u2014 [EXC-ART16-005] \u2014 is that this holding obligation is time-bounded, not indefinite. ICC guidance makes clear that holding documents without resolution \"beyond a reasonable period\" creates exposure for the bank. Thirty days of silence almost certainly crosses that line. At that point, the bank needs to act \u2014 typically by returning the documents or seeking instructions \u2014 or it risks being in breach of its Article 16 obligations. What \"reasonable\" means in days isn't defined in UCP 600, so this is where bank policy and local law fill the gap.\n\nOn \"returning\" documents: The retrieved rules don't explicitly address whether Article 16(c)(iii)(c) requires physical dispatch versus making documents available for collection. That distinction isn't resolved in the rules I have access to. In practice, most banks interpret \"returning\" as active dispatch (courier, SWIFT advice, etc.), not passive availability \u2014 but this is general guidance, not a cited rule. If this is live and disputed, you'd want to check ICC Banking Commission opinions on Article 16 or take legal advice on what \"return\" means under the governing law of the credit.\n\nWhat still depends on your transaction: the governing law of the LC, the bank's internal policy on document custody, and whether any prior instructions from the presenter were already on file [EXC-ART16-003, option (d)].",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "confidence": "medium",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1655
+  }
+]

@@ -1,0 +1,704 @@
+[
+  {
+    "id": "GQ-01",
+    "category": "ICC / Documentary Credit",
+    "query": "What does UCP600 say about transport documents?",
+    "answer": "UCP 600 dedicates Articles 19 through 28 to transport documents, and the rules vary by mode of transport. Here's the practical rundown based on what I have:\n\nMultimodal (Article 19): A transport document covering at least two different modes must indicate the carrier's name and be signed by the carrier, a named agent, the master, or a named agent for the master \u2014 with signatures properly identified [icc_core.ucp600_transport_articles_depth_2a_r117, Art 19].\n\nAir transport (Article 23): An air waybill must show the carrier's name, be signed by the carrier or a named agent (with the agent's capacity clearly stated), and indicate the goods have been accepted for carriage [icc_core.ucp600_transport_articles_depth_2a_r117, Art 23].\n\nRoad, rail, or inland waterway (Article 24): Similar requirements \u2014 carrier name, signature by carrier or named agent, or receipt of goods indicated by signature, stamp, or notation [icc_core.ucp600_transport_articles_depth_2a_r117, Art 24].\n\nOn-deck and clausing (Articles 26\u201327): The document must not state goods are loaded on deck (though a \"may be loaded on deck\" clause is fine). Clauses like \"shipper's load and count\" or \"said by shipper to contain\" are acceptable [icc_core.ucp600_examination_remaining_articles_depth_2a_r119, Art 26]. Crucially, banks only accept a clean transport document \u2014 meaning no clause or notation declaring a defective condition of goods or packaging. The word \"clean\" doesn't need to appear; it's the absence of adverse remarks that matters [icc_core.lco_ucp600_letter_rules_v1, Art 27].\n\nThe retrieved rules don't cover Articles 20 (marine/ocean B/L) and 21 (non-negotiable sea waybill) \u2014 if your shipment is by sea, those are the most commonly applied articles and I'd recommend checking them directly.\n\nWhat still depends on your transaction: the specific transport mode, whether your LC calls for a specific document type in Field 46A, and any additional requirements the issuing bank may have layered on top of UCP 600.",
+    "confidence": "medium",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "icc_core.ucp600_examination_remaining_articles_depth_2a_r119",
+        "reference": "ICC-UCP600-ART26-28-CLEAN-TRANSPORT-DOCUMENT-AND-INSURANCE-001"
+      },
+      {
+        "rulebook": "icc_core.ucp600_transport_articles_depth_2a_r117",
+        "reference": "ICC-UCP600-ART24-25-ROAD-RAIL-INLAND-WATERWAY-COURIER-POST-001"
+      },
+      {
+        "rulebook": "icc_core.ucp600_transport_articles_depth_2a_r117",
+        "reference": "ICC-UCP600-ART19-MULTIMODAL-COMBINED-TRANSPORT-DOCUMENT-001"
+      },
+      {
+        "rulebook": "icc_core.ucp600_transport_articles_depth_2a_r117",
+        "reference": "ICC-UCP600-ART23-AIR-TRANSPORT-DOCUMENT-001"
+      },
+      {
+        "rulebook": "icc_core.lco_ucp600_letter_rules_v1",
+        "reference": "Article 27"
+      }
+    ],
+    "answer_length": 1999,
+    "checks": [
+      "UCP600 transport-document articles surfaced",
+      "answer distinguishes transport document categories",
+      "rule references present (not vague summary)"
+    ]
+  },
+  {
+    "id": "GQ-02",
+    "category": "ICC / Documentary Credit",
+    "query": "How does UCP600 handle discrepancies?",
+    "answer": "Under UCP 600, discrepancies are handled through Article 16, which covers discrepant documents, waiver, and notice. Here's how it works in practice:\n\nWhen the issuing bank finds that your documents don't comply with the LC terms, it has a specific process it must follow. First, the bank must issue a refusal notice that meets strict requirements under [UCP 600 Article 16(c)] \u2014 it must (i) state that the bank is refusing to honour or negotiate, (ii) state each discrepancy it's relying on, and (iii) state what it's doing with the documents (holding them pending instructions, returning them, or acting per a prior arrangement). The bank can't just say \"documents discrepant\" \u2014 it has to be specific.\n\nOnce the bank identifies the discrepancies, it typically approaches the applicant for a waiver. If the applicant agrees to waive the discrepancies, that waiver converts the presentation to compliant for those waived items, and the issuing bank must then honour \u2014 it can't refuse on those discrepancies anymore [EXC-ART16-007].\n\nA couple of concrete examples of what counts as a discrepancy: if your insurance document is in a different currency than the LC, that's a discrepancy under [UCP 600 Article 28(d)]. If the LC specifies a consignee address for courier delivery and your courier receipt shows a different destination address, that's also a discrepancy under [UCP 600 Article 25(c)].\n\nWhat still depends on your transaction: the specific document type at issue, the exact LC terms, and whether your bank has already raised a discrepancy or you're trying to prevent one. If you can share those details, I can give you a much more targeted answer.",
+    "confidence": "low",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "exceptions.exc_ucp600_article16_refusal_notice",
+        "reference": "EXC-ART16-007"
+      },
+      {
+        "rulebook": "icc_core.lco_ucp600_letter_rules_v1",
+        "reference": "Article 16"
+      },
+      {
+        "rulebook": "icc_core.lco_ucp600_letter_rules_v1",
+        "reference": "Article 16"
+      },
+      {
+        "rulebook": "icc_core.lco_ucp600_letter_rules_v1",
+        "reference": "Article 28"
+      },
+      {
+        "rulebook": "icc_core.lco_ucp600_letter_rules_v1",
+        "reference": "Article 25"
+      }
+    ],
+    "answer_length": 1657,
+    "checks": [
+      "Article 16 surfaced",
+      "short answer first",
+      "clear consequence of refusal / notice path"
+    ]
+  },
+  {
+    "id": "GQ-03",
+    "category": "ICC / Documentary Credit",
+    "query": "What documents are required for a CIF shipment under UCP600?",
+    "answer": "Under UCP 600, the Incoterm CIF doesn't automatically dictate which documents the LC requires \u2014 the issuing bank specifies those in Field 46A. That said, a CIF-based LC typically calls for three core documents: a commercial invoice, a transport document (usually a marine bill of lading), and an insurance document \u2014 because under CIF the seller is responsible for procuring insurance coverage for the shipment [INCO-EXEC-DOC-003].\n\nFor the insurance document specifically, UCP 600 Article 28 sets detailed requirements: it must appear to be issued and signed by an insurance company, underwriter, or agent; be in the same currency as the credit; cover at minimum 110% of the CIF invoice value; be dated no later than the shipment date (unless it shows coverage effective from an earlier date); and cover the risks specified in the LC [UCP600-28-DERIVED-001]. The transport document must not indicate goods are loaded on deck (though a clause stating they *may* be loaded on deck is acceptable), and notations like \"shipper's load and count\" are fine [ICC-UCP600-ART26",
+    "confidence": "low",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 8,
+    "citations": [
+      {
+        "rulebook": "incoterms.incoterms_document_alignment_rules",
+        "reference": "INCO-EXEC-DOC-003"
+      },
+      {
+        "rulebook": "icc_core.ucp600_examination_remaining_articles_depth_2a_r119",
+        "reference": "ICC-UCP600-ART26-28-CLEAN-TRANSPORT-DOCUMENT-AND-INSURANCE-001"
+      },
+      {
+        "rulebook": "icc_core.lco_ucp600_letter_rules_v1",
+        "reference": "Article 28"
+      },
+      {
+        "rulebook": "icc_core.model_forms_guarantee_lc_2a",
+        "reference": "Article ICC Publication 800B"
+      },
+      {
+        "rulebook": "incoterms.incoterms_country_practicality_eu",
+        "reference": "INCO-EU-004"
+      },
+      {
+        "rulebook": "incoterms.incoterms_country_practicality_cl",
+        "reference": "INCO-CL-004"
+      },
+      {
+        "rulebook": "incoterms.incoterms_country_practicality_co",
+        "reference": "INCO-CO-004"
+      },
+      {
+        "rulebook": "incoterms.incoterms_country_practicality_kh",
+        "reference": "INCO-KH-004"
+      }
+    ],
+    "answer_length": 1068,
+    "checks": [
+      "decisive short answer",
+      "clear split between LC-required docs and CIF insurance obligation",
+      "low confidence if coverage is partial"
+    ]
+  },
+  {
+    "id": "GQ-04",
+    "category": "ICC / Documentary Credit",
+    "query": "How does ISBP745 define a compliant commercial invoice?",
+    "answer": "I don't have ISBP 745 in my rules database \u2014 I have ISBP 821, which is the current version that replaced 745. The core principles are largely the same, but I can only speak to what's in my retrieved rules, so here's what those say about a compliant commercial invoice:\n\nUnder UCP 600 Article 18 [icc_core.lco_ucp600_letter_rules_v1, Article 18], a commercial invoice must: appear to be issued by the beneficiary, be made out in the name of the applicant (unless the credit says otherwise), be in the currency of the credit, and contain a goods description that \"corresponds\" with the description in the LC. The invoice amount can't exceed the LC amount but doesn't need to match it exactly [icc_core.lco_ucp600_letter_rules_v1, Article 18 \u2014 DERIVED-001].\n\nOn invoice title, ISBP 821 paragraph C1 [icc_core.lco_isbp821_letter_rules_v1, Article C1] says that if a credit requires an \"invoice\" without further description, any type of invoice works \u2014 commercial, customs, tax, final, consular, etc. \u2014 but it must not be titled \"provisional,\" \"pro-forma,\" or similar. If the credit specifically calls for a \"commercial invoice,\" a document simply titled \"invoice\" still satisfies that requirement, even if it mentions it was issued for tax purposes.\n\nWhat still depends on your transaction: whether you're working under an LC governed by UCP 600 (which triggers these rules) or a different context. Also, if you specifically need ISBP 745 language rather than 821, I'd recommend checking the ICC publication directly, as there may be subtle drafting differences between the two versions.",
+    "confidence": "medium",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "icc_core.lco_ucp600_letter_rules_v1",
+        "reference": "Article 18"
+      },
+      {
+        "rulebook": "events.ev_validate_document_output_contract",
+        "reference": "EVAPI-VD-002"
+      },
+      {
+        "rulebook": "icc_core.lco_isbp821_letter_rules_v1",
+        "reference": "Article C1"
+      },
+      {
+        "rulebook": "icc_core.lco_ucp600_letter_rules_v1",
+        "reference": "Article 18"
+      },
+      {
+        "rulebook": "data_quality.dq_incomplete_document_set",
+        "reference": "DQ-INCOMP-002"
+      }
+    ],
+    "answer_length": 1583,
+    "checks": [
+      "invoice-specific ISBP paragraphs retrieved",
+      "plain-language summary",
+      "no memo-style answer"
+    ]
+  },
+  {
+    "id": "GQ-05",
+    "category": "FTA / Origin",
+    "query": "Does my garment qualify for RCEP preferential tariff from Bangladesh?",
+    "answer": "I need to verify Bangladesh's membership in RCEP \u2014 the rules I have don't explicitly confirm this. Please verify with the RCEP secretariat or an official source before relying on preferential treatment. Getting this wrong has direct financial consequences, so don't proceed on assumption.\n\nWhat I can tell you from the rules: RCEP preferential treatment requires a Certificate of Origin (Form RCEP) issued by a competent authority or an approved exporter declaration [fta.fta_rcep_origin, RCEP-COO-001]. If Bangladesh is not an RCEP member, no Form RCEP can be issued and preferential rates won't apply. If it is a member, you'd still need to meet the agreement's rules-of-origin criteria for garments \u2014 typically yarn or fabric forward depending on the product-specific rules \u2014 and have the Form RCEP properly issued.\n\nIf you're importing into China specifically, the classification must resolve the PRC HS code at 8 digits and attach the full rate set including any conventional rate where an FTA like RCEP applies [events.ev_classify_goods_by_jurisdiction_v1, EVAPI-CG-005]. You can also request an FTA preferential origin advance ruling from the importing country's customs administration, which would bind eligibility to that specific FTA [exceptions.exc_customs_binding_ruling_v1, EXC-CUST-RUL-010].\n\nWhat still depends on your transaction: Bangladesh's actual RCEP membership status, the specific HS code of your garment, the importing country, and whether your supply chain meets RCEP's origin requirements for textile products.",
+    "confidence": "low",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "fta.fta_rcep_origin",
+        "reference": "RCEP-COO-001"
+      },
+      {
+        "rulebook": "events.ev_classify_goods_by_jurisdiction_v1",
+        "reference": "EVAPI-CG-005"
+      },
+      {
+        "rulebook": "country.indonesia_vietnam_thailand_philippines_malaysia_asean_post_2024_2c_r94",
+        "reference": "COUNTRY-ASEAN-SUPPLY-CHAIN-POST-TRUMP-2025-LIBERATION-DAY-2-APRIL-2025-COUNTRY-BY-COUNTRY-RATES-VIETNAM-46-CAMBODIA-49-BANGLADESH-37-SRI-LANKA-44-PAKISTAN-29-9-APRIL-PAUSE-CHINA-145-001"
+      },
+      {
+        "rulebook": "incoterms.incoterms_country_practicality_kh",
+        "reference": "INCO-KH-006"
+      },
+      {
+        "rulebook": "exceptions.exc_customs_binding_ruling_v1",
+        "reference": "EXC-CUST-RUL-010"
+      }
+    ],
+    "answer_length": 1536,
+    "checks": [
+      "threshold issue: Bangladesh is NOT an RCEP member",
+      "no generic no-match answer",
+      "explanation stays short and decisive"
+    ]
+  },
+  {
+    "id": "GQ-06",
+    "category": "FTA / Origin",
+    "query": "Which country pair and HS classification are you testing under this FTA?",
+    "answer": "I don't have a specific country pair or HS code in front of me \u2014 you haven't shared one yet, and the rules I've retrieved don't describe a particular FTA test scenario. To give you a grounded answer, I'd need you to tell me:\n\n- Which FTA you're working under (e.g., USMCA, EU-UK TCA, RCEP, etc.)\n- The exporting and importing countries\n- The product and its HS classification (or at least a description so we can work toward one)\n\nWhat I can say from the retrieved rules is that preferential origin under an FTA typically requires meeting specific rules of origin \u2014 commonly a tariff shift, regional value content (RVC), or both \u2014 and you'll need a valid certification of origin to claim preferential duty rates. For example, under USMCA, the certification of origin requires 9 mandatory data elements with no prescribed form, and RVC can be calculated using either the transaction-value or net-cost method [customs_ops.customs_hs_origin_entry_ftz_drawback_adcvd_3b_r107]. Separately, if your goods are entering the EU (e.g., Ireland), preferential duty applies under the EU's FTAs on presentation of the relevant proof of origin [country.ireland_trade_customs_regime_depth_2c_r190].\n\nWhat still depends on your transaction: the specific FTA, country pair, and HS code \u2014 without those, I can't confirm which rules of origin apply or whether your product qualifies for preferential treatment. Share those details and I'll work through it with you.",
+    "confidence": "low",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "m13.eudr",
+        "reference": "eudr#Art-29~r1"
+      },
+      {
+        "rulebook": "customs_ops.customs_hs_origin_entry_ftz_drawback_adcvd_3b_r107",
+        "reference": "CUSTOMS-RULES-OF-ORIGIN-NON-PREFERENTIAL-VS-PREFERENTIAL-SUBSTANTIAL-TRANSFORMATION-TARIFF-SHIFT-USMCA-CERTIFICATION-9-DATA-ELEMENTS-RVC-NET-COST-CBP-VERIFICATION-001"
+      },
+      {
+        "rulebook": "customs_ops.customs_followup_3b_r85",
+        "reference": "CUSTOMS-OPS-HS-2027-TRANSITION-BTI-EU-CROSS-US-ADVANCE-RULINGS-WCO-CN-DEPTH-001"
+      },
+      {
+        "rulebook": "customs_ops.eudr_derived_products_3a",
+        "reference": "EUDR-DERIV-003"
+      },
+      {
+        "rulebook": "country.ireland_trade_customs_regime_depth_2c_r190",
+        "reference": "COUNTRY-IRELAND-TARIFF-EXCISE-001"
+      }
+    ],
+    "answer_length": 1446,
+    "checks": [
+      "treated as in-scope trade question",
+      "no out-of-scope misclassification",
+      "asks for missing facts usefully"
+    ]
+  },
+  {
+    "id": "GQ-07",
+    "category": "FTA / Origin",
+    "query": "What is the USMCA de minimis threshold for textile imports?",
+    "answer": "The rules I have access to don't specifically address the USMCA de minimis threshold for textile imports. The only de minimis reference in my retrieved rules is a general $800 USD threshold mentioned in the context of the February 2025 IEEPA tariff regime on Mexico, Canada, and China [customs_ops.post_trump_2025_tariff_implementation_3b_r95, IEEPA rule]. That $800 figure is the US Section 321 informal entry threshold \u2014 it's a general customs provision, not a USMCA-specific textile rule.\n\nThe USMCA does contain its own de minimis provisions (in the customs administration chapter), and textiles are often subject to stricter rules of origin and tariff-shift requirements under the agreement. But I can't confirm the specific threshold or how it applies to textiles from the rules in my database.\n\nFor the definitive answer, you'd want to check:\n- USMCA Chapter 7 (Customs Administration), specifically the de minimis article\n- CBP's USMCA implementing regulations and any textile-specific guidance\n- USMCA Uniform Regulations, which may address textile de minimis treatment\n\nWhat still depends on your transaction: the specific textile product (HS code), the country of origin, whether you're claiming USMCA preferential treatment, and whether the goods are subject to any additional tariffs (Section 301, IEEPA, etc.) that may override de minimis treatment.",
+    "confidence": "medium",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "customs_ops.post_trump_2025_tariff_implementation_3b_r95",
+        "reference": "CUSTOMS-SECTION-232-AUTO-AUTO-PARTS-10-APRIL-2025-PROCLAMATION-25-PCT-USMCA-AUTO-ROO-ARTICLE-4-6-75-PCT-RVC-70-PCT-STEEL-ALUMINIUM-40-45-LVC-USD-16-HR-SUPER-CORE-7-CASTING-EV-001"
+      },
+      {
+        "rulebook": "customs_ops.post_trump_2025_tariff_implementation_3b_r95",
+        "reference": "CUSTOMS-SECTION-232-STEEL-ALUMINIUM-12-MARCH-2025-PROCLAMATION-ALL-EXEMPTIONS-REVOKED-EU-UK-JAPAN-KOREA-BRAZIL-SOUTH-AFRICA-AUSTRALIA-USMCA-NOT-APPLIED-CBP-ENFORCEMENT-DOWNSTREAM-ARTICLES-001"
+      },
+      {
+        "rulebook": "customs_ops.post_trump_2025_tariff_implementation_3b_r95",
+        "reference": "CUSTOMS-IEEPA-TARIFFS-MEXICO-CANADA-CHINA-FENTANYL-4-FEB-2025-25-PCT-MEXICO-CANADA-10-PCT-CHINA-MARCH-2025-ESCALATION-CHINA-20-PCT-FENTANYL-DEROGATIONS-001"
+      },
+      {
+        "rulebook": "country.mexico_sheinbaum_post_amlo_cartel_fto_usmca_review_2c_r86",
+        "reference": "COUNTRY-MEXICO-POST-TRUMP-FEB-2025-25-PCT-IEEPA-EO-14194-USMCA-COMPLIANT-EXEMPT-RETALIATION-001"
+      },
+      {
+        "rulebook": "customs_ops.customs_hs_origin_entry_ftz_drawback_adcvd_3b_r107",
+        "reference": "CUSTOMS-RULES-OF-ORIGIN-NON-PREFERENTIAL-VS-PREFERENTIAL-SUBSTANTIAL-TRANSFORMATION-TARIFF-SHIFT-USMCA-CERTIFICATION-9-DATA-ELEMENTS-RVC-NET-COST-CBP-VERIFICATION-001"
+      }
+    ],
+    "answer_length": 1363,
+    "checks": [
+      "agreement and textile context recognized",
+      "answer distinguishes de minimis from broader origin qualification"
+    ]
+  },
+  {
+    "id": "GQ-08",
+    "category": "Sanctions",
+    "query": "What are OFAC requirements for trading with UAE counterparties?",
+    "answer": "The rules I have access to don't cover UAE-specific OFAC requirements. There's no rule in my database addressing OFAC's particular posture toward UAE entities, UAE-based designated persons, or any UAE-specific general licenses or executive orders. For that, you'd need to consult OFAC's website directly or your bank's compliance team.\n\nWhat the rules do cover \u2014 and what applies to UAE counterparties just as to any other \u2014 is the general screening framework. When you have a named entity in a trade finance transaction (applicant, beneficiary, guarantor, aval party), OFAC SDN, UN Consolidated Sanctions, EU Consolidated Sanctions, and any jurisdiction-applicable domestic list must all be queried \u2014 and the result should include a match confidence score, not just a binary hit/no-hit [events.ev_screen_counterparty_by_party_type, EVAPI-SC-001]. If a hit comes back as a sectoral sanction (SSI or CAPTA list), the correct response is a sector-restricted decision identifying the specific Directive \u2014 not a blanket block [events.ev_screen_counterparty_by_program_v1, EVAPI-SC-009]. And if someone cites an OFAC general license to unblock a transaction, that license must belong to the same sanctions program that triggered the block \u2014 you can't use a Russia-program GL to authorize an Iran-blocked transaction [exceptions.exc_sanctions_general_license_v1, EXC-SANC-GL-002].\n\nWhat still depends on your transaction: the specific UAE counterparty name, the goods involved, whether any UAE entity is 50% or more owned by an SDN (OFAC's 50 Percent Rule), and whether your bank applies enhanced due diligence on UAE-linked trade. These are standard OFAC considerations but aren't spelled out in the rules I retrieved \u2014 verify with your compliance team.",
+    "confidence": "low",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "exceptions.exc_sanctions_general_license_v1",
+        "reference": "EXC-SANC-GL-002"
+      },
+      {
+        "rulebook": "events.ev_screen_counterparty_by_party_type",
+        "reference": "EVAPI-SC-001"
+      },
+      {
+        "rulebook": "sanctions.sanc_mas_tf_aml_cft",
+        "reference": "SANC-MAS-004"
+      },
+      {
+        "rulebook": "events.ev_screen_counterparty_by_program_v1",
+        "reference": "EVAPI-SC-009"
+      },
+      {
+        "rulebook": "electronic.swift_mx_iso20022_sr2023_nov_2025_cutover_4a_r88",
+        "reference": "ELECTRONIC-FATF-REC-16-UPDATE-JUN-2024-TRAVEL-RULE-STRUCTURED-ORIGINATOR-BENEFICIARY-VASP-WOLFSBERG-001"
+      }
+    ],
+    "answer_length": 1748,
+    "checks": [
+      "UAE not treated as comprehensively sanctioned",
+      "answer covers screening, ownership/control, goods/destination",
+      "no unnecessary TRDR/RulHub mention"
+    ]
+  },
+  {
+    "id": "GQ-09",
+    "category": "Sanctions",
+    "query": "Is Iran sanctioned under OFAC?",
+    "answer": "Yes \u2014 Iran is under a comprehensive OFAC embargo. It's one of the most heavily sanctioned economies in the world, second only to North Korea in breadth.\n\nUnder OFAC's Iran sanctions program, there is a comprehensive embargo: no trade, no financial transactions, and no services are permitted with Iran by US persons. Sanctions were reimposed in 2018 following the US withdrawal from the JCPOA, and the architecture spans multiple legal authorities including IEEPA, the Iran Sanctions Act (1996), CISADA (2010), IFCA (2012), CAATSA (2017), and Executive Order 13846 [OFAC-PROG-IRAN-001, sanctions.ofac_programs_phase2b; COUNTRY-IR-TF-DEPTH-001, country.me_depth_ir_2c].\n\nKey things to be aware of:\n\n- Secondary sanctions apply to non-US persons. Even if you're not a US person, engaging in significant transactions with Iran \u2014 particularly in energy, metals, or with designated Iranian banks \u2014 can trigger secondary sanctions [OFAC-PROG-IRAN-001, sanctions.ofac_programs_phase2b].\n- The Central Bank of Iran (CBI) is itself an OFAC SDN, designated under IEEPA EO 13599 and listed since 2019 under CAATSA [COUNTRY-IR-TF-DEPTH-001, country.me_depth_ir_2c].\n- There is a narrow humanitarian carve-out under the Trade Sanctions Reform Act (TSRA, 2000) for licensed exports of medicine, medical devices, and certain agricultural commodities \u2014 but these require specific OFAC licenses [SANCTIONS-OFAC-GL-HUM-002, sanctions.ofac_gl_humanitarian_2b_r9].\n- The environment has intensified further with post-2025 \"maximum pressure 2.0\" measures, including IRGC commercial-network secondary sanctions and broad de-risking by Iranian banks' correspondents [SANCTIONS-IRAN-COMPLIANCE-PLAYBOOK-OFAC-IRGC-NSPM-9-MAHAN-AIR-SADERAT-SECONDARY-SANCTIONS-001, sanctions.iran_israel_direct_strikes_2024_2025_depth_2b_r83].\n\nIf you're exploring any transaction touching Iran, assume it's prohibited unless you have a specific license or a confirmed general license carve-out. Your compliance team should screen all parties and consult OFAC directly before proceeding.",
+    "confidence": "medium",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "country.me_depth_ir_2c",
+        "reference": "COUNTRY-IR-TF-DEPTH-001"
+      },
+      {
+        "rulebook": "sanctions.ofac_programs_phase2b",
+        "reference": "OFAC-PROG-IRAN-001"
+      },
+      {
+        "rulebook": "sanctions.ofac_non_russia_2b_r19",
+        "reference": "SANCTIONS-OFAC-IRAN-IEEPA-DEEP-001"
+      },
+      {
+        "rulebook": "sanctions.ofac_gl_humanitarian_2b_r9",
+        "reference": "SANCTIONS-OFAC-GL-HUM-002"
+      },
+      {
+        "rulebook": "sanctions.iran_israel_direct_strikes_2024_2025_depth_2b_r83",
+        "reference": "SANCTIONS-IRAN-COMPLIANCE-PLAYBOOK-OFAC-IRGC-NSPM-9-MAHAN-AIR-SADERAT-SECONDARY-SANCTIONS-001"
+      }
+    ],
+    "answer_length": 2044,
+    "checks": [
+      "decisive answer (yes)",
+      "correct scope framing",
+      "no hedging on the core point"
+    ]
+  },
+  {
+    "id": "GQ-10",
+    "category": "Incoterms / Trade Operations",
+    "query": "What is the difference between CIF and FOB under Incoterms 2020?",
+    "answer": "The retrieved rules I have don't contain the actual Incoterms 2020 definitions of FOB and CIF \u2014 they reference these terms in other contexts (pricing reconciliation, invoice matching, port consistency). So I can't give you the full Incoterms 2020 rule text from my database. Here's what I can tell you from the retrieved rules, plus general guidance clearly marked as such.\n\nFrom the retrieved rules:\n\n- Both FOB and CIF are sea-only Incoterms \u2014 they should reference maritime ports, not vague inland places [incoterms.incoterms_place_port_consistency, INCO-EXEC-PLACE-001].\n- CIF includes freight and insurance; FOB does not. This matters for price comparisons: a CIF price compared to an FOB reference will look inflated by the freight + insurance component unless you adjust for it [data_quality.dq_tbml_pricing_field_criticality_v1, DQ-FCRIT-TBML-008].\n- To convert between the two: add freight and insurance to go FOB \u2192 CIF; subtract them to go CIF \u2192 FOB [events.ev_evaluate_price_band_by_commodity_v1, EVAPI-TBML-006].\n- On export forms, FOB-equivalent value and freight/insurance should be shown separately [m13.gfet_vol1, M13-GFET-08-021].\n- Whatever term you use, the invoice must match the LC [crossdoc.lcopilot_crossdoc, CROSSDOC-INV-LC-9].\n\nGeneral guidance (not from retrieved rules): Under Incoterms 2020, FOB (Free On Board) means risk transfers to the buyer once goods are loaded on board the vessel at the named port. CIF (Cost, Insurance and Freight) means the seller pays freight and minimum insurance to the destination port, but risk still transfers at the origin port when goods are loaded on board. For the full definitions, consult the ICC's Incoterms 2020 publication directly.\n\nWhat still depends on your transaction: the specific goods, mode of transport, and who controls freight/insurance will determine which term is more appropriate for your contract.",
+    "confidence": "medium",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "data_quality.dq_tbml_pricing_field_criticality_v1",
+        "reference": "DQ-FCRIT-TBML-008"
+      },
+      {
+        "rulebook": "events.ev_evaluate_price_band_by_commodity_v1",
+        "reference": "EVAPI-TBML-006"
+      },
+      {
+        "rulebook": "crossdoc.lcopilot_crossdoc",
+        "reference": "CROSSDOC-INV-LC-9"
+      },
+      {
+        "rulebook": "m13.gfet_vol1",
+        "reference": "M13-GFET-08-021"
+      },
+      {
+        "rulebook": "incoterms.incoterms_place_port_consistency",
+        "reference": "INCO-EXEC-PLACE-001"
+      }
+    ],
+    "answer_length": 1882,
+    "checks": [
+      "short side-by-side distinction",
+      "risk transfer and insurance obligation separated clearly",
+      "no LC-specific obligations mixed in unless framed separately"
+    ]
+  },
+  {
+    "id": "GQ-11",
+    "category": "Bank / Operational Rules",
+    "query": "What are HDFC Bank's LC requirements?",
+    "answer": "I don't have HDFC Bank-specific LC requirements in my rules database \u2014 what I have are the ICC publications (UCP 600, ISBP 821, etc.) that apply universally to any LC issued by any bank, including HDFC. HDFC Bank, like all Indian banks issuing LCs, will be subject to RBI's trade finance guidelines and the Foreign Exchange Management Act (FEMA) on top of the ICC rules \u2014 but I don't have those specific regulatory requirements in my system.\n\nWhat I can tell you is that any LC issued by HDFC will be governed by UCP 600 and ISBP 821 unless the credit explicitly states otherwise. For example, if your HDFC-issued LC requires a beneficiary's certificate, the data on that certificate must not conflict with the credit's requirements [ISBP 821 Article P3], but it doesn't need to be word-for-word identical \u2014 it just needs to clearly show the requirement is fulfilled [ISBP 821 Article P4]. Similarly, transport document consignment instructions follow standard ISBP practice \u2014 e.g., if the LC requires goods consigned to \"issuing bank,\" the document must name HDFC Bank but doesn't need to repeat their address [ISBP 821 Article F13].\n\nFor HDFC's internal policies \u2014 things like their preferred LC format, required additional documents, internal turnaround times, or specific clauses they routinely insert \u2014 you'd need to contact HDFC's trade finance desk directly or check their trade services portal.\n\nWhat still depends on your transaction: the specific LC terms HDFC issues (Field 46A document requirements, Field 47A additional conditions), whether the LC is subject to UCP 600 or includes any modifications, and any India-specific regulatory requirements under FEMA/RBI that apply to your trade.",
+    "confidence": "low",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "icc_core.lco_isbp821_letter_rules_v1",
+        "reference": "Article P3"
+      },
+      {
+        "rulebook": "icc_core.pop_urf800_letter_rules_v1",
+        "reference": "Article 5"
+      },
+      {
+        "rulebook": "icc_core.lco_isbp821_letter_rules_v1",
+        "reference": "Article P4"
+      },
+      {
+        "rulebook": "icc_core.lco_isbp821_letter_rules_v1",
+        "reference": "Article J8"
+      },
+      {
+        "rulebook": "icc_core.lco_isbp821_letter_rules_v1",
+        "reference": "Article F13"
+      }
+    ],
+    "answer_length": 1701,
+    "checks": [
+      "bank-specific rules retrieved if present",
+      "answer clearly distinguishes bank practice from ICC rules"
+    ]
+  },
+  {
+    "id": "GQ-12",
+    "category": "Out Of Scope",
+    "query": "What is Bitcoin?",
+    "answer": "I specialize in trade finance compliance rules. That question sits outside this product's scope.",
+    "confidence": "low",
+    "model": "none",
+    "routing_tier": "sonnet",
+    "cost_usd": null,
+    "citation_count": 0,
+    "citations": [],
+    "answer_length": 96,
+    "checks": [
+      "politely declined",
+      "no attempt to answer from general model knowledge"
+    ]
+  },
+  {
+    "id": "GQ-13",
+    "category": "Out Of Scope",
+    "query": "How do I file my taxes?",
+    "answer": "I specialize in trade finance compliance rules. That question sits outside this product's scope.",
+    "confidence": "low",
+    "model": "none",
+    "routing_tier": "sonnet",
+    "cost_usd": null,
+    "citation_count": 0,
+    "citations": [],
+    "answer_length": 96,
+    "checks": [
+      "politely declined",
+      "no weak adjacent explanation"
+    ]
+  },
+  {
+    "id": "GQ-14",
+    "category": "Product Behavior",
+    "query": "Is this LC compliant?",
+    "answer": "I can explain the rules that apply to your situation, but I can't validate actual documents or confirm compliance from a text description alone. If you share the specific terms or requirements you're working with, I can walk you through what the rules say. For full document-level validation, that requires a dedicated document-review workflow.",
+    "confidence": "low",
+    "model": "none",
+    "routing_tier": "sonnet",
+    "cost_usd": null,
+    "citation_count": 0,
+    "citations": [],
+    "answer_length": 344,
+    "checks": [
+      "does not pretend to validate a real document",
+      "states the product boundary clearly"
+    ]
+  },
+  {
+    "id": "GQ-15",
+    "category": "Product Behavior",
+    "query": "Can you review my invoice wording?",
+    "answer": "I can explain the rules that apply to your situation, but I can't validate actual documents or confirm compliance from a text description alone. If you share the specific terms or requirements you're working with, I can walk you through what the rules say. For full document-level validation, that requires a dedicated document-review workflow.",
+    "confidence": "low",
+    "model": "none",
+    "routing_tier": "sonnet",
+    "cost_usd": null,
+    "citation_count": 0,
+    "citations": [],
+    "answer_length": 344,
+    "checks": [
+      "states whether this is rules explanation vs document review",
+      "does not over-claim"
+    ]
+  },
+  {
+    "id": "GQ-16",
+    "category": "ICC / Documentary Credit",
+    "query": "Explain what MT700 field 46A controls and how strictly banks apply the documents listed there.",
+    "answer": "Field 46A in an MT700 is the \"Documents Required\" field \u2014 it lists every document the beneficiary must present to trigger payment. Per the SWIFT MT700 structure, F46A is a mandatory field alongside the LC number, amount, goods description, and other core elements [messaging.swift_phase_misc, SWIFT-MT700-001]. Whatever is listed there is what the examining bank will check against.\n\nOn how strictly banks apply it: the retrieved rules don't give me the full UCP 600 examination standard for 46A specifically. What I can tell you is that ICC Opinion R892 reinforces UCP 600 Article 14(h) \u2014 if a credit states a condition but doesn't stipulate a document to show compliance, banks disregard that condition as not stated [opinions.icc_opinions_phase2a_main_session, R892]. So the flip side is: if 46A does call for a specific document, the bank will examine it strictly. Anything listed in 46A is a documentary requirement the bank must verify; anything not tied to a document is effectively unenforceable.\n\nWhat still depends on your transaction: the exact wording of your 46A clauses, whether Field 47A adds additional conditions, and the specific bank's internal examination practices \u2014 those determine how rigidly each document gets checked.",
+    "confidence": "low",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "messaging.swift_phase_misc",
+        "reference": "SWIFT-MT700-001"
+      },
+      {
+        "rulebook": "messaging.iso20022_mt_mx_migration",
+        "reference": "ISO-MTMX-003"
+      },
+      {
+        "rulebook": "messaging.iso20022_trade",
+        "reference": "ISO20022-TRAD-003"
+      },
+      {
+        "rulebook": "messaging.iso20022_trade",
+        "reference": "ISO20022-TRAD-005"
+      },
+      {
+        "rulebook": "opinions.icc_opinions_phase2a_main_session",
+        "reference": "Article UCP 600 Art 14(h)"
+      }
+    ],
+    "answer_length": 1243,
+    "checks": [
+      "field 46A correctly identified as the documents-required field",
+      "distinguishes what the field controls from the examination standard",
+      "no invented field numbers or article citations"
+    ]
+  },
+  {
+    "id": "GQ-17",
+    "category": "ICC / Documentary Credit",
+    "query": "Under ISBP 821, can the goods description on the invoice differ from the LC wording?",
+    "answer": "Yes \u2014 the invoice description does not need to be a word-for-word copy of the LC, but it must correspond with it. Under ISBP 821 Article C3, there is explicitly no requirement for a mirror image. The key is that the invoice description doesn't contradict what the LC says. Details can even be spread across different areas of the invoice, as long as when read together they correspond to the LC description.\n\nYou're also allowed to add extra detail beyond what the LC states \u2014 pack sizes, model numbers, dimensions \u2014 provided those additions don't change the nature, classification, or category of the goods. ISBP 821 Article C5 gives clear examples: if the LC says \"Suede Shoes\" and your invoice says \"Imitation Suede Shoes,\" that's discrepant because it changes the nature of the goods. If the LC says \"Hydraulic Drilling Rig\" and your invoice adds \"Second Hand,\" that's also discrepant because it shifts the category from new to used.\n\nSo the short version: you can add detail, you can split the description across the invoice, but you can't alter or contradict what the LC actually says about the goods.\n\nWhat still depends on your transaction: how strictly your issuing bank interprets \"correspondence\" \u2014 some banks push for near-identical wording even though the rules don't require it. If in doubt, match the LC description as closely as practical.",
+    "confidence": "medium",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "icc_core.isbp821_delta_doctypes_v1",
+        "reference": "ISBP821-DELTA-INVOICE-GOODS-001"
+      },
+      {
+        "rulebook": "icc_core.lco_isbp821_letter_rules_v1",
+        "reference": "Article C3"
+      },
+      {
+        "rulebook": "icc_core.lco_isbp821_letter_rules_v1",
+        "reference": "Article C5"
+      },
+      {
+        "rulebook": "icc_core.lco_isbp821_letter_rules_v1",
+        "reference": "Article L4"
+      },
+      {
+        "rulebook": "icc_core.lco_isbp821_letter_rules_v1",
+        "reference": "Article C12"
+      }
+    ],
+    "answer_length": 1355,
+    "checks": [
+      "correspondence-not-identical standard surfaced",
+      "ISBP 821-specific paragraph referenced",
+      "no overclaiming that any wording difference is acceptable"
+    ]
+  },
+  {
+    "id": "GQ-18",
+    "category": "ICC / Documentary Credit",
+    "query": "When does a demand under URDG 758 have to be presented, and what makes it non-complying?",
+    "answer": "A demand under URDG 758 must be presented to the guarantor at the place of issue (or whatever other place the guarantee specifies) on or before the expiry date, and it must identify the guarantee it's made under \u2014 typically by referencing the guarantor's reference number. The presentation must also be complete unless it expressly indicates it will be completed later [icc_core.urdg758_demand_guarantee_depth_2a_r115, Article 14].\n\nTo be complying, the demand must include a supporting statement by the beneficiary indicating in what respect the applicant is in breach of the underlying contract. A generic statement like \"the applicant is in breach\" is not enough \u2014 you need to specify the nature of the breach, such as \"failure to deliver by [date]\" or \"abandonment of works.\" That supporting statement can be in the demand itself or in a separate signed document accompanying it. The demand must also be for a specific amount and must not exceed the guaranteed amount [icc_core.isdgp_demand_guarantee_2a, ISDGP Para. 95-110; URDG Art. 15; icc_core.gop_urdg758_letter_rules_v6, Article 15].\n\nA demand becomes non-complying if any of these elements are missing or deficient \u2014 no specific breach identified, no identification of the guarantee, presented after expiry, or presented at the wrong place. When a demand is non-complying, the guarantor must give notice of rejection, and the rules in Articles 23\u201326 govern how that process works, including the extend-or-pay option and the timeline for the guarantor's response [icc_core.urdg758_demand_guarantee_depth_2a_r115, Articles 23-26].\n\nWhat still depends on your transaction: the exact expiry date, place of presentation, and whether your guarantee requires any additional documents beyond the supporting statement \u2014 all of these are set in the guarantee text itself, so check those terms carefully.",
+    "confidence": "medium",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "icc_core.isdgp_demand_guarantee_2a",
+        "reference": "Article ISDGP Para. 95-110; URDG Art. 15"
+      },
+      {
+        "rulebook": "icc_core.gop_urdg758_letter_rules_v6",
+        "reference": "Article 15"
+      },
+      {
+        "rulebook": "icc_core.urdg758_demand_guarantee_depth_2a_r115",
+        "reference": "ICC-URDG758-ART23-26-EXTEND-OR-PAY-NON-COMPLYING-DEMAND-WAIVER-NOTICE-REDUCTION-TERMINATION-FORCE-MAJEURE-001"
+      },
+      {
+        "rulebook": "icc_core.urdg758_demand_guarantee_depth_2a_r115",
+        "reference": "ICC-URDG758-ART14-18-PRESENTATION-DEMAND-SUPPORTING-STATEMENT-PARTIAL-MULTIPLE-001"
+      },
+      {
+        "rulebook": "icc_core.urdg758_art_16_35_deep_2a",
+        "reference": "ICC-URDG758-ART-23-25"
+      }
+    ],
+    "answer_length": 1854,
+    "checks": [
+      "presentation timing and non-complying-demand grounds both addressed",
+      "URDG 758-specific articles surfaced",
+      "short, decisive framing before caveats"
+    ]
+  },
+  {
+    "id": "GQ-19",
+    "category": "ICC / Documentary Credit",
+    "query": "What changes under eUCP 2.1 when documents are presented electronically?",
+    "answer": "Under eUCP 2.1, the biggest shift is that electronic records are treated as functional equivalents of paper documents \u2014 but only if they meet specific authentication and examinability requirements. The eUCP supplements UCP 600; it doesn't replace it. A credit subject to eUCP is also automatically subject to UCP 600 without express incorporation [eUCP 2.1 Articles e1\u2013e2].\n\nHere's what changes in practice:\n\n- Place of presentation: The LC must state where electronic records are to be presented, and if paper documents are also allowed, a separate place for those. Electronic records don't all need to arrive at the same time \u2014 they can be presented separately [eUCP 2.1 Article e5].\n\n- Hybrid presentations are allowed: You can mix electronic and paper documents in a single presentation. But if you choose to present only paper under an eUCP credit that gives you the choice, UCP alone applies \u2014 eUCP drops out for that presentation [eUCP 2.1 Article e2(c)].\n\n- Authentication is critical: An electronic record must be authenticated (electronic signature, certificate, or blockchain hash), capable of being examined for compliance, and must identify the sender and source. Without valid authentication, the record won't be accepted [ISBP 821 electronic record guidance].\n\n- Corruption risk: eUCP 2.1 Articles e10\u2013e11 address what happens when a transport document is presented electronically and when an electronic record becomes corrupted after presentation \u2014 a scenario that simply doesn't exist in the paper world.\n\nWhat still depends on your transaction: the specific LC must expressly state it's subject to eUCP \u2014 it doesn't apply automatically. Also, the rules I have don't detail every article's operational mechanics, so if you're dealing with a specific document type (e.g., electronic bills of lading or certificates of origin), let me know and I can dig deeper into the relevant provisions.",
+    "confidence": "medium",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "icc_core.eucp21_electronic_presentation_2a_r111",
+        "reference": "ICC-EUCP21-E5-PRESENTATION-ELECTRONIC-ADDRESS-NOTICE-COMPLETENESS-001"
+      },
+      {
+        "rulebook": "icc_core.eucp_v21_deep_2a",
+        "reference": "ICC-EUCP21-E10-E11"
+      },
+      {
+        "rulebook": "icc_core.eucp21_electronic_presentation_2a_r111",
+        "reference": "ICC-EUCP21-E1-E2-SCOPE-UCP-RELATIONSHIP-001"
+      },
+      {
+        "rulebook": "icc_core.lco_eucp21_letter_rules_v1",
+        "reference": "EUCP21-e2C"
+      },
+      {
+        "rulebook": "icc_core.isbp821_delta_electronic_v1",
+        "reference": "ISBP821-DELTA-ERECORD-001"
+      }
+    ],
+    "answer_length": 1905,
+    "checks": [
+      "eUCP 2.1 treated as a supplement to UCP600, not a standalone replacement",
+      "express-incorporation threshold point surfaced",
+      "no fabricated eUCP article numbers"
+    ]
+  },
+  {
+    "id": "GQ-20",
+    "category": "FTA / Origin",
+    "query": "What proof of origin does RCEP accept for preferential tariff treatment?",
+    "answer": "RCEP preferential treatment requires a Certificate of Origin (Form RCEP) issued by a competent authority, or alternatively an approved exporter declaration [fta.fta_rcep_origin, RCEP-COO-001]. That's the core proof-of-origin mechanism the rules I have access to cover.\n\nOne additional pathway: RCEP also allows for advance rulings on preferential origin issued by the importing party's customs administration. If you obtain such a ruling, it binds the FTA eligibility determination \u2014 but the ruling must cite the correct FTA (RCEP specifically), and it must come from the customs administration of the importing country [exceptions.exc_customs_binding_ruling_v1, EXC-CUST-RUL-010].\n\nA practical note: country of origin is the foundational input for any FTA preferential rate selection, including RCEP. Without a properly determined country of origin, the preferential treatment path is blocked entirely \u2014 and country of export or consignment is not a substitute [data_quality.dq_customs_classification_field_criticality_v1, DQ-FCRIT-CUST-005].\n\nThe rules I have don't go into the specific Form RCEP fields, back-to-back certification, or de minimis thresholds. For those details, consult the RCEP agreement text directly or your local customs authority.\n\nWhat still depends on your transaction: I need to verify your specific country's membership in RCEP \u2014 the rules I have don't explicitly confirm which countries are parties. Please verify with the RCEP secretariat or your customs office before relying on preferential treatment. The exact Form RCEP format and approved-exporter requirements also vary by member state.",
+    "confidence": "medium",
+    "model": "z-ai/glm-5.2-20260616",
+    "routing_tier": "haiku",
+    "cost_usd": null,
+    "citation_count": 5,
+    "citations": [
+      {
+        "rulebook": "fta.fta_rcep_origin",
+        "reference": "RCEP-COO-001"
+      },
+      {
+        "rulebook": "exceptions.exc_customs_binding_ruling_v1",
+        "reference": "EXC-CUST-RUL-010"
+      },
+      {
+        "rulebook": "incoterms.incoterms_country_practicality_ph",
+        "reference": "INCO-PH-006"
+      },
+      {
+        "rulebook": "incoterms.incoterms_country_practicality_kh",
+        "reference": "INCO-KH-006"
+      },
+      {
+        "rulebook": "data_quality.dq_customs_classification_field_criticality_v1",
+        "reference": "DQ-FCRIT-CUST-005"
+      }
+    ],
+    "answer_length": 1621,
+    "checks": [
+      "distinct from GQ-05 (proof-of-origin, not membership/threshold)",
+      "names accepted proof-of-origin forms rather than a vague answer",
+      "low confidence if only part of the accepted forms are covered"
+    ]
+  }
+]

@@ -1,0 +1,196 @@
+[
+  {
+    "id": "GQ-51",
+    "title": "User Contradicts LC Terms",
+    "answer": "This is a discrepancy. The LC Field 45A says \"CIF Hamburg\" \u2014 that trade term is part of the goods description in the credit. Under ISBP745 Paragraph C9, when a trade term appears in the LC's goods description, the invoice must show that same term. You cannot substitute a different Incoterm. Showing \"FCA Ho Chi Minh City\" instead of \"CIF Hamburg\" is a direct conflict, not a minor variation.\n\nYour sales contract is irrelevant to the bank's examination. The bank only looks at the LC and the documents presented against it. Deutsche Bank as confirming bank will examine your invoice against Field 45A \u2014 and \"FCA\" versus \"CIF\" is not a technicality, it's a fundamentally different delivery and risk arrangement.\n\nThere's also a secondary issue worth flagging: Incoterms 2020 guidance notes that CIF is a sea-only term not recommended for containerised cargo \u2014 FCA is actually the more appropriate term for container shipments. But that doesn't help you here. The LC says CIF Hamburg, so your invoice must say CIF Hamburg.\n\nWhat you need to do: Reissue the commercial invoice showing \"CIF Hamburg\" (and match the Incoterms version if the LC specifies one, per ISBP745 C9). If your contract genuinely operates on FCA terms, that's a matter between you and your buyer \u2014 it doesn't change what the LC requires.\n\nWhat still depends on your transaction: whether the LC specifies \"Incoterms 2020\" or another version alongside \"CIF Hamburg,\" which would affect exactly how the term must appear on the invoice.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1501
+  },
+  {
+    "id": "GQ-52",
+    "title": "Confirmation Misconception",
+    "answer": "That's a really common misconception, and it's important to clear it up before it costs you.\n\nLC confirmation does not protect you against damaged goods. Under UCP600 Art 8 (referenced in SWIFT MT700 Field 49), confirmation means Standard Chartered Lagos has added its own payment undertaking \u2014 so if compliant documents are presented, SCB Lagos will pay even if the issuing bank defaults. That's it. It's a payment guarantee, not a cargo guarantee.\n\nBanks deal in documents, not goods. If the exporter ships damaged generators but presents documents that appear compliant on their face, the confirming bank is still obligated to pay. Your recourse for damaged cargo is entirely separate \u2014 it sits with your cargo insurer, not your bank.\n\nThis is actually where the Standard Chartered-specific rules in my database become relevant. SCB requires insurance coverage of at least 110% of CIF/CIP value [BANK-SCB-001], and the insurance certificate must carry an \"All Risks\" or ICC(A) clause [BANK-SCB-003]. If your LC is confirmed by SCB Lagos, make sure your insurance document meets those requirements \u2014 not because it protects you from damage (that's the insurer's job), but because SCB can reject your documents if those conditions aren't met.\n\nSo your protection against damaged generators is: a solid cargo insurance policy with ICC(A)/All Risks coverage, and a clear claims process with your insurer. The LC confirmation protects your payment \u2014 your insurance protects your goods.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1483
+  },
+  {
+    "id": "GQ-53",
+    "title": "Advising vs Issuing Bank Confusion",
+    "answer": "I can explain the rules that apply to your situation, but I can't validate actual documents or confirm compliance from a text description alone. If you share the specific terms or requirements you're working with, I can walk you through what the rules say. For full document-level validation, that requires a dedicated document-review workflow.",
+    "model": "none",
+    "routing_tier": "sonnet",
+    "citation_count": 0,
+    "fallback_reasons": [],
+    "answer_length": 344
+  },
+  {
+    "id": "GQ-54",
+    "title": "B/L Backdating \u2014 Fraud Warning",
+    "answer": "Do not do this. What your freight forwarder is describing is fraud \u2014 specifically, the backdating of a shipping document to misrepresent when goods were actually loaded. It doesn't matter that the intent is to \"fix\" a late shipment. A B/L showing March 14 when the goods loaded March 18 is a false document.\n\nThe rule is clear: the on-board date on the B/L must not exceed the LC's latest shipment date [UCP600 Art. 20(a)(ii), ISBP745 E3]. Your shipment missed that deadline. The correct answer to that problem is an LC amendment \u2014 not a falsified B/L.\n\nThe risks here go well beyond a documentary discrepancy:\n\n- Banking fraud. Presenting a backdated B/L under a documentary credit is fraud against the issuing bank and the applicant. Banks that discover this can refuse payment, freeze funds, and report the matter.\n- Criminal exposure. In most jurisdictions, knowingly presenting a false shipping document is a criminal offence \u2014 for you, your forwarder, and potentially anyone in the chain who knew.\n- Carrier liability. The carrier or their agent who issues a falsely dated B/L faces their own legal exposure. Many will refuse outright.\n\nYour real options: request an amendment to extend the latest shipment date (if the buyer agrees), or accept that this shipment missed the LC deadline and negotiate a new arrangement with your buyer. Those conversations are uncomfortable \u2014 but they're the only legitimate path.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1419
+  },
+  {
+    "id": "GQ-55",
+    "title": "Partial Shipments \u2014 Good News",
+    "answer": "No, you cannot make two separate shipments and presentations. When an LC is silent on partial shipments, UCP 600 treats them as prohibited by default. Shipping 6,000 pieces now and 4,000 pieces next month would be a partial shipment, and your first presentation would be discrepant \u2014 the bank would refuse it.\n\nThe retrieved rules confirm this indirectly: [UCP600-38C] notes that partial shipments must be *permitted* under the LC for split arrangements to work, and [ISBP745 Paragraph C15] addresses the specific scenario where partial shipments are prohibited, treating any short-shipped quantity as non-compliant unless it falls within the 5% tolerance rule.\n\nSpeaking of which \u2014 [UCP600-30C] does allow a 5% under-drawing tolerance, but only when the *full quantity* is shipped. Shipping 6,000 of 10,000 pieces is a 40% shortfall, well outside that tolerance.\n\nYour options:\n\n- Request an amendment to the LC to explicitly permit partial shipments. This is the clean fix \u2014 get the applicant to instruct their bank to amend Field 43P to \"Allowed.\"\n- Ship the full 10,000 pieces in one shipment if you can consolidate.\n- Negotiate with your buyer to issue a new or amended LC before you ship anything.\n\nDon't present partial documents hoping the bank will overlook it \u2014 they won't, and you'll lose time chasing a rejection.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1325
+  },
+  {
+    "id": "GQ-56",
+    "title": "Transferable LC Invoice Substitution",
+    "answer": "Yes, this is exactly what the invoice substitution mechanism in a transferable LC is designed for \u2014 and you're entitled to use it.\n\nUnder UCP600 Article 38, the first beneficiary (you) has the right to substitute your own invoice and draft for those of the second beneficiary (your supplier). The key mechanic is this: you transfer the LC to your supplier at a reduced unit price \u2014 lower than what the original LC states \u2014 and when documents are presented, you swap in your own invoice at the original (higher) unit price. The difference is your margin. [UCP600-38D] explicitly confirms that the unit price of the transferred LC may be reduced from the original precisely to create this back-to-back margin for the first beneficiary.\n\nA few things to keep in mind:\n\n- Your substituted invoice must not exceed the original LC amount. [UCP600-38D]\n- The rest of the terms \u2014 goods description, shipment conditions, expiry, etc. \u2014 must otherwise mirror the original credit. [UCP600-38]\n- You remain responsible for any discrepancies in the documents you substitute. If your supplier's documents are compliant but your invoice creates a discrepancy, that's on you. [UCP600-38]\n- The transferring bank handles the substitution process and is the point of contact \u2014 coordinate with them on timing, since you'll need to act promptly when your supplier presents documents. [UCP600-38-DERIVED-002]\n\nThis is a standard, legitimate structure. The buyer never sees your supplier's invoice \u2014 only yours.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1489
+  },
+  {
+    "id": "GQ-57",
+    "title": "Oil & Gas \u2014 War Risk Insurance",
+    "answer": "Yes, that would be a discrepancy \u2014 and a clear one.\n\nThe 110% of CIF value minimum isn't a suggestion. Per DOCDEX-006, coverage for anything less than 110% of CIF or CIP value is explicitly discrepant. The cost of the premium doesn't change that requirement. If your insurance document shows a covered amount below that threshold, the bank will reject it.\n\nOn top of that, your LC specifically requires war risk and SRCC coverage. That's a condition of the credit, not optional. If the insurance document doesn't confirm those perils are covered, that's a second, separate discrepancy \u2014 regardless of what the underlying policy actually covers.\n\nA few practical points:\n\n- The premium being expensive doesn't give you a documentary out. The bank examines the document on its face, not the commercial circumstances behind it.\n- If the broker can issue a policy covering the full 110% CIF value including war risk and SRCC \u2014 even at a higher premium \u2014 that's your cleanest path. The cost is your problem to absorb or renegotiate with the buyer.\n- If coverage genuinely can't be obtained at the required level, you need to go back to the applicant and request an LC amendment before you present documents. Presenting with a known discrepancy and hoping for a waiver is a risk you don't want on an LNG shipment.\n\nWhat still depends on your transaction: whether the LC specifies a minimum insured value in absolute terms (overriding the 110% default), and whether the LC allows for any named exclusions on war risk or SRCC coverage.",
+    "model": "gpt-4.1",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [
+      "Anthropic (anthropic/claude-sonnet-4.6): answer contained hallucinated references, dropped"
+    ],
+    "answer_length": 1527
+  },
+  {
+    "id": "GQ-58",
+    "title": "Agriculture \u2014 Banned Fumigant",
+    "answer": "This is a real conflict between what your LC says and what EU law permits \u2014 and you need to resolve it before presentation, not after.\n\nThe core problem: your LC specifically calls for methyl bromide fumigation. Under UCP 600, the bank must examine documents strictly against the LC terms. If your fumigation certificate shows phosphine instead of methyl bromide, that is a documentary discrepancy \u2014 full stop. The bank is entitled to refuse it, regardless of the regulatory reason behind the substitution.\n\nThe retrieved rules confirm that methyl bromide is being phased out under ISPM 15 [AGRI-ISPM15-002], which supports your position factually \u2014 but that doesn't fix the LC wording. The bank doesn't adjudicate EU environmental law. It checks documents against the credit.\n\nWhat you need to do:\n\n- Request an LC amendment immediately. Ask the applicant (your EU buyer) to instruct their bank to amend Field 46A to replace \"methyl bromide fumigation certificate\" with \"fumigation certificate\" or \"phosphine fumigation certificate.\" This is the clean fix.\n- Get your buyer to confirm in writing that phosphine is acceptable and that EU customs will accept it \u2014 this protects you commercially even if the bank accepts the amendment.\n\nDo not present a phosphine certificate against an LC that says methyl bromide without that amendment. The discrepancy risk is high and the bank will likely refuse.\n\nWhat still depends on your transaction: whether the issuing bank has any discretion built into the LC wording (e.g., \"or equivalent treatment\"), and whether your buyer is cooperative on the amendment.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1600
+  },
+  {
+    "id": "GQ-59",
+    "title": "Textiles \u2014 GSP Form A vs REX",
+    "answer": "The short answer is: no, not under your current LC terms. Your LC specifically calls for \"GSP Form A issued by competent authority.\" A REX self-certification statement is a fundamentally different document \u2014 it's self-issued by the exporter, not issued by a competent authority. Under UCP600 Article 14(a), the bank must examine documents to determine whether they comply strictly with the LC terms. If you present a REX statement where the LC demands a Form A, that's a discrepancy the bank is entitled \u2014 and likely obligated \u2014 to raise.\n\nYour buyer is correct that the EU has been transitioning GSP beneficiary countries to REX, and Cambodia is part of that transition. But that regulatory shift doesn't automatically update your LC. The LC is a separate contractual instrument, and the bank examines what the LC says, not what EU customs policy currently allows.\n\nWhat you need to do:\n\n- Request an LC amendment from your buyer/applicant to replace \"GSP Form A issued by competent authority\" with wording that accepts a REX origin statement or statement on invoice.\n- Until the amendment is confirmed, do not present under the original LC terms with a REX statement \u2014 you risk a clean refusal.\n- If Cambodia's competent authority (typically the Ministry of Commerce) still issues Form A for your shipment, that remains the safest document to present under the unamended LC.\n\nI should be transparent: the retrieved rules I have cover REX in the context of EU-Japan EPA, EU-UK TCA, and CETA \u2014 not specifically the EU GSP/REX transition for Cambodia. The regulatory detail on Cambodia's GSP-to-REX timeline should be verified directly with Cambodia's Ministry of Commerce or the EU's trade helpdesk before your next shipment.\n\nWhat still depends on your transaction: the amendment timeline relative to your shipment date, and whether Cambodia's competent authority will still issue Form A for your goods under the current transition rules.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1939
+  },
+  {
+    "id": "GQ-60",
+    "title": "Performance Guarantee Reduction",
+    "answer": "The short answer is no \u2014 you cannot unilaterally request a reduction in the guarantee amount based on project completion. Under URDG758 Article 13, the guarantee amount can only be varied (reduced, increased, or reinstated) if the guarantee text itself expressly authorises that variation \u2014 for example, a reduction clause tied to completion milestones or certified progress payments. Your guarantee has no such clause, which means any reduction attempt has no standing under URDG 758. The guarantor is fully entitled to reject it.\n\nThis is one of the fundamental features of a demand guarantee: it is independent of the underlying contract. The fact that 70% of the work is complete and accepted by the employer is commercially relevant, but it has no automatic legal effect on the guarantee amount. The guarantee stands at SAR 5 million until it expires, is returned, or is formally amended.\n\nWhat you can actually do:\n\n- Approach the employer (the beneficiary) and ask them to consent to a formal amendment reducing the guarantee amount. If they agree, the guarantor can issue an amendment \u2014 but only with the beneficiary's agreement.\n- Negotiate this into your next contract. A reduction clause tied to certified completion milestones is standard practice and entirely valid under URDG 758 Article 13 \u2014 it just needs to be in the guarantee text from the start.\n\nThere's no workaround here under the rules as they stand. The path forward is commercial negotiation with the employer, not a unilateral instruction to the bank.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1527
+  },
+  {
+    "id": "GQ-61",
+    "title": "LC Expires Tomorrow \u2014 Crisis",
+    "answer": "Present today \u2014 don't wait. With expiry tomorrow, your absolute priority is getting documents to the bank before the LC expires. A discrepancy you can argue about is far better than an expired LC you can't.\n\nOn the discrepancy itself: \"Chittagong\" vs \"Chattogram\" is a strong candidate for a non-discrepancy argument. The port was officially renamed in 2018, and both names refer to the same physical port \u2014 this is publicly documented. Many banks and ICC practitioners treat this as a naming variant rather than a different place. However, the retrieved rules I have (UCP600-24C) state that the port of loading on the transport document must match what the LC stipulates, and a different name is technically a discrepancy. Banks examining documents on their face may not look beyond the text.\n\nSo here's your practical path:\n\n- Present today with a covering letter explaining that \"Chittagong\" is the former official name of \"Chattogram\" and both refer to the same port \u2014 attach any publicly available reference (Bangladesh government gazette, port authority notice).\n- Simultaneously request a waiver from the issuing bank via your nominated bank. The issuing bank will contact the applicant. Per [EXC-WAIVE-PROD-005], the applicant must authorize the waiver at presentation time \u2014 a blanket pre-authorization in the LC doesn't remove this step.\n- Do not wait to correct the BL. Getting a corrected BL issued and re-presented before tomorrow's expiry is almost certainly impossible. Per [EXC-REPR-002], any re-presentation must still be received before expiry \u2014 there's no grace for corrections.\n\nThe waiver route is your best shot. The argument that these are the same port is factually solid and many banks will accept it, especially with documentation. But the bank's decision is theirs to make.\n\nWhat still depends on your transaction: whether the issuing bank is in a jurisdiction that strictly applies the \"name on document must match LC exactly\" standard, and how quickly the applicant can be reached to authorize a waiver.",
+    "model": "gpt-4.1",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [
+      "Anthropic (anthropic/claude-sonnet-4.6): answer contained hallucinated references, dropped"
+    ],
+    "answer_length": 2032
+  },
+  {
+    "id": "GQ-62",
+    "title": "Amendment Not Yet Accepted",
+    "answer": "The short answer: don't ship under the amended terms until you've accepted the amendment. Here's why that matters practically.\n\nUnder UCP600 Article 10, an amendment only becomes operative for you \u2014 the beneficiary \u2014 once you accept it. The issuing bank is bound the moment it issues the amendment, but you are not. Until you accept, the original LC terms remain your operative credit. The amended shipment date and increased amount don't apply to you yet.\n\nThis creates a real risk if you ship under the amended terms without accepting first. Your transport documents will show a shipment date that falls outside the original LC's latest shipment date. When you present documents, the bank examines against the credit as it stands from your side \u2014 and if you haven't accepted, that's still the original terms. You'd have a discrepancy on the shipment date, and potentially on the drawing amount too. [UCP600 Article 10]\n\nOnce you formally accept \u2014 which can be done expressly in writing, or implicitly by presenting documents that conform to the amended terms \u2014 the new shipment window and increased amount become operative from that point. [icc.trade_finance.lifecycle LIFE-AMD-002, LIFE-AMD2-001, LIFE-AMD2-003]\n\nThe practical fix: Accept the amendment in writing now, before you ship. It takes minutes and eliminates the risk entirely.\n\nWhat still depends on your transaction: whether there's a confirming bank involved (their confirmation of the amendment is separate), and whether your LC has any auto-effect language \u2014 which UCP600 Article 10 says must be disregarded regardless.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1586
+  },
+  {
+    "id": "GQ-63",
+    "title": "Deferred Payment \u2014 Early Cash",
+    "answer": "Good news: you have a real path to early payment, and your situation is actually well-suited for it.\n\nThe issuing bank's confirmation that your presentation complies is the key asset here. Under the forfaiting rules [URF800-5C], that acceptance \u2014 combined with a copy of the LC, all amendments, and the issuing bank's undertaking to pay on the deferred date \u2014 is exactly what a forfaiter needs to purchase your payment claim. In plain terms: you can sell your right to receive payment on day 90 to a forfaiting house or a bank that offers receivables discounting, and get cash now (minus a discount fee reflecting the 76-day financing cost).\n\nYour two main options:\n\n- Forfaiting: Sell the deferred payment claim outright to a forfaiter. They take on the issuing bank's credit risk. You get paid now, no recourse to you. [URF800-5C] directly supports this structure.\n- Discounting by a nominated/confirming bank: If your LC was confirmed or if a nominated bank is willing, they may discount the deferred payment undertaking \u2014 effectively advancing you the funds against the issuing bank's obligation.\n\nOne thing the rules are clear on: the issuing bank itself must pay on the due date [ISBP745/ISBP821-B7-VAR02]. It cannot be compelled to pay early \u2014 that requires its voluntary agreement or a separate financing arrangement.\n\nWhat still depends on your transaction: Whether your LC is confirmed (a confirming bank has a stronger obligation to discount); whether the issuing bank is willing to prepay voluntarily; and the forfaiter's appetite for the issuing bank's country and credit risk.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1590
+  },
+  {
+    "id": "GQ-64",
+    "title": "Red Clause LC",
+    "answer": "Red clause LCs are a real and well-established instrument for exactly this situation \u2014 financing a supplier's pre-shipment costs like harvesting and processing. Here's how they work and where your risk sits.\n\nA red clause LC authorises the advising or nominated bank in Kenya to pay your supplier an advance (typically a percentage of the LC value) before any shipment takes place. The supplier usually signs a simple undertaking to repay the advance if they fail to ship and present complying documents. The advance is deducted from the final payment when documents are presented.\n\nThe critical risk point: The advance is paid on the supplier's undertaking alone \u2014 no bill of lading, no shipping documents, nothing. If your supplier takes the advance and doesn't ship, the advising bank that paid out is reimbursed by your issuing bank, and your issuing bank looks to you (the applicant) for recovery. The credit risk of non-performance sits squarely with you as the buyer. The bank has no obligation to chase the supplier \u2014 that's your problem.\n\nI have to be transparent here: the retrieved rules I have for this query don't include a specific red clause LC rule from UCP 600 or ISBP 745. What I've described above is well-established general trade finance practice, not drawn from a retrieved rule in this session. The mechanics are widely understood, but for the precise drafting of the red clause wording and your bank's specific requirements, work directly with your issuing bank's trade finance team.\n\nWhat still depends on your transaction: the advance percentage your bank will allow, whether they require a separate repayment guarantee from the supplier, and whether Kenyan exchange control regulations affect how the advance is disbursed locally.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1757
+  },
+  {
+    "id": "GQ-65",
+    "title": "Revocable LC \u2014 Trick Question",
+    "answer": "No. Under UCP 600, revocable letters of credit do not exist. Every credit issued subject to UCP 600 is irrevocable by default \u2014 the issuing bank is irrevocably bound from the moment it issues the credit [UCP600 Article 7]. There is no mechanism in UCP 600 to issue a revocable credit.\n\nYour textbook is likely referencing UCP 500 (the previous version, in force until 2007), which did allow revocable credits under its Article 8. When the ICC revised the rules and published UCP 600 in 2007, they deliberately eliminated the concept entirely. The drafting committee took the view that a revocable credit offers the beneficiary no real security and had become essentially obsolete in practice.\n\nThe irrevocability principle is reinforced by [UCP600 Article 10], which makes clear that a credit can only be amended or cancelled with the agreement of the issuing bank, any confirming bank, and the beneficiary. So even after issuance, the bank cannot unilaterally walk away.\n\nIf you see a credit today that purports to be \"revocable\" and is subject to UCP 600, that designation has no legal effect under the rules \u2014 the credit is still irrevocable.\n\nSo the short answer: your textbook is describing a concept that UCP 600 abolished. If you're working under UCP 600, all credits are irrevocable, full stop.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1302
+  },
+  {
+    "id": "GQ-66",
+    "title": "Currency Collapse \u2014 EGP LC",
+    "answer": "Yes, you have to ship and draw at the original EGP amount \u2014 the LC is a fixed EGP obligation and currency depreciation doesn't change that.\n\nAn LC is an independent payment undertaking. The bank's commitment is to pay the stated amount in the stated currency when compliant documents are presented. There is no mechanism in UCP 600 that adjusts the LC amount for exchange rate movements \u2014 the rules simply don't contemplate it. The EGP amount in your LC is the ceiling and the reference point, full stop.\n\nThe only tolerances available to you are narrow ones: a 5% under-drawing is permitted if you ship the full quantity and the LC doesn't restrict it [UCP600-30C, DOCDEX-004], and a \u00b15% quantity tolerance applies if goods aren't specified in discrete units [UCP600-30B]. Neither of these helps with a 40% FX loss \u2014 they're rounding tools, not currency hedges.\n\nYour real options are commercial, not documentary:\n\n- Negotiate an amendment with the applicant to increase the LC amount in EGP to reflect current rates. This requires the applicant's cooperation and the issuing bank's agreement.\n- Absorb the loss or renegotiate the underlying contract \u2014 the LC just mirrors whatever the parties agreed.\n- Check your sales contract for any FX risk allocation or price adjustment clause \u2014 that's where your remedy, if any, lives.\n\nOne Egypt-specific note: the Central Bank of Egypt has specific rules around import LC documentation and may require bank involvement for amendments [CBE Foreign Trade Regulations, EG-CBE-002]. Your Egyptian counterpart's bank should be your first call on the amendment process.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1607
+  },
+  {
+    "id": "GQ-67",
+    "title": "Back-to-Back LC Document Mismatch",
+    "answer": "The short answer: you don't amend your supplier's documents \u2014 you substitute your own. That's the standard back-to-back mechanism, and it's the invoice substitution that solves the goods description mismatch.\n\nHere's how it works in practice. Your supplier's invoice is issued under the back-to-back LC, with a description that matches *that* credit's terms. You, as the intermediary, issue your own commercial invoice to present under the master LC, with a goods description that matches the master LC exactly. Under UCP 600 Art 14(d), data across documents must not conflict \u2014 it doesn't have to be word-for-word identical, but the description on your invoice must correspond to the master LC. Per ISBP 745 Paragraph C4, your invoice must reflect what was actually shipped, and it can carry the full LC description alongside the actual shipment details.\n\nFor other documents \u2014 transport documents, certificates, packing lists \u2014 the non-contradiction standard under UCP 600 Art 14(d) gives you some flexibility. A transport document doesn't need to mirror the LC goods description verbatim, but it must not contradict it. If your supplier's B/L uses a general description that doesn't conflict with the master LC terms, it may pass examination as-is.\n\nWhat you should never do is alter your supplier's original documents. That crosses into document fraud, regardless of commercial intent.\n\nWhat still depends on your transaction: exactly which documents the master LC requires, whether the description gap is a conflict or just a difference in specificity, and whether your bank has any internal policies on back-to-back structures beyond UCP600.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 5,
+    "fallback_reasons": [],
+    "answer_length": 1647
+  },
+  {
+    "id": "GQ-68",
+    "title": "Everything at Once \u2014 5 Questions",
+    "error": "Client error '422 Unprocessable Entity' for url 'https://rulegpt-api.onrender.com/api/query'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422"
+  },
+  {
+    "id": "GQ-69",
+    "title": "Sanctions + FTA + Customs Union",
+    "answer": "This is an important question, but I have to be straight with you: the retrieved rules I have for this query cover WTO Trade Facilitation Agreement provisions on transit, advance rulings, and publication obligations \u2014 they don't contain the EU GSP+ non-manipulation/direct transport rules, the specific REX/Form A documentation requirements for Uzbekistan, EU sanctions rules on Uzbekistan, or the details of the EU-Turkey Customs Union. So here's what I can and can't tell you with authority.\n\nWhat the retrieved rules do support:\n\nUnder WTO TFA Article 11, goods transiting Turkey should not face customs duties on the transit movement itself, and Turkey cannot impose unnecessary delays or restrictions. That's the baseline transit protection. Separately, WTO TFA Article 3 means you can request a binding advance ruling from EU customs on origin status before the shipment moves \u2014 this is genuinely useful here and I'd recommend it.\n\nWhat you actually need to know \u2014 but I can't confirm from these rules:\n\nThe GSP+ direct transport / non-manipulation condition, what documentation Turkey requires to prove goods weren't commercially processed there, whether Uzbekistan is currently an active GSP+ beneficiary, current EU or OFAC sanctions exposure on Uzbekistan-origin textiles, and how the EU-Turkey Customs Union interacts with third-country GSP claims \u2014 none of that is in my retrieved ruleset for this query.\n\nFor the GSP+ origin and transit rules, go directly to the EU's GSP Regulation (EU) 978/2012 and the Delegated Regulation on Rules of Origin (EU) 2015/2446. For sanctions, check the EU's official sanctions map at sanctionsmap.eu and OFAC's SDN list.\n\nWhat still depends on your transaction: whether the goods will be stored, repackaged, or processed in Turkey at all \u2014 even minor handling can trigger the non-manipulation clause under EU GSP rules.",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citation_count": 4,
+    "fallback_reasons": [],
+    "answer_length": 1865
+  },
+  {
+    "id": "GQ-70",
+    "title": "Expert \u2014 Art 14(d) vs 14(f) Tension",
+    "error": "Client error '422 Unprocessable Entity' for url 'https://rulegpt-api.onrender.com/api/query'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422"
+  }
+]

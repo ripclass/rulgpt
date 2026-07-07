@@ -1,0 +1,473 @@
+[
+  {
+    "id": "GQ-01",
+    "title": "Third Party Document Trap",
+    "query": "The bank refused my documents saying the commercial invoice was issued by a third party, not the beneficiary. But I used my trading company to issue it \u2014 I AM the beneficiary. The trading company and the beneficiary are the same entity, just different letterhead. Is the bank right?",
+    "answer": "The bank's refusal is technically valid \u2014 but whether it's *correct* depends on one key fact: does the name on the invoice letterhead match the beneficiary name in the LC?\n\nUnder UCP600 Article 18, the invoice must *appear* to have been issued by the beneficiary. The operative word is \"appear\" \u2014 the bank examines documents on their face. If your trading company's letterhead shows a different name than what's in the LC as the beneficiary, the bank sees a document issued by a stranger to the credit, and that's a legitimate discrepancy [UCP600-18A, CROSSDOC-INV-LC-4].\n\nThe fact that you *know* they're the same entity doesn't help you at the counter. Banks don't look behind the documents [UCP600-18-DERIVED-001].\n\nThat said, if the names are genuinely the same \u2014 just styled differently (e.g., \"ABC Trading Co. Ltd\" vs \"ABC Trading Company Limited\") \u2014 that's a different argument. The standard is whether the invoice *appears* to be issued by the beneficiary, and minor stylistic differences in a name are generally not treated as a discrepancy [DOCDEX-010].\n\nWhat to do now:\n- Compare the exact name on the invoice letterhead against the exact beneficiary name in Field 59 of the LC.\n- If they differ in substance (not just punctuation or abbreviation), the bank is right and you need a corrected invoice.\n- If they're the same name in different formatting, push back in writing citing the \"appear to be\" standard and request the bank reconsider.\n\nWhat still depends on your transaction: The exact wording of both names, and whether this LC has been transferred (which would change the issuer requirement entirely).",
+    "confidence": "medium",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citations": [
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP 600 Article 18, ICC Publication No. 600",
+        "excerpt": "A commercial invoice must be issued by the beneficiary, made out in the applicant's name, in the same currency as the cr"
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP 600",
+        "excerpt": "A commercial invoice must appear to have been issued by the beneficiary named in the LC. An invoice issued by any other "
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP600 Art. 18(a)(i), ISBP745 C2",
+        "excerpt": "Invoice must be issued by the LC beneficiary (or name appearing to be the same)."
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP 600",
+        "excerpt": "The commercial invoice must: (a) appear to be issued by the beneficiary; (b) be made out in the name of the applicant (u"
+      },
+      {
+        "rulebook": "unknown",
+        "reference": "n/a",
+        "excerpt": "Invoice must appear to be issued by beneficiary. Name change must be indicated properly."
+      }
+    ],
+    "answer_length": 1621
+  },
+  {
+    "id": "GQ-02",
+    "title": "Tolerance on LC Amount",
+    "query": "My LC amount is USD 50,000. I shipped goods worth USD 52,300. The LC doesn't say anything about tolerance. Will the bank accept my documents or is this a discrepancy?",
+    "answer": "This is a discrepancy. Your drawing amount of USD 52,300 exceeds the LC amount of USD 50,000 by USD 2,300 \u2014 that's 4.6% over, and the bank cannot pay more than the LC amount regardless of what you shipped.\n\nHere's why the tolerance rules don't save you here:\n\n- The \u00b15% quantity tolerance [UCP600 Art 30(b)] only applies when the LC doesn't stipulate a specific quantity in packing units or individual items \u2014 and critically, it only works if the total drawing still doesn't exceed the LC amount. Your drawing exceeds the LC amount, so this tolerance doesn't help.\n- The 5% under-drawing tolerance [UCP600 Art 30(c)] allows you to draw *less* than the LC amount when full quantity is shipped. That's the opposite of your situation.\n- The \u00b110% tolerance [UCP600 Art 30(a)] only applies when the LC uses the words \"about\" or \"approximately.\" Yours doesn't.\n\nWhat you should do: You have two practical options. First, amend your commercial invoice to draw exactly USD 50,000 \u2014 the maximum the LC permits \u2014 and absorb or separately recover the USD 2,300 difference outside the LC (direct payment, open account, etc.). Second, request an LC amendment from the applicant to increase the LC amount to at least USD 52,300 before presenting documents. Don't present at USD 52,300 as-is \u2014 the bank will refuse it.",
+    "confidence": "medium",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citations": [
+      {
+        "rulebook": "UN",
+        "reference": "n/a",
+        "excerpt": "LC amount tolerance of 5% applies unless LC prohibits or states a specific quantity without tolerance."
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP 600",
+        "excerpt": "When the words 'about' or 'approximately' are used in relation to an LC amount, quantity, or unit price, a tolerance of "
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP 600",
+        "excerpt": "A tolerance of 5% less than the LC amount is allowed provided the full quantity of goods is shipped and the LC does not "
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP 600",
+        "excerpt": "A tolerance of 5% more or less in the quantity of goods is allowed if the LC does not stipulate the quantity in a stated"
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP 600",
+        "excerpt": "UCP 600 Art 30 provides tolerance rules to accommodate normal commercial variances: (a) '\u00b15%' after credit amount, maxim"
+      }
+    ],
+    "answer_length": 1303
+  },
+  {
+    "id": "GQ-03",
+    "title": "Late Presentation vs Expired LC",
+    "query": "I shipped on March 1. My LC expires April 30. I'm presenting documents on March 25 \u2014 that's 24 days after shipment. The LC doesn't mention any specific presentation period. Is my presentation late?",
+    "answer": "Yes, your presentation is late \u2014 and this is a discrepancy.\n\nThe rule is clear: documents must be presented no later than 21 calendar days after the date of shipment, and no later than the LC expiry date. Both conditions must be met [UCP600 Art. 14(c)]. Your LC doesn't specify a different presentation period, so the default 21-day rule applies. March 1 + 21 days = March 22. You're presenting on March 25 \u2014 three days late. The fact that your LC doesn't expire until April 30 doesn't help you here. Being within expiry is necessary but not sufficient [UCP600 Art. 14(c); DOCDEX-001].\n\nWhat this means practically: The bank is entitled to refuse your documents on the basis of late presentation. This is a hard discrepancy, not a grey area.\n\nYour options:\n\n- Ask the bank to accept the documents on an approval basis (they contact the applicant and seek a waiver). The applicant can waive the discrepancy, but they're not obligated to.\n- If the applicant agrees, get that waiver confirmed quickly \u2014 you still have time before the April 30 expiry.\n- If the applicant refuses, you're outside the LC and would need to fall back on your underlying sales contract.\n\nDon't delay. Contact your bank today and flag the late presentation proactively \u2014 it's better than waiting for a formal refusal notice.",
+    "confidence": "medium",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citations": [
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP600 Art. 14(c)",
+        "excerpt": "Documents must be presented within 21 days of shipment (or LC-specified period) and before expiry."
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP 600",
+        "excerpt": "A presentation of documents must be made by the beneficiary or a nominated bank no later than 21 calendar days after the"
+      },
+      {
+        "rulebook": "unknown",
+        "reference": "n/a",
+        "excerpt": "When a presenter cures a discrepancy and re-presents, the re-presentation must satisfy the LC's time constraints as if i"
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP 600",
+        "excerpt": "Documents must be presented no later than 21 calendar days after the date of shipment, AND no later than the LC expiry d"
+      },
+      {
+        "rulebook": "unknown",
+        "reference": "n/a",
+        "excerpt": "Documents presented after 21 calendar days from B/L date constitute a discrepancy even if within LC validity."
+      }
+    ],
+    "answer_length": 1297
+  },
+  {
+    "id": "GQ-04",
+    "title": "Multimodal vs Bill of Lading",
+    "query": "My client's LC calls for a 'Bill of Lading' but the shipment is container door-to-door from Jebel Ali to Rotterdam, with a truck leg from the factory to the port. The shipping line will only issue a multimodal transport document, not a marine bill of lading. Can I present the multimodal document against an LC that says 'Bill of Lading'?",
+    "answer": "The Rotterdam Rules (UN Convention on Contracts for the International Carriage of Goods Wholly or Partly by Sea, 2009) extend the carrier's liability period beyond the sea leg to the full door-to-door transport movement: from the point where the carrier receives the goods from the shipper to the point of delivery to the consignee. [unknown n/a]\n\n- [unknown n/a] Commodity trade often uses Contracts of Affreightment (COA) or consecutive voyage charters for bulk shipments over a period (grain, coal, iron ore, fertiliser).\n\n- [Incoterms 2020 n/a] The transport document presented under an LC must be compatible with both the Incoterm and the mode of transport.",
+    "confidence": "medium",
+    "model": "fallback",
+    "routing_tier": "sonnet",
+    "citations": [
+      {
+        "rulebook": "unknown",
+        "reference": "n/a",
+        "excerpt": "The Rotterdam Rules (UN Convention on Contracts for the International Carriage of Goods Wholly or Partly by Sea, 2009) e"
+      },
+      {
+        "rulebook": "unknown",
+        "reference": "n/a",
+        "excerpt": "Commodity trade often uses Contracts of Affreightment (COA) or consecutive voyage charters for bulk shipments over a per"
+      },
+      {
+        "rulebook": "Incoterms 2020",
+        "reference": "n/a",
+        "excerpt": "The transport document presented under an LC must be compatible with both the Incoterm and the mode of transport. Sea-on"
+      },
+      {
+        "rulebook": "unknown",
+        "reference": "n/a",
+        "excerpt": "Oil tanker bills of lading have document-specific requirements distinct from dry cargo BLs: (a) they are typically issue"
+      },
+      {
+        "rulebook": "RCEP",
+        "reference": "n/a",
+        "excerpt": "Rotterdam Rules Articles 50\u201356 establish a novel concept: the 'right of control' \u2014 the right of the controlling party (s"
+      }
+    ],
+    "answer_length": 662
+  },
+  {
+    "id": "GQ-05",
+    "title": "RCEP Cumulation",
+    "query": "I manufacture car brake pads in Thailand using steel imported from Japan and rubber from Malaysia. I want to export to South Korea under RCEP preferential tariff. Can I cumulate the Japanese and Malaysian inputs to meet the origin requirement?",
+    "answer": "Yes, RCEP's full cumulation rule is designed exactly for this kind of multi-country supply chain. Under [RCEP Chapter 3, Article 3.4], production processes carried out in any RCEP member country can be counted toward origin determination \u2014 so your Japanese steel and Malaysian rubber can both be cumulated with your Thai manufacturing when assessing whether the brake pads qualify as RCEP originating.\n\nThe general origin framework [RCEP Chapter 3, Article 3.2] gives you three pathways: wholly obtained, produced exclusively from originating materials, or satisfying the Product Specific Rules (PSR). Since your inputs are non-originating at the point of import into Thailand, you'll need to check the PSR for brake pads (likely classified under HS 8708.30) to confirm which test applies \u2014 typically a tariff classification change, regional value content threshold, or a combination of both.\n\nIf you satisfy the PSR with cumulation applied, you'll need a Certificate of Origin (Form RCEP) issued by Thailand's competent authority or via an approved exporter declaration [RCEP Chapter 3, Article 3.16]. Keep your production records and supplier origin documentation \u2014 South Korea can request verification through written inquiry or a verification visit [RCEP Chapter 3, Article 3.24].\n\nOne important caveat: The retrieved rules confirm RCEP covers 15 Asia-Pacific countries but do not explicitly list them. I cannot confirm Thailand, Japan, Malaysia, and South Korea are all RCEP members from the rules I have. Please verify all four countries' membership with the RCEP Secretariat or your national trade authority before relying on preferential treatment \u2014 getting this wrong means denied tariff preference and potential customs penalties.\n\nWhat still depends on your transaction: the specific PSR for your brake pad HS code, and whether your Japanese steel and Malaysian rubber suppliers can provide origin declarations to support your cumulation claim.",
+    "confidence": "low",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citations": [
+      {
+        "rulebook": "RCEP",
+        "reference": "RCEP Chapter 3, Article 3.2",
+        "excerpt": "Goods qualify as RCEP originating if wholly obtained, produced exclusively from originating materials, or satisfy Produc"
+      },
+      {
+        "rulebook": "RCEP",
+        "reference": "RCEP Chapter 3, Article 3.4",
+        "excerpt": "RCEP allows full cumulation - production processes in any RCEP member can be counted toward origin determination."
+      },
+      {
+        "rulebook": "RCEP",
+        "reference": "RCEP Chapter 3, Article 3.16",
+        "excerpt": "RCEP preferential treatment requires Certificate of Origin (Form RCEP) issued by competent authority or approved exporte"
+      },
+      {
+        "rulebook": "RCEP",
+        "reference": "RCEP Chapter 3, Article 3.24",
+        "excerpt": "Importing party may verify origin through written request to exporter/producer, verification visit (with consent), or th"
+      },
+      {
+        "rulebook": "RCEP",
+        "reference": "RCEP Agreement, Chapter 3",
+        "excerpt": "RCEP (Regional Comprehensive Economic Partnership) includes 15 Asia-Pacific countries. Largest trade bloc by GDP."
+      }
+    ],
+    "answer_length": 1955
+  },
+  {
+    "id": "GQ-06",
+    "title": "USMCA Automotive Rules of Origin",
+    "query": "We assemble passenger vehicles in Mexico using engines from the US and transmissions from Japan. What's the Regional Value Content threshold for the finished vehicle under USMCA, and does the Japanese transmission disqualify us?",
+    "answer": "The RVC threshold for passenger vehicles under USMCA is 75% on a net cost basis, which has been in effect since 2023. [USMCA Chapter 4, Appendix]\n\nOn the Japanese transmission \u2014 it doesn't automatically disqualify you, but it does count as non-originating material, which means its value works against your RVC calculation. The key question is whether enough of your total vehicle value comes from North American content (Mexico, US, Canada) to still clear 75%. Your US-sourced engines help significantly here, since USMCA allows accumulation of production and value across all three member countries \u2014 so the US engine content counts fully toward your RVC. [USMCA Chapter 4, Article 4.4]\n\nTwo additional requirements you need to be aware of beyond RVC:\n\n- Labor Value Content (LVC): A portion of the vehicle's value must come from workers earning at least $16/hour. This is a separate USMCA-specific test. [USMCA Chapter 4, Article 4.18]\n- Steel and aluminum: 70% of your steel and aluminum purchases must be sourced from North America. [USMCA Chapter 4]\n\nSo the Japanese transmission is a headwind, not a dealbreaker \u2014 it depends on the math.\n\nWhat still depends on your transaction: The actual value of the transmission as a share of total vehicle net cost; whether your LVC calculation clears the required threshold; and your steel/aluminum sourcing breakdown. You'll need a full RVC calculation before you can certify origin with confidence.",
+    "confidence": "low",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citations": [
+      {
+        "rulebook": "USMCA",
+        "reference": "USMCA Chapter 4, Article 4.18",
+        "excerpt": "USMCA uniquely requires Labor Value Content - percentage of vehicle value from high-wage labor ($16+/hour)."
+      },
+      {
+        "rulebook": "USMCA",
+        "reference": "USMCA Chapter 4, Appendix",
+        "excerpt": "USMCA has strict automotive rules. Passenger vehicles require 75% RVC (net cost) by 2023."
+      },
+      {
+        "rulebook": "USMCA",
+        "reference": "USMCA Chapter 4",
+        "excerpt": "Goods qualify as originating if wholly obtained, produced entirely from originating materials, or satisfy PSR using CTC "
+      },
+      {
+        "rulebook": "USMCA",
+        "reference": "USMCA Chapter 4, Article 4.4",
+        "excerpt": "USMCA allows accumulation of production/value across three parties."
+      },
+      {
+        "rulebook": "USMCA",
+        "reference": "USMCA Chapter 4",
+        "excerpt": "Automotive: 70% of steel/aluminum purchases must be from North America."
+      }
+    ],
+    "answer_length": 1446
+  },
+  {
+    "id": "GQ-07",
+    "title": "Bangladesh RCEP Trick Question",
+    "query": "I export ready-made garments from Bangladesh to Australia. Can I use RCEP certificate of origin to get preferential tariff since Australia is an RCEP member?",
+    "answer": "The critical issue here is membership, and I have to be straight with you: the rules I have don't explicitly confirm whether Bangladesh is an RCEP member. Before anything else, you need to verify this with the RCEP Secretariat or the Australian Border Force (ABF) website. Getting this wrong means your CoO gets rejected at customs and you lose the preferential tariff \u2014 so don't assume.\n\nIf Bangladesh is an RCEP member, here's how the framework applies to your situation:\n\n- You'd need a Form RCEP Certificate of Origin issued by a competent authority or an approved exporter declaration [RCEP Chapter 3, Article 3.16]. In Bangladesh, that's typically the Export Promotion Bureau (EPB) \u2014 but confirm this locally.\n- Your garments must qualify as RCEP originating \u2014 either wholly obtained in Bangladesh, made from originating materials, or meeting the Product Specific Rules (PSR) for your HS code [RCEP Chapter 3, Article 3.2]. For ready-made garments, the PSR is usually a yarn-forward or fabric-forward rule \u2014 check the RCEP PSR annex for your specific HS code.\n- The CoO is valid for 12 months from issue date [RCEP Chapter 3].\n- Australia can request origin verification, so keep your production records [RCEP Chapter 3, Article 3.24].\n\nWhat still depends on your transaction: Your garment's HS code (determines which PSR applies), whether your fabric/yarn sourcing meets that PSR, and \u2014 most importantly \u2014 Bangladesh's RCEP membership status.",
+    "confidence": "low",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citations": [
+      {
+        "rulebook": "RCEP",
+        "reference": "RCEP Chapter 3, Article 3.16",
+        "excerpt": "RCEP preferential treatment requires Certificate of Origin (Form RCEP) issued by competent authority or approved exporte"
+      },
+      {
+        "rulebook": "RCEP",
+        "reference": "RCEP Chapter 3, Article 3.2",
+        "excerpt": "Goods qualify as RCEP originating if wholly obtained, produced exclusively from originating materials, or satisfy Produc"
+      },
+      {
+        "rulebook": "RCEP",
+        "reference": "RCEP Chapter 3",
+        "excerpt": "RCEP Certificate of Origin valid for 12 months from date of issue."
+      },
+      {
+        "rulebook": "RCEP",
+        "reference": "RCEP Chapter 3, Article 3.24",
+        "excerpt": "Importing party may verify origin through written request to exporter/producer, verification visit (with consent), or th"
+      },
+      {
+        "rulebook": "RCEP",
+        "reference": "RCEP Chapter 3, Article 3.4",
+        "excerpt": "RCEP allows full cumulation - production processes in any RCEP member can be counted toward origin determination."
+      }
+    ],
+    "answer_length": 1449
+  },
+  {
+    "id": "GQ-08",
+    "title": "UAE Transshipment and Iran Sanctions",
+    "query": "We received an LC for medical equipment from a German exporter to a company in Dubai. The goods are listed as medical devices but the end-user certificate shows a hospital in Tehran, Iran. The applicant says medical goods are exempt from sanctions. Are they right? What should we check?",
+    "answer": "This is a serious red flag \u2014 stop and escalate before processing. The applicant's claim that \"medical goods are exempt\" is a dangerous oversimplification.\n\nThe humanitarian exemption is narrow and conditional. Under OFAC's Iran sanctions, there is a general license for humanitarian transactions involving medicine and medical devices (OFAC, 31 CFR 560.530), but it does not authorize transactions that involve the Government of Iran or any SDN, items with potential military end-use, or routing through SWIFT-excluded Iranian banks. A commercial trade transaction cannot simply claim the humanitarian GL \u2014 there must be a clear showing of exclusively humanitarian purpose (OFAC-IRAN-006).\n\nHere's what you need to check:\n\n- Diversion risk. The LC applicant is in Dubai but the end-user is in Tehran. UAE banks are required to check shipment routing to ensure goods aren't transiting to sanctioned destinations (AE-ROUTING-001, CBUAE Guidelines). An end-use certificate pointing to Iran makes this exactly the scenario those checks exist for (AE-SANCTIONS-002).\n- Dual-use screening. Some medical devices (imaging equipment, certain electronics) can be dual-use. Screen the specific goods description against dual-use control lists (SANC-DUALUSE-001).\n- EU export controls. The exporter is German \u2014 EU sanctions and export licensing requirements apply on the exporter's side independently of OFAC.\n\nThe LC structure here \u2014 Dubai applicant, Iranian end-user \u2014 is a classic TBML/sanctions evasion pattern. Do not rely on the applicant's assurance. This needs your compliance team and likely external sanctions counsel involved immediately.\n\nWhat still depends on your transaction: the exact medical device classification, whether any party is an SDN, which Iranian bank (if any) is involved, and whether the German exporter holds an EU export license.",
+    "confidence": "low",
+    "model": "claude-opus-4-6",
+    "routing_tier": "opus",
+    "citations": [
+      {
+        "rulebook": "UN",
+        "reference": "CBUAE Guidelines, UAE Export Control",
+        "excerpt": "UAE banks may require end-use certificates/statements for sensitive goods to prevent diversion."
+      },
+      {
+        "rulebook": "EU",
+        "reference": "n/a",
+        "excerpt": "Check if goods are prohibited for export to Russia under EU sanctions packages."
+      },
+      {
+        "rulebook": "OFAC",
+        "reference": "31 CFR 560.530; 31 CFR 560.550; OFAC ITSR FAQ 201\u2013215",
+        "excerpt": "OFAC GL authorizes certain personal remittances to or from Iran (31 CFR 560.550) and humanitarian transactions involving"
+      },
+      {
+        "rulebook": "EU",
+        "reference": "n/a",
+        "excerpt": "Check if goods description contains potential dual-use items requiring export license."
+      },
+      {
+        "rulebook": "UN",
+        "reference": "CBUAE Guidelines, UAE Sanctions",
+        "excerpt": "UAE banks check shipment routing to ensure goods don't transit through or originate from sanctioned countries."
+      }
+    ],
+    "answer_length": 1849
+  },
+  {
+    "id": "GQ-09",
+    "title": "Russian Oil Price Cap",
+    "query": "A client wants to ship Russian crude oil from Novorossiysk to India. The price is $58 per barrel. Is this compliant with the G7 price cap? What vessel checks do I need to do?",
+    "answer": "At $58/bbl, the price is below the G7 price cap of USD 60/bbl for Russian crude, so on price alone the transaction can be serviced by coalition-country operators \u2014 meaning EU/G7 insurers, banks, and shipping companies can provide transport, financing, and insurance [EU Regulation 2022/1904; Council Regulation (EU) 833/2014 Article 3n]. But price compliance is only one piece. Here's what else you need to nail down:\n\n- Attestation requirement. The vessel and your client must provide a written attestation that the cargo was purchased at or below the price cap. This is mandatory for any coalition-country service provider touching the shipment [G7/EU Price Cap Coalition \u2014 VESSEL-RUSSIA-OIL-001].\n\n- Shadow fleet screening. Check the vessel carefully. Red flags include: flag of convenience registered after Feb 2022 (Gabon, Palau, Cameroon, Togo, Belize are common), recently formed owner/manager with no verifiable track record, vessel purchased by a new entity in 2022\u2013present, and opaque beneficial ownership. Any of these indicators should trigger escalation [OFAC Shadow Fleet Advisory 2024; EU 14th Sanctions Package \u2014 VESSEL-FLAG-003].\n\n- US nexus matters. If any US person, US-dollar clearing, or US-nexus bank is involved, note that OFAC prohibits US persons from financing the import of Russian-origin crude entirely \u2014 the price cap doesn't save you on the US side [EO 14024 Directive 4; EO 14066; 31 CFR 587.201 \u2014 OFAC-RUSSIA-006].\n\nWhat still depends on your transaction: Which jurisdiction your bank, insurer, and shipowner sit in (EU/UK/US each have different rules); whether the vessel or any counterparty is on the SDN or EU consolidated sanctions list; and whether the $58 price includes all costs or just FOB \u2014 the price cap applies to the purchase price and coalition guidance specifies how ancillary costs factor in, which my retrieved rules don't detail fully. Verify that with your compliance team against the latest coalition FAQ.",
+    "confidence": "medium",
+    "model": "claude-opus-4-6",
+    "routing_tier": "opus",
+    "citations": [
+      {
+        "rulebook": "EU",
+        "reference": "EU Regulation 2022/1904; G7 Price Cap Coalition; Council Regulation (EU) 833/2014 Article 3n",
+        "excerpt": "EU Regulation 2022/1904 and the G7 Price Cap Coalition prohibit EU operators from providing services \u2014 including maritim"
+      },
+      {
+        "rulebook": "EU",
+        "reference": "G7/EU Price Cap Coalition",
+        "excerpt": "Vessels carrying Russian oil must provide attestation that cargo purchased at/below price cap."
+      },
+      {
+        "rulebook": "OFAC",
+        "reference": "OFAC Shadow Fleet Advisory 2024; EU 14th Sanctions Package shadow fleet provisions; G7 Price Cap Coalition guidance",
+        "excerpt": "Since 2022, a 'shadow fleet' of vessels \u2014 typically older tankers registered under flags of convenience (Gabon, Palau, C"
+      },
+      {
+        "rulebook": "export_controls_core_v1",
+        "reference": "n/a",
+        "excerpt": "Escalate when the transaction combines strategic-sector goods or shipping activity with price-cap attestations, restrict"
+      },
+      {
+        "rulebook": "OFAC",
+        "reference": "EO 14024 Directive 4; EO 14066; EO 14068; 31 CFR 587.201",
+        "excerpt": "EO 14024 Directive 4 and subsequent Executive Orders prohibit US persons from making new investments in the Russian ener"
+      }
+    ],
+    "answer_length": 1957
+  },
+  {
+    "id": "GQ-10",
+    "title": "CIF vs FOB Insurance Under LC",
+    "query": "My supplier in India is shipping fabric under CIF New York. The LC calls for CIF. Who is responsible for insurance \u2014 me or the supplier? And does the insurance document need to be presented with the LC documents? My supplier says insurance is 'included in the price' so I don't need a separate policy.",
+    "answer": "Your supplier is responsible for the insurance \u2014 that's the whole point of CIF. Under Incoterms 2020 CIF, the seller must procure marine cargo insurance covering the buyer's risk during transit, at a minimum of Institute Cargo Clauses (C) [Incoterms 2020 - CIF]. \"Included in the price\" just means the cost of the premium is built into the CIF price \u2014 it doesn't mean you skip the document.\n\nAnd yes, the insurance document absolutely must be presented under the LC. Because your LC calls for CIF, the insurance certificate is a mandatory document [UCP600 Art. 28, Incoterms 2020 CIF]. The minimum coverage required is 110% of the CIF invoice value [UCP600 Art. 28 / ISBP745 K5, Incoterms 2020 CIF]. The certificate must also be transferable to you as the buyer [Incoterms 2020 - CIF].\n\nIf your supplier presents documents without an insurance certificate, the bank will raise a discrepancy and can refuse to pay. This is not a grey area.\n\nTell your supplier: the insurance certificate \u2014 not just the premium being \"included\" \u2014 must be presented as part of the LC document set, endorsed or made out in a way that transfers the benefit to you.\n\nWhat still depends on your transaction: Whether your LC's Field 46A explicitly lists the insurance document (it should), and whether it specifies a coverage level above the ICC(C) minimum. Check those LC terms \u2014 if the LC requires ICC(A) or a specific percentage above 110%, the supplier must meet that higher standard.",
+    "confidence": "low",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citations": [
+      {
+        "rulebook": "Incoterms 2020",
+        "reference": "Incoterms 2020 - CIF",
+        "excerpt": "Most common LC term. Seller pays freight AND insurance to destination. Risk transfers on board. SEA ONLY. Insurance mini"
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "Incoterms 2020, UCP600 Art. 28",
+        "excerpt": "CIF and CIP Incoterms require insurance. If LC uses these terms, insurance document mandatory."
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP600 Art 28, ISBP745 K5, Incoterms 2020 - CIF",
+        "excerpt": "Under CIF terms, seller must provide insurance. LC documents must include insurance certificate at minimum 110% of CIF v"
+      },
+      {
+        "rulebook": "Incoterms 2020",
+        "reference": "n/a",
+        "excerpt": "CIF (Cost, Insurance and Freight) is a sea-only term. The seller pays freight to the named port of destination and must "
+      },
+      {
+        "rulebook": "Incoterms 2020",
+        "reference": "n/a",
+        "excerpt": "Under CFR, the seller has no obligation to procure insurance for the goods during transit. Risk passes to the buyer at t"
+      }
+    ],
+    "answer_length": 1463
+  },
+  {
+    "id": "GQ-11",
+    "title": "HDFC Bank Presentation Period",
+    "query": "I received an LC from HDFC Bank India. The LC says 'Documents must be presented within 15 days of shipment.' UCP600 says 21 days. Which one applies? Can HDFC override UCP600?",
+    "answer": "The 15 days applies. HDFC hasn't \"overridden\" UCP600 \u2014 they've used a mechanism UCP600 explicitly allows.\n\nUCP600 Article 14(c) [MT700-48-001] sets 21 days as the default presentation period, not a minimum or a fixed rule. The LC itself can specify a shorter (or longer) period, and when it does, that stated period governs. HDFC putting \"15 days\" in Field 48 of the MT700 is exactly how this is supposed to work. The 21-day default only kicks in when the LC is silent on presentation period.\n\nSo no, HDFC isn't overriding UCP600 \u2014 they're operating within it.\n\nWhat this means for you practically:\n\n- Your clock starts on the shipment date (the date on the bill of lading or equivalent transport document)\n- You have 15 calendar days from that date to present complying documents to the nominated bank\n- You must also stay within the LC's overall expiry date [MT700-31D-001] \u2014 whichever deadline falls first controls\n\n15 days is tight. If your shipment is going by sea and your freight forwarder takes a few days to release the BL, you can run out of time fast. Get your document preparation process moving the moment goods are loaded.\n\nWhat still depends on your transaction: whether the LC specifies banking days or calendar days for the 15-day count. If it doesn't say, treat them as calendar days \u2014 that's standard practice.",
+    "confidence": "medium",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citations": [
+      {
+        "rulebook": "UCP600",
+        "reference": "SWIFT MT700 Standards, UCP600 Art 14(c)",
+        "excerpt": "Field 48 specifies the number of days after shipment within which documents must be presented. Default is 21 days per UC"
+      },
+      {
+        "rulebook": "ISO 20022",
+        "reference": "ISO 20022 trad.001 / PrestnPrd",
+        "excerpt": "Number of days after shipment date within which documents must be presented. Default 21 days per UCP600."
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "SWIFT MT700 Standards, UCP600 Art 3",
+        "excerpt": "Field 44C specifies the latest date by which shipment must be effected. Format: YYMMDD."
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "SWIFT MT700 Standards, UCP600 Art 6",
+        "excerpt": "Field 31D contains the expiry date (YYMMDD) and place where documents must be presented. Both are mandatory."
+      },
+      {
+        "rulebook": "unknown",
+        "reference": "n/a",
+        "excerpt": "Deutsche Bank applies zero tolerance on shipment dates. Shipment must be on or before the latest shipment date specified"
+      }
+    ],
+    "answer_length": 1329
+  },
+  {
+    "id": "GQ-12",
+    "title": "Crypto Payment for Trade",
+    "query": "Can I pay for my import shipment using Bitcoin instead of opening an LC? My supplier in China accepts crypto. What are the trade compliance rules for cryptocurrency payments?",
+    "answer": "I specialize in trade finance compliance rules. That question sits outside this product's scope.",
+    "confidence": "low",
+    "model": "none",
+    "routing_tier": "sonnet",
+    "citations": [],
+    "answer_length": 96
+  },
+  {
+    "id": "GQ-13",
+    "title": "Income Tax on Export Revenue",
+    "query": "How much income tax do I pay on my export revenue in Kenya? Are there any export tax incentives?",
+    "answer": "I specialize in trade finance compliance rules. That question sits outside this product's scope.",
+    "confidence": "low",
+    "model": "none",
+    "routing_tier": "sonnet",
+    "citations": [],
+    "answer_length": 96
+  },
+  {
+    "id": "GQ-14",
+    "title": "Document Validation Request",
+    "error": "The read operation timed out"
+  },
+  {
+    "id": "GQ-15",
+    "title": "Legal Opinion on DOCDEX",
+    "query": "The issuing bank refused my documents citing 3 discrepancies. I believe 2 of them are wrong \u2014 the bank is misinterpreting UCP600 Article 14. I want to take this to ICC DOCDEX arbitration. Can you tell me if I have a strong case and whether I should proceed?",
+    "answer": "That's a frustrating position to be in \u2014 let me give you a straight answer.\n\nWhether you have a strong DOCDEX case depends on two things: whether the bank's refusal notice was procedurally valid, and whether their interpretation of Article 14 is actually wrong on the merits.\n\nOn the procedural side, check this first. Under [UCP600 Article 16(c)(ii)], the refusal notice must state *each* discrepancy specifically. If the bank listed all three discrepancies clearly and gave notice by the close of the fifth banking day after presentation, the notice is procedurally valid. If it was vague or late, [UCP600 Article 16(f)] kicks in \u2014 the bank is precluded from claiming non-compliance entirely, and you may not even need DOCDEX.\n\nOn the Article 14 merits. The key standard is that data in documents need not be *identical* but must not *conflict* [UCP600 Article 14]. If the bank is treating a non-conflicting difference as a discrepancy, that's a misapplication of the rule \u2014 and that's exactly the kind of dispute DOCDEX handles well.\n\nBefore you file, though: DOCDEX gives an expert opinion, not a binding judgment. It carries significant persuasive weight, but enforcement still depends on the issuing bank and the courts in its jurisdiction. It's also not free. Weigh that against the value of the LC.\n\nWhat still depends on your transaction: the exact wording of the two disputed discrepancies, the specific LC terms, and whether the refusal notice was issued within the five-day window.",
+    "confidence": "medium",
+    "model": "anthropic/claude-sonnet-4.6",
+    "routing_tier": "sonnet",
+    "citations": [
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP 600 Article 16, ICC Publication No. 600",
+        "excerpt": "When a bank determines a presentation is not complying, it may refuse to honour or negotiate. If refusing, it must issue"
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP 600 Article 7, ICC Publication No. 600",
+        "excerpt": "The issuing bank is irrevocably bound from the moment it issues the credit. It must honor a complying presentation if do"
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "n/a",
+        "excerpt": "UCP 600 Article 16(c)(ii) requires that a refusal notice must state each discrepancy in respect of which the bank refuse"
+      },
+      {
+        "rulebook": "UCP600",
+        "reference": "UCP 600 Article 14, ICC Publication No. 600",
+        "excerpt": "Banks must examine documents on their face to determine compliance. They have up to five banking days to decide. Present"
+      },
+      {
+        "rulebook": "UN",
+        "reference": "n/a",
+        "excerpt": "Under UCP 600, the issuing bank's obligation to honour is conditional on a complying presentation. When documents are di"
+      }
+    ],
+    "answer_length": 1493
+  }
+]
