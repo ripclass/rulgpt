@@ -73,6 +73,7 @@ class BillingConfigStatusResponse(BaseModel):
     professional_annual_price_configured: bool
     enterprise_monthly_price_configured: bool
     enterprise_annual_price_configured: bool
+    pro_monthly_price_configured: bool
     checkout_ready: bool
     webhook_ready: bool
     oneoff_prices_configured: bool

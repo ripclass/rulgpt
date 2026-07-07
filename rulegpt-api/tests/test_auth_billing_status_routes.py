@@ -49,6 +49,7 @@ def billing_configured(monkeypatch):
     monkeypatch.setattr(settings, "STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID", "price_professional_annual")
     monkeypatch.setattr(settings, "STRIPE_ENTERPRISE_MONTHLY_PRICE_ID", "price_enterprise_monthly")
     monkeypatch.setattr(settings, "STRIPE_ENTERPRISE_ANNUAL_PRICE_ID", "price_enterprise_annual")
+    monkeypatch.setattr(settings, "STRIPE_PRO_MONTHLY_PRICE_ID", "price_pro_monthly")
     yield
 
 
@@ -93,11 +94,28 @@ def test_billing_status_reports_checkout_and_webhook_readiness(billing_configure
     assert response.status_code == 200
     data = response.json()
     assert data["stripe_configured"] is True
+    assert data["pro_monthly_price_configured"] is True
     assert data["checkout_ready"] is True
     assert data["webhook_ready"] is True
     assert data["blockers"] == []
     assert data["supported_plans"] == ["professional", "enterprise"]
     assert data["supported_intervals"] == ["monthly", "annual"]
+
+
+def test_billing_status_checkout_not_ready_without_pro_monthly_price(billing_configured, monkeypatch):
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "STRIPE_PRO_MONTHLY_PRICE_ID", "")
+
+    client = TestClient(_build_app())
+
+    response = client.get("/api/billing/status")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["pro_monthly_price_configured"] is False
+    assert data["checkout_ready"] is False
+    assert "Pro monthly Stripe price ID is missing." in data["blockers"]
 
 
 def test_billing_status_reports_missing_stripe_blockers(monkeypatch):
@@ -109,6 +127,7 @@ def test_billing_status_reports_missing_stripe_blockers(monkeypatch):
     monkeypatch.setattr(settings, "STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID", "")
     monkeypatch.setattr(settings, "STRIPE_ENTERPRISE_MONTHLY_PRICE_ID", "")
     monkeypatch.setattr(settings, "STRIPE_ENTERPRISE_ANNUAL_PRICE_ID", "")
+    monkeypatch.setattr(settings, "STRIPE_PRO_MONTHLY_PRICE_ID", "")
 
     client = TestClient(_build_app())
 
@@ -123,4 +142,5 @@ def test_billing_status_reports_missing_stripe_blockers(monkeypatch):
     assert "Professional annual Stripe price ID is missing." in data["blockers"]
     assert "Enterprise monthly Stripe price ID is missing." in data["blockers"]
     assert "Enterprise annual Stripe price ID is missing." in data["blockers"]
+    assert "Pro monthly Stripe price ID is missing." in data["blockers"]
     assert "Stripe webhook secret is missing." in data["blockers"]

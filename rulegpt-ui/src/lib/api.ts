@@ -67,6 +67,7 @@ export interface BillingConfigStatusResponse {
   professional_annual_price_configured: boolean
   enterprise_monthly_price_configured: boolean
   enterprise_annual_price_configured: boolean
+  pro_monthly_price_configured: boolean
   checkout_ready: boolean
   webhook_ready: boolean
   supported_plans: BillingPlan[]

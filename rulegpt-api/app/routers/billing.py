@@ -33,6 +33,9 @@ async def billing_status() -> BillingConfigStatusResponse:
     professional_annual = bool(settings.STRIPE_PROFESSIONAL_ANNUAL_PRICE_ID)
     enterprise_monthly = bool(settings.STRIPE_ENTERPRISE_MONTHLY_PRICE_ID)
     enterprise_annual = bool(settings.STRIPE_ENTERPRISE_ANNUAL_PRICE_ID)
+    # The upgrade page's only checkout button is Pro $29/mo — checkout_ready
+    # must gate on its price ID too, or the button 503s when clicked.
+    pro_monthly = bool(settings.STRIPE_PRO_MONTHLY_PRICE_ID)
     webhook_secret_configured = bool(billing_client.webhook_secret)
     checkout_ready = (
         stripe_configured
@@ -40,6 +43,7 @@ async def billing_status() -> BillingConfigStatusResponse:
         and professional_annual
         and enterprise_monthly
         and enterprise_annual
+        and pro_monthly
     )
     webhook_ready = stripe_configured and webhook_secret_configured
     oneoff_prices_configured = bool(settings.STRIPE_CASE_NOTE_PRICE_ID) and bool(settings.STRIPE_DRAFT_PRICE_ID)
@@ -55,6 +59,8 @@ async def billing_status() -> BillingConfigStatusResponse:
         blockers.append("Enterprise monthly Stripe price ID is missing.")
     if not enterprise_annual:
         blockers.append("Enterprise annual Stripe price ID is missing.")
+    if not pro_monthly:
+        blockers.append("Pro monthly Stripe price ID is missing.")
     if not webhook_secret_configured:
         blockers.append("Stripe webhook secret is missing.")
 
@@ -66,6 +72,7 @@ async def billing_status() -> BillingConfigStatusResponse:
         professional_annual_price_configured=professional_annual,
         enterprise_monthly_price_configured=enterprise_monthly,
         enterprise_annual_price_configured=enterprise_annual,
+        pro_monthly_price_configured=pro_monthly,
         checkout_ready=checkout_ready,
         webhook_ready=webhook_ready,
         oneoff_prices_configured=oneoff_prices_configured,
