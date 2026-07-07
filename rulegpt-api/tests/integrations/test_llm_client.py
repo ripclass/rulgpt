@@ -6,9 +6,14 @@ import httpx
 import pytest
 
 from app.services.integrations.llm_client import (
+    LLMStreamEvent,
     LLMUnavailableError,
     OpenRouterLLMClient,
 )
+
+
+def _sse(*chunks: str) -> bytes:
+    return "".join(f"data: {c}\n\n" for c in chunks).encode()
 
 
 def make_llm_client(handler, max_retries: int = 2) -> OpenRouterLLMClient:
@@ -129,3 +134,51 @@ async def test_model_override_degrades_through_primary_before_fallbacks():
     from app.config import settings
     assert models_tried[0] == "anthropic/claude-opus-4.8"
     assert models_tried[1] == settings.RULGPT_LLM_MODEL
+
+
+@pytest.mark.asyncio
+async def test_stream_answer_yields_deltas_then_result():
+    def handler(request):
+        body = json.loads(request.content)
+        assert body["stream"] is True
+        return httpx.Response(200, content=_sse(
+            json.dumps({"choices": [{"delta": {"content": "Under UCP600"}}], "model": body["model"]}),
+            json.dumps({"choices": [{"delta": {"content": " Article 14"}}]}),
+            json.dumps({"choices": [], "usage": {"prompt_tokens": 50, "completion_tokens": 7, "cost": 0.0003},
+                        "model": body["model"]}),
+            "[DONE]",
+        ))
+    c = make_llm_client(handler)
+    deltas, result = [], None
+    async for ev in c.stream_answer("q", "system"):
+        if ev.result is not None:
+            result = ev.result
+        elif ev.delta:
+            deltas.append(ev.delta)
+    assert deltas == ["Under UCP600", " Article 14"]
+    assert result is not None
+    assert result.text == "Under UCP600 Article 14"
+    assert result.completion_tokens == 7 and result.cost_usd == pytest.approx(0.0003)
+
+
+@pytest.mark.asyncio
+async def test_stream_answer_falls_to_next_model_on_open_5xx():
+    tried = []
+    def handler(request):
+        m = json.loads(request.content)["model"]; tried.append(m)
+        if len(tried) == 1:
+            return httpx.Response(503)
+        return httpx.Response(200, content=_sse(
+            json.dumps({"choices": [{"delta": {"content": "ok"}}], "model": m}), "[DONE]"))
+    c = make_llm_client(handler, max_retries=0)
+    text = "".join(ev.delta for ev in [e async for e in c.stream_answer("q", "s")] if ev.delta)
+    assert text == "ok" and len(tried) >= 2
+
+
+@pytest.mark.asyncio
+async def test_stream_answer_all_models_fail_raises():
+    def handler(request): return httpx.Response(503)
+    c = make_llm_client(handler, max_retries=0)
+    with pytest.raises(LLMUnavailableError):
+        async for _ in c.stream_answer("q", "s"):
+            pass

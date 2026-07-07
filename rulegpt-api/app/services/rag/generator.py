@@ -985,6 +985,119 @@ class AnswerGenerator:
                 "fallback_reasons": [f"LLMUnavailableError: {exc}"],
             }
 
+    async def generate_stream(
+        self,
+        query: str,
+        retrieved_rules: Sequence[RetrievedRule],
+        classifier_output: ClassifierOutput,
+        user_tier: str = "anonymous",
+        routing_tier: str = "sonnet",
+    ):
+        """Streaming sibling of `generate()` for LLM tiers (haiku/sonnet/opus).
+
+        Yields ("delta", text) for each streamed token, then a single
+        ("final", <dict>) with the SAME shape `generate()` returns. Reuses the
+        exact gated system prompt, user prompt, normalization, and
+        retry-once-then-degrade citation logic — the only difference from
+        generate() is that the first attempt is streamed. template/fallback
+        tiers are handled upstream and never reach here.
+        """
+        import logging
+        _log = logging.getLogger("rulegpt.generator")
+
+        partial_coverage = assess_partial_coverage(query, retrieved_rules)
+        token_budget = calculate_token_budget(query, retrieved_rules, routing_tier)
+        rendered_rules = _render_retrieved_rules(retrieved_rules)
+        system_prompt = RULEGPT_SYSTEM_PROMPT_TEMPLATE.format(
+            current_date=date.today().isoformat(),
+            user_tier=user_tier,
+            retrieved_rules=rendered_rules,
+        )
+        prompt = _build_user_prompt(query, retrieved_rules, classifier_output.complexity, classifier_output)
+        llm_client = self._get_llm_client()
+        from app.config import settings as _model_settings
+        tier_model = _model_settings.RULGPT_OPUS_TIER_MODEL if routing_tier == "opus" else None
+
+        raw_parts: List[str] = []
+        stream_result = None
+        try:
+            async for event in llm_client.stream_answer(
+                prompt, system_prompt, model=tier_model, max_tokens=token_budget
+            ):
+                if event.result is not None:
+                    stream_result = event.result
+                elif event.delta:
+                    raw_parts.append(event.delta)
+                    yield ("delta", event.delta)
+        except LLMUnavailableError as exc:
+            _log.error("[GEN-STREAM] streaming unavailable, grounded fallback | error=%s | query=%r", exc, query[:80])
+            answer = compose_grounded_answer(query, retrieved_rules, partial_coverage=partial_coverage)
+            yield ("final", {
+                "answer": answer,
+                "model_used": "grounded-fallback",
+                "partial_coverage": partial_coverage,
+                "routing_tier": routing_tier,
+                "cost_usd": 0.0,
+                "generation_model": None,
+                "tokens": (0, 0),
+                "fallback_reasons": [f"LLMUnavailableError: {exc}"],
+            })
+            return
+
+        raw_text = stream_result.text if stream_result is not None else "".join(raw_parts)
+        answer = normalize_generated_answer(raw_text)
+        model_used = stream_result.model if stream_result is not None else "fallback"
+        generation_model = model_used
+        total_cost = stream_result.cost_usd if stream_result is not None else None
+        total_prompt_tokens = stream_result.prompt_tokens if stream_result is not None else 0
+        total_completion_tokens = stream_result.completion_tokens if stream_result is not None else 0
+
+        # Same retry-once-then-degrade citation guard as generate(); the strict
+        # retry is a normal (non-streamed) call — the client replaces the
+        # streamed text with the finalized answer on the "final" event.
+        if answer and answer_mentions_unknown_references(answer, retrieved_rules):
+            _log.warning("[GEN-STREAM] streamed answer hallucinated references, strict retry | query=%r", query[:80])
+            strict_system_prompt = system_prompt + (
+                "\nSTRICT CITATION MODE: You may cite ONLY the exact [rulebook reference] "
+                "pairs present in Retrieved rules. Do not mention any other article, "
+                "publication, paragraph, or rule number."
+            )
+            try:
+                retry_res = await llm_client.generate_answer(
+                    prompt, strict_system_prompt, model=tier_model, max_tokens=token_budget
+                )
+                total_cost = _sum_llm_cost(total_cost, retry_res.cost_usd)
+                total_prompt_tokens += retry_res.prompt_tokens
+                total_completion_tokens += retry_res.completion_tokens
+                retry_answer = normalize_generated_answer(retry_res.text)
+                if retry_answer and answer_mentions_unknown_references(retry_answer, retrieved_rules):
+                    answer = compose_citations_only_answer(query, retrieved_rules)
+                    model_used = "citations-only"
+                    generation_model = "citations-only"
+                else:
+                    answer = retry_answer
+                    model_used = retry_res.model
+                    generation_model = retry_res.model
+            except LLMUnavailableError:
+                answer = compose_citations_only_answer(query, retrieved_rules)
+                model_used = "citations-only"
+                generation_model = "citations-only"
+
+        if not answer:
+            answer = compose_citations_only_answer(query, retrieved_rules)
+            model_used = "citations-only"
+            generation_model = "citations-only"
+
+        yield ("final", {
+            "answer": answer,
+            "model_used": model_used,
+            "partial_coverage": partial_coverage,
+            "routing_tier": routing_tier,
+            "cost_usd": total_cost,
+            "generation_model": generation_model,
+            "tokens": (total_prompt_tokens, total_completion_tokens),
+        })
+
     async def suggested_followups(
         self,
         query: str,

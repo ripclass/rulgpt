@@ -273,3 +273,93 @@ async def test_pipeline_document_set_query_downgrades_partial_coverage_to_low():
     assert result.confidence_band == "low"
     assert result.citations
     assert result.suggested_followups == ["f1", "f2", "f3"]
+
+
+# ---------------------------------------------------------------------------
+# Streaming pipeline (process_query_stream)
+# ---------------------------------------------------------------------------
+
+class _StreamGenerator:
+    """generate_stream yields deltas then a final dict (generate()'s shape)."""
+
+    async def generate_stream(self, query, retrieved_rules, classifier_output, user_tier="anonymous", routing_tier="sonnet"):
+        yield ("delta", "Under UCP600 ")
+        yield ("delta", "Article 14 the examination standard applies.")
+        yield ("final", {
+            "answer": "Under UCP600 Article 14 the examination standard applies to the presentation.",
+            "model_used": "z-ai/glm-5.2",
+            "partial_coverage": False,
+            "routing_tier": routing_tier,
+            "cost_usd": 0.0004,
+            "generation_model": "z-ai/glm-5.2",
+            "tokens": (100, 20),
+        })
+
+    async def suggested_followups(self, query, answer, classifier, partial_coverage=False):
+        return ["f1", "f2", "f3"]
+
+    @staticmethod
+    def _static_followups(query, classifier, partial_coverage=False):
+        return ["f1", "f2", "f3"]
+
+
+class _ICCRetriever:
+    async def retrieve(self, session, query, classification, top_k=5):
+        return [RetrievedRule(
+            rule_id="UCP600-14", rulebook="UCP600", reference="Article 14",
+            title="Standard for Examination of Documents",
+            excerpt="Banks examine a presentation on its face to determine a complying presentation.",
+            domain="icc", jurisdiction="global", document_type="lc",
+            similarity_score=0.9, rerank_score=0.85,
+        )]
+
+
+async def _drain(agen):
+    return [event async for event in agen]
+
+
+@pytest.mark.asyncio
+async def test_process_query_stream_happy_path_streams_then_finalizes():
+    pipeline = RAGPipeline(classifier=_FakeClassifier(), retriever=_ICCRetriever(), generator=_StreamGenerator())
+    events = await _drain(pipeline.process_query_stream(
+        query="How does UCP600 handle examination discrepancies?", session=None, language="en", user_tier="free"))
+    deltas = [e["text"] for e in events if e["type"] == "delta"]
+    finals = [e["result"] for e in events if e["type"] == "final"]
+    assert "".join(deltas) == "Under UCP600 Article 14 the examination standard applies."
+    assert len(finals) == 1
+    result = finals[0]
+    assert result.answer.startswith("Under UCP600 Article 14")
+    assert result.citations, "UCP600 Article 14 should be cited and validated"
+    assert result.confidence_band in {"high", "medium", "low"}
+    assert result.suggested_followups == ["f1", "f2", "f3"]
+    # free tier + non-sanctions → GLM-5.2 under the haiku label, passed through
+    # select_model into generate_stream and echoed back in the final payload.
+    assert result.routing_tier == "haiku"
+
+
+class _OutOfScopeClassifier:
+    async def classify(self, query):
+        return ClassifierOutput(domain="other", jurisdiction="global", document_type="other",
+                                complexity="simple", in_scope=False)
+
+
+@pytest.mark.asyncio
+async def test_process_query_stream_out_of_scope_delegates_single_chunk():
+    pipeline = RAGPipeline(classifier=_OutOfScopeClassifier(), retriever=_ICCRetriever(), generator=_StreamGenerator())
+    events = await _drain(pipeline.process_query_stream(
+        query="What's a good chocolate cake recipe?", session=None, language="en", user_tier="free"))
+    deltas = [e["text"] for e in events if e["type"] == "delta"]
+    finals = [e["result"] for e in events if e["type"] == "final"]
+    assert len(deltas) == 1  # static path is emitted as ONE chunk, not streamed
+    assert len(finals) == 1
+    assert finals[0].answer == "".join(deltas)
+
+
+@pytest.mark.asyncio
+async def test_process_query_stream_no_rules_delegates_refusal():
+    pipeline = RAGPipeline(classifier=_FakeClassifier(), retriever=_FakeRetriever(), generator=_StreamGenerator())
+    events = await _drain(pipeline.process_query_stream(
+        query="How does UCP600 handle transport documents?", session=None, language="en", user_tier="free"))
+    finals = [e["result"] for e in events if e["type"] == "final"]
+    assert finals[0].answer == NO_RULE_MESSAGE
+    assert finals[0].routing_tier == "fallback"

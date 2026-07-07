@@ -10,8 +10,9 @@ considered unavailable.
 from __future__ import annotations
 
 import asyncio
+import json
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, AsyncIterator
 
 import httpx
 
@@ -27,6 +28,15 @@ class LLMResult:
     prompt_tokens: int
     completion_tokens: int
     cost_usd: float | None
+
+
+@dataclass
+class LLMStreamEvent:
+    """One event from `stream_answer`. Delta events carry an incremental text
+    chunk; the single terminal event (delta="") carries the finished
+    `LLMResult` (full text, model, tokens, cost)."""
+    delta: str = ""
+    result: LLMResult | None = None
 
 
 class LLMUnavailableError(Exception):
@@ -72,6 +82,128 @@ class OpenRouterLLMClient:
         if model and model != settings.RULGPT_LLM_MODEL:
             models.insert(1, settings.RULGPT_LLM_MODEL)
         return await self._run_chain(models, prompt, system_prompt, max_tokens, temperature)
+
+    async def stream_answer(
+        self,
+        prompt: str,
+        system_prompt: str,
+        model: str | None = None,
+        max_tokens: int = 1200,
+        temperature: float = 0.2,
+    ) -> AsyncIterator[LLMStreamEvent]:
+        """Stream a completion token-by-token via OpenRouter SSE.
+
+        Yields LLMStreamEvent deltas as text arrives, then a single terminal
+        event carrying the finished LLMResult (full text + usage). Fallback is
+        open-only: if a model fails BEFORE its first token, the next model in
+        the chain is tried; once tokens have started flowing a mid-stream
+        failure propagates (we can't silently swap models mid-answer). Callers
+        that need a guaranteed answer fall back to the non-streaming
+        `generate_answer` on any raised error.
+        """
+        if not self.is_available:
+            raise LLMUnavailableError("OPENROUTER_API_KEY is not configured")
+        models = [model or settings.RULGPT_LLM_MODEL, *settings.llm_fallback_models()]
+        if model and model != settings.RULGPT_LLM_MODEL:
+            models.insert(1, settings.RULGPT_LLM_MODEL)
+
+        last_error: Exception | None = None
+        for candidate_model in models:
+            emitted = False
+            try:
+                async for event in self._stream_request(
+                    candidate_model, prompt, system_prompt, max_tokens, temperature
+                ):
+                    emitted = True
+                    yield event
+                return  # stream finished cleanly
+            except Exception as exc:  # noqa: BLE001 - decide by whether we already streamed
+                last_error = exc
+                if emitted:
+                    raise  # partial output already sent — cannot switch models
+                continue  # open failed before first token — try the next model
+        raise LLMUnavailableError(f"All models failed to stream: {last_error}") from last_error
+
+    async def _stream_request(
+        self,
+        model: str,
+        user_prompt: str,
+        system_prompt: str,
+        max_tokens: int,
+        temperature: float,
+    ) -> AsyncIterator[LLMStreamEvent]:
+        payload: dict[str, Any] = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "stream": True,
+            "usage": {"include": True},
+        }
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+            **build_openrouter_headers(),
+        }
+        endpoint = f"{self.base_url}/chat/completions"
+
+        owns_client = self._client is None
+        client = self._client or httpx.AsyncClient(timeout=self.timeout)
+        text_parts: list[str] = []
+        final_model = model
+        prompt_tokens = 0
+        completion_tokens = 0
+        cost: float | None = None
+        try:
+            try:
+                async with client.stream("POST", endpoint, headers=headers, json=payload) as response:
+                    if response.status_code == 429 or response.status_code >= 500:
+                        raise _RetryableError(f"HTTP {response.status_code}")
+                    if response.status_code >= 400:
+                        await response.aread()
+                        response.raise_for_status()
+                    async for line in response.aiter_lines():
+                        if not line or not line.startswith("data:"):
+                            continue
+                        data = line[len("data:"):].strip()
+                        if data == "[DONE]":
+                            break
+                        try:
+                            obj = json.loads(data)
+                        except json.JSONDecodeError:
+                            continue
+                        choices = obj.get("choices") or []
+                        if choices:
+                            delta = (choices[0].get("delta") or {}).get("content")
+                            if delta:
+                                text_parts.append(delta)
+                                yield LLMStreamEvent(delta=delta)
+                        if obj.get("model"):
+                            final_model = obj["model"]
+                        usage = obj.get("usage")
+                        if usage:
+                            prompt_tokens = int(usage.get("prompt_tokens") or prompt_tokens)
+                            completion_tokens = int(usage.get("completion_tokens") or completion_tokens)
+                            if usage.get("cost") is not None:
+                                cost = usage.get("cost")
+            except (httpx.TimeoutException, httpx.TransportError) as exc:
+                raise _RetryableError(str(exc)) from exc
+        finally:
+            if owns_client:
+                await client.aclose()
+
+        yield LLMStreamEvent(
+            result=LLMResult(
+                text="".join(text_parts),
+                model=final_model,
+                prompt_tokens=prompt_tokens,
+                completion_tokens=completion_tokens,
+                cost_usd=cost,
+            )
+        )
 
     async def classify(
         self,

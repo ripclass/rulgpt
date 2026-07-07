@@ -520,7 +520,161 @@ class RAGPipeline:
         )
 
 
+    async def process_query_stream(
+        self, query: str, session: Any, language: str = "en", user_tier: str = "free"
+    ):
+        """Streaming variant of process_query. Async-generates event dicts:
+
+            {"type": "delta", "text": str}            # incremental answer tokens
+            {"type": "final", "result": QueryResult}  # finalized answer + metadata
+
+        Only the happy-path LLM generation is streamed. Every static/edge case
+        (document-validation redirect, out-of-scope, retrieval-unavailable,
+        no-rules fallback, and the $0 template tier) is delegated to the proven
+        non-streaming process_query and emitted as a single delta — those paths
+        are instant, so there is nothing to stream. The gated logic (routing,
+        citations, confidence) is REUSED here, never reimplemented, and
+        process_query itself is left completely untouched.
+        """
+        if not query or not query.strip():
+            raise ValueError("Query cannot be empty.")
+        if len(query) > 500:
+            raise ValueError("Query exceeds 500 characters.")
+
+        async def _delegate_once():
+            result = await self.process_query(
+                query=query, session=session, language=language, user_tier=user_tier
+            )
+            return result
+
+        # Stage 1: classification (mirror process_query's fallback)
+        try:
+            classifier_output = await self.classifier.classify(query=query)
+            reason = (classifier_output.reason or "").lower()
+            classifier_model = "heuristic" if "heuristic" in reason else "claude-haiku-4-5"
+        except Exception:
+            classifier_output = ClassifierOutput(
+                domain="other", jurisdiction="global", document_type="other",
+                complexity="simple", in_scope=True, reason="classifier_fallback",
+            )
+            classifier_model = "heuristic"
+
+        # Static paths (redirect / out-of-scope) → delegate, emit once.
+        if _query_needs_lcopilot_redirect(query) or not classifier_output.in_scope:
+            result = await _delegate_once()
+            yield {"type": "delta", "text": result.answer}
+            yield {"type": "final", "result": result}
+            return
+
+        # Stage 2: retrieval
+        try:
+            retrieved_rules = await self.retriever.retrieve(
+                session=session, query=query, classification=classifier_output,
+                top_k=8 if requires_document_breadth(query) else 5,
+            )
+        except RetrievalUnavailableError:
+            result = await _delegate_once()  # quota-neutral "unavailable" message
+            yield {"type": "delta", "text": result.answer}
+            yield {"type": "final", "result": result}
+            return
+        except Exception:
+            retrieved_rules = []
+
+        # Stage 2.5: routing
+        from app.config import settings as _settings
+        if _settings.RULEGPT_ENABLE_SMART_ROUTING and retrieved_rules:
+            routing_tier = select_model(
+                user_tier, query, retrieved_rules, complexity=classifier_output.complexity,
+            )
+        else:
+            routing_tier = "sonnet"
+
+        # Non-LLM tiers (no rules → fallback, or $0 template) → delegate, emit once.
+        if (not retrieved_rules) or routing_tier in ("template", "fallback"):
+            result = await _delegate_once()
+            yield {"type": "delta", "text": result.answer}
+            yield {"type": "final", "result": result}
+            return
+
+        # ---- Happy path: stream the generation ----
+        start_total = time.perf_counter()
+        gen_final: Dict[str, Any] = {}
+        try:
+            async for kind, payload in self.generator.generate_stream(
+                query=query, retrieved_rules=retrieved_rules,
+                classifier_output=classifier_output, user_tier=user_tier,
+                routing_tier=routing_tier,
+            ):
+                if kind == "delta":
+                    yield {"type": "delta", "text": payload}
+                else:
+                    gen_final = payload
+        except Exception:
+            # Never leave the user hanging — fall back to the proven path.
+            result = await _delegate_once()
+            yield {"type": "delta", "text": result.answer}
+            yield {"type": "final", "result": result}
+            return
+
+        answer = str(gen_final.get("answer", "")).strip() or NO_RULE_MESSAGE
+        model_used = str(gen_final.get("model_used", "fallback"))
+        partial_coverage = bool(gen_final.get("partial_coverage"))
+        routing_tier = str(gen_final.get("routing_tier", routing_tier))
+        fallback_reasons = gen_final.get("fallback_reasons") or []
+
+        tokens = gen_final.get("tokens") or (0, 0)
+        prompt_toks, completion_toks = tokens if isinstance(tokens, (tuple, list)) and len(tokens) == 2 else (0, 0)
+        logging.getLogger("rulegpt.cost").info(
+            "llm_cost query_hash=%s tier=%s model=%s prompt_toks=%s completion_toks=%s cost_usd=%s stream=1",
+            hashlib.sha1(query.encode()).hexdigest()[:10], routing_tier,
+            gen_final.get("generation_model"), prompt_toks, completion_toks,
+            f"{gen_final.get('cost_usd') or 0:.6f}",
+        )
+
+        # Stage 4: citations + confidence — REUSE the gated helpers verbatim.
+        citations = build_citations(answer=answer, retrieved_rules=retrieved_rules, max_items=8)
+        if not validate_citations(citations, retrieved_rules):
+            citations = []
+        confidence_band = _confidence_from_rules(
+            query=query, rules=retrieved_rules, citation_count=len(citations),
+            partial_coverage=partial_coverage, answer=answer,
+        )
+        try:
+            suggested_followups = await self.generator.suggested_followups(
+                query=query, answer=answer, classifier=classifier_output,
+                partial_coverage=partial_coverage,
+            )
+        except Exception:
+            suggested_followups = self.generator._static_followups(query, classifier_output, partial_coverage)
+        latency_ms = int((time.perf_counter() - start_total) * 1000)
+
+        result = QueryResult(
+            answer=answer,
+            citations=citations,
+            confidence_band=confidence_band,  # type: ignore[arg-type]
+            suggested_followups=suggested_followups[:3],
+            show_trdr_cta=False,
+            disclaimer=DISCLAIMER_TEXT,
+            classifier_output=classifier_output,
+            retrieved_rule_ids=[rule.rule_id for rule in retrieved_rules],
+            model_used=model_used,
+            classifier_model=classifier_model,
+            latency_ms=latency_ms,
+            stage_latency_ms={},
+            routing_tier=routing_tier,
+            fallback_reasons=fallback_reasons,
+        )
+        yield {"type": "final", "result": result}
+
+
 async def process_query(query: str, session: Any, language: str = "en", user_tier: str = "free") -> QueryResult:
     """Stable backend-facing entrypoint."""
     pipeline = RAGPipeline()
     return await pipeline.process_query(query=query, session=session, language=language, user_tier=user_tier)
+
+
+def stream_query(query: str, session: Any, language: str = "en", user_tier: str = "free"):
+    """Stable backend-facing streaming entrypoint — returns an async generator
+    of {"type": "delta"|"final", ...} events. See RAGPipeline.process_query_stream."""
+    pipeline = RAGPipeline()
+    return pipeline.process_query_stream(query=query, session=session, language=language, user_tier=user_tier)

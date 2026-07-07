@@ -175,6 +175,103 @@ export interface RequestIdentity {
   accessToken?: string | null
 }
 
+interface SseFrame {
+  event: string | null
+  data: Record<string, unknown> | null
+}
+
+function parseSseFrame(block: string): SseFrame {
+  let event: string | null = null
+  let dataRaw: string | null = null
+  for (const line of block.split('\n')) {
+    if (line.startsWith('event:')) event = line.slice('event:'.length).trim()
+    else if (line.startsWith('data:')) dataRaw = line.slice('data:'.length).trim()
+  }
+  let data: Record<string, unknown> | null = null
+  if (dataRaw) {
+    try {
+      data = JSON.parse(dataRaw)
+    } catch {
+      data = null
+    }
+  }
+  return { event, data }
+}
+
+export interface StreamCallbacks {
+  /** Called for each incremental answer chunk as it arrives. */
+  onToken: (delta: string) => void
+}
+
+/**
+ * Stream an answer from POST /api/query/stream (Server-Sent Events). Invokes
+ * `onToken` for each chunk and resolves with the finalized QueryResponse.
+ * Throws ApiError on a non-200 (e.g. 429 quota, before the stream) or on a
+ * mid-stream `error` event — callers can fall back to the non-streaming
+ * `submitQuery` on network/5xx failures.
+ */
+async function streamQuery(
+  payload: QueryRequest,
+  identity: RequestIdentity | undefined,
+  callbacks: StreamCallbacks,
+): Promise<QueryResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/query/stream`, {
+    method: 'POST',
+    headers: buildHeaders({ 'Content-Type': 'application/json', ...identityHeaders(identity) }),
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    const raw = await response.text()
+    let message = raw || `Request failed with status ${response.status}`
+    let detail: unknown
+    try {
+      const parsed = JSON.parse(raw)
+      detail = parsed.detail
+      if (typeof parsed.detail === 'string') message = parsed.detail
+      else if (typeof parsed.message === 'string') message = parsed.message
+    } catch {
+      // raw text is fine as-is
+    }
+    throw new ApiError(message, response.status, detail)
+  }
+  if (!response.body) {
+    throw new ApiError('Streaming not supported by this browser', 0)
+  }
+
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  let done: QueryResponse | null = null
+  let streamError: ApiError | null = null
+
+  const handleBlock = (block: string) => {
+    const { event, data } = parseSseFrame(block)
+    if (!event) return
+    if (event === 'token' && data) callbacks.onToken(String(data.delta ?? ''))
+    else if (event === 'done' && data) done = data as unknown as QueryResponse
+    else if (event === 'error' && data) {
+      streamError = new ApiError(String(data.message ?? 'Request failed'), Number(data.status ?? 500))
+    }
+  }
+
+  for (;;) {
+    const { value, done: readerDone } = await reader.read()
+    if (readerDone) break
+    buffer += decoder.decode(value, { stream: true })
+    let idx: number
+    while ((idx = buffer.indexOf('\n\n')) !== -1) {
+      handleBlock(buffer.slice(0, idx))
+      buffer = buffer.slice(idx + 2)
+    }
+  }
+  if (buffer.trim()) handleBlock(buffer)
+
+  if (streamError) throw streamError
+  if (!done) throw new ApiError('Stream ended without a result', 0)
+  return done
+}
+
 function identityHeaders(identity?: RequestIdentity) {
   return {
     ...(identity?.accessToken ? { Authorization: `Bearer ${identity.accessToken}` } : {}),
@@ -193,6 +290,7 @@ export const api = {
       body: payload,
       headers: identityHeaders(identity),
     }),
+  streamQuery,
   getHistory: (identity: RequestIdentity) =>
     request<SessionSummary[]>('/api/history', {
       headers: identityHeaders(identity),

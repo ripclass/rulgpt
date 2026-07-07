@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import inspect
+import json
 import uuid
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -327,3 +329,161 @@ async def submit_query(
     db: Session = Depends(get_db),
 ):
     return await process_query_request(payload=payload, request=request, db=db)
+
+
+def _sse(event: str, data: dict) -> str:
+    """Format one Server-Sent Event frame."""
+    return f"event: {event}\ndata: {json.dumps(data, default=str)}\n\n"
+
+
+def _response_to_done(resp: QueryResponse) -> dict:
+    """Shape a completed QueryResponse into the SSE `done` payload (used when the
+    streaming path falls back to the non-streaming pipeline)."""
+    return {
+        "query_id": str(resp.query_id),
+        "answer": resp.answer,
+        "citations": [c.model_dump() for c in resp.citations],
+        "confidence_band": resp.confidence_band,
+        "suggested_followups": resp.suggested_followups,
+        "show_trdr_cta": resp.show_trdr_cta,
+        "trdr_cta_text": resp.trdr_cta_text,
+        "trdr_cta_url": resp.trdr_cta_url,
+        "disclaimer": resp.disclaimer,
+        "queries_remaining": resp.queries_remaining,
+        "tier": resp.tier,
+        "model_used": resp.model_used,
+        "routing_tier": resp.routing_tier,
+        "fallback_reasons": resp.fallback_reasons,
+    }
+
+
+@router.post("/query/stream")
+async def submit_query_stream(
+    payload: QueryRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    """Streaming sibling of POST /api/query. Returns an SSE stream:
+
+        event: token   data: {"delta": "..."}     # incremental answer tokens
+        event: done     data: {<QueryResponse>}    # finalized answer + metadata
+        event: error    data: {"message","status"} # only on mid-stream failure
+
+    Quota is enforced up front (a 429 is a normal HTTP error before the stream
+    body). On any streaming failure the endpoint falls back to the proven
+    non-streaming pipeline so the caller always gets an answer.
+    """
+    session_obj = _find_or_create_session(db, request, payload)
+    tier = session_obj.tier
+    limit, window = _tier_limit(tier)
+    window_start = _window_start(window, _utc_now())
+    used_count = _queries_this_month(db, session_obj, tier, window_start)
+    if used_count >= limit:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=_limit_reached_message(tier),
+        )
+
+    session_id = session_obj.id
+
+    async def event_stream():
+        started = _utc_now()
+        final_result = None
+        streamed_any = False
+        try:
+            from app.services.rag.pipeline import stream_query
+
+            async for event in stream_query(payload.query, db, payload.language, user_tier=tier):
+                if event.get("type") == "delta":
+                    streamed_any = True
+                    yield _sse("token", {"delta": event.get("text", "")})
+                elif event.get("type") == "final":
+                    final_result = event.get("result")
+        except Exception:
+            # Streaming blew up — guarantee an answer via the non-streaming path.
+            try:
+                resp = await process_query_request(payload, request, db)
+            except HTTPException as he:
+                yield _sse("error", {"message": str(he.detail), "status": he.status_code})
+                return
+            except Exception:
+                yield _sse("error", {"message": "Request failed. Please try again.", "status": 500})
+                return
+            if not streamed_any:
+                yield _sse("token", {"delta": resp.answer})
+            yield _sse("done", _response_to_done(resp))
+            return
+
+        if final_result is None:
+            # No final event (unexpected) — fall back for a correct answer.
+            try:
+                resp = await process_query_request(payload, request, db)
+                if not streamed_any:
+                    yield _sse("token", {"delta": resp.answer})
+                yield _sse("done", _response_to_done(resp))
+            except Exception:
+                yield _sse("error", {"message": "Request failed. Please try again.", "status": 500})
+            return
+
+        # Persist the finalized answer (mirrors process_query_request).
+        citations = _coerce_citations([c.model_dump() for c in final_result.citations])
+        answer = final_result.answer
+        confidence = final_result.confidence_band if final_result.confidence_band in {"high", "medium", "low"} else "low"
+        followups = list(final_result.suggested_followups or [])[:3]
+        try:
+            session_obj.query_count += 1
+            elapsed_ms = int((_utc_now() - started).total_seconds() * 1000)
+            query_row = RuleGPTQuery(
+                session_id=session_id,
+                user_id=session_obj.user_id,
+                query_text=payload.query,
+                query_domain=getattr(final_result.classifier_output, "domain", None),
+                query_jurisdiction=getattr(final_result.classifier_output, "jurisdiction", None),
+                query_complexity=getattr(final_result.classifier_output, "complexity", None),
+                retrieved_rule_ids=final_result.retrieved_rule_ids or [c.rule_id for c in citations],
+                answer_text=answer,
+                confidence_band=confidence,
+                citations=[c.model_dump() for c in citations],
+                suggested_followups=followups,
+                model_used=final_result.model_used,
+                classifier_model=final_result.classifier_model,
+                latency_ms=elapsed_ms,
+                show_trdr_cta=False,
+                ice_training_eligible=False,
+                routing_tier=final_result.routing_tier,
+            )
+            db.add(query_row)
+            db.add(session_obj)
+            db.commit()
+            db.refresh(query_row)
+            query_id = str(query_row.id)
+            remaining = max(0, limit - _queries_this_month(db, session_obj, tier, window_start))
+        except Exception:
+            db.rollback()
+            # Quota-neutral rows (unavailable/mt700) don't count; otherwise assume +1.
+            query_id = None
+            counted = final_result.routing_tier not in ("unavailable", "mt700")
+            remaining = max(0, limit - (used_count + (1 if counted else 0)))
+
+        yield _sse("done", {
+            "query_id": query_id,
+            "answer": answer,
+            "citations": [c.model_dump() for c in citations],
+            "confidence_band": confidence,
+            "suggested_followups": followups,
+            "show_trdr_cta": False,
+            "trdr_cta_text": None,
+            "trdr_cta_url": None,
+            "disclaimer": DISCLAIMER_TEXT,
+            "queries_remaining": remaining,
+            "tier": tier,
+            "model_used": final_result.model_used,
+            "routing_tier": final_result.routing_tier,
+            "fallback_reasons": final_result.fallback_reasons or None,
+        })
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )

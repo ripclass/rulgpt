@@ -126,6 +126,12 @@ export function RuleGPTMessage({
         <div className="pt-2">
           <p className="whitespace-pre-wrap leading-relaxed text-[15px] text-neutral-900 dark:text-neutral-100">
             {message.text}
+            {message.isStreaming ? (
+              <span
+                aria-hidden
+                className="ml-0.5 inline-block h-[1.05em] w-[2px] translate-y-[2px] animate-pulse bg-[#FF4F00] align-baseline"
+              />
+            ) : null}
           </p>
         </div>
 
@@ -176,6 +182,7 @@ export function RuleGPTMessage({
           </div>
         ) : null}
 
+        {message.isStreaming ? null : (
         <div className="mt-6 border-t border-neutral-100 dark:border-white/5 pt-4 flex items-center justify-between transition-colors">
           <div className="text-[10px] font-semibold tracking-wider text-neutral-400 dark:text-neutral-500 uppercase">
             {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -221,6 +228,7 @@ export function RuleGPTMessage({
             }}
           />
         </div>
+        )}
 
         {message.showTRDRCTA ? (
           <div className="mt-6">

@@ -71,25 +71,63 @@ export function useQuery({ sessionToken, tier, userId, accessToken }: UseQueryOp
     setError(null)
     setIsLoading(true)
     setMessages((prev) => [...prev, userMessage(trimmed)])
+
+    const payload = { query: trimmed, session_token: sessionToken, language: 'en' as const }
+    const identity = { userId, tier, accessToken }
+
+    // The streaming message is created lazily on the first token so the
+    // ThinkingIndicator covers the classify+retrieve gap, then the answer
+    // fills in token-by-token.
+    let streamId: string | null = null
+    const onToken = (delta: string) => {
+      if (streamId === null) {
+        streamId = crypto.randomUUID()
+        const id = streamId
+        setMessages((prev) => [
+          ...prev,
+          { id, role: 'assistant', text: delta, createdAt: new Date().toISOString(), isStreaming: true },
+        ])
+      } else {
+        const id = streamId
+        setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, text: m.text + delta } : m)))
+      }
+    }
+
     try {
-      const response = await api.submitQuery(
-      {
-        query: trimmed,
-        session_token: sessionToken,
-        language: 'en',
-      },
-        { userId, tier, accessToken },
+      const response = await api.streamQuery(payload, identity, { onToken })
+      const finalMsg = assistantMessage(response)
+      setMessages((prev) =>
+        streamId === null
+          ? [...prev, finalMsg]
+          : prev.map((m) => (m.id === streamId ? { ...finalMsg, id: m.id } : m)),
       )
-      setMessages((prev) => [...prev, assistantMessage(response)])
       setQueriesRemaining(response.queries_remaining)
       return response
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.message)
-      } else {
-        setError('Request failed. Please try again.')
+    } catch (streamErr) {
+      // Drop any partial streamed message.
+      if (streamId !== null) {
+        const id = streamId
+        setMessages((prev) => prev.filter((m) => m.id !== id))
       }
-      return null
+      // A 4xx (e.g. 429 quota) is a definitive answer — surface it, don't retry.
+      if (streamErr instanceof ApiError && streamErr.status >= 400 && streamErr.status < 500) {
+        setError(streamErr.message)
+        return null
+      }
+      // Network / 5xx / no-stream — fall back to the non-streaming endpoint once.
+      try {
+        const response = await api.submitQuery(payload, identity)
+        setMessages((prev) => [...prev, assistantMessage(response)])
+        setQueriesRemaining(response.queries_remaining)
+        return response
+      } catch (err) {
+        if (err instanceof ApiError) {
+          setError(err.message)
+        } else {
+          setError('Request failed. Please try again.')
+        }
+        return null
+      }
     } finally {
       setIsLoading(false)
     }

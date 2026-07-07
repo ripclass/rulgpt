@@ -174,6 +174,8 @@ export interface Message {
   queryId?: string
   disclaimer?: string
   suggestedFollowups?: string[]
+  /** True while an answer is still streaming in token-by-token. */
+  isStreaming?: boolean
 }
 
 export interface AuthUser {

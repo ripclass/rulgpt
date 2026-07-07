@@ -60,7 +60,9 @@ export function ChatThread({
           </div>
         ),
       )}
-      {isLoading ? <ThinkingIndicator /> : null}
+      {/* Hide the indicator once a message is actively streaming — the filling
+          answer bubble is the progress signal from that point on. */}
+      {isLoading && !messages.some((m) => m.isStreaming) ? <ThinkingIndicator /> : null}
 
       {reachedLimit ? (
         <div className="flex justify-start chat-message-enter mt-2">
