@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import { CitationChip } from '@/components/chat/CitationChip'
 import { ConfidenceBadge } from '@/components/chat/ConfidenceBadge'
@@ -44,6 +45,10 @@ export function RuleGPTMessage({
   const [artifactOpen, setArtifactOpen] = useState(false)
   const [paywallDetail, setPaywallDetail] = useState<PaymentRequiredDetail | null>(null)
   const [paywallOpen, setPaywallOpen] = useState(false)
+  // Citations are kept out of the way by default so the answer reads clean;
+  // the count stays visible (it's still a *cited* answer) and one tap reveals
+  // the exact articles for anyone who wants to verify.
+  const [citationsOpen, setCitationsOpen] = useState(false)
 
   const handleArtifactError = (error: unknown) => {
     if (error instanceof ApiError && error.status === 402 && isPaymentRequiredDetail(error.detail)) {
@@ -126,16 +131,30 @@ export function RuleGPTMessage({
 
         {message.citations && message.citations.length > 0 ? (
           <div className="mt-6 border-t border-neutral-100 dark:border-white/5 pt-5 transition-colors">
-            <p className="mb-3 text-[11px] font-semibold tracking-wider text-neutral-500 uppercase">Referenced Articles</p>
-            <div className="flex flex-wrap gap-2">
-              {message.citations.map((citation) => (
-                <CitationChip
-                  key={`${citation.rule_id}-${citation.reference}`}
-                  citation={citation}
-                  onClick={onCitationClick}
-                />
-              ))}
-            </div>
+            <button
+              type="button"
+              onClick={() => setCitationsOpen((open) => !open)}
+              aria-expanded={citationsOpen}
+              className="group/cite inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-wider uppercase text-neutral-500 hover:text-[#FF4F00] dark:hover:text-[#FF4F00] transition-colors cursor-pointer"
+            >
+              <ChevronRight
+                className={`h-3 w-3 transition-transform duration-200 ${citationsOpen ? 'rotate-90' : ''}`}
+              />
+              {citationsOpen
+                ? 'Referenced Articles'
+                : `${message.citations.length} source${message.citations.length > 1 ? 's' : ''} cited`}
+            </button>
+            {citationsOpen ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {message.citations.map((citation) => (
+                  <CitationChip
+                    key={`${citation.rule_id}-${citation.reference}`}
+                    citation={citation}
+                    onClick={onCitationClick}
+                  />
+                ))}
+              </div>
+            ) : null}
           </div>
         ) : null}
 

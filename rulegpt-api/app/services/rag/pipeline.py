@@ -90,14 +90,16 @@ def select_model(
     """Select the generation tier from subscription tier + query signals.
 
     Tiers map to models in the generator: haiku/sonnet → RULGPT_LLM_MODEL
-    (GLM-5.2, budget differs), opus → RULGPT_OPUS_TIER_MODEL (Opus 4.8).
+    (GLM-5.2), opus → RULGPT_OPUS_TIER_MODEL (Opus 4.8).
 
-    The opus escalation gate applies to EVERY subscription tier, free and
-    anonymous included: high-stakes signals (sanctions/TBML, sanctioned
-    jurisdictions, 3+ rule domains, classifier-complex questions, stacked
-    fail-severity rules) deserve the strongest model regardless of who is
-    asking — daily quotas cap the worst-case free-tier spend. Target share
-    ~10-20% of answers; measure via the stored routing_tier analytics.
+    GLM-5.2 runs the show. The opus escalation is reserved for sanctions/OFAC
+    and TBML/fraud queries only — the ~5% of traffic where a wrong answer is a
+    regulatory problem — and applies to EVERY tier, free included (daily quotas
+    cap worst-case free spend). Every other query generates on GLM-5.2; the
+    haiku/sonnet labels are analytics only and both map to RULGPT_LLM_MODEL.
+    Changed 2026-07-07 (Ripon): the old num_rules / num_domains / complexity /
+    fail-severity triggers fired on nearly every query (every enterprise query
+    hit Opus) and were removed.
     """
     import logging
     _log = logging.getLogger("rulegpt.routing")
@@ -157,57 +159,33 @@ def select_model(
     ) and len(query.split()) < 12
     is_simple_lookup = num_rules <= 2 and num_domains <= 1
 
-    # --- Universal opus-grade escalation (all tiers, free included) ---
-    needs_opus_grade = (
-        is_sanctions
-        or involves_sanctioned
-        or is_tbml
-        or num_domains >= 3
-        or complexity == "complex"
-        or (has_fail_severity and num_rules >= 5)
-    )
+    # --- Opus escalation: SANCTIONS / TBML ONLY (Ripon 2026-07-07) ---
+    # GLM-5.2 runs the show; Opus 4.8 is reserved for the ~5% of queries with
+    # real regulatory consequence. The old num_rules>=5 / num_domains>=3 /
+    # complexity / fail-severity triggers fired on nearly every query (every
+    # enterprise query hit Opus) and were removed.
+    needs_opus_grade = is_sanctions or involves_sanctioned or is_tbml
     if needs_opus_grade:
         _log.info(
             "[ROUTING] opus escalation | tier=%s sanctions=%s tbml=%s "
-            "sanctioned_jurisdiction=%s domains=%d complexity=%s fail_sev=%s | query=%r",
-            user_tier, is_sanctions, is_tbml, involves_sanctioned,
-            num_domains, complexity, has_fail_severity, query[:80],
+            "sanctioned_jurisdiction=%s | query=%r",
+            user_tier, is_sanctions, is_tbml, involves_sanctioned, query[:80],
         )
         return "opus"
 
-    # --- 3-tier routing ---
+    # --- Tier labels for analytics only (all map to GLM-5.2) ---
+    # Sanctions/TBML already returned "opus" above; the choice below is only
+    # between the haiku and sonnet analytics labels, which both generate on
+    # RULGPT_LLM_MODEL (GLM-5.2) — no cost or latency difference between them.
     tier = user_tier.strip().lower() if user_tier else "free"
 
     if tier in ("free", "anonymous"):
-        # Haiku-budget tier on the primary model
         model: RoutingTier = "haiku"
-
     elif tier == "professional":
-        # 30% Haiku / 60% Sonnet / 10% Opus
-        if is_sanctions or involves_sanctioned or is_tbml:
-            model = "opus"
-        elif num_domains >= 3:
-            model = "opus"
-        elif is_definition and is_simple_lookup:
-            model = "haiku"
-        else:
-            model = "sonnet"
-
+        model = "haiku" if (is_definition and is_simple_lookup) else "sonnet"
     elif tier == "enterprise":
-        # 20% Haiku / 60% Sonnet / 20% Opus
-        if is_sanctions or is_tbml:
-            model = "opus"
-        elif num_domains >= 3 or num_rules >= 5:
-            model = "opus"
-        elif has_fail_severity and num_rules >= 3:
-            model = "opus"
-        elif is_definition and is_simple_lookup and not has_fail_severity:
-            model = "haiku"
-        else:
-            model = "sonnet"
-
+        model = "haiku" if (is_definition and is_simple_lookup and not has_fail_severity) else "sonnet"
     else:
-        # Unknown tier → conservative default: free-tier Haiku-only routing
         model = "haiku"
 
     _log.info(
@@ -264,6 +242,22 @@ def _query_needs_lcopilot_redirect(query: str) -> bool:
     return False
 
 
+# Confidence thresholds — calibrated to RulHub's rank-normalized rerank scores.
+# rerank = 0.7*rank_norm + 0.3*lexical, and the top candidate is always
+# rank-normalized to 1.0, so `best` sits ~0.70-0.82 in practice; the old
+# best>=0.8 "high" gate was effectively unreachable (0/12 high in the
+# 2026-07-07 live batch, including unambiguous questions). The honest
+# discriminator is `average` — a tight cluster of on-topic rules vs one lonely
+# hit — plus validated citations. Recalibrated 2026-07-07 (Ripon-approved):
+# solid, cited answers read HIGH; genuine gaps (partial-coverage language,
+# no/failed citations, lonely weak hits) still read LOW. Trust-calibration
+# logic — changes here are Ripon-gated.
+_CONF_HIGH_BEST = 0.70
+_CONF_HIGH_AVG = 0.45
+_CONF_MED_BEST = 0.50
+_CONF_MED_AVG = 0.35
+
+
 def _confidence_from_rules(
     query: str,
     rules: List[RetrievedRule],
@@ -271,6 +265,8 @@ def _confidence_from_rules(
     partial_coverage: bool,
     answer: str,
 ) -> str:
+    # Genuine-gap guards stay first: a hedged answer, or one with no validated
+    # citation, is LOW regardless of retrieval scores.
     if partial_coverage or has_partial_coverage_language(answer):
         return "low"
     if not rules or citation_count == 0:
@@ -281,14 +277,14 @@ def _confidence_from_rules(
     if requires_document_breadth(query):
         if unique_references < 2:
             return "low"
-        if best >= 0.8 and average >= 0.6 and citation_count >= min(3, unique_references):
+        if best >= _CONF_HIGH_BEST and average >= _CONF_HIGH_AVG and citation_count >= min(3, unique_references):
             return "high"
-        if best >= 0.6 and average >= 0.45:
+        if best >= _CONF_MED_BEST and average >= _CONF_MED_AVG:
             return "medium"
         return "low"
-    if best >= 0.8 and average >= 0.6 and citation_count >= 1:
+    if best >= _CONF_HIGH_BEST and average >= _CONF_HIGH_AVG and citation_count >= 1:
         return "high"
-    if best >= 0.5 and average >= 0.4:
+    if best >= _CONF_MED_BEST and average >= _CONF_MED_AVG:
         return "medium"
     return "low"
 
