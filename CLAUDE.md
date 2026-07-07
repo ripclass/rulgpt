@@ -75,8 +75,7 @@ Four products in the Enso Intelligence ecosystem:
 - Admin auth uses `ADMIN_SECRET` shared secret — no real RBAC (`rulegpt-api/app/routers/deps.py`, `require_admin_user`)
 - API usage counting returns hardcoded 0 (`rulegpt-api/app/routers/api_access.py:31`)
 - `show_trdr_cta` is always `False` in the chat pipeline (MT700 has its own separate, always-on CTA — see ECOSYSTEM CONTEXT above)
-- `GET /api/billing/status` computes `checkout_ready` from the legacy Professional/Enterprise price IDs only — it does not check `STRIPE_PRO_MONTHLY_PRICE_ID`, so the frontend Pro button can render "ready" before that env var is actually set
-- `rulegpt-api/app/routers/rules.py` (`GET /api/rules/{rule_id}`) still reads from the local `rule_store` first, falling back to `rulhub_client.get_rule()` — it was never migrated to prefer RulHub the way the main query pipeline was. Low-traffic endpoint, but a real inconsistency if you're auditing "does everything read from RulHub now."
+- `GET /api/billing/status` `checkout_ready` now gates on `STRIPE_PRO_MONTHLY_PRICE_ID` too (fixed 2026-07-07) — but the one-off prices (`STRIPE_CASE_NOTE_PRICE_ID`/`STRIPE_DRAFT_PRICE_ID`) are still only surfaced via the separate `oneoff_prices_configured` field, which no UI reads; a missing one-off price surfaces as a 503 error toast at purchase time
 
 ### Missing entirely
 - End-to-end browser tests
@@ -108,7 +107,7 @@ This inverts what used to be true. As of the 2026-07 relaunch, `RulHubRetriever`
 7. Caches the final result under a 30-minute TTL, keyed on `(query, domain, jurisdiction, document_type, top_k)`.
 
 **The old `rule_store.py` abstraction still exists but is now local-rollback-only plumbing:**
-- Used by: `retriever.py` (the local-rollback path), `embedder.py` (deprecated local sync), and `routers/rules.py` (`GET /api/rules/{rule_id}` — this one endpoint was never migrated and still checks local-first, RulHub-fallback, which is backwards relative to everywhere else).
+- Used by: `retriever.py` (the local-rollback path), `embedder.py` (deprecated local sync), and `routers/rules.py` (`GET /api/rules/{rule_id}` — only on the `local` rollback backend; on `rulhub` it goes RulHub-first, fail-closed, since 2026-07-07).
 - **Not used** by `rulhub_retriever.py` at all — it talks to `RulHubClient` and normalizes rows itself.
 
 **RulHub API contract actually in use** (`rulhub_client.py`): `GET /v1/rulesets`, `GET /v1/rulesets/{key}`, `GET /v1/rules`, `GET /v1/rules/{rule_id}`, `POST /v1/rules/search`, `GET /v1/rules/lookup`, `GET /v1/rules/intelligence`, `GET /v1/stats`. Auth via `X-API-Key` header; `RulHub-Version` header pinned via `RULHUB_API_VERSION` env var (read with raw `os.getenv`, **not** part of the pydantic `Settings` class in `config.py` — easy to miss when auditing env vars).
@@ -448,7 +447,7 @@ The RulHub migration described in earlier versions of this document is **done in
 2. Once it resumes: create an Internal-tier `RULHUB_API_KEY`, smoke-test `/v1/stats`, `/v1/rules/search`, `/v1/rules/lookup` directly, then flip `RETRIEVAL_BACKEND` from `local` to `rulhub` in Render.
 3. Run all 20 golden queries against the live RulHub path and compare citation accuracy/confidence bands against what shipped on the local corpus.
 4. Keep the local corpus (`rulegpt_rules`/`rulegpt_rule_embeddings`) and its rollback path intact until the RulHub path has run clean in production for a week — don't drop those tables early.
-5. `GET /api/rules/{rule_id}` (`routers/rules.py`) still checks local-first, RulHub-fallback — this is the one endpoint that was not migrated to RulHub-primary. Low priority to fix (rarely called directly), but worth knowing about if you're asked "does everything read from RulHub now."
+5. ~~`GET /api/rules/{rule_id}` local-first inconsistency~~ — fixed 2026-07-07: on `RETRIEVAL_BACKEND=rulhub` the endpoint is RulHub-first and fail-closed (503 when RulHub is unreachable, never stale local rows); the local-first-with-RulHub-fallback behavior survives only on the `local` rollback backend.
 
 ## KNOWN ISSUES
 
@@ -470,17 +469,11 @@ DETAIL: `get_usage()` returns `api_queries_used=0` always. This is the legacy en
 PRIORITY: medium
 BLOCKED BY: API key management system
 
-ISSUE: `billing_status.checkout_ready` is not Pro-price-aware
-FILE: rulegpt-api/app/routers/billing.py
-DETAIL: `checkout_ready` only checks the four legacy Professional/Enterprise price IDs. It does not check `STRIPE_PRO_MONTHLY_PRICE_ID`, `STRIPE_CASE_NOTE_PRICE_ID`, or `STRIPE_DRAFT_PRICE_ID`. The frontend Pro button can render as ready before those env vars are actually set, and the checkout call will 503 when clicked.
-PRIORITY: medium
-BLOCKED BY: None — straightforward fix, just not yet done
-
-ISSUE: `GET /api/rules/{rule_id}` was not migrated to RulHub-primary
-FILE: rulegpt-api/app/routers/rules.py
-DETAIL: Reads local `rule_store` first, falls back to `rulhub_client.get_rule()`. Every other retrieval path in the app is RulHub-primary now; this one endpoint is backwards relative to that.
+ISSUE: One-off price readiness is exposed but nothing reads it
+FILE: rulegpt-api/app/routers/billing.py, rulegpt-ui (workbench paywall)
+DETAIL: `checkout_ready` gates on `STRIPE_PRO_MONTHLY_PRICE_ID` since 2026-07-07 (plus the four legacy Professional/Enterprise IDs), and a `pro_monthly_price_configured` field + blocker were added. The one-off prices (`STRIPE_CASE_NOTE_PRICE_ID`/`STRIPE_DRAFT_PRICE_ID`) are still only surfaced via `oneoff_prices_configured`, which no UI consumes — a missing one-off price shows up as a 503 error at purchase time instead of a disabled button.
 PRIORITY: low
-BLOCKED BY: None — low-traffic endpoint
+BLOCKED BY: None — frontend needs to read `oneoff_prices_configured` in the workbench paywall
 
 ISSUE: `show_trdr_cta` is always False in the chat pipeline
 FILE: rulegpt-api/app/routers/query.py, app/services/rag/pipeline.py
