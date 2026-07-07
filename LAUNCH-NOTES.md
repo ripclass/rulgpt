@@ -76,7 +76,17 @@ Render service `rulegpt-api` already has most Phase 1-4 keys wired in `render.ya
 
 ## 6. Stripe (account: Enso Intelligence Labs, `acct_1T4IAtBG8gnvAJXa`)
 
-**These three prices do not exist yet — create them in test mode first, then live:**
+**STATUS 2026-07-07: the three live-mode prices and the live webhook endpoint exist** (created via API 2026-07-06 ~10:16 PM). What remains is verifying the IDs below are set in Render, and clearing the "Payouts paused — required task past due" banner on the Stripe account.
+
+| Price | Live price ID | Product |
+|---|---|---|
+| Pro $29/mo | `price_1TqFBaBG8gnvAJXa3I6t8gkI` | `prod_Upv1dSBzNka8Pl` RulGPT Pro |
+| Case Note $9 | `price_1TqFBcBG8gnvAJXaEpYo8dBc` | `prod_Upv1cfhTCo9urC` RulGPT Case Note |
+| Draft $19 | `price_1TqFBdBG8gnvAJXaSU2YYGfi` | `prod_Upv1dAtTrt0GHh` RulGPT Draft Response |
+
+Live webhook: `we_1TJQW6BG8gnvAJXa6WDURVlT` ("inspiring-victory") → `https://rulegpt-api.onrender.com/api/billing/webhook`, listening to `checkout.session.completed`, `customer.subscription.created/updated/deleted`, `invoice.payment_failed`, `invoice.payment_succeeded`.
+
+**Original checklist (kept for reference):**
 1. **Pro** — $29/month recurring price → set `STRIPE_PRO_MONTHLY_PRICE_ID` in Render
 2. **Case Note** — $9 one-off price → set `STRIPE_CASE_NOTE_PRICE_ID` in Render
 3. **Draft** — $19 one-off price → set `STRIPE_DRAFT_PRICE_ID` in Render
