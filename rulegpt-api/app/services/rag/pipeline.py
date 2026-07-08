@@ -368,18 +368,20 @@ class RAGPipeline:
                     "You normalize trade-finance questions into concise English "
                     "search keywords for a rules database. Output only English keywords."
                 ),
-                # Use the primary model, not the flash classifier: glm-4.7-flash
-                # returned EMPTY content here (spends its token budget on internal
-                # reasoning), and because that's a *successful* response the
-                # fallback chain never advances — so retrieval silently fell back
-                # to the raw non-English query. glm-5.2 reliably returns content.
+                # GLM models emit reasoning tokens that _request does not capture
+                # (only message.content). With a small max_tokens the budget is
+                # spent "thinking" and content comes back EMPTY — and an empty
+                # but *successful* response doesn't trip the fallback chain, so
+                # retrieval silently fell back to the raw non-English query.
+                # Give ample headroom so the keyword content survives.
                 model=_s.RULGPT_LLM_MODEL,
-                max_tokens=120,
+                max_tokens=512,
                 temperature=0.0,
             )
             english = (res.text or "").strip()
             # WARNING so it survives prod's log level (INFO is filtered out).
-            _log.warning("[XLANG] %r -> %r (model=%s)", query[:60], english[:80], res.model)
+            _log.warning("[XLANG] %r -> %r (model=%s ctoks=%s)",
+                         query[:60], english[:80], res.model, res.completion_tokens)
             if english:
                 return english
         except Exception as exc:
