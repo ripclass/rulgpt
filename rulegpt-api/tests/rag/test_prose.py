@@ -47,3 +47,22 @@ def test_punctuation_tidy_after_strips():
 
 def test_empty_and_none_safe():
     assert sanitize_outbound("") == ""
+
+
+def test_genuine_chinese_answer_is_not_stripped():
+    """A legitimately Chinese answer must survive — the CJK strip only targets
+    a stray Han glyph leaking into non-CJK prose, not the answer's language."""
+    from app.services.rag.prose import sanitize_outbound
+    chinese = "电放是指承运人在收回正本提单前，指示目的港代理放货。这存在无单放货的风险 [URC 522 Article 7]。"
+    out = sanitize_outbound(chinese)
+    assert "电放" in out and "无单放货" in out  # Chinese content preserved
+    assert "URC 522 Article 7" in out
+
+
+def test_stray_cjk_leak_is_still_stripped():
+    """A single leaked glyph in an English answer is still removed."""
+    from app.services.rag.prose import sanitize_outbound
+    leaked = "The bank must examine documents标 within five banking days under UCP 600."
+    out = sanitize_outbound(leaked)
+    assert "标" not in out
+    assert "five banking days" in out

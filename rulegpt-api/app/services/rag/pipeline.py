@@ -379,9 +379,7 @@ class RAGPipeline:
                 temperature=0.0,
             )
             english = (res.text or "").strip()
-            # WARNING so it survives prod's log level (INFO is filtered out).
-            _log.warning("[XLANG] %r -> %r (model=%s ctoks=%s)",
-                         query[:60], english[:80], res.model, res.completion_tokens)
+            _log.info("[XLANG] %r -> %r", query[:60], english[:80])
             if english:
                 return english
         except Exception as exc:
