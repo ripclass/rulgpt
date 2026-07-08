@@ -9,17 +9,31 @@
       "no confident \"yes, the reverse applies\" hallucination"
     ],
     "fail_closed": false,
-    "answer": "No. Excluding an article doesn't flip it to its opposite, it simply removes that article from applying to the credit. The article is gone, not reversed.\n\nUnder UCP 600 Article 1, the rules are binding on all parties \"unless expressly modified or excluded by the credit\" [ICC-UCP600-ART1-3-APPLICATION-DEFINITIONS-INTERPRETATIONS-001]. So when a credit says \"Articles 7(c) and 12(b) are excluded,\" those articles simply cease to govern the credit. There is no default \"opposite\" rule that springs into place. If the issuing bank wanted a specific alternative rule to apply instead, it would need to state that expressly in the credit terms.\n\nThink of it this way: exclusion creates a gap, not a mirror image. Whatever those articles would have required is no longer required, but nothing automatically fills the space unless the credit itself specifies a replacement rule.\n\nWhat still depends on your transaction: The retrieved rules I have don't include the actual text of Articles 7(c) or 12(b), so I can't tell you what practical effect the exclusion has on your specific credit. You'll want to read those articles directly to understand what obligations the issuing bank has carved out, and then check whether the credit replaces them with anything. If it doesn't, you're operating without those protections or requirements entirely.",
+    "answer": "No, the opposite does not automatically apply. When an LC excludes a specific UCP 600 article, that article simply ceases to govern the credit. There is no default \"mirror image\" or inverse rule that kicks in. The article is removed from the applicable framework, and whatever gap is left is governed by the express terms of the LC itself, any remaining UCP 600 articles that still apply, and standard banking practice.\n\nSo if the issuing bank wanted a particular outcome that is the opposite of what Article 7(c) or 12(b) provides, it needs to state that outcome expressly in the LC terms. Exclusion alone just creates silence on that point.\n\nI should be upfront: the retrieved rules I have access to do not include the text of UCP 600 Articles 7(c) or 12(b) specifically, so I cannot walk you through exactly what those articles say or what the practical effect of excluding each one would be in your transaction. My answer here is grounded in general LC practice regarding article exclusions, not in a retrieved rule that explicitly addresses this mechanism.\n\nWhat still depends on your transaction: the specific language of your LC, particularly whether it replaces the excluded articles with any alternative wording. If the LC is silent on what replaces them, ask the issuing bank for clarification before presentation, because the gap could affect your obligations or the bank's examination standard.",
     "confidence": "medium",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 69366,
+    "latency_ms": 23902,
     "citations": [
-      "UCP 600 Art. 1-3",
       "UCP 600 Art. 10-11",
-      "ISBP 821 Para. A6",
+      "UCP 600 Art. 4-5",
       "eUCP 2.1 EUCP21-e2A",
-      "UCP 600 Art. 14"
+      "UCP 600 Art. 14",
+      "UCP 600 Art. 30"
+    ],
+    "citation_rule_ids": [
+      "ICC-UCP600-ART10-11-AMENDMENTS-TELETRANSMITTED-PRE-ADVISED-CREDITS-001",
+      "ICC-UCP600-ART4-5-CREDITS-VS-CONTRACTS-DOCUMENTS-VS-GOODS-001",
+      "EUCP21-e2A",
+      "ICC-OPINION-R913",
+      "UCP600-30-DERIVED-001"
+    ],
+    "retrieved_rule_ids": [
+      "ICC-UCP600-ART10-11-AMENDMENTS-TELETRANSMITTED-PRE-ADVISED-CREDITS-001",
+      "ICC-UCP600-ART4-5-CREDITS-VS-CONTRACTS-DOCUMENTS-VS-GOODS-001",
+      "EUCP21-e2A",
+      "ICC-OPINION-R913",
+      "UCP600-30-DERIVED-001"
     ],
     "error": null
   },
@@ -33,17 +47,31 @@
       "no invented percentage or base; cite the article"
     ],
     "fail_closed": false,
-    "answer": "The tolerance under UCP 600 Article 30 applies to the credit amount as stated in the LC, not to a remaining unused balance after partial drawings. So if your LC is for USD 100,000 with a ±5% tolerance, the maximum you can draw is USD 105,000 total across all presentations combined, not USD 105,000 on top of whatever you've already drawn.\n\nHere's what the retrieved rules confirm:\n\n- [UCP600 Article 30(a)] (icc_core.lco_ucp600_letter_rules_v1): the ±5% tolerance applies to the \"credit amount, maximum drawing amount, or quantity\" as stated in the credit. It's measured against the LC's stated figures, not a running balance.\n- [ISBP 821 Paragraph C14] (icc_core.lco_isbp821_letter_rules_v1): \"A variance of UP TO +5% in quantity does NOT allow the amount demanded under the presentation to exceed the amount of the credit.\" This reinforces that the ceiling is the total LC amount (plus tolerance), not a per-drawing or remaining-balance figure.\n\nWhat the retrieved rules don't explicitly address is the specific mechanics of how tolerance interacts with partial drawings and a remaining balance. The rules cover tolerance and partial shipments separately (Articles 30 and 31), but don't spell out the combined scenario you're describing. From general trade finance practice, the standard interpretation is that tolerance is applied to the original LC amount, and the aggregate of all drawings cannot exceed that amount plus the permitted tolerance. But if your situation involves unusual LC wording (e.g., instalment shipments with per-instalment amounts), the answer could shift.\n\nWhat still depends on your transaction: the exact wording of your LC's amount and quantity fields, whether partial shipments are allowed, and whether the credit specifies instalment amounts or a single total. If you can share those details, I can give you a more precise read.",
+    "answer": "UCP 600 Article 30 tolerance applies to the credit amount, the maximum drawing amount, or the quantity as stated in the credit, not to any \"remaining unused balance\" after partial drawings. The tolerance is calculated against the figure specified in the LC itself [icc_core.lco_ucp600_letter_rules_v1, Article 30].\n\nSo if your LC says the credit amount is USD 100,000 with a ±5% tolerance under Article 30(a), each drawing can go up to USD 105,000 (or down to USD 95,000) regardless of how much has already been drawn under prior presentations. The tolerance isn't recalculated against what's left.\n\nThe same logic applies to quantity: if the LC states 1,000 MT with a 5% tolerance, each shipment can be up to 1,050 MT. If you've already shipped 600 MT in a first partial drawing, the tolerance on the second shipment still references the 1,000 MT figure in the LC, not the remaining 400 MT.\n\nThe one nuance: the aggregate of all drawings cannot exceed the total credit amount plus the tolerance. So across all presentations combined, you can't draw more than USD 105,000 in the example above. Each individual drawing gets the tolerance, but the overall ceiling holds.\n\nWhat still depends on your transaction: whether your LC has specific clauses overriding the default tolerance, whether partial shipments are allowed or prohibited, and whether the LC stipulates a specific quantity (which changes which sub-article of Article 30 applies).",
     "confidence": "medium",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 168839,
+    "latency_ms": 22253,
     "citations": [
       "UCP 600 Art. 30",
       "UCP 600 Art. 29-32",
-      "ISBP 821 Para. C13",
-      "UCP 600 Art. 30",
-      "ISBP 821 Para. C14"
+      "eUCP 2.1 EUCP21-e2A",
+      "ISBP 821 Para. K12",
+      "UCP 600 Art. 38"
+    ],
+    "citation_rule_ids": [
+      "UCP600-30-DERIVED-001",
+      "ICC-UCP600-ART29-32-EXPIRY-EXTENSION-TOLERANCE-PARTIAL-INSTALMENT-001",
+      "EUCP21-e2A",
+      "ISBP821-K12",
+      "UCP600-38-DERIVED-001"
+    ],
+    "retrieved_rule_ids": [
+      "UCP600-30-DERIVED-001",
+      "ICC-UCP600-ART29-32-EXPIRY-EXTENSION-TOLERANCE-PARTIAL-INSTALMENT-001",
+      "EUCP21-e2A",
+      "ISBP821-K12",
+      "UCP600-38-DERIVED-001"
     ],
     "error": null
   },
@@ -57,17 +85,31 @@
       "does not treat \"sent on collection\" as a valid substitute for a timely refusal notice"
     ],
     "fail_closed": false,
-    "answer": "Yes, the buyer can delay or refuse payment once documents shift to a collection basis, and no, the \"collection basis\" clause does not let the issuing bank skip the Article 16 refusal timeline. These are two separate issues, and the rules are clear on both.\n\nOn the refusal timeline: ICC Opinion R904 directly addresses discrepancy clauses that say documents will be \"forwarded on collection basis.\" The opinion is explicit that such a clause does not override Article 16 refusal procedures. The issuing bank must still send a timely refusal notice, within 5 banking days, identifying each specific discrepancy [ICC-OP-R904, UCP 600 Art 16]. If the bank fails to do that, it's precluded from claiming the documents are discrepant under Article 16(f), and under DOCDEX Decision 318, failure to send the notice means the bank is deemed to have honored [ICC-DOCDEX-003]. So the bank cannot use the collection clause as a shortcut to avoid its refusal obligations.\n\nOn buyer payment delay: once documents are genuinely being handled as a collection under URC 522, the landscape changes. The collecting bank does not examine documents for compliance with any standard, and there are no \"discrepancies\" in the UCP 600 sense. Documents are released against payment (D/P) or acceptance (D/A) per the collection instruction, and the drawee can refuse to pay or accept [EXC-WAIVE-PROD-004]. So yes, the buyer gains leverage to delay or negotiate.\n\nAlso worth noting: a discrepancy that was refused is not cured just by forwarding on collection. Cure requires either corrected replacement documents or an applicant waiver [EXC-REPR-004].\n\nWhat still depends on your transaction: whether the LC actually contained a discrepancy clause authorizing collection-basis forwarding, whether the issuing bank sent a proper Article 16 refusal notice listing specific discrepancies, and whether the collection is structured as D/P or D/A.",
+    "answer": "I can't give a synthesized answer with verified citations for this one. Here are the relevant rules:\n- [icc_core.cop_urc522_letter_rules_v1 URC522-12A] Collecting Bank Must Verify Documents Received Against Collection Instruction List: Upon receipt of documents for collection, the collecting/presenting bank must verify that the documents received appear to be as listed in the collection instruction — checking qua…\n- [icc_core.cop_urc522_letter_rules_v1 URC522-4A] Collection Instruction Must Accompany All Documents Sent for Collection: Every set of documents forwarded for collection must be accompanied by a collection instruction. The collection instruction must indicate that the collection is subject to URC 522…\n- [icc_core.cop_urc522_letter_rules_v1 Article 4(a)(i)] Collection Instruction Must Accompany Documents: All documents sent for collection must be accompanied by a collection instruction indicating that the collection is subject to URC 522 and giving complete and precise instructions.…\n- [icc_core.lco_ucp600_letter_rules_v1 Article 16] Discrepant Documents, Waiver and Notice: Discrepant Documents, Waiver and Notice…\n- [lifecycle.discrepancy_waiverability_rules LIFE-WAIVDISC-001] Hard timing and absent-document discrepancies should default to strong waiver caution: Where discrepancies concern timing failures or complete document absence, waiverability should not be assumed casually even if downstream applicant pressure exists.…",
     "confidence": "low",
     "routing_tier": "sonnet",
-    "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 17053,
+    "model_used": "citations-only",
+    "latency_ms": 31218,
     "citations": [
-      "Exc Waiver By Product EXC-WAIVE-PROD-004",
-      "Exc Representment And Cure Rules EXC-REPR-004",
+      "URC 522 URC522-12A",
+      "URC 522 URC522-4A",
+      "URC 522 Art. 4",
       "UCP 600 Art. 16",
-      "ICC DOCDEX Decision 295",
-      "UCP 600 Art. 16"
+      "Discrepancy Waiverability Rules LIFE-WAIVDISC-001"
+    ],
+    "citation_rule_ids": [
+      "URC522-12A",
+      "URC522-4A",
+      "URC522-4a-i",
+      "UCP600-16",
+      "LIFE-WAIVDISC-001"
+    ],
+    "retrieved_rule_ids": [
+      "URC522-12A",
+      "URC522-4A",
+      "URC522-4a-i",
+      "UCP600-16",
+      "LIFE-WAIVDISC-001"
     ],
     "error": null
   },
@@ -81,16 +123,31 @@
       "no overclaim in either direction"
     ],
     "fail_closed": false,
-    "answer": "Generally, this should not be a discrepancy, but the retrieved rules I have don't specifically address the language-of-documents question, so I'll be upfront about that boundary.\n\nWhat the rules do confirm is that Field 46A is the primary field for document requirements (messaging.swift_mt700, MT700-46A-001), and that for a UCP 600 LC, the required document set and any specific requirements are defined entirely by the LC's own stipulated fields (events.ev_infer_required_evidence_by_product, EVAPI-IRE-001). So the Field 47A language condition is a binding LC term you must comply with.\n\nWhat's not covered by my retrieved rules is the specific question of whether a proper noun, product model name, or trade designation that exists only in Spanish violates an \"all documents in English\" clause. This is a grey area that trade finance practice typically handles pragmatically. Product model names, brand names, and trade designations are generally treated as proper nouns and are not \"translated\" in commercial practice. An invoice that is otherwise fully in English but carries a model designation like \"Cabezal Fresadora X-200\" would usually be acceptable because that string is the actual commercial name of the product, not a descriptive term that could be rendered in English.\n\nThe risk is that some issuing banks take a strict literal approach to \"all documents in English\" and may flag any non-English text. If the model name appears in the LC goods description itself in Spanish, that actually strengthens your position, since your invoice is then mirroring the LC.\n\nWhat still depends on your transaction: the exact wording of the 47A clause, whether the Spanish model name also appears in the LC, and how strict the issuing bank's examination team is. If the stakes are high, a pre-presentation query to the issuing bank through your advising bank is the safest move.",
+    "answer": "No, this is generally not a discrepancy, but I need to be upfront: the retrieved rules I have access to for this query don't directly cover the language-of-documents issue. None of the five retrieved rules address LC Field 47A language requirements or the treatment of proper nouns, brand names, or model designations in foreign languages.\n\nFrom general trade finance practice (not from the retrieved rules): proper nouns, trademarks, model numbers, and product names that are inherently untranslatable are widely accepted on documents even when the LC requires English. A Spanish product model name like \"Modelo Río\" or a brand designation is treated as a proper noun, not as content that the \"all documents in English\" clause is meant to catch. Banks routinely accept this. The spirit of a Field 47A language requirement is that the substantive content of the document, the descriptions, quantities, values, and terms, must be in English so the examining bank can read them.\n\nThat said, the safest approach is to keep everything else on the invoice in English and let the model name stand as-is. If you want zero risk, add an English translation or transliteration in parentheses next to the Spanish name.\n\nWhat still depends on your transaction: the exact wording of the Field 47A clause matters. If it says \"all documents must be exclusively in English,\" some banks may read that more strictly. If it says \"documents must be in English\" or \"drawn up in English,\" the proper-noun exception is more defensible. Check the precise language and, if in doubt, ask the issuing bank or your nominated bank for their view before presentation.",
     "confidence": "low",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 64462,
+    "latency_ms": 26747,
     "citations": [
       "Swift Mt700 MT700-46A-001",
-      "ICC Model Forms Pub. 800B",
-      "UCP 600 ISLAMIC-LC-UCP600-COMPLIANCE-PLAYBOOK-001",
-      "ISP98 Pub. 590"
+      "eUCP 2.1 EUCP21-e6B",
+      "Pop Urf800 Letter Rules Art. 5",
+      "ISBP 821 Para. K6",
+      "Swift Mt700 MT700-39B-001"
+    ],
+    "citation_rule_ids": [
+      "MT700-46A-001",
+      "EUCP21-e6B",
+      "URF800-5-004",
+      "ISBP821-K6",
+      "MT700-39B-001"
+    ],
+    "retrieved_rule_ids": [
+      "MT700-46A-001",
+      "EUCP21-e6B",
+      "URF800-5-004",
+      "ISBP821-K6",
+      "MT700-39B-001"
     ],
     "error": null
   },
@@ -104,16 +161,31 @@
       "Fail if it says waiting for the applicant is acceptable"
     ],
     "fail_closed": false,
-    "answer": "The short answer is no, the bank cannot wait for the applicant's waiver before sending its refusal notice. The five-banking-day clock is fixed and does not pause while the bank waits for the applicant to decide.\n\nUnder UCP 600 Article 16, the issuing bank must provide its notice of refusal within five banking days following the day of presentation. The bank may approach the applicant for a waiver, but that outreach does not extend the examination or refusal timeline. If the waiver arrives before the deadline, great, the bank can release documents. If it does not arrive in time, the bank must still issue its refusal notice within the five-day window or it loses the right to refuse.\n\nThe retrieved rules in my database do not cover UCP 600 Article 16 specifically, so this guidance is drawn from general trade finance knowledge rather than the retrieved rule set. The rules I do have retrieved touch on bank behavior and tolerance profiles, but none address refusal timing or waiver mechanics.\n\nWhat still depends on your transaction: whether the LC is subject to UCP 600 (vs. ISP98 or another framework), and whether the issuing bank has any internal policies that add procedural steps around waiver requests. If you need full LC validation or document checking, TRDR Hub at trdrhub.com offers those capabilities.",
+    "answer": "The short answer is no, the bank cannot extend the five-banking-day examination period to wait for an applicant's waiver. Under UCP 600, the issuing bank must issue its notice of refusal within five banking days following presentation if it intends to refuse. The bank may approach the applicant for a waiver during that window, but the clock does not stop. If the waiver hasn't arrived by the time the five-day period expires, the bank must still send a compliant refusal notice or it risks being deemed to have accepted the documents.\n\nThat said, the rules I have retrieved here don't include the specific UCP 600 timing articles (Article 14(b) or Article 16), so I'm stating this from general trade finance knowledge rather than from the retrieved set. What the retrieved rules do confirm is the waiver dynamic itself: the issuing bank may seek a waiver from the applicant [DOCDEX-020], but the applicant's waiver does not bind the issuing bank to honor [DOCDEX-308]. So even if the applicant says \"I accept the discrepancy,\" the bank retains discretion.\n\nOne practical caution: where the discrepancy involves a timing failure or a missing document, waiver should not be assumed casually, even with applicant pressure [LIFE-WAIVDISC-001].\n\nWhat still depends on your transaction: whether your credit is subject to UCP 600 or ISP98 (ISP98 has its own waiver framework under Article 3.11), and whether the LC itself contains any modified timing terms.",
     "confidence": "low",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 15457,
+    "latency_ms": 40213,
     "citations": [
-      "Bbeh Thresh Confidence Threshold Overlays BBEH-THRESH-002",
-      "Cb Wolfsberg Kyc Depth CB-DOLLAR-001",
-      "Brpd Icrrs brpd-icrrs#1.5~r9",
-      "Bbeh Dq Bank Behavior Dq Bridge BBEH-DQ-003"
+      "ICC DOCDEX DOCDEX-020",
+      "ICC DOCDEX DOCDEX-308",
+      "Discrepancy Waiverability Rules LIFE-WAIVDISC-001",
+      "ISP98 Art. 3",
+      "Icc Opinions Key ICC-R797"
+    ],
+    "citation_rule_ids": [
+      "DOCDEX-020",
+      "DOCDEX-308",
+      "LIFE-WAIVDISC-001",
+      "ISP98-3.11",
+      "ICC-R797"
+    ],
+    "retrieved_rule_ids": [
+      "DOCDEX-020",
+      "DOCDEX-308",
+      "ISP98-3.11",
+      "ICC-R797",
+      "LIFE-WAIVDISC-001"
     ],
     "error": null
   },
@@ -127,17 +199,31 @@
       "product-boundary behavior (rule vs legal advice), not a confident yes/no"
     ],
     "fail_closed": true,
-    "answer": "Yes, under URDG 758 the guarantor is generally obligated to pay a complying demand, because the guarantee is independent of the underlying relationship and the guarantor deals in documents, not the underlying dispute [icc_core.urdg758_demand_guarantee_depth_2a_r115, Articles 1-7]. A foreign court injunction, however, is not something the URDG rules themselves resolve. The rules I have access to do not explicitly address the scenario where a court in one country issues an injunction directed at a guarantor in another country.\n\nHere is what the rules do cover that is relevant:\n\n- Independence principle: The guarantee is by its nature independent of the underlying contract, and the guarantor's obligation is to examine the presentation on its face and pay if it is complying [icc_core.urdg758_demand_guarantee_depth_2a_r115, Articles 1-7 and 19-22].\n- Force majeure (Article 26): The retrieved rules reference a force majeure provision in Articles 23-26, but the excerpt does not detail whether a foreign court injunction qualifies as force majeure. You would need to review the full text of Article 26 to assess this [icc_core.urdg758_demand_guarantee_depth_2a_r115, Articles 23-26].\n\nThe practical reality is that a court injunction creates a direct legal conflict for the guarantor: pay under the URDG or comply with the court order. This is a legal question, not purely a rules question. You should consult a trade finance lawyer in the guarantor's jurisdiction immediately, because the enforceability of the foreign injunction depends on local law, bilateral enforcement treaties, and whether the court has jurisdiction the guarantor recognizes.\n\nWhat still depends on your transaction: the jurisdiction of the guarantor, the jurisdiction of the issuing court, whether the injunction was served directly on the guarantor, and whether the guarantee itself specifies a governing law or jurisdiction clause.",
+    "answer": "Yes, under URDG 758 principles, the guarantor's obligation is independent of the underlying contract and any disputes arising from it. The guarantee is irrevocable from issuance, and any unilateral attempt by the guarantor to revoke or avoid payment is invalid [icc_core.gop_urdg758_letter_rules_v6, Article 4]. A complying demand must be paid.\n\nHowever, the specific question of whether a foreign court injunction overrides the guarantor's payment obligation is not covered by the retrieved rules. URDG 758 Article 5 (the independence principle) and Article 20 (exceptions to payment) are not in my retrieved set, so I cannot cite them directly. What I can say from general trade finance knowledge is that the independence principle is a cornerstone of URDG 758: the guarantor pays against a complying demand regardless of disputes between the applicant and beneficiary. Court injunctions, especially from a jurisdiction other than the one whose law governs the guarantee, are a serious tension point. The guarantor may face conflicting legal duties: pay under URDG, or comply with the injunction under local law.\n\nThis is ultimately a legal question, not a pure rules question. You need a trade finance lawyer to assess whether the injunction is enforceable against the guarantor in the guarantor's jurisdiction, and whether the governing law clause in your guarantee gives the issuing court jurisdiction.\n\nWhat still depends on your transaction: the governing law clause in the guarantee, the jurisdiction of the injunction versus the guarantor's place of business, and whether the guarantee text contains any clause addressing court orders or injunctions.",
     "confidence": "medium",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 17915,
+    "latency_ms": 42230,
     "citations": [
-      "URDG 758 Art. 23-26",
-      "URDG 758 Art. 19-22",
-      "URDG 758 Art. 14-18",
-      "ICC DOCDEX Decision 401",
-      "URDG 758 Art. 1-7"
+      "URDG 758 Art. 4",
+      "URDG 758 Art. 4-5",
+      "URDG 758 Art. 17",
+      "URDG 758 Art. 1",
+      "URDG 758 Art. 33"
+    ],
+    "citation_rule_ids": [
+      "GOP-URDG-003",
+      "ICC-URDG758-ART-4-5",
+      "URDG758-17B",
+      "GOP-URDG-001",
+      "GOP-URDG-010"
+    ],
+    "retrieved_rule_ids": [
+      "GOP-URDG-003",
+      "ICC-URDG758-ART-4-5",
+      "URDG758-17B",
+      "GOP-URDG-001",
+      "GOP-URDG-010"
     ],
     "error": null
   },
@@ -151,17 +237,31 @@
       "(Directly tests the standing ISBP 745→821 paragraph-verification risk. A wrong/legacy paragraph number here loses an examiner instantly.)"
     ],
     "fail_closed": true,
-    "answer": "The rules I have access to in this query don't cover presentation periods or \"stale documents acceptable\" clauses. The retrieved ISBP 821 paragraphs address clean transport document clauses (Articles J15, D24, H20), \"all risks\" insurance coverage (K18), and sanctions clauses in LCs. None of them touch on the interaction between a stated presentation period and a \"stale documents acceptable\" provision.\n\nFrom general trade finance knowledge (not from the retrieved rules): a \"stale documents acceptable\" clause typically waives the requirement that documents must be presented within 21 days after shipment (the default under UCP 600 Article 14(c)), but it does not automatically override an expressly stated presentation deadline in the LC. If the credit says \"documents must be presented within 15 days after the date of shipment,\" that specific period generally governs. \"Stale documents acceptable\" usually means the bank won't raise a discrepancy solely because documents are presented after 21 days, not that it ignores a shorter period the LC itself imposes. But I'd want to confirm this against the specific ISBP 821 paragraphs on presentation periods and stale documents, which aren't in my current retrieved set.\n\nWhat still depends on your transaction: the exact wording of both clauses in your LC matters enormously here, as does whether the 15-day period is framed as a presentation deadline or a stale documents cutoff. Your issuing bank's interpretation will be decisive.",
-    "confidence": "low",
+    "answer": "I can't give a synthesized answer with verified citations for this one. Here are the relevant rules:\n- [icc_core.isbp821_delta_transport_v1 ISBP821-DELTA-STALE-001] ISBP 821: Stale Documents — 21-Day Rule Clarification and Exceptions: ISBP 821 stale documents 21-day rule clarification + UCP 600 Art 14(c): presentation of documents must be made by or on behalf of the beneficiary not later than 21 calendar days af…\n- [icc_core.isbp821_delta_transport_v1 ISBP821-DELTA-ORIGINAL-001] ISBP 821: Original Documents — Updated Determination Standards: ISBP 821 original documents updated standards + UCP 600 Art 17: ISBP 821 maintains and clarifies the UCP 600 Art 17 tests for whether a document qualifies as 'original': (a) appear…\n- [icc_core.isbp821_delta_modern_v1 ISBP821-DELTA-COMPLIANCE-CHECKLIST-001] ISBP 821: Document Examination Best Practice — Structured Checklist Approach: ISBP 821 best-practice checklist approach: examining banks and beneficiaries are encouraged to use structured checklists covering all LC-required documents before presentation. Com…\n- [icc_core.lco_isbp821_letter_rules_v1 Article J15] Clean road/rail/IWT transport document — no clause expressly declaring defective condition: ISBP 821 J15 — A road, rail or inland waterway transport document is not to include a clause or clauses that expressly declare a defective condition of the goods or their packaging…\n- [icc_core.isbp821_delta_doctypes_v1 ISBP821-DELTA-FORWARDING-001] ISBP 821: Forwarding Agent's Document vs Carrier's Document — Acceptability: ISBP 821 forwarding agent vs carrier guidance + UCP 600 Art 14(l): a forwarding agent's document is only acceptable if the forwarder issues it in the capacity of carrier (named as…",
+    "confidence": "medium",
     "routing_tier": "sonnet",
-    "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 26166,
+    "model_used": "citations-only",
+    "latency_ms": 22403,
     "citations": [
+      "ISBP 821 ISBP821-DELTA-STALE-001",
+      "ISBP 821 ISBP821-DELTA-ORIGINAL-001",
+      "ISBP 821 ISBP821-DELTA-COMPLIANCE-CHECKLIST-001",
       "ISBP 821 Para. J15",
-      "ISBP 821 Para. D24",
-      "ISBP 821 Para. H20",
-      "ISBP 821 ISBP821-DELTA-SANCTIONS-LC-001",
-      "ISBP 821 Para. K18"
+      "ISBP 821 ISBP821-DELTA-FORWARDING-001"
+    ],
+    "citation_rule_ids": [
+      "ISBP821-DELTA-STALE-001",
+      "ISBP821-DELTA-ORIGINAL-001",
+      "ISBP821-DELTA-COMPLIANCE-CHECKLIST-001",
+      "ISBP821-J15",
+      "ISBP821-DELTA-FORWARDING-001"
+    ],
+    "retrieved_rule_ids": [
+      "ISBP821-DELTA-STALE-001",
+      "ISBP821-DELTA-ORIGINAL-001",
+      "ISBP821-DELTA-COMPLIANCE-CHECKLIST-001",
+      "ISBP821-J15",
+      "ISBP821-DELTA-FORWARDING-001"
     ],
     "error": null
   },
@@ -175,17 +275,31 @@
       "does not act as legal counsel drafting an operative document"
     ],
     "fail_closed": true,
-    "answer": "I can't draft an LOI for you, and I want to be straight about why. Drafting a letter of indemnity is a legal document that creates binding financial liability, so it needs to come from your legal team, your P&I club, or a trade finance lawyer familiar with your jurisdiction and the carrier's requirements.\n\nWhat I can tell you from the rules: the retrieved rules reference LOIs in the context of crude oil tanker transactions, specifically mentioning the \"LOI-financed model\" and \"BIMCO LOI Wording 2008\" as an industry standard wording for cargo release without original bills of lading [commodities.energy_commodities_depth_4a, COMMODITIES-CRUDE-OIL-TANKER-LOI-FINANCED-MODEL-001]. That BIMCO 2008 wording is the most widely used industry template for this exact situation. Your carrier or their agent will likely have a preferred format as well, and many carriers insist on their own wording.\n\nA couple of practical points:\n\n- The carrier takes all the risk when releasing cargo against an LOI, so they will typically dictate the terms, not you. Ask them for their standard LOI template first.\n- If your shipment is under a documentary credit, releasing cargo without original B/Ls doesn't affect your LC presentation separately, but it does mean you need to track the originals and ensure they reach the right party [icc_core.ucp600_transport_articles_depth_2a_r117, UCP 600 Article 20].\n\nWhat still depends on your transaction: the commodity, whether a charter party is involved (which changes the B/L regime under UCP 600 Article 22), whether your bank or counterparty has specific LOI wording requirements, and whether P&I club cover is involved.",
+    "answer": "I can't draft a letter of indemnity for you. The rules I have access to cover bill of lading requirements under documentary credits (UCP 600 Article 20, ISBP 821 G8), not LOIs for cargo release without original B/Ls. Drafting an LOI is a legal document that should come from your legal counsel or your carrier's standard form, not from a trade finance rules engine.\n\nHere's what I can tell you from a trade finance angle:\n\n- If this shipment is under an LC, releasing cargo against an LOI instead of original B/Ls creates a real risk. The bank examines documents, not goods (UCP 600 Article 20 covers B/L requirements). If the original B/Ls never surface or arrive after the presentation deadline, you may face a discrepancy when you try to claim under the credit.\n- LOIs for cargo release are a commercial arrangement between you, the carrier, and typically your bank. Most carriers have their own standard LOI templates and will insist on their wording, not yours. Your bank may also need to counter-indemnify or issue a bank-endorsed LOI, depending on the carrier's requirements.\n\nWhat still depends on your transaction: Whether this shipment is under an LC or on open account, who the carrier is, whether your bank is involved in the LOI chain, and what the destination port's customs require for release without originals. Your freight forwarder or carrier will have the LOI template you need, and your legal team should review it before signing.",
     "confidence": "low",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 18355,
+    "latency_ms": 14564,
     "citations": [
       "UCP 600 Art. 20",
+      "ISBP 821 Para. G8",
       "UCP 600 Art. 20",
-      "Energy Commodities Depth 4A COMMODITIES-CRUDE-OIL-TANKER-LOI-FINANCED-MODEL-001",
-      "UCP 600 Art. 22",
-      "UCP 600 Art. 20"
+      "Icc Opinions Merged ICC-R814",
+      "Lcopilot Crossdoc CROSSDOC-DRAFT-3"
+    ],
+    "citation_rule_ids": [
+      "UCP600-20",
+      "ISBP821-G8",
+      "UCP600-20E",
+      "ICC-R814",
+      "CROSSDOC-DRAFT-3"
+    ],
+    "retrieved_rule_ids": [
+      "UCP600-20",
+      "ISBP821-G8",
+      "UCP600-20E",
+      "ICC-R814",
+      "CROSSDOC-DRAFT-3"
     ],
     "error": null
   },
@@ -199,17 +313,31 @@
       "flags any LC-specific condition that would change the answer"
     ],
     "fail_closed": false,
-    "answer": "A charter-party bill of lading is acceptable only if your LC expressly permits it. If the credit is silent on charter-party B/Ls, presenting one will be treated as a discrepancy.\n\n- If the LC does allow a charter-party B/L, it will be examined under UCP 600 Article 22 [ICC-UCP600-ART22-CHARTER-PARTY-BILL-OF-LADING-001, UCP600 Article 22]. Even a regular marine B/L that merely contains a reference to a charter party falls into this category and is not acceptable unless the LC permits it [UCP600 Article 20, UCP600-20G].\n\n- A charter-party B/L must be signed by the master, owner, charterer, or a named agent of any of those parties [ICC-UCP600-ART22-CHARTER-PARTY-BILL-OF-LADING-001]. Banks will examine the B/L itself but do not examine the charter-party contract, even if the LC requires it to be presented alongside the B/L [ISBP 821 Article G1, ISBP821-G1-VAR02].\n\nWhat still depends on your transaction: Check Field 46A (documents required) and Field 47A (additional conditions) in your LC. If neither field explicitly allows a charter-party B/L, you have two options: request an amendment to the credit, or arrange for a standard (non-charter-party) ocean B/L instead.",
+    "answer": "Only if your LC explicitly permits charter party bills of lading. Under UCP 600 Article 20 (icc_core.lco_ucp600_letter_rules_v1), a bill of lading containing a reference to a charter party is not acceptable unless the credit specifically allows it. If your LC does permit it, the document must then comply with the requirements of UCP 600 Article 22 (icc_core.ucp600_letter_rules_v1), which governs charter party bills of lading specifically.\n\nIf Article 22 applies, the bill must appear to be signed by the master, a named agent for the master, the owner, a named agent for the owner, the charterer, or a named agent for the charterer (icc_core.ucp600_transport_articles_depth_2a_r117).\n\nOne important nuance: just because your bill uses a form name like \"Congenbill\" or \"Tanker Bill of Lading\" does not automatically make it a charter party bill. Under ISBP 821 paragraph G3 (icc_core.lco_isbp821_letter_rules_v1), a code name or form name commonly associated with charter party bills is not by itself an indication of a charter party, unless there is additional text referencing one.\n\nWhat still depends on your transaction: Check Field 46A of your LC to see whether charter party bills are expressly permitted. If the LC is silent, a charter party bill will be raised as a discrepancy. If you're unsure, share the relevant LC clause and I can help you read it.",
     "confidence": "high",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 20339,
+    "latency_ms": 15572,
     "citations": [
-      "UCP 600 Art. 22",
       "UCP 600 Art. 20",
-      "ISBP 821 Para. G1",
       "UCP 600 Art. 22",
-      "ISBP 821 Para. G1"
+      "UCP 600 Art. 22",
+      "ISBP 821 Para. G3",
+      "UCP 600 Art. 20"
+    ],
+    "citation_rule_ids": [
+      "UCP600-20G",
+      "UCP600-22",
+      "ICC-UCP600-ART22-CHARTER-PARTY-BILL-OF-LADING-001",
+      "ISBP821-G3",
+      "UCP600-20"
+    ],
+    "retrieved_rule_ids": [
+      "UCP600-20G",
+      "UCP600-22",
+      "ICC-UCP600-ART22-CHARTER-PARTY-BILL-OF-LADING-001",
+      "ISBP821-G3",
+      "UCP600-20"
     ],
     "error": null
   },
@@ -223,16 +351,31 @@
       "flags sampling-rules interaction rather than a flat yes/no"
     ],
     "fail_closed": true,
-    "answer": "The rules I have access to do not cover GAFTA contract terms or quality finality clauses. None of the retrieved rules address GAFTA dispute resolution, loadport vs. discharge port quality determination, or rejection rights under commodity trade contracts.\n\nHere's what I can say from general trade finance knowledge (not from the retrieved rules):\n\nWhen a GAFTA contract states \"quality final at loadport,\" that clause generally means the quality determined by the loadport surveyor's certificate is contractually binding and final. The buyer typically cannot then reject the goods at discharge based on a different surveyor's findings, because the contract has allocated quality risk to the loadport result. This is a common feature in bulk agricultural trades (grains, pulses, etc.) where cargo condition can change during transit due to moisture, ventilation, or natural causes.\n\nHowever, there are important exceptions that depend on your specific contract language:\n\n- Latent defects or contamination not present at loadport may still give you a claim, depending on the contract's defect/contamination clauses.\n- The GAFTA arbitration framework would govern any dispute, and the arbitration panel would look at the exact contract wording, the applicable GAFTA contract form (e.g., GAFTA 49, 64, etc.), and any amendments.\n\nThis is fundamentally a contract law question, not a trade finance or banking compliance question. You should consult a commodity trade lawyer or GAFTA arbitration specialist who can review your actual contract terms.\n\nWhat still depends on your transaction: the specific GAFTA contract form number, any amendments to the quality clause, the commodity involved, and whether the discharge surveyor's findings relate to quality that existed at loadport or developed during transit.",
+    "answer": "The rules I have access to don't cover GAFTA contract terms or quality final at loadport provisions. GAFTA (Grain and Feed Trade Association) contracts are governed by their own specific contract forms and arbitration framework, which fall outside the ICC publications, SWIFT messaging standards, and cross-document validation rules in my database.\n\nWhat I can tell you from general trade finance knowledge, clearly marked as general guidance: when a GAFTA contract states \"quality final at loadport,\" the loadport surveyor's certificate typically binds both parties on quality. This generally means you cannot later reject the cargo at discharge based on a different quality assessment, unless the contract also includes a separate clause allowing dischargeport claims for specific conditions (e.g., condition at discharge, contamination in transit, or weight shortage). The key is whether your contract distinguishes between \"quality\" and \"condition,\" and whether it includes any survival clauses or transit-related provisions that override the loadport finality.\n\nYou should review your specific GAFTA contract form number (e.g., GAFTA 49, 64, etc.) and any rider clauses, because the answer depends entirely on the exact wording and the applicable GAFTA default rules for that contract type. Your trade finance lawyer or a GAFTA-registered arbitrator would be the right person to confirm your rejection rights.\n\nWhat still depends on your transaction: the specific GAFTA contract form used, any rider or amendment clauses, the exact wording of the quality clause, and whether the surveyor's report at discharge addresses quality versus condition or transit damage.",
     "confidence": "low",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 12213,
+    "latency_ms": 33157,
     "citations": [
-      "Transport Rotterdam Rules TRAN-ROTT-001",
-      "Exchange Warrants Commodity Finance 4A COMMODITIES-ENERGY-OIL-LNG-CUSTOMS-SPECIALS-001",
-      "Energy Commodities Depth 4A COMMODITIES-LNG-SPA-CTMS-DESTINATION-CLAUSE-EU-ANTITRUST-001",
-      "Customs Transit Systems 3B CUSTOMS-TRANSIT-CONCEPT-RKC-TFA-001"
+      "ISBP 821 Para. E8",
+      "ISBP 821 Para. F7",
+      "Swift Mt700 MT700-44F-001",
+      "Incoterms 2020 INCO-VAR-003",
+      "Lcopilot Crossdoc CROSSDOC-BL-LC-2"
+    ],
+    "citation_rule_ids": [
+      "ISBP821-E8",
+      "ISBP821-F7",
+      "MT700-44F-001",
+      "INCO-VAR-003",
+      "CROSSDOC-BL-LC-2"
+    ],
+    "retrieved_rule_ids": [
+      "ISBP821-E8",
+      "ISBP821-F7",
+      "MT700-44F-001",
+      "INCO-VAR-003",
+      "CROSSDOC-BL-LC-2"
     ],
     "error": null
   },
@@ -246,17 +389,31 @@
       "short, corrective, plain-language"
     ],
     "fail_closed": false,
-    "answer": "An LC, DAP, and TT are three entirely different things that people often confuse because they all show up in trade deals. Here's the plain version:\n\nAn LC (Letter of Credit) is a payment instrument. The buyer's bank issues a written undertaking to pay the seller, provided the seller presents documents that comply with the LC's terms. Under UCP 600 Articles 1-3, these rules bind all parties once the credit expressly states it is subject to UCP 600. The key feature: the bank's obligation is separate from the underlying sales contract, so the seller gets paid if documents match, regardless of disputes about the goods.\n\nDAP (Delivered at Place) is not a payment method at all. It's an Incoterm that defines who carries the risk and cost of getting goods to a named destination. The seller bears risk until the goods arrive at the agreed place; the buyer handles import clearance. DAP sits in your sales contract, not in your payment arrangement. You can pair DAP with an LC, with a TT, or with any other payment method.\n\nTT (Telegraphic Transfer) is a straightforward bank-to-bank wire transfer of funds. No document conditions, no bank undertaking to the seller. The buyer simply instructs their bank to send money. The seller's risk: they ship and hope the buyer pays, or the buyer pays and hopes the seller ships.\n\nThe rules I have retrieved cover LC through UCP 600 Articles 1-3. DAP falls under Incoterms 2020, and TT is governed by banking payment regulations. Neither is covered by my current ruleset, so treat those descriptions as general guidance and verify against the Incoterms 2020 publication and your bank's payment terms.\n\nWhat still depends on your transaction: Whether DAP appears only in your sales contract or is also referenced in the LC's Field 45A goods description matters. If it's in the LC, your transport document must show delivery terms consistent with DAP, and the bank will check that during examination.",
+    "answer": "These three are fundamentally different things that often get confused because they all touch international trade payments.\n\nLC (Letter of Credit) is a bank undertaking. The issuing bank promises to pay the beneficiary against compliant documents. It's governed by UCP 600, and the bank deals in documents, not goods. The retrieved rules touch specific LC mechanics, like tolerance in amounts and quantities under UCP600 Article 30, and how credits can be teletransmitted under UCP600 Article 11, but they don't define the LC concept itself. That definition comes from general UCP 600 knowledge.\n\nDAP (Delivered at Place) is an Incoterm 2020 delivery term. It defines who bears risk and cost for delivery to a named place. It has nothing to do with payment method. You can ship under DAP terms and still get paid by LC, TT, or open account. The retrieved rules don't cover Incoterms, so I can't cite a specific rule here.\n\nTT (Telegraphic Transfer) is a plain wire transfer, a payment instruction sent via SWIFT. No bank undertaking, no document examination. The buyer just sends money. No retrieved rule covers TT.\n\nThe key distinction: LC is a payment mechanism with a bank guarantee. DAP is a delivery/risk allocation term. TT is a bare payment instruction with no conditions attached.\n\nWhat still depends on your transaction: whether DAP appears in your sales contract only, or also in your LC wording (Field 45A), because that affects how the bank examines your transport document.",
     "confidence": "low",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 64986,
+    "latency_ms": 29891,
     "citations": [
-      "UCP 600 Art. 1-3",
-      "ISBP 821 Para. H19",
-      "UCP 600 Art. 19",
-      "ISBP 821 Para. D23",
-      "ISBP 821 Para. J14"
+      "URBPO 750 Article COMPARISON",
+      "UCP 600 Art. 30",
+      "eUCP 2.1 EUCP21-e1D",
+      "UCP 600 Art. 11",
+      "ISBP 821 Para. B18"
+    ],
+    "citation_rule_ids": [
+      "URBPO750-VS-LC-001",
+      "UCP600-30",
+      "EUCP21-e1D",
+      "UCP600-11",
+      "ISBP821-B18"
+    ],
+    "retrieved_rule_ids": [
+      "URBPO750-VS-LC-001",
+      "UCP600-30",
+      "EUCP21-e1D",
+      "UCP600-11",
+      "ISBP821-B18"
     ],
     "error": null
   },
@@ -270,17 +427,31 @@
       "no false reassurance that telex release is risk-free"
     ],
     "fail_closed": false,
-    "answer": "Yes, telex release absolutely creates that risk, but I have to be upfront: none of the retrieved rules mention telex release specifically. What I can tell you is how it collides with the collection rules I do have.\n\nTelex release is a carrier-side action where the shipping line instructs its destination agent to release cargo without collecting the original bill of lading. The problem is that in a documentary collection, the whole payment mechanism depends on the buyer needing the original transport documents to claim the goods. Under URC 522 Article 7(c) and Article 7(b), commercial documents in a D/P collection are released only against payment. Under URC 522 Article 4C, the collection instruction must clearly state whether documents are delivered D/P or D/A. And under Article 19(b), the presenting bank releases documents only after full payment is received.\n\nBut here is the catch: if the carrier has already telex-released the cargo, the buyer can collect the goods without ever needing the original B/L from the bank. The bank still holds the documents, but the documents have lost their practical leverage. The bank is not responsible for this, because the bank deals in documents, not goods, and the telex release happened outside the collection chain entirely.\n\nSo the risk is real and it bypasses the collection structure. The shipper or freight forwarder who authorizes the telex release effectively surrenders the documentary control that the collection was designed to provide.\n\nWhat still depends on your transaction: whether your collection instruction or sales contract prohibits telex release, who authorized it, and whether the carrier had any obligation to check with the remitting bank before releasing. Those are contractual and carrier-terms questions beyond what URC 522 covers.",
+    "answer": "Yes, telex release does create that risk, and here's why it matters in a trade finance context.\n\nA telex release is a carrier practice where the shipping line instructs its destination agent to release cargo to the consignee without requiring the original bill of lading to be surrendered. The retrieved rules don't specifically address telex release, as it's a maritime/carrier concept rather than a banking rule. But the rules I have do cover the document release mechanics that telex release can undermine.\n\nIn a D/P collection, the presenting bank must not release commercial documents until payment is actually received [URC522-7B, collections.dp_da_branch_rules COP-BRANCH-002]. The collection instruction must clearly state the delivery terms, whether D/P, D/A, or otherwise [URC522-4C]. The entire security of a D/P collection depends on the buyer needing the original bill of lading to claim the goods, and that original B/L is among the documents the bank holds until payment.\n\nWhen a telex release happens, the buyer can collect the cargo from the carrier without ever needing the original B/L from the bank. The bank's leverage disappears. The buyer gets the goods, the seller may not get paid, and the bank is left holding documents that no longer control anything.\n\nThis is also why partial payment protections [collections.partial_payment_and_release_rules COP-PART-002] become moot if the goods are already released by the carrier outside the banking channel.\n\nWhat still depends on your transaction: whether your collection instruction or LC explicitly prohibits telex release or requires full-set original B/Ls to be presented, and whether your contract with the buyer or carrier addresses this. The retrieved rules don't cover carrier-side release mechanisms, so you should also check your transport contract and shipping line terms.",
     "confidence": "low",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 17779,
+    "latency_ms": 23887,
     "citations": [
-      "URC 522 Art. 7",
+      "Partial Payment And Release Rules Art. 002",
       "URC 522 URC522-4C",
-      "URC 522 Art. 19",
-      "URC 522 Art. 7",
-      "Exchange Warrants Commodity Finance 4A COMMODITIES-WARRANT-ECOSYSTEM-DOCUMENT-OF-TITLE-001"
+      "Dp Da Branch Rules COP-BRANCH-002",
+      "URC 522 Art. 6-8",
+      "URC 522 URC522-7B"
+    ],
+    "citation_rule_ids": [
+      "COP-PART-002",
+      "URC522-4C",
+      "COP-BRANCH-002",
+      "ICC-URC522-ART-6-8",
+      "URC522-7B"
+    ],
+    "retrieved_rule_ids": [
+      "COP-BRANCH-002",
+      "COP-PART-002",
+      "ICC-URC522-ART-6-8",
+      "URC522-7B",
+      "URC522-4C"
     ],
     "error": null
   },
@@ -295,17 +466,31 @@
       "(Highest fabrication risk in the customs segment.)"
     ],
     "fail_closed": true,
-    "answer": "The rules I have access to don't contain a specific HS code for LED flashlights. What I can tell you is that the classification principles in my database emphasize that any proposed HS code must coherently match the product's stated function, composition, and use, and that classification should not be treated as confident when the product description is too generic to support a defensible tariff-line posture [customs.hs_classification_support_rules, COPS-HS-001 and COPS-HS-002].\n\nAs general guidance (not from the retrieved rules), LED flashlights typically classify under HS 8513.10, which covers portable electric lamps designed to function by their own source of energy such as dry batteries or accumulators. However, the exact subheading can vary by national tariff schedule, and some jurisdictions may classify certain types differently depending on whether the device is handheld, head-mounted, or integrated into another product.\n\nWhat still depends on your transaction:\n- The destination country's national tariff schedule (the 8-10 digit national code)\n- Whether the flashlight has additional features (e.g., rechargeable, solar, combination tool) that could shift classification\n- Whether any specific certifications or standards apply in the importing country\n\nFor a definitive classification, I'd recommend consulting a licensed customs broker in the destination country or using a classification tool. If you need full HS code classification with validation, TRDR Hub at trdrhub.com offers that capability.",
+    "answer": "I don't have a specific HS code lookup for LED flashlights in my rules database, so I can't give you a confirmed tariff line from what I have. What I can tell you is that \"LED flashlight\" as a product description is too generic to support a defensible HS classification on its own. Per [customs.hs_classification_support_rules, COPS-HS-001], HS classification should not be treated as confident when the product description is generic. You'd need to specify details like whether it's handheld, rechargeable, waterproof, or part of a larger assembly.\n\nAdditionally, [customs.hs_classification_support_rules, COPS-HS-002] requires that the proposed HS code must coherently match the product's function, composition, and use. So whatever code you land on needs to align with what the flashlight actually does and how it's built.\n\nAs general guidance (not from my rules): portable electric lamps designed to function by their own source of energy, such as flashlights, commonly fall under HS heading 8513. But I'd strongly recommend confirming this against the specific tariff schedule of your importing country, as national extensions beyond the 6-digit international level vary significantly.\n\nWhat still depends on your transaction: the destination country's tariff schedule, whether anti-dumping duties might apply (per [customs.ad_cvd_overlay_rules, COPS-AD-001]), and the full technical spec of the flashlight. If you need an automated HS classification with full tariff-line validation, TRDR Hub at trdrhub.com offers that capability.",
     "confidence": "low",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 19706,
+    "latency_ms": 41189,
     "citations": [
       "Hs Classification Support Rules COPS-HS-002",
+      "CBAM CBAM-SCOPE-H2-001",
+      "Ad Cvd Overlay Rules COPS-AD-001",
       "CBAM CBAM-SCOPE-ELEC-001",
-      "Hs Classification Support Rules COPS-HS-001",
-      "CBAM CBAM-SCOPE-ALU-001",
-      "CBAM CBAM-SCOPE-CEMENT-001"
+      "Hs Classification Support Rules COPS-HS-001"
+    ],
+    "citation_rule_ids": [
+      "COPS-HS-002",
+      "CBAM-SCOPE-H2-001",
+      "COPS-AD-001",
+      "CBAM-SCOPE-ELEC-001",
+      "COPS-HS-001"
+    ],
+    "retrieved_rule_ids": [
+      "COPS-HS-002",
+      "CBAM-SCOPE-H2-001",
+      "COPS-AD-001",
+      "CBAM-SCOPE-ELEC-001",
+      "COPS-HS-001"
     ],
     "error": null
   },
@@ -319,17 +504,31 @@
       "consistent with the existing FTA-membership financial-consequences guardrail"
     ],
     "fail_closed": true,
-    "answer": "Your good qualifies for USMCA duty-free treatment only if it meets the agreement's origin rules. There are three main pathways: the good is wholly obtained in the territory, it's produced entirely from originating materials, or it satisfies the product-specific rule of origin (PSR) using a tariff shift (CTC) and/or regional value content (RVC) threshold [fta.fta_usmca_origin, USMCA-ORIGIN-001].\n\nA few things that can help your case:\n\n- If you're using some non-originating inputs, they may still be disregarded under the de minimis rule if they don't exceed 10% of the transaction value (textiles have separate rules) [fta.fta_usmca_origin, USMCA-DEMINIMIS-001].\n- You can accumulate production or value across all three USMCA parties when calculating origin [fta.fta_usmca_origin, USMCA-CUMUL-001].\n- If the good transits through a non-party country, it keeps originating status as long as it doesn't undergo further processing outside USMCA territory [fta.fta_usmca_origin, USMCA-DIRECT-001].\n- You must keep records supporting your origin claim for 5 years from the date of importation [fta.fta_usmca_origin, USMCA-RECORD-001].\n\nI need to verify your country's membership in USMCA, as the rules I have don't explicitly list the member countries. Please confirm with the USMCA secretariat or your local customs authority before relying on preferential treatment.\n\nWhat still depends on your transaction: the specific HS classification of your good (which determines the applicable PSR), the origin of your inputs, your RVC calculation method, and whether your shipment transits through a non-party country.",
+    "answer": "Your good qualifies for USMCA duty-free treatment if it meets one of three origin pathways: it is wholly obtained in the territory, produced entirely from originating materials, or satisfies the product-specific rule of origin (PSR) using a tariff shift (CTC) and/or regional value content (RVC) test [fta.fta_usmca_origin, USMCA-ORIGIN-001]. A few additional tools may help: non-originating materials up to 10% of transaction value can generally be disregarded under the de minimis provision, though textiles have separate rules [fta.fta_usmca_origin, USMCA-DEMINIMIS-001]. You can also accumulate production or value across all three USMCA parties when calculating origin [fta.fta_usmca_origin, USMCA-CUMUL-001]. If your goods transit through a non-party country, they remain originating as long as they don't undergo further processing outside USMCA territory [fta.fta_usmca_origin, USMCA-DIRECT-001]. And remember to keep all records supporting your origin claim for 5 years from the date of importation [fta.fta_usmca_origin, USMCA-RECORD-001].\n\nWhat still depends on your transaction: I need to verify your country's membership in USMCA, the rules I have don't explicitly list the member countries. Please verify with the USMCA secretariat or official source before relying on preferential treatment. I also need to know your specific product and its HS code to determine which PSR applies, as each product has its own origin requirement. If you're importing into a country, confirm whether your good is subject to textile-specific de minimis rules.",
     "confidence": "low",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 11198,
+    "latency_ms": 43851,
     "citations": [
       "USMCA USMCA-ORIGIN-001",
       "USMCA USMCA-DEMINIMIS-001",
       "USMCA USMCA-DIRECT-001",
       "USMCA USMCA-CUMUL-001",
       "USMCA USMCA-RECORD-001"
+    ],
+    "citation_rule_ids": [
+      "USMCA-ORIGIN-001",
+      "USMCA-DEMINIMIS-001",
+      "USMCA-DIRECT-001",
+      "USMCA-CUMUL-001",
+      "USMCA-RECORD-001"
+    ],
+    "retrieved_rule_ids": [
+      "USMCA-ORIGIN-001",
+      "USMCA-DEMINIMIS-001",
+      "USMCA-DIRECT-001",
+      "USMCA-CUMUL-001",
+      "USMCA-RECORD-001"
     ],
     "error": null
   },
@@ -343,17 +542,31 @@
       "low/medium confidence if coverage of the exclusions is partial"
     ],
     "fail_closed": false,
-    "answer": "Yes, the de minimis rule can potentially save your good even when it fails the tariff shift, but it depends entirely on which FTA you're claiming under.\n\nHere's how it works: when a good doesn't meet the tariff shift requirement, the de minimis provision lets you disregard a small percentage of non-originating materials. If the non-originating materials that cause the tariff shift failure fall within that threshold, the good can still qualify as originating.\n\nFrom the rules I have:\n\n- Under ASEAN-China FTA, non-originating materials up to 10% of FOB value are allowed [ACFTA-007].\n- Under CPTPP, non-originating materials up to 10% of transaction value may be disregarded, but textiles have separate rules [CPTPP-DEMINIMIS-001].\n\nSo the mechanics are similar across agreements, but the valuation base (FOB vs. transaction value) and exclusions (especially for textiles) differ. You need to check the specific FTA's de minimis provision against your bill of materials to see if the offending non-originating inputs fall within the tolerance.\n\nWhat still depends on your transaction: which FTA you're claiming preferential origin under, the value of the non-originating materials that trigger the tariff shift failure, and whether your product falls under a textile or other sector-specific carve-out. I need to verify your country's membership in the relevant agreement before you rely on preferential treatment, as the rules I have don't explicitly confirm member countries.",
+    "answer": "Yes, the 10% de minimis rule can potentially save your good, but it depends on which FTA you're using and how the de minimis threshold is calculated under that specific agreement.\n\nThe retrieved rules show that several major FTAs allow non-originating materials up to 10% to be disregarded when a good fails its origin requirement (such as a tariff shift), but the valuation base differs:\n\n- ASEAN-China FTA: Non-originating materials up to 10% of FOB value allowed [fta.fta_asean_china, ACFTA-007].\n- CPTPP: Non-originating materials up to 10% of transaction value may be disregarded, with separate rules for textiles [fta.fta_cptpp_origin, CPTPP-DEMINIMIS-001].\n- USMCA: Non-originating materials up to 10% of transaction value may be disregarded, with different rules for textiles [fta.fta_usmca_origin, USMCA-DEMINIMIS-001].\n- AfCFTA: Non-originating materials up to 10% of ex-works price may be disregarded for CTC-based rules [fta.fta_afcfta_origin, AFCFTA-DEMINIMIS-001].\n- EU-UK TCA: Non-originating materials up to 10% of ex-works price (15% for textiles by weight) [fta.fta_eu_uk_tca, EUUK-TCA-005].\n\nSo if your non-originating inputs that fail the tariff shift fall at or below the applicable threshold, the good can still qualify as originating. If your product is a textile, expect stricter or different de minimis treatment under most of these agreements.\n\nWhat still depends on your transaction: which FTA you're claiming under, the value of the non-originating materials relative to the correct valuation base (FOB, transaction value, or ex-works), and whether your product falls under textile-specific rules. I also need to verify your country's membership in the relevant FTA, as the rules I have don't explicitly confirm member countries. Please verify with the official agreement source before relying on preferential treatment.",
     "confidence": "low",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 29684,
+    "latency_ms": 17740,
     "citations": [
       "Fta Asean China ACFTA-007",
       "CPTPP CPTPP-DEMINIMIS-001",
-      "Ecommerce De Minimis Low Value Imports 3B CUSTOMS-ECOM-US-DEMINIMIS-001",
-      "USMCA CUSTOMS-RULES-OF-ORIGIN-NON-PREFERENTIAL-VS-PREFERENTIAL-SUBSTANTIAL-TRANSFORMATION-TARIFF-SHIFT-USMCA-CERTIFICATION-9-DATA-ELEMENTS-RVC-NET-COST-CBP-VERIFICATION-001",
-      "Post Trump 2025 Tariff Implementation CUSTOMS-LIBERATION-DAY-2-APRIL-2025-RECIPROCAL-CALCULATION-METHODOLOGY-USTR-NEGOTIATIONS-DE-MINIMIS-800-USD-THRESHOLD-2-MAY-2025-CHINA-HONG-KONG-2-MAY-2025-OTHER-COUNTRIES-LATE-2025-001"
+      "USMCA USMCA-DEMINIMIS-001",
+      "Fta Afcfta Origin AFCFTA-DEMINIMIS-001",
+      "Fta Eu Uk Tca EUUK-TCA-005"
+    ],
+    "citation_rule_ids": [
+      "ACFTA-007",
+      "CPTPP-DEMINIMIS-001",
+      "USMCA-DEMINIMIS-001",
+      "AFCFTA-DEMINIMIS-001",
+      "EUUK-TCA-005"
+    ],
+    "retrieved_rule_ids": [
+      "ACFTA-007",
+      "CPTPP-DEMINIMIS-001",
+      "USMCA-DEMINIMIS-001",
+      "AFCFTA-DEMINIMIS-001",
+      "EUUK-TCA-005"
     ],
     "error": null
   },
@@ -367,17 +580,31 @@
       "distinguishes rule from a specific dollar computation it can't perform"
     ],
     "fail_closed": false,
-    "answer": "Yes, buyer-supplied molds and tooling (commonly called \"assists\") are dutiable. Under the WTO Customs Valuation Agreement Article 8, the price actually paid or payable is adjusted upward to reach customs value, and assists fall within those mandatory additions [customs_ops.customs_valuation_deeper_edges_3b, CUSTOMS-VAL-ASSISTS-ROYALTIES-ADDITIONS-001]. The rule title explicitly covers assists alongside royalties, licence fees, commissions, and proceeds of resale as Article 8 additions.\n\nThe core principle: if the buyer supplies the seller with molds, tooling, dies, engineering, or development work at no charge or at reduced cost, and that cost is not already reflected in the invoice price, it must be added to the dutiable value to the extent borne by the buyer. The same rule confirms the general Article 8 framework: additions apply only where the cost is not already included in the price and is borne by the buyer [customs_ops.customs_valuation_deeper_edges_3b, CUSTOMS-VAL-ASSISTS-ROYALTIES-ADDITIONS-001].\n\nHowever, the retrieved excerpt is truncated before reaching the specific assists valuation methodology. The rules I have access to do not spell out the exact valuation methods (e.g., acquisition cost, production cost, or apportionment across the quantity of goods imported). That detail is governed by WTO CVA Article 8.1(b) and its Interpretive Notes, which your customs broker or trade compliance team should consult directly for the specific calculation approach.\n\nWhat still depends on your transaction: the importing country's customs authority will have its own procedural rules for declaring and valuing assists, and some countries require a formal assists declaration or reconciliation. You'll need to confirm the specific valuation method and documentation requirements with the destination country's customs office.",
+    "answer": "Yes, buyer-supplied molds and tooling are dutiable. Under WTO Customs Valuation Agreement Article 8(1)(b) (m13.wto_cva, wto-cva#Art-8~r2), when you as the buyer supply goods or services to the producer free of charge or at reduced cost for use in making the imported goods, and that value isn't already reflected in the price you paid, you must add it to the customs value. Tools, dies, and molds are named explicitly as one of the categories of assists that get added.\n\nThe same rule covers other assists you should watch for: materials and components physically incorporated into the goods, materials consumed in production, and engineering, development, artwork, design, plans, and sketches done outside the country of importation (m13.wto_cva, wto-cva#Art-8~r2).\n\nOn the \"how much\" part: the rule says you add the \"apportioned\" value of the assist (m13.wto_cva, wto-cva#Art-8~r2). So if one mold is used to produce several shipments or many units, you don't dump the entire mold cost onto one entry. You spread it across the production it supports. The rule confirms apportionment is required but does not spell out a specific apportionment method or formula, so that detail is not grounded here.\n\nWhat still depends on your transaction:\n- The country of import's specific apportionment method and documentation rules, which are not in my retrieved rules. Confirm with that customs authority.\n- Whether the mold value is already embedded in your invoice price. If it is, you don't add it again.\n\nIf you need help sizing the actual dutiable amount against your invoices and HS classification, TRDR Hub handles that kind of valuation and classification work.",
     "confidence": "low",
-    "routing_tier": "sonnet",
-    "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 27644,
+    "routing_tier": "opus",
+    "model_used": "anthropic/claude-4.8-opus-20260528",
+    "latency_ms": 22168,
     "citations": [
-      "Customs Valuation Deeper Edges 3B CUSTOMS-VAL-ASSISTS-ROYALTIES-ADDITIONS-001",
-      "Cva Advanced 3B CUSTOMS-CVA-ROYALTIES-001",
-      "Cva Advanced 3B CUSTOMS-CVA-COMMISSIONS-001",
-      "Brazil Trade Customs Regime COUNTRY-BRAZIL-TARIFF-TAX-001",
-      "Canada Trade Customs Regime COUNTRY-CANADA-TARIFF-DUTY-TAX-REGIME-001"
+      "Wto Cva Art. 8",
+      "Icc Sustainable Climate 3A ESG-CSDDD-001",
+      "Eu Best Practices eu-best-practices#61~r1",
+      "Bb Islamic Banking M13-ISLB-05-012",
+      "Commodity Sanctions SANC-COMM-PRECIOUS-METALS"
+    ],
+    "citation_rule_ids": [
+      "wto-cva#Art-8~r2",
+      "ESG-CSDDD-001",
+      "eu-best-practices#61~r1",
+      "M13-ISLB-05-012",
+      "SANC-COMM-PRECIOUS-METALS"
+    ],
+    "retrieved_rule_ids": [
+      "wto-cva#Art-8~r2",
+      "ESG-CSDDD-001",
+      "eu-best-practices#61~r1",
+      "M13-ISLB-05-012",
+      "SANC-COMM-PRECIOUS-METALS"
     ],
     "error": null
   },
@@ -391,17 +618,31 @@
       "plain-language, high-volume funnel answer"
     ],
     "fail_closed": false,
-    "answer": "The retrieved rules in my database don't directly define or distinguish HS, HTS, and Schedule B codes. What I can tell you comes from general trade finance knowledge, not from the specific rules I retrieved, so treat this as background guidance rather than a cited authority.\n\nAll three are built on the same foundation: the Harmonized System (HS), maintained by the World Customs Organization. The HS uses a 6-digit international code that's recognized by virtually all WTO members. The first 6 digits are the same worldwide for a given product.\n\n- HS code is the generic, internationally shared 6-digit classification. When a country's tariff schedule is described as \"HS-based\" (as Jordan's is, per [country.jordan_trade_customs_regime_depth_2c_r168, COUNTRY-JORDAN-TARIFF-TAX-FTA-001]), it means the national tariff builds on those 6 digits and then adds country-specific digits for more granular duty treatment.\n- HTS code (Harmonized Tariff Schedule) is the US-specific extension of the HS, maintained by the US International Trade Commission. It typically runs 10 digits and is used for importing goods into the United States.\n- Schedule B is also US-specific, maintained by the US Census Bureau, and is used for export declarations. It overlaps heavily with HTS but can differ at the 8- or 10-digit level for certain products.\n\nThe practical takeaway: the first 6 digits should be consistent across all three, but the longer national extensions diverge. You need the right code for the right direction (import vs. export) and the right country.\n\nWhat still depends on your transaction: the specific country you're importing into or exporting from, and whether you need the code for customs duty calculation, LC document preparation, or export declarations. If you need full HS/HTS classification, TRDR Hub at trdrhub.com offers automated classification tools.",
+    "answer": "The rules I have access to don't define HS, HTS, or Schedule B codes specifically. The one relevant retrieved rule touches tariff classification indirectly: under WTO TFA Article 3, customs authorities must issue binding advance rulings on tariff classification, and once issued, they cannot apply a different classification to the same goods under the same conditions [customs.customs_wto_tfa, CUST-TFA-002]. That's useful if you're unsure how your product will be classified, but it doesn't explain the code systems themselves.\n\nHere's what I can tell you from general trade knowledge (not from the retrieved rules):\n\n- HS code (Harmonized System) is the global 6-digit classification maintained by the World Customs Organization. Every WTO member uses these same first 6 digits as a common language for tariff classification.\n- HTS code (Harmonized Tariff Schedule) is the US-specific extension beyond 6 digits, typically 10 digits, used by US Customs for import duty determination.\n- Schedule B is the US export classification system, also based on the HS but maintained by the Census Bureau for export statistical purposes. It's used when filing export declarations, not for import duties.\n\nSo the first 6 digits are internationally harmonized, and countries then add their own digits for national tariff or statistical purposes.\n\nWhat still depends on your transaction: which country you're importing into or exporting from determines which code system applies to your filing. If you need an HS code classified for a specific product, TRDR Hub at trdrhub.com offers that capability.",
     "confidence": "low",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 33098,
+    "latency_ms": 27069,
     "citations": [
-      "Kazakhstan Trade Customs Regime COUNTRY-KAZAKHSTAN-TARIFF-TAX-REGIME-001",
-      "Jordan Trade Customs Regime COUNTRY-JORDAN-TARIFF-TAX-FTA-001",
-      "ISBP 821 Para. H19",
+      "Bb Islamic Banking M13-ISLB-05-019",
       "RCEP RCEP-TARIFF-001",
-      "ISBP 821 Para. D23"
+      "Dos Rmg 2018 M13-RMG-01-002",
+      "Customs Wto Tfa CUST-TFA-002",
+      "Brpd Crm brpd-crm#7.1~r2"
+    ],
+    "citation_rule_ids": [
+      "M13-ISLB-05-019",
+      "RCEP-TARIFF-001",
+      "M13-RMG-01-002",
+      "CUST-TFA-002",
+      "brpd-crm#7.1~r2"
+    ],
+    "retrieved_rule_ids": [
+      "M13-ISLB-05-019",
+      "RCEP-TARIFF-001",
+      "M13-RMG-01-002",
+      "CUST-TFA-002",
+      "brpd-crm#7.1~r2"
     ],
     "error": null
   },
@@ -415,17 +656,31 @@
       "cites the governing mechanism"
     ],
     "fail_closed": true,
-    "answer": "I can't tell you whether your specific product is subject to AD/CVD duties without knowing what you're shipping, from where, and to which destination market. Here's what I can tell you from the rules framework:\n\nAD and CVD duties are WTO-sanctioned trade remedies imposed when a product is sold below \"normal value\" (dumping) or benefits from government subsidies, and the importing country's domestic industry suffers material injury as a result [customs_ops.tariff_measures_trade_remedies_3b, CUSTOMS-TARIFF-AD-CVD-001]. In the US, these are imposed through a bifurcated investigation: Commerce determines the dumping margin or subsidy amount, and the ITC determines injury [customs_ops.customs_hs_origin_entry_ftz_drawback_adcvd_3b_r107]. Once an order is in place, estimated cash deposits are required at entry, with retrospective assessment through annual administrative reviews [same source]. AD/CVD also stacks on top of other tariff layers like Section 232, Section 301, or IEEPA duties [same source].\n\nTo find out if your product is covered by an active AD/CVD order, you need to check the specific importing country's enforcement database. For the US, that's the Commerce Department's AD/CVD Orders search tool. For the EU, check the European Commission's Trade Defence Instruments register. You'll need your HS code, country of origin, and product description to search effectively.\n\nWhat still depends on your transaction: the product (HS code), country of origin, destination market, and whether any scope rulings or circumvention inquiries have been initiated that might pull your product into an existing order.",
+    "answer": "I can't tell you whether your specific product is subject to anti-dumping or countervailing duties right now. That depends entirely on the product (HS code), the exporting country, the importing country, and whether an active duty order exists for that product-country combination. The rules I have access to cover how the WTO Subsidies and Countervailing Measures (SCM) Agreement structures countervailing duties, but they don't list which products or countries currently have duties in force.\n\nWhat I can tell you from the retrieved rules:\n\n- Countervailing duties are capped at the subsidy amount found to exist, calculated per unit of the subsidized and exported product (wto-scm, Art 19.4).\n- They apply only prospectively, meaning to products entered for consumption after the relevant decision enters into force, with limited exceptions (wto-scm, Art 20).\n- In regional-industry cases, duties are levied only on products consigned for final consumption to that specific area (wto-scm, Art 16.3).\n\nNone of this tells you whether your particular shipment faces a duty. To determine that, you need to check the importing country's customs authority or trade remedy agency website, which publishes active anti-dumping and countervailing duty orders by product and origin country.\n\nWhat still depends on your transaction: the HS code of your product, the country of export/origin, the country of import, and the shipment date relative to any active duty order's effective date.",
     "confidence": "medium",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 17712,
+    "latency_ms": 35651,
     "citations": [
-      "Tariff Measures Trade Remedies 3B CUSTOMS-TARIFF-AD-CVD-001",
       "Wto Scm Art. 20",
-      "Customs Hs Origin Entry Ftz Drawback Adcvd CUSTOMS-AD-CVD-TRADE-REMEDY-OPERATIONAL-CASH-DEPOSITS-SCOPE-RULINGS-CIRCUMVENTION-EAPA-19-USC-1517-EVASION-TRANSSHIPMENT-COMMERCE-ITC-BIFURCATION-SECTION-232-STACKING-001",
       "Wto Scm Art. 19",
-      "Wto Scm Art. 16"
+      "Wto Scm Art. 16",
+      "Wto Tbt wto-tbt#1.3~r1",
+      "EUDR Art. 26"
+    ],
+    "citation_rule_ids": [
+      "wto-scm#Art-20~r1",
+      "wto-scm#Art-19~r4",
+      "wto-scm#Art-16~r3",
+      "wto-tbt#1.3~r1",
+      "eudr#Art-26~r1"
+    ],
+    "retrieved_rule_ids": [
+      "wto-scm#Art-20~r1",
+      "wto-scm#Art-19~r4",
+      "wto-scm#Art-16~r3",
+      "wto-tbt#1.3~r1",
+      "eudr#Art-26~r1"
     ],
     "error": null
   },
@@ -439,17 +694,31 @@
       "low confidence if the retrieved rules only partially cover cumulation"
     ],
     "fail_closed": false,
-    "answer": "Yes. RCEP allows full cumulation, meaning production processes and materials from any RCEP member can be counted toward origin determination for your goods [fta.fta_rcep_origin, RCEP-CUMUL-001]. This is one of RCEP's most exporter-friendly features compared to many other FTAs.\n\nIn practice, this means if you use inputs sourced from or processed in another RCEP member country, those inputs can be treated as originating when determining whether your final product qualifies for preferential tariff treatment. Your goods qualify as RCEP-originating if they are wholly obtained, produced exclusively from originating materials, or satisfy the applicable Product Specific Rules (PSR) [fta.fta_rcep_origin, RCEP-ORIGIN-001]. The PSR for your product might require a change in tariff classification (CC, CTH, or CTSH) for non-originating materials [fta.fta_rcep_origin, RCEP-ORIGIN-003].\n\nTo actually claim the preferential rate, you'll need a Certificate of Origin (Form RCEP) issued by the competent authority or an approved exporter declaration [fta.fta_rcep_origin, RCEP-COO-001].\n\nWhat still depends on your transaction: I need to verify your specific country's membership in RCEP, the rules I have don't explicitly confirm member countries. Please verify with the RCEP secretariat or your local customs authority before relying on preferential treatment. You'll also need to check the specific PSR for your product's HS code, as cumulation helps but doesn't automatically qualify every product.",
+    "answer": "Yes, absolutely. RCEP's full cumulation rule is one of its biggest advantages for regional supply chains. Under [fta.fta_rcep_origin, RCEP-CUMUL-001], production processes carried out in any RCEP member can be counted toward origin determination. This means inputs or processing done in one RCEP country can contribute to the originating status of goods finished in another RCEP country.\n\nTo qualify for preferential tariffs, your goods need to meet one of the origin pathways in [fta.fta_rcep_origin, RCEP-ORIGIN-001]: wholly obtained, produced exclusively from originating materials, or satisfying the Product Specific Rules (PSR) for your HS code. Once you meet that threshold, you'll need a Certificate of Origin (Form RCEP) issued by the competent authority or an approved exporter declaration to claim the preferential rate [fta.fta_rcep_origin, RCEP-COO-001].\n\nA couple of practical points worth noting:\n\n- Tariff reductions are phased in over transition periods and vary by country pair and product, so the preferential margin depends on your specific trade lane and HS code [fta.fta_rcep_origin, RCEP-TARIFF-001].\n- If goods transit through an intermediate RCEP party, that party can issue a back-to-back Certificate of Origin [fta.fta_rcep_origin, RCEP-BACKTOBACK-001].\n\nWhat still depends on your transaction: I need to verify your specific country's membership in RCEP, the rules I have don't explicitly confirm which countries are members. Please verify with the RCEP secretariat or your local customs authority before relying on preferential treatment. You'll also need to check the PSR for your specific product to confirm how cumulation applies in practice.",
     "confidence": "medium",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 22505,
+    "latency_ms": 20179,
     "citations": [
       "RCEP RCEP-CUMUL-001",
       "RCEP RCEP-ORIGIN-001",
       "RCEP RCEP-COO-001",
-      "RCEP RCEP-DEMINIMIS-001",
-      "RCEP RCEP-ORIGIN-003"
+      "RCEP RCEP-TARIFF-001",
+      "RCEP RCEP-BACKTOBACK-001"
+    ],
+    "citation_rule_ids": [
+      "RCEP-CUMUL-001",
+      "RCEP-ORIGIN-001",
+      "RCEP-COO-001",
+      "RCEP-TARIFF-001",
+      "RCEP-BACKTOBACK-001"
+    ],
+    "retrieved_rule_ids": [
+      "RCEP-CUMUL-001",
+      "RCEP-ORIGIN-001",
+      "RCEP-COO-001",
+      "RCEP-TARIFF-001",
+      "RCEP-BACKTOBACK-001"
     ],
     "error": null
   },
@@ -463,17 +732,31 @@
       "the canonical chat→screening-API hand-off; a confident yes/no is a Fail"
     ],
     "fail_closed": true,
-    "answer": "I can't confirm whether a specific company is on the OFAC SDN list. I don't have live access to the SDN list, and screening a named entity against current designations is a real-time lookup, not something the rules I hold can answer. Don't treat any answer I give as a clearance.\n\nHere's what I can tell you about how to run the check properly:\n\n- Being absent from the SDN list is not enough. Under OFAC's 50% Rule (sanctions.sanc_sdn_50pct_screening_depth, OFAC-50PCT-002), an entity is blocked if it's owned 50% or more, in aggregate, by one or more blocked persons, even when the company itself is not listed. This applies through multiple tiers of ownership, so you need to trace the ownership chain, not just match the name.\n\n- Watch for evasion signals. For Iran-linked exposure, OFAC red flags include mail-drop or registered-agent addresses in UAE, Turkey, or Malaysia, vague goods descriptions, and payment routing through multiple jurisdictions without clear commercial rationale (sanctions.sanc_ofac_iran_depth, OFAC-IRAN-009). A clean name match can still hide a front company.\n\nWhat still depends on your transaction: the company's country and jurisdiction, and its ultimate beneficial ownership, drive which regime applies.\n\nFor an actual name-and-ownership screen against current lists, TRDR Hub (trdrhub.com) offers sanctions screening. Verify directly on OFAC's official SDN search before proceeding.",
+    "answer": "I can't tell you whether a specific company is on the OFAC SDN list. I don't have a live screening feed, and the rules I hold describe how sanctions work, not the current contents of the SDN list itself. Checking a named party requires an actual screening against the live OFAC lists, which is not something I can do from these rules.\n\nWhat I can flag from what I have:\n\n- Even if a company isn't listed by name, it can still be blocked. Under OFAC's 50% rule (sanctions.ofac_sectoral_2b_r6, SANC-OFAC-SSI-50PCT-001), an entity owned 50% or more, directly or indirectly, by one or more blocked persons is treated as blocked even though it doesn't appear on the list itself. So a clean name search isn't the whole answer.\n- Country exposure matters too. Even a non-listed company can be caught if origin, destination, or transit touches a comprehensively sanctioned jurisdiction (sanctions.sanctions_screening, SANC-OFAC-005).\n\nWhat still depends on your transaction: the company's country and ownership structure, and whether any leg of the trade touches a sanctioned jurisdiction. All of these change the answer.\n\nFor an actual name-and-ownership screen against the live SDN and consolidated lists, TRDR Hub (trdrhub.com) runs sanctions screening. You can also check OFAC's own Sanctions List Search at sanctionssearch.ofac.treas.gov directly.",
     "confidence": "medium",
     "routing_tier": "opus",
     "model_used": "anthropic/claude-4.8-opus-20260528",
-    "latency_ms": 36756,
+    "latency_ms": 27422,
     "citations": [
-      "OFAC OFAC-50PCT-002",
-      "OFAC SANCTIONS-LEBANON-COMPLIANCE-PLAYBOOK-HEZBOLLAH-OFAC-SDN-FATF-GREY-LIST-AML-CFT-001",
-      "OFAC OFAC-IRAN-009",
-      "Investment Context Phase2B Article Fintech Screening",
-      "OFAC SANCTIONS-SUDAN-OFAC-RSF-SAF-HEMEDTI-BURHAN-EU-UK-CANADA-UNSC-1591-FATF-GREY-LIST-001"
+      "OFAC SANC-OFAC-GL-NGO-001",
+      "OFAC SANC-OFAC-005",
+      "OFAC SANCTIONS-OFAC-GL-HUM-005",
+      "OFAC SANCTIONS-OFAC-IRAN-IEEPA-DEEP-001",
+      "OFAC SANC-OFAC-SSI-50PCT-001"
+    ],
+    "citation_rule_ids": [
+      "SANC-OFAC-GL-NGO-001",
+      "SANC-OFAC-005",
+      "SANCTIONS-OFAC-GL-HUM-005",
+      "SANCTIONS-OFAC-IRAN-IEEPA-DEEP-001",
+      "SANC-OFAC-SSI-50PCT-001"
+    ],
+    "retrieved_rule_ids": [
+      "SANC-OFAC-GL-NGO-001",
+      "SANC-OFAC-005",
+      "SANCTIONS-OFAC-GL-HUM-005",
+      "SANCTIONS-OFAC-IRAN-IEEPA-DEEP-001",
+      "SANC-OFAC-SSI-50PCT-001"
     ],
     "error": null
   },
@@ -487,17 +770,31 @@
       "answers the \"how\", declines the definitive \"what\""
     ],
     "fail_closed": true,
-    "answer": "I can't classify your product without knowing what it is. Tell me the item name, technical specs, end use, and destination country, and I can point you toward the right ECCN category.\n\nHere's how the system works so you know what information matters:\n\nAn ECCN (Export Control Classification Number) follows a digit-letter-3-digit format, like 3A001. The first digit (0 through 9) identifies the category: 0 is nuclear, 1 is materials, 2 is materials processing, 3 is electronics, 4 is computers, 5 is telecom, 6 is sensors, 7 is navigation, 8 is marine, 9 is propulsion. The letter identifies the product group: A is equipment, B is test/production, C is materials, D is software, E is technology [export_controls.regime_detail_phase2b, Article ECCN Structure].\n\nThe US system is bifurcated. Defense articles and related technical data fall under ITAR (22 CFR 120-130, administered by DDTC) on the USML. Dual-use items fall under the EAR (15 CFR 730-774, administered by BIS) on the Commerce Control List. If your item doesn't match any specific ECCN, it defaults to EAR99, which is a catch-all for low-risk items [export_controls.wassenaar_eu_dual_use_us_itar_ear_semiconductor_diffusion_china_critical_minerals_post_trump_4a_r102].\n\nA few examples from the rules I have: electronics like high-frequency transistors fall under 3A001; technology for developing controlled computing items falls under 4E001; inertial navigation accelerometers fall under 7A001 [export_controls.ec_ear_eccn_depth, EC-EAR-002; export_controls.ec_ccl_computers_sensors_marine_aerospace_depth, EC-CCL-4E001; export_controls.ec_ear_eccn_depth, EC-EAR-004].\n\nWhat still depends on your transaction: the actual product description, its technical specifications, the end user, the end use, and the destination country. Without those, I can only explain the framework, not assign a number. If you share those details, I can narrow it down. For a definitive classification, BIS offers the SNAP-R request process or you can use a classification service like TRDR Hub.",
-    "confidence": "high",
-    "routing_tier": "sonnet",
-    "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 27473,
+    "answer": "I can't tell you your ECCN without knowing what your product actually is. An ECCN (Export Control Classification Number) isn't something I can guess from a broad question. It depends entirely on the technical characteristics, function, and specifications of the specific item.\n\nHere's the framework the rules give me. The US export-control system is split into two tracks (export_controls.wassenaar_eu_dual_use_us_itar_ear... EC-US-ITAR-...-001):\n\n- ITAR track (22 CFR Parts 120-130, administered by the State Department's DDTC): covers items on the USML, the US Munitions List of 21 categories, meaning munitions, defense articles, defense services, and related technical data. If your product is defense-related, it's classified under a USML category, not an ECCN.\n- EAR track (15 CFR Parts 730-774, administered by Commerce's BIS): covers the CCL, the Commerce Control List, where actual ECCNs live. If your item isn't specifically listed on the CCL, it may fall under the EAR99 catch-all rather than a specific ECCN.\n\nSo the first question is: is your product defense-related (ITAR/USML) or commercial/dual-use (EAR/CCL)? That determines which list you're even looking at.\n\nWhat still depends on your transaction: the product's exact technical specs, its function, any controlled parameters (performance thresholds, encryption, etc.), and end use. Without those I can only point you to the framework, not a number.\n\nFor an actual classification, you'd self-classify against the CCL or request a formal ruling from BIS. TRDR Hub offers HS and export classification support if you want structured help narrowing it down.",
+    "confidence": "medium",
+    "routing_tier": "opus",
+    "model_used": "anthropic/claude-4.8-opus-20260528",
+    "latency_ms": 20989,
     "citations": [
-      "Regime Detail Phase2B Article ECCN Structure",
-      "Ec Ccl Computers Sensors Marine Aerospace Depth EC-CCL-4E001",
       "Wassenaar Eu Dual Use Us Itar Ear Semiconductor Diffusion China Critical Minerals Post Trump EC-US-ITAR-22-CFR-120-130-USML-21-CATEGORIES-DDTC-EAR-15-CFR-730-774-CCL-EAR99-FOREIGN-DIRECT-PRODUCT-RULE-FDPR-ENTITY-LIST-MEU-LIST-VEU-DENIED-PERSONS-001",
-      "Ec Ear Eccn Depth EC-EAR-002",
-      "Ec Ear Eccn Depth EC-EAR-004"
+      "Water Circular Csddd 3A GOV-CIRCULAR-ECONOMY-002",
+      "Pa Panama Rules PA-ACODECO-001",
+      "Commodity Sanctions SANC-COMM-PETRO-PRODUCTS",
+      "SFDR ESG-SFDR-001"
+    ],
+    "citation_rule_ids": [
+      "EC-US-ITAR-22-CFR-120-130-USML-21-CATEGORIES-DDTC-EAR-15-CFR-730-774-CCL-EAR99-FOREIGN-DIRECT-PRODUCT-RULE-FDPR-ENTITY-LIST-MEU-LIST-VEU-DENIED-PERSONS-001",
+      "GOV-CIRCULAR-ECONOMY-002",
+      "PA-ACODECO-001",
+      "SANC-COMM-PETRO-PRODUCTS",
+      "ESG-SFDR-001"
+    ],
+    "retrieved_rule_ids": [
+      "EC-US-ITAR-22-CFR-120-130-USML-21-CATEGORIES-DDTC-EAR-15-CFR-730-774-CCL-EAR99-FOREIGN-DIRECT-PRODUCT-RULE-FDPR-ENTITY-LIST-MEU-LIST-VEU-DENIED-PERSONS-001",
+      "GOV-CIRCULAR-ECONOMY-002",
+      "PA-ACODECO-001",
+      "SANC-COMM-PETRO-PRODUCTS",
+      "ESG-SFDR-001"
     ],
     "error": null
   },
@@ -510,16 +807,31 @@
       "cites the governing provision; does not give a falsely reassuring \"EAR99 = free to ship\""
     ],
     "fail_closed": false,
-    "answer": "Yes, you need a BIS license. EAR99 classification does not save you when the end-user is on the Entity List.\n\nThe Entity List (15 CFR Part 744, Supplement No. 4) overrides the normal ECCN-based licensing logic entirely. A listed entity requires a license for all items subject to the EAR, regardless of ECCN or destination country. That means even EAR99 items, which are normally NLR-eligible, trigger a license requirement when the end-user is designated [EC-BIS-001].\n\nThis is also reinforced by the NLR validation framework: an EAR99 item can only claim NLR if the end-user list check (Entity List, MEU List, UVL, DPL) comes back clean. If any of those checks trip, the item must be treated as license_required_part744 instead [EXC-EC-LIC-001, EVAPI-EC-002].\n\nA couple of additional things to keep in mind for China specifically:\n\n- The MEU rule (EAR 744.21) adds a separate layer: if you know or have reason to know the item is intended for military end-use or a military end-user in China, a license is required for any EAR item including EAR99 [EC-MEU-001].\n- The WMD catch-all under 744.11 can also capture EAR99 items if there are red flags suggesting nuclear, chemical, biological, or missile end-use [EC-CATCH-001].\n\nWhat still depends on your transaction: The specific license application review policy varies by Entity List entry, so check the individual listing for your party to understand the likelihood of approval and any conditions BIS may impose.",
+    "answer": "Yes. Being EAR99 does not save you here. Once your buyer or end-user is on the BIS Entity List, a license is required for ALL items subject to the EAR to that party, regardless of ECCN or destination (export_controls.ec_ear_eccn_depth EC-BIS-001). The rule spells this out directly: even EAR99 items, which are normally license-free, still need a BIS license if the end-user is Entity-Listed (EC-BIS-001). Screening the party against the Entity List and obtaining that license before the transaction is mandatory (jurisdiction_modes.us_mode_isp98 US-EAR-002).\n\nOne thing to brace for: the license review policy for Entity List parties ranges from case-by-case to a presumption of denial, so a license being \"required\" does not mean it will be granted (sanctions.list_mechanics_phase2b, BIS Entity List). Check the specific policy noted against that entity's listing before you commit to the deal or open any financing around it.\n\nAlso worth flagging: Entity List entries often overlap with OFAC designations, so screen the party against OFAC as well (sanctions.list_mechanics_phase2b, BIS Entity List).\n\nWhat still depends on your transaction: the exact entity's listing and its stated license review policy, and whether the same party also appears on any OFAC list. If you want the actual party screened against these lists, TRDR Hub can run that check for you.",
     "confidence": "medium",
-    "routing_tier": "sonnet",
-    "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 53876,
+    "routing_tier": "opus",
+    "model_used": "anthropic/claude-4.8-opus-20260528",
+    "latency_ms": 20089,
     "citations": [
       "Ec Ear Eccn Depth EC-BIS-001",
-      "Ec Eu Uk Dualuse Depth EC-MEU-001",
-      "Ec Ccl Nuclear Materials Processing Depth EC-CATCH-001",
-      "Exc Export Control License Exception EXC-EC-LIC-001"
+      "OFAC Article BIS Entity List",
+      "Ear Itar Phase2B EC-EAR-002",
+      "ISP98 US-EAR-002",
+      "Cn Safe China CN-EXPORT-001"
+    ],
+    "citation_rule_ids": [
+      "EC-BIS-001",
+      "OFAC-LIST-BIS-ENTITY",
+      "EC-EAR-002",
+      "US-EAR-002",
+      "CN-EXPORT-001"
+    ],
+    "retrieved_rule_ids": [
+      "EC-BIS-001",
+      "OFAC-LIST-BIS-ENTITY",
+      "EC-EAR-002",
+      "US-EAR-002",
+      "CN-EXPORT-001"
     ],
     "error": null
   },
@@ -533,16 +845,31 @@
       "notes that SDN-list screening alone does not reveal 50%-blocked entities"
     ],
     "fail_closed": false,
-    "answer": "Yes, the entity is blocked under OFAC. The key word in the OFAC 50% rule is \"aggregate\": ownership by blocked persons is added together, not measured per individual. Here, 40% plus 15% equals 55% aggregate ownership by blocked persons, which crosses the 50% threshold (sanctions.implementation_variations_phase2b, Ownership Thresholds). So the entity is treated as blocked in its own right, even though neither owner individually holds 50% or more.\n\nA few things worth flagging beyond the arithmetic:\n\n- Jurisdiction matters for the outcome. OFAC uses the aggregate 50% test. The EU and UK apply 50% ownership OR a control criterion, and control can bite below 50%. If your transaction touches EU or UK persons, the entity could be caught even at lower ownership levels through control (sanctions.implementation_variations_phase2b, Ownership Thresholds). If you operate across jurisdictions, apply the lowest applicable threshold.\n\n- Screen for cross-list designation. If both owners are designated across OFAC, EU, UN, or UK, you should be reconciling those hits into a single aggregated result and applying the strictest restriction (events.ev_screen_counterparty_by_program_v1, EVAPI-SC-015).\n\nWhat still depends on your transaction: you told me both individuals are already blocked persons, which drives the answer. But I need the relevant jurisdiction of the parties and your bank to confirm which threshold governs. If you want the entity and its owners screened against live lists, TRDR Hub can run that check.",
+    "answer": "Yes, this entity is blocked. Add the two stakes together: 40% plus 15% equals 55%, which crosses the 50% threshold. Under sanctions.ofac_programs_phase2b OFAC-50PCT-001, an entity that is 50% or more owned by one or more SDNs is treated as an SDN itself, even if the entity is not separately named on any list, and aggregate ownership across multiple blocked persons applies. That aggregation rule is exactly what catches your scenario: neither blocked owner hits 50% alone, but combined they do.\n\nPractically, that means you must treat this entity as fully blocked. If your bank identifies property in which this entity has an interest, it must block it immediately and file with OFAC within 10 business days, per sanctions.ofac_programs_phase2b OFAC-REPORT-001, with records kept and the annual report by September 30. If instead you reject rather than process a transaction involving it, that rejection is also reportable within 10 business days under sanctions.reporting_phase2b (OFAC Reports). Failure to report is itself a violation.\n\nWhat still depends on your transaction: I do not have the relevant jurisdiction confirmed. This answer is grounded strictly in the OFAC (US) framework in the retrieved rules. If EU, UK, or UN sanctions also apply, their ownership-aggregation tests can differ and are not covered here.\n\nFor actual entity ownership screening and beneficial-owner mapping, TRDR Hub offers sanctions screening tooling.",
     "confidence": "medium",
     "routing_tier": "opus",
     "model_used": "anthropic/claude-4.8-opus-20260528",
-    "latency_ms": 38680,
+    "latency_ms": 19653,
     "citations": [
-      "Implementation Variations Phase2B Article Ownership Thresholds",
-      "OFAC ofac-560-iran#s560-209~r1",
-      "OFAC ofac-31cfr501#app-a-i-definitions~r1",
-      "Implementation Variations Phase2B Article Designation Gaps"
+      "OFAC OFAC-50PCT-001",
+      "OFAC Article OFAC Reports",
+      "OFAC OFAC-REPORT-001",
+      "OFAC OFAC-PROG-LIBYA-001",
+      "OFAC OFAC-PROG-LEBANON-001"
+    ],
+    "citation_rule_ids": [
+      "OFAC-50PCT-001",
+      "SANC-REPORT-BLOCKING",
+      "OFAC-REPORT-001",
+      "OFAC-PROG-LIBYA-001",
+      "OFAC-PROG-LEBANON-001"
+    ],
+    "retrieved_rule_ids": [
+      "OFAC-50PCT-001",
+      "SANC-REPORT-BLOCKING",
+      "OFAC-REPORT-001",
+      "OFAC-PROG-LIBYA-001",
+      "OFAC-PROG-LEBANON-001"
     ],
     "error": null
   },
@@ -556,17 +883,31 @@
       "flags that the lists change"
     ],
     "fail_closed": false,
-    "answer": "Yes, most likely, if you are an EU exporter selling certain sensitive goods to third countries. The \"No Russia clause\" is Article 12g of EU Regulation 833/2014, introduced under the twelfth sanctions package in June 2024. It requires you to contractually prohibit your third-country buyers from re-exporting the covered goods to Russia (sanctions.russia_2025... Article 12g; sanctions.eu_russia_packages_phase2b Package 12).\n\nWhat the rules tell us clearly:\n- The obligation: Contracts for sensitive goods exported to third countries must include a no-Russia (no-re-export) clause (sanctions.eu_russia_packages_phase2b Package 12).\n- Where circumvention risk is highest: The EU flagged enhanced due diligence for re-export routes via the UAE, Turkey, and Kazakhstan, plus listings targeting facilitators in Central Asian and Caucasus countries (sanctions.eu_russia_packages_phase2b Package 12).\n\nWhat I cannot give you from these rules: the precise list of which goods categories trigger the clause. The retrieved rules confirm it applies to \"sensitive goods\" and references the Common High Priority List (sanctions.russia_2025... Article 12g), but they do not spell out the specific Annex codes. You need to check your product against the official Article 12g goods annex before relying on any exemption.\n\nWhat still depends on your transaction: your exact HS codes and whether they fall within the Article 12g scope, your buyer's jurisdiction, and your contract date. Verify the current goods annex directly with the EU sanctions text or your legal counsel, since misclassifying scope here carries real enforcement exposure.\n\nTRDR Hub can help screen parties and classify goods if you want a fuller check.",
-    "confidence": "medium",
+    "answer": "I can't give a synthesized answer with verified citations for this one. Here are the relevant rules:\n- [m13.eudr eudr#Art-3~r4] EUDR condition (c): goods covered by a due diligence statement: An Article 3 condition for lawful market placement or export is that the relevant commodities and products are covered by a due diligence statement (DDS).…\n- [m13.eudr eudr#Art-3~r2] EUDR condition (a): goods must be deforestation-free: One of the three cumulative Article 3 conditions for lawful market placement or export is that the relevant commodities and products are deforestation-free.…\n- [m13.cbam_regulation cbam-regulation#Art-34~r2] Reporting exemption — outward-processing products and Article 203 returned goods: The Article 35 CBAM reporting obligation does not apply to imports of processed products resulting from the outward processing procedure (Article 259 of the Union Customs Code) or…\n- [m13.cbam_regulation cbam-regulation#Art-34~r1] Inward-processing reporting — report input goods placed under the procedure: Where processed products from the inward processing procedure (Article 256 of the Union Customs Code) are imported, the Article 35 reporting obligation must include information on…\n- [m13.eu_269_2014 eu-269-2014#art-10-no-liability~r1] EU 269/2014 Article 10 — no liability for good-faith freezing: Provides the good-faith savings: freezing or refusing to make available funds or economic resources in good faith under the Regulation gives rise to no liability, save where neglig…",
+    "confidence": "low",
     "routing_tier": "opus",
-    "model_used": "anthropic/claude-4.8-opus-20260528",
-    "latency_ms": 24621,
+    "model_used": "citations-only",
+    "latency_ms": 35395,
     "citations": [
-      "Eu Russia Packages Phase2B Article Package 12",
-      "Russia 2025 Iran Max Pressure Jcpoa Snapback SANCTIONS-RUSSIA-CIRCUMVENTION-CRACKDOWN-EO-14114-SECONDARY-SANCTIONS-FOREIGN-BANKS-MILITARY-INDUSTRIAL-BASE-COMMON-HIGH-PRIORITY-LIST-12G-NO-RE-EXPORT-001",
-      "Wassenaar Eu Dual Use Us Itar Ear Semiconductor Diffusion China Critical Minerals Post Trump EC-EU-DUAL-USE-REG-2021-821-RECAST-9-SEP-2021-IN-FORCE-CYBER-SURVEILLANCE-AUTONOMOUS-EU-CONTROLS-FORCED-LABOUR-2024-3015-INTERPLAY-ANNEX-I-IV-DEFENCE-WHITE-PAPER-MAR-2024-001",
-      "Transport Rotterdam Rules Additional TRAN-ROTT-009",
-      "Transport Rotterdam Rules TRAN-ROTT-003"
+      "EUDR Art. 3",
+      "EUDR Art. 3",
+      "CBAM Art. 34",
+      "CBAM Art. 34",
+      "Eu 269 2014 Art. 10"
+    ],
+    "citation_rule_ids": [
+      "eudr#Art-3~r4",
+      "eudr#Art-3~r2",
+      "cbam-regulation#Art-34~r2",
+      "cbam-regulation#Art-34~r1",
+      "eu-269-2014#art-10-no-liability~r1"
+    ],
+    "retrieved_rule_ids": [
+      "eudr#Art-3~r4",
+      "eudr#Art-3~r2",
+      "cbam-regulation#Art-34~r2",
+      "cbam-regulation#Art-34~r1",
+      "eu-269-2014#art-10-no-liability~r1"
     ],
     "error": null
   },
@@ -580,16 +921,31 @@
       "does not hand out a single \"yes/no\" threshold"
     ],
     "fail_closed": true,
-    "answer": "It depends entirely on where you're re-exporting to. The de minimis threshold changes by destination, so 12% US content could be below or above the line.\n\nUnder [EC-DEMINIMIS-001] and confirmed by [EC-REEXP-002], the thresholds are:\n\n- 25% for most countries. If your destination is a standard commercial market, 12% is comfortably below the threshold and the item is not subject to EAR re-export controls.\n- 10% for Country Group E:1 destinations, specifically Cuba, Iran, DPRK, Syria, and Sudan. If you're re-exporting to any of these, 12% exceeds the threshold and the item IS subject to EAR.\n- 0% for EAR-controlled components in items for military end-use in certain countries. In that scenario, any US content, even 12%, triggers EAR jurisdiction.\n\nSo the short answer: 12% is below de minimis for most destinations, but not for embargoed or military end-use cases.\n\nWhat still depends on your transaction: You mentioned \"this destination\" but didn't specify the country. If it's a normal commercial destination, you're likely fine. If it's anywhere in Country Group E:1 or involves a military end-use, 12% puts you above the threshold and you'd need BIS authorization. Confirm the destination and end-use before relying on this.",
+    "answer": "It depends on the destination country. Under the EAR de minimis rule, foreign-made items with US-controlled content are only subject to EAR re-export controls if that content exceeds a specific threshold [export_controls.ec_eu_uk_dualuse_depth, EC-DEMINIMIS-001]:\n\n- For most countries: the threshold is 25%. At 12% US content, you're below this and the item would generally fall outside EAR re-export controls.\n- For Cuba, Iran, DPRK, Syria, and Sudan (Group E:1): the threshold drops to 10%. At 12%, you're above this, so the item would be subject to EAR re-export controls.\n- For military end-use in certain countries: the threshold can be 0%, meaning any US-controlled content triggers EAR jurisdiction.\n\nSo if your destination is a standard commercial market, 12% is likely below de minimis and you're probably fine. If the destination is one of the Group E:1 countries, 12% exceeds the 10% threshold and EAR applies.\n\nWhat still depends on your transaction: the specific destination country, whether the US content is EAR-controlled (not all US content counts toward de minimis), and whether there are any military end-use or end-user concerns that could trigger the 0% threshold. You'll want to confirm the exact classification of the US-origin components with your export compliance team before relying on this.",
     "confidence": "medium",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 40065,
+    "latency_ms": 88311,
     "citations": [
       "Ec Eu Uk Dualuse Depth EC-DEMINIMIS-001",
-      "Ec Ccl Nuclear Materials Processing Depth EC-REEXP-002",
-      "Rare Earths Depth 4A COMMODITIES-REE-COMPLIANCE-PLAYBOOK-9-STEP-WASSENAAR-IRA-CRMA-001",
-      "Critical Minerals Depth 4A COMMODITIES-CRITICAL-MINERALS-COMPLIANCE-PLAYBOOK-9-STEP-001"
+      "Fta Afcfta Origin AFCFTA-RVC-001",
+      "Commodity Destination Restriction Rules CINT-DEST-001",
+      "Fta Mercosur MERCOSUR-003",
+      "ISBP 821 Para. D27"
+    ],
+    "citation_rule_ids": [
+      "EC-DEMINIMIS-001",
+      "AFCFTA-RVC-001",
+      "CINT-DEST-001",
+      "MERCOSUR-003",
+      "ISBP821-D27"
+    ],
+    "retrieved_rule_ids": [
+      "EC-DEMINIMIS-001",
+      "AFCFTA-RVC-001",
+      "CINT-DEST-001",
+      "MERCOSUR-003",
+      "ISBP821-D27"
     ],
     "error": null
   },
@@ -603,17 +959,31 @@
       "(Highest fabrication risk in the ESG segment; a wrong value mis-provisions certificates.)"
     ],
     "fail_closed": true,
-    "answer": "I don't have CBAM rules in my current database, so I can't give you the specific default emission value for BF-BOF steel from India for 2026. The rules I retrieved are all from the WTO Customs Valuation Agreement and have nothing to do with CBAM or carbon emission values.\n\nHere's what I can tell you from general trade knowledge, which you should verify independently:\n\nCBAM default values are set by the European Commission through implementing regulations. For the definitive period starting January 1, 2026, the Commission publishes country-specific and production-method-specific default values. BF-BOF (blast furnace/basic oxygen furnace) steel from India would have its own default value, typically expressed in tonnes of CO2 equivalent per tonne of steel. These values are updated periodically and were published during the transitional period (2023-2025) as well.\n\nTo get the exact 2026 figure, you should check the European Commission's CBAM portal or the latest CBAM implementing regulation. The default values are used when importers cannot provide verified actual emissions data from their supplier. Importers who do have verified actual emissions can use those instead, which is often lower than the default and financially advantageous.\n\nWhat still depends on your transaction: whether your Indian steel producer has obtained verified emissions data (which would let you avoid the default value entirely), the specific CN code of your steel product, and whether any updates to the default values have been published closer to your import date.",
+    "answer": "I don't have CBAM default values in my rules database. The rules I retrieved are all from the WTO Customs Valuation Agreement, which covers customs valuation methods, not EU carbon border pricing. None of them address CBAM default emission values for steel production routes.\n\nCBAM default values are set by the European Commission and published in the Implementing Regulation. For BF-BOF steel specifically, the default values vary by country of origin and are updated periodically. The 2026 values would be based on the latest Commission implementing act in force at that time.\n\nTo get the exact figure you need, check the European Commission's CBAM portal or the relevant Implementing Regulation (EU) for the specific reference period. Your CBAM declarant or customs broker should have access to the current default value tables.\n\nWhat still depends on your transaction: whether you're using default values because you don't have actual emissions data, whether your Indian supplier can provide verified installation-level emissions (which would override the default), and the exact product CN code, since CBAM default values can differ by steel product category even within the BF-BOF route.",
     "confidence": "low",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 22844,
+    "latency_ms": 41835,
     "citations": [
       "Wto Cva Art. 6",
-      "Wto Cva Art. 7",
+      "Wto Cva Art. 6",
       "Wto Cva Art. 1",
       "Wto Cva Art. 1",
-      "Wto Cva Art. 3"
+      "Wto Cva Art. 7"
+    ],
+    "citation_rule_ids": [
+      "wto-cva#Art-6~r1",
+      "wto-cva#note-to-article-6~r1",
+      "wto-cva#Art-1~r1",
+      "wto-cva#note-to-article-1~r5",
+      "wto-cva#note-to-article-7~r1"
+    ],
+    "retrieved_rule_ids": [
+      "wto-cva#Art-6~r1",
+      "wto-cva#note-to-article-6~r1",
+      "wto-cva#Art-1~r1",
+      "wto-cva#note-to-article-1~r5",
+      "wto-cva#note-to-article-7~r1"
     ],
     "error": null
   },
@@ -627,17 +997,31 @@
       "does not answer from the superseded original-text framing"
     ],
     "fail_closed": false,
-    "answer": "It depends on your role in the supply chain. Under the EUDR, you are an operator if you are the first to place a relevant product on the EU market or if you are exporting it. Operators carry the full weight of due diligence: information gathering, risk assessment, risk mitigation, and filing a Due Diligence Statement (DDS) [customs.eudr_operator_enforcement_3a, EUDR-OPERATOR-VS-TRADER-DEPTH-001].\n\nYou are a trader if you are a subsequent buyer or seller of the product within the EU. Traders split into two tiers:\n\n- SME traders face simplified obligations: record keeping and traceability, but no independent DDS filing.\n- Non-SME traders carry the same full due diligence obligations as operators, including DDS submission [customs.eudr_operator_enforcement_3a, EUDR-OPERATOR-VS-TRADER-DEPTH-001].\n\nBoth operators and traders must fix shortcomings in their due diligence system if non-compliance is found, regardless of any corrective action already taken [m13.eudr, Article 24(3)].\n\nWhat still depends on your transaction:\n- Whether you are the first placer on the EU market or an exporter (operator) versus a downstream buyer/seller (trader).\n- Your company size: SME status determines whether you get simplified obligations or full ones as a trader.\n- The specific product: only \"relevant products\" covered by the EUDR (cattle, cocoa, coffee, oil palm, rubber, soy, wood, and derived products) trigger these obligations. The rules I have don't list the full product scope, so verify your product against the EUDR annex.",
+    "answer": "It depends on where you sit in the supply chain. Under EUDR, you're an operator if you're the first person to place a relevant product on the EU market, or if you're exporting it to the EU. You're a trader if you're anyone else in the supply chain who makes relevant products available on the EU market in a commercial capacity [m13.eudr, Art-2~r4].\n\nThe distinction matters because the obligations are very different:\n\n- Operators carry the full load: information gathering, risk assessment, risk mitigation, and filing a Due Diligence Statement (DDS) in TRACES NT [customs.eudr_operator_enforcement_3a, EUDR-OPERATOR-VS-TRADER-DEPTH-001; customs_ops.eudr_derived_products_3a, EUDR-DERIV-002].\n- SME traders get a lighter regime: record keeping and traceability, but no independent DDS filing.\n- Non-SME traders are pulled back up to the same full obligations as operators [customs.eudr_operator_enforcement_3a, EUDR-OPERATOR-VS-TRADER-DEPTH-001].\n\nSo the two questions that determine your status are: (1) Are you the first to place the product on the EU market or are you exporting it to the EU? If yes, you're an operator. (2) If not, are you an SME? That determines whether you get the simplified trader obligations or the full set.\n\nWhat still depends on your transaction: your company's SME status, your exact role in the supply chain (importer, distributor, retailer, etc.), and whether the product falls under EUDR's scope (cattle, cocoa, coffee, oil palm, rubber, soya, wood, and derived products). If you can share those details, I can narrow it down further.",
     "confidence": "high",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 12929,
+    "latency_ms": 21016,
     "citations": [
       "EUDR EUDR-OPERATOR-VS-TRADER-DEPTH-001",
+      "EUDR Art. 2",
       "EUDR Art. 24",
       "EUDR EUDR-DERIV-002",
-      "EUDR Art. 31",
-      "EUDR Art. 24"
+      "EUDR Art. 31"
+    ],
+    "citation_rule_ids": [
+      "EUDR-OPERATOR-VS-TRADER-DEPTH-001",
+      "eudr#Art-2~r4",
+      "eudr#Art-24~r3",
+      "EUDR-DERIV-002",
+      "eudr#Art-31~r1"
+    ],
+    "retrieved_rule_ids": [
+      "EUDR-OPERATOR-VS-TRADER-DEPTH-001",
+      "eudr#Art-2~r4",
+      "eudr#Art-24~r3",
+      "EUDR-DERIV-002",
+      "eudr#Art-31~r1"
     ],
     "error": null
   },
@@ -651,17 +1035,31 @@
       "high-volume orientation answer, low liability — good funnel behavior"
     ],
     "fail_closed": false,
-    "answer": "Yes, you must hold authorised CBAM declarant status before you can import CBAM goods into the EU customs territory. This is not optional. Under the CBAM Regulation, goods covered by CBAM may be brought in only by a party holding that status, and importation by anyone else is not permitted [m13.cbam_regulation, Art-4]. If you're an importer established in a Member State, you must apply for authorised CBAM declarant status before importing. You can also appoint an indirect customs representative who agrees to act as the authorised CBAM declarant on your behalf, in which case that representative submits the application [m13.cbam_regulation, Art-5].\n\nOn the de minimis threshold: the rules I have reference a de minimis of 50 tonnes, meaning importers whose total annual imports of CBAM goods are below 50 tonnes qualify for an exemption. The same rule references a 90 percent SME importer exemption, reflecting that the vast majority of small importers fall below this threshold and are not required to participate in CBAM [esg.eudr_csddd_cbam_2026_financial_phase_3a_r99]. The financial phase of CBAM has been in force since 1 January 2026, so these obligations are now live, not just reporting.\n\nWhat still depends on your transaction: Whether your specific goods fall within CBAM scope (cement, iron, steel, aluminium, fertilisers, electricity, hydrogen, and certain downstream products), and whether your annual import volume stays below the 50-tonne de minimis. If you're close to that threshold or unsure how downstream products are classified, check with your customs broker or the national competent authority for a definitive answer.",
-    "confidence": "medium",
+    "answer": "Yes, you must hold authorised CBAM declarant status to import CBAM goods into the EU customs territory. Customs authorities are explicitly prohibited from allowing importation by anyone who doesn't have that status [cbam-regulation Art-25, Art-4]. If you're an importer established in a Member State, you need to apply for authorised CBAM declarant status before importing [cbam-regulation Art-5]. You can also appoint an indirect customs representative who agrees to act as the authorised CBAM declarant, in which case that representative submits the application [cbam-regulation Art-5]. The term \"authorised CBAM declarant\" is defined as a person authorised by a competent authority under Article 17 of the regulation [cbam-regulation Art-3].\n\nOn your second question, the threshold below which CBAM doesn't apply: the rules I have access to do not cover this. The CBAM Regulation does include a monetary threshold (currently €150 per shipment, based on the customs value) below which goods are generally excluded, but I cannot confirm this from the retrieved rules. You should verify the current threshold directly with the European Commission's CBAM guidance or your customs broker, as the rules I have don't specify it.\n\nWhat still depends on your transaction: whether your goods actually fall within the CBAM product scope (certain cement, iron and steel, aluminium, fertilisers, electricity, and hydrogen), and whether any specific exemptions or transitional period rules apply to your shipment date.",
+    "confidence": "high",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 18927,
+    "latency_ms": 33648,
     "citations": [
+      "CBAM Art. 25",
       "CBAM Art. 5",
+      "CBAM Art. 3",
       "CBAM Art. 4",
-      "CBAM ESG-CBAM-REG-2023-956-FINANCIAL-PHASE-1-JAN-2026-AUTHORISED-CBAM-DECLARANT-CERTIFICATE-PURCHASE-EU-ETS-FREE-ALLOCATION-PHASE-OUT-OMNIBUS-FEB-2025-DE-MINIMIS-50T-001",
-      "Tunisia Trade Customs Regime COUNTRY-TUNISIA-IMPORT-DOMICILIATION-001",
-      "Cabo Verde Trade Customs Regime COUNTRY-CABO-VERDE-IMPORT-DOCUMENTATION-001"
+      "Wco Rkc General Annex wco-rkc-general-annex#3.9~r1"
+    ],
+    "citation_rule_ids": [
+      "cbam-regulation#Art-25~r1",
+      "cbam-regulation#Art-5~r1",
+      "cbam-regulation#Art-3~r2",
+      "cbam-regulation#Art-4~r1",
+      "wco-rkc-general-annex#3.9~r1"
+    ],
+    "retrieved_rule_ids": [
+      "cbam-regulation#Art-25~r1",
+      "cbam-regulation#Art-5~r1",
+      "cbam-regulation#Art-3~r2",
+      "cbam-regulation#Art-4~r1",
+      "wco-rkc-general-annex#3.9~r1"
     ],
     "error": null
   },
@@ -675,17 +1073,31 @@
       "does not over-generalize point-vs-polygon"
     ],
     "fail_closed": false,
-    "answer": "It depends on the plot size. Under EUDR, a single GPS point is acceptable for plots of 4 hectares or less, but plots larger than 4 hectares require full polygon boundaries describing the perimeter [EUDR-GEO-001, customs.esg_cbam_eudr_phase3a; eudr#Art-2~r5, m13.eudr].\n\nA few specifics that matter:\n\n- Coordinates must be latitude/longitude with at least six decimal digits, and accuracy must be within 10 meters [eudr#Art-2~r5, m13.eudr; EUDR-IMPL-001, customs_ops.eudr_csrd_carbon_3a].\n- The geolocation data goes into your Due Diligence Statement submitted through the EUDR Information System, covering every plot where the commodity was produced [EUDR-DDS-CONTENT-001, customs.eudr_timber_palm_depth_3a].\n- If you're sourcing from smallholder aggregators (common in West African cocoa, for example), each individual farmer's plot still needs its own geolocation. Many plots will fall under 4 ha and qualify for point coordinates, but you'll need to map every single one [EUDR-COCOA-WA-TRACE-001, customs.eudr_cocoa_west_africa_3a].\n\nSo if your plots are small, a point is fine. If any plot exceeds 4 ha, you need the polygon for that plot.\n\nWhat still depends on your transaction: whether your specific commodity is cattle (the rules note polygon requirements apply to commodities \"other than cattle\"), and whether any plots in your supply chain straddle the 4 ha threshold in ways that make classification ambiguous.",
+    "answer": "It depends on the size of the plot. Under EUDR Regulation 2023/1115, a single GPS point is acceptable only for plots of 4 hectares or less. For any plot larger than 4 hectares, you must provide a full polygon describing the perimeter [EUDR-GEO-001, customs.esg_cbam_eudr_phase3a; eudr#Art-2~r5, m13.eudr].\n\nA few specifics that matter:\n\n- Coordinates must be latitude/longitude with at least six decimal digits per plot, and accuracy must be within 10 meters [eudr#Art-2~r5, m13.eudr; Article EUDR Regulation 2023/1115 Art. 9-10, customs_ops.eudr_csrd_carbon_3a].\n- The polygon-vs-point rule applies to commodities other than cattle. For cattle, the retrieved rules don't specify a different geolocation standard, so I can't confirm what applies there.\n- Every plot where the relevant commodity was produced must be geolocated, not just the farm or concession as a whole [Article EUDR Regulation 2023/1115 Art. 9-10, customs_ops.eudr_csrd_carbon_3a].\n\nIf you're sourcing from smallholders, tools like Whisp or Global Forest Watch Pro can help collect compliant geolocation data, and aggregator models are recognized for managing this across multiple small plots [EUDR-DERIV-006, customs_ops.eudr_derived_products_3a].\n\nWhat still depends on your transaction: which commodity you're shipping, the actual plot sizes in your supply chain, and whether any plots cross the 4-hectare threshold. If even one plot exceeds 4 ha, you need polygons for that plot.",
     "confidence": "medium",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 27175,
+    "latency_ms": 27424,
     "citations": [
       "EUDR EUDR-GEO-001",
       "EUDR Art. 2",
       "EUDR Art. 9-10",
-      "EUDR EUDR-COCOA-WA-TRACE-001",
-      "EUDR EUDR-DDS-CONTENT-001"
+      "EUDR EUDR-IMPL-GEOLOCATION-001",
+      "EUDR EUDR-DERIV-006"
+    ],
+    "citation_rule_ids": [
+      "EUDR-GEO-001",
+      "eudr#Art-2~r5",
+      "EUDR-IMPL-001",
+      "EUDR-IMPL-GEOLOCATION-001",
+      "EUDR-DERIV-006"
+    ],
+    "retrieved_rule_ids": [
+      "EUDR-GEO-001",
+      "eudr#Art-2~r5",
+      "EUDR-IMPL-001",
+      "EUDR-IMPL-GEOLOCATION-001",
+      "EUDR-DERIV-006"
     ],
     "error": null
   },
@@ -699,17 +1111,31 @@
       "pre-Omnibus knowledge answering this confidently is a Fail"
     ],
     "fail_closed": false,
-    "answer": "I can't give a synthesized answer with verified citations for this one. Here are the relevant rules:\n- [governance.water_circular_csddd_3a GOV-CSRD-OMNIBUS-006] CSRD Directive 2022/2464 + ESRS Set 1 + Omnibus I Feb 2025 Scope Reduction + Reporting Delays: CSRD Directive 2022/2464 + ESRS Set 1 + Omnibus I Feb 2025 Scope Reduction + Reporting Delays…\n- [governance.omnibus_package_i_3a GOV-OMNIBUS-I-TAXONOMY-ESPR-001] EU Omnibus I — Taxonomy Voluntary + ESPR Digital Product Passport + Forced Labour Timing: EU Omnibus I amendments to supporting frameworks: EU Taxonomy Regulation (Reg 2020/852): reporting obligations amended — Art 8 Disclosures Regulation making Taxonomy reporting MAND…\n- [customs_ops.eudr_csrd_carbon_3a Article CSRD Directive 2022/2464] CSRD: Double Materiality Assessment for Trade Finance Counterparties: CSRD (Corporate Sustainability Reporting Directive 2022/2464) impact on trade finance: (1) scope: large EU companies (2 of 3: >250 employees, >EUR50M revenue, >EUR25M assets) from…\n- [governance.omnibus_package_i_3a GOV-OMNIBUS-I-CSRD-001] EU Omnibus I — CSRD Amendments Scope Reduction + Wave 2/3 Delay + ESRS Review: Corporate Sustainability Reporting Directive (CSRD, Dir 2022/2464) amended by Omnibus I: Original scope (2022/2464): Wave 1 FY2024 (large public-interest entities >500 employees ~1…\n- [esg.tnfd_issb_csrd_sfdr_cbam_eu_taxonomy_cross_thread_global_convergence_3a_r103 ESG-EU-CSRD-DIRECTIVE-2022-2464-16-DEC-2022-IN-FORCE-5-JAN-2023-ESRS-REG-2023-2772-31-JUL-2023-12-STANDARDS-WAVE-1-FY-2024-WAVE-2-FY-2025-OMNIBUS-I-COM-2025-82-DELAY-001] ESG - EU CSRD Corporate Sustainability Reporting Directive 2022/2464 16 December 2022 in force 5 January 2023 + ESRS European Sustainability Reporting Standards Reg 2023/2772 31 July 2023 + 12 standards (2 cross-cutting + 10 topical 5 environmental + 4 social + 1 governance) + Wave-1 FY 2024 11700 NFRD-companies first-reports H1 2025 + Wave-2 FY 2025 49000 large-companies + Wave-3 FY 2026 listed-SMEs + Wave-4 FY 2028 non-EU groups + Omnibus I COM(2025)82 delay + 80 pct threshold + 50 pct data-point reduction + EFRAG European Financial Reporting Advisory Group + Voluntary SME ESRS: The EU CSRD Corporate Sustainability Reporting Directive (EU) 2022/2464 of the European Parliament and of the Council of 14 December 2022 amending Regulation (EU) 537/2014 + Direct…",
+    "answer": "I can't tell you definitively without knowing your company's size, listing status, and EU presence, but here's the framework to figure it out.\n\nThe original CSRD (Directive 2022/2464) set up four waves: Wave 1 covered large public-interest entities with over 500 employees (FY2024 reporting, roughly 11,000 companies). Wave 2 covered large entities with over 250 employees, over EUR 50M turnover, and over EUR 25M balance sheet (FY2025, roughly 50,000 companies). Wave 3 covered listed SMEs and non-EU parents (FY2026). Wave 4 targeted non-EU companies with EUR 150M+ EU turnover and an EU presence, under Article 40a (FY2028) [governance.omnibus_package_i_3a, GOV-OMNIBUS-I-CSRD-001].\n\nThe EU's Omnibus I (February 2025) amended CSRD to reduce scope and delay certain waves. The retrieved rules confirm that Wave 1 was retained, but the excerpt cuts off before detailing exactly how Waves 2 and 3 were modified [governance.omnibus_package_i_3a, GOV-OMNIBUS-I-CSRD-001]. The core reporting obligation itself, where it applies, requires sustainability information in the management report on a double-materiality basis [m13.csrd, csrd#Art-19a~r1].\n\nIf your company already falls under CSRD reporting (Articles 19a, 29a, or 40a of the Accounting Directive), you're exempt from the separate annual-statement duty under the CSDDD [m13.csddd, csddd#Art-16~r2].\n\nWhat still depends on your transaction: I need your employee count, turnover, balance sheet total, whether you're listed, and whether you're an EU or non-EU entity to place you in the right wave. Also, the Omnibus I excerpt is truncated, so I can't confirm the exact revised thresholds for Waves 2 and 3. I'd recommend checking the full Omnibus I text or consulting your sustainability compliance team for the precise updated cutoffs.",
     "confidence": "medium",
     "routing_tier": "sonnet",
-    "model_used": "citations-only",
-    "latency_ms": 61940,
+    "model_used": "z-ai/glm-5.2-20260616",
+    "latency_ms": 46254,
     "citations": [
       "CSRD GOV-CSRD-OMNIBUS-006",
-      "Omnibus Package I 3A GOV-OMNIBUS-I-TAXONOMY-ESPR-001",
-      "CSRD Article CSRD Directive 2022/2464",
       "CSRD GOV-OMNIBUS-I-CSRD-001",
-      "CSRD ESG-EU-CSRD-DIRECTIVE-2022-2464-16-DEC-2022-IN-FORCE-5-JAN-2023-ESRS-REG-2023-2772-31-JUL-2023-12-STANDARDS-WAVE-1-FY-2024-WAVE-2-FY-2025-OMNIBUS-I-COM-2025-82-DELAY-001"
+      "Csddd Art. 16",
+      "Esrs Tpt 3A GOV-ESRS-TPT-001",
+      "CSRD Art. 19a"
+    ],
+    "citation_rule_ids": [
+      "GOV-CSRD-OMNIBUS-006",
+      "GOV-OMNIBUS-I-CSRD-001",
+      "csddd#Art-16~r2",
+      "GOV-ESRS-TPT-001",
+      "csrd#Art-19a~r1"
+    ],
+    "retrieved_rule_ids": [
+      "GOV-CSRD-OMNIBUS-006",
+      "GOV-OMNIBUS-I-CSRD-001",
+      "csddd#Art-16~r2",
+      "GOV-ESRS-TPT-001",
+      "csrd#Art-19a~r1"
     ],
     "error": null
   },
@@ -723,17 +1149,31 @@
       "does not answer the wrong \"Article 8\""
     ],
     "fail_closed": false,
-    "answer": "Yes, but the specific requirement depends on whether your firm considers principal adverse impacts (PAI) at entity level.\n\nIf your financial market participant does not consider PAI at entity level, then under [SFDR Art 7(2)] the pre-contractual disclosures for each financial product, including your Article 8 product, must state that it does not consider the adverse impacts of investment decisions on sustainability factors, along with the reasons why.\n\nSeparately, your Article 8 product also needs the mandatory DNSH (do-no-significant-harm) disclaimer. Under [EU Taxonomy Art 6], information disclosed under SFDR Articles 6(3) and 11(2) for environmental-characteristics products must be accompanied by the prescribed statement clarifying that the DNSH principle applies only to investments that take into account the EU criteria for environmentally sustainable economic activities.\n\nWhat the retrieved rules do not cover: the scenario where your entity does consider PAI at entity level. The rules I have only address the",
+    "answer": "Yes, but it depends on your entity-level PAI position. If your firm does not consider principal adverse impacts at entity level (i.e., you fall under point (b) of Article 4(1)), then for each financial product, including your Article 8 product, your pre-contractual disclosures must explicitly state that the product does not consider adverse impacts of investment decisions on sustainability factors, along with the reasons why [sfdr#Art-7~r2]. This is a product-level requirement, not just an entity-level one.\n\nSeparately, your Article 8 product also triggers website disclosure obligations: you must publish and maintain on your website a description of the environmental or social characteristics promoted, the methodologies used to assess them, and the relevant Article 8/9 and Article 11 information [sfdr#Art-10~r1].\n\nOn top of that, if your Article 8 product promotes environmental characteristics, the disclosures must be accompanied by the prescribed DNSH (do-no-significant-harm) disclaimer clarifying that the DNSH principle applies only to investments that take into account the EU criteria for environmentally sustainable economic activities [eu-taxonomy#Art-6~r2].\n\nWhat the retrieved rules do not cover is the scenario where your firm does consider PAI at entity level. The rules I have only address the \"does not consider\" case under Art 7(2). If you do consider PAI at entity level, different product-level disclosure obligations likely apply, but I cannot confirm the specifics from the rules available to me. You should verify that position with your compliance team or legal advisor.",
     "confidence": "medium",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 13537,
+    "latency_ms": 44062,
     "citations": [
       "SFDR Art. 7",
+      "SFDR Art. 10",
       "Eu Taxonomy Art. 6",
       "Eu Taxonomy Art. 7",
-      "EUDR Art. 4",
       "EUDR Art. 4"
+    ],
+    "citation_rule_ids": [
+      "sfdr#Art-7~r2",
+      "sfdr#Art-10~r1",
+      "eu-taxonomy#Art-6~r2",
+      "eu-taxonomy#Art-7~r1",
+      "eudr#Art-4~r3"
+    ],
+    "retrieved_rule_ids": [
+      "sfdr#Art-7~r2",
+      "sfdr#Art-10~r1",
+      "eu-taxonomy#Art-6~r2",
+      "eu-taxonomy#Art-7~r1",
+      "eudr#Art-4~r3"
     ],
     "error": null
   },
@@ -747,17 +1187,31 @@
       "product-boundary behavior analogous to \"is this LC compliant?\""
     ],
     "fail_closed": true,
-    "answer": "I can't help with calculating embedded emissions for your steel shipment. The rules I have access to cover trade finance documentary credit practice (UCP 600, ISBP 821, eURC, and related ICC publications). None of them address carbon accounting, embedded emissions, or environmental compliance calculations.\n\nEmbedded emissions for steel is a regulatory and environmental compliance matter, not a trade finance rule. If your shipment is heading to the EU, this likely falls under the EU Carbon Border Adjustment Mechanism (CBAM), which has its own methodology for calculating embedded emissions based on production data, not trade finance documents. If it's another jurisdiction, different rules may apply.\n\nYou'll need to consult your CBAM-specific compliance tools or your environmental/sustainability team for the actual calculation. They'll need production-level data from the steel manufacturer, including direct and indirect emissions per tonne, to produce the figure.\n\nWhat still depends on your transaction: the destination country and its applicable carbon regime, the specific steel product category, and whether your manufacturer has already provided verified emissions data or you need to use default values.",
+    "answer": "I can't calculate embedded emissions for your steel shipment. The rules I have access to cover trade finance compliance (UCP 600, ISBP 821, collections, guarantees, sanctions, etc.), not carbon accounting or emissions methodologies. None of the retrieved rules touch on embedded emissions, carbon intensity, or environmental reporting.\n\nWhat you're looking for falls under environmental regulation, not trade finance rules. For steel specifically, this typically involves frameworks like the EU CBAM (Carbon Border Adjustment Mechanism), which requires embedded emissions calculations based on actual production data from your steel manufacturer, including direct and indirect emissions per tonne of product. You'd need the installation-level emissions data, production route (BF-BOF, EAF, etc.), and relevant emission factors.\n\nYour steel supplier's environmental declaration or an accredited verifier's report would be the starting point. If your LC or destination country requires an emissions certificate as a document, that's a regulatory requirement separate from banking compliance under UCP 600, unless the LC specifically lists it in Field 46A.\n\nWhat still depends on your transaction: the destination country's carbon regime (e.g., EU CBAM vs. other schemes), the specific production data from your supplier, and whether your LC calls for any emissions-related document. If you need full document validation or compliance screening, TRDR Hub at trdrhub.com may offer tools that can help with that side of things.",
     "confidence": "low",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 17729,
+    "latency_ms": 19649,
     "citations": [
+      "ISBP 821 Para. D22",
+      "ISBP 821 Para. F16",
       "ISBP 821 Para. A15",
-      "Cop Eurc11 Letter Rules EURC11-e9A",
       "ISBP 821 Para. J14",
-      "UCP 600 Art. 14",
       "ISBP 821 Para. D23"
+    ],
+    "citation_rule_ids": [
+      "ISBP821-D22",
+      "ISBP821-F16",
+      "ISBP821-A15",
+      "ISBP821-J14",
+      "ISBP821-D23"
+    ],
+    "retrieved_rule_ids": [
+      "ISBP821-D22",
+      "ISBP821-F16",
+      "ISBP821-A15",
+      "ISBP821-J14",
+      "ISBP821-D23"
     ],
     "error": null
   },
@@ -771,17 +1225,31 @@
       "direct analogue of the FTA-membership guardrail, higher stakes"
     ],
     "fail_closed": true,
-    "answer": "I can't check a live wallet address against sanctions lists here. I don't have real-time screening access, and the rules I hold describe how screening works, not the current status of any specific address. For a definitive yes/no you need to run the address through an actual screening tool against the live lists.\n\nHere's how you get a reliable answer:\n\n- Screen against the current SDN list. OFAC publishes the actual blockchain addresses tied to designated persons, and virtual asset service providers must screen wallet addresses against that list (sanctions.financial_sanctions_phase2b, Article Crypto Screening). The list changes, so only a live check counts.\n- Use blockchain analytics tooling. Vendors like Chainalysis (KYT, Reactor), Elliptic, TRM Labs and CipherTrace do wallet screening against OFAC SDN addresses plus tracing through mixers and cross-chain hops (sanctions.screening_technology_phase2b, Article Blockchain Analytics). This catches indirect exposure, not just a direct list match.\n- Watch mixer exposure. Even if the address itself isn't listed, contact with a designated protocol matters. Tornado Cash was designated by OFAC in August 2022, and banks must screen for any Tornado Cash-linked addresses (sanctions.enforcement_detail_2b_r3).\n\nWhat still depends on your transaction: which regime binds you. A US nexus points to OFAC's SDN list; a UK nexus brings the OFSI consolidated list into play, since UK crypto assets are treated as \"economic resources\" and Russia-specific crypto prohibitions apply (sanctions.uk_ofsi_2b_r6). Tell me the jurisdiction and I'll be more precise on which list governs.\n\nFor live wallet screening, TRDR Hub offers sanctions checking as part of its compliance workspace.",
+    "answer": "I can't check a specific wallet address against sanctions lists in real time. I don't have live screening access to the OFAC SDN list or any other consolidated list, and the rules I hold don't let me confirm the current status of any individual address. So the honest answer is: I can't tell you whether that wallet is sanctioned right now.\n\nWhat I can tell you is how the screening actually works, so you get a reliable result:\n\n- OFAC publishes the actual blockchain addresses tied to designated persons, and those addresses are part of the SDN list. Screening a wallet means matching it against those published addresses (sanctions.financial_sanctions_phase2b, Article Crypto Screening).\n- The tooling to do this properly is blockchain analytics: Chainalysis (KYT, Reactor), Elliptic, TRM Labs, CipherTrace. These trace transactions, follow funds through mixers, track cross-chain, and flag exposure even when the wallet itself isn't listed (sanctions.screening_technology_phase2b, Article Blockchain Analytics).\n- If a UK nexus is involved, crypto assets are treated as \"relevant funds\" and must also be screened against the OFSI consolidated list (sanctions.uk_ofsi_2b_r6, reg.18A-18D).\n\nWhat still depends on your transaction: which jurisdiction applies (US OFAC, UK OFSI, or another regime), since the list you screen against changes with it.\n\nFor an actual live wallet screen, TRDR Hub offers sanctions screening tools that can do this against current lists.",
     "confidence": "low",
     "routing_tier": "opus",
     "model_used": "anthropic/claude-4.8-opus-20260528",
-    "latency_ms": 17953,
+    "latency_ms": 17278,
     "citations": [
       "Screening Technology Phase2B Article Blockchain Analytics",
       "Financial Sanctions Phase2B Article Crypto Screening",
-      "Enforcement Detail SANC-ENF-TORNADO-CASH",
-      "OFAC Article OFAC Tornado Cash Designation",
-      "Uk Ofsi Article UK Russia Regulations SI 2019/855 reg.18A-18D"
+      "Uk Ofsi Article UK Russia Regulations SI 2019/855 reg.18A-18D",
+      "Enforcement Insurance SANCTIONS-ENF-INS-003",
+      "OFAC OFAC-VE-CRYPTO"
+    ],
+    "citation_rule_ids": [
+      "SANC-TECH-BLOCKCHAIN",
+      "SANC-FIN-CRYPTO-SCREENING",
+      "SANC-UK-OFSI-CRYPTO-001",
+      "SANCTIONS-ENF-INS-003",
+      "OFAC-VE-CRYPTO"
+    ],
+    "retrieved_rule_ids": [
+      "SANC-TECH-BLOCKCHAIN",
+      "SANC-FIN-CRYPTO-SCREENING",
+      "SANC-UK-OFSI-CRYPTO-001",
+      "SANCTIONS-ENF-INS-003",
+      "OFAC-VE-CRYPTO"
     ],
     "error": null
   },
@@ -795,16 +1263,31 @@
       "chat-answerable policy question (top-of-funnel), answered cleanly"
     ],
     "fail_closed": false,
-    "answer": "Here's what I can ground for you, and where my rules stop short.\n\nOn the UK side, you screen against the UK OFSI Consolidated List, which operates under the Sanctions and Anti-Money Laundering Act 2018 (SAMLA) and is organised by regime, for example Russia, Belarus, Iran, Counter-Terrorism, Counter-Proliferation (events.ev_screen_counterparty_by_program_v1, EVAPI-SC-013). Each match should tie to the specific regime and statutory instrument, for instance The Russia (Sanctions) (EU Exit) Regulations 2019/855. Critically, a UK match isn't just a block: if you know or suspect you've dealt with or for a designated person, you have a legal reporting obligation to OFSI within one calendar month under SAMLA Section 18, and that applies even to accidental dealings (sanctions.sanc_ofsi_2026_eu_criminal_directive, SANC-OFSI26-002).\n\nOn the EU side, my retrieved rules only confirm the underlying asset-freeze framework, EU Regulation 269/2014 (as amended), which requires freezing assets of designated persons (sanctions.enforcement_eu_member_2b_r8, SANCTIONS-ENFORCE-R8-001). What the rules do not give me is the name of the specific EU list you screen against or the EU reporting mechanics, so I can't spell those out reliably here. I'd recommend confirming the exact EU consolidated list and reporting channel with your compliance function before relying on it.\n\nWhat still depends on your transaction: your role (issuing bank, advising bank, corporate) shapes exactly whom you screen: applicant, beneficiary, issuing bank, goods, routes, and documents all come into play for LC parties (sanctions.trade_finance_context_phase2b, Issuing and Advising Bank Obligations).\n\nIf you want automated multi-list screening across parties, TRDR Hub offers that.",
-    "confidence": "medium",
+    "answer": "I have to be straight with you: the rules retrieved for this query don't actually cover the EU and UK sanctions list frameworks. What I have here is a set of OFAC (US) sector-specific programs, an EU carbon border measure, and some thematic export-control notes, none of which answer your core question about which consolidated lists you must screen against in the EU versus the UK.\n\nSo the honest position is that I can't give you the authoritative list names and legal bases for EU and UK screening from what's in front of me. I don't want to name specific lists or regulations that aren't in my retrieved set, because getting sanctions screening obligations wrong carries real enforcement risk.\n\nThe one adjacent point I can ground: if you're financing or importing CBAM-covered goods into the EU, that carries its own compliance obligations (importer registration, emissions verification, certificate purchase, reporting), and banks are expected to verify the importer's compliance status (sanctions.thematic_programs_phase2b, Article Carbon Trade Measures). That's separate from list screening but worth knowing if metals or carbon-intensive goods are in scope.\n\nFor the definitive EU and UK consolidated list names and screening obligations, check with the EU (the EU Consolidated Financial Sanctions List authority) and the UK (OFSI) directly, or run it through a dedicated screening tool. TRDR Hub offers party sanctions screening if you need that operationally.",
+    "confidence": "low",
     "routing_tier": "opus",
     "model_used": "anthropic/claude-4.8-opus-20260528",
-    "latency_ms": 22359,
+    "latency_ms": 19321,
     "citations": [
-      "Trade Finance Context Phase2B Article Issuing Bank Obligations",
-      "Sanc Ofsi 2026 Eu Criminal Directive SANC-OFSI26-002",
-      "Trade Finance Context Phase2B Article Advising Bank Obligations",
-      "Enforcement Eu Member Article EU Regulation 269/2014"
+      "OFAC Article Iran Metals",
+      "OFAC Article Iran Automotive",
+      "Thematic Programs Phase2B Article Carbon Trade Measures",
+      "OFAC Article Syria-Russia Nexus",
+      "Thematic Programs Phase2B Article Space/Satellite"
+    ],
+    "citation_rule_ids": [
+      "OFAC-IR-METALS-001",
+      "OFAC-IR-AUTO-001",
+      "SANC-CARBON-BORDER",
+      "OFAC-SY-RUSSIA-NEXUS",
+      "SANC-SPACE-LAUNCH"
+    ],
+    "retrieved_rule_ids": [
+      "OFAC-IR-METALS-001",
+      "OFAC-IR-AUTO-001",
+      "SANC-CARBON-BORDER",
+      "OFAC-SY-RUSSIA-NEXUS",
+      "SANC-SPACE-LAUNCH"
     ],
     "error": null
   },
@@ -818,17 +1301,31 @@
       "cites OFAC guidance"
     ],
     "fail_closed": false,
-    "answer": "The short answer: no, a plain SDN-list name screen will NOT reliably catch 50%-blocked entities, and that is exactly the gap the 50% rule creates.\n\nHere is what the rule means. OFAC's 50% Rule blocks any entity that is owned 50% or more, in aggregate, by one or more blocked persons, even when that entity itself does not appear on the SDN list [sanctions.sanc_sdn_50pct_screening_depth OFAC-50PCT-002]. The rule reaches through unlimited tiers of ownership, so a subsidiary several layers down can be blocked because of who ultimately owns it [sanctions.sanc_sdn_50pct_screening_depth OFAC-50PCT-002].\n\nThat is the trap: because the blocked entity is not named on the SDN list, a name-match screen against the list alone comes back clean. You only find it by mapping the ownership structure behind your counterparty and testing each tier against the aggregate 50% threshold [sanctions.sanc_sdn_50pct_screening_depth OFAC-50PCT-002].\n\nTwo practical points:\n- Go beyond names. Effective SDN screening also covers property identifiers: vessel IMO numbers, aircraft tail numbers, LEIs, and national/tax IDs where OFAC publishes them [sanctions.sanc_sdn_50pct_screening_depth OFAC-SDN-003].\n- Beneficial-ownership data is the real safeguard. Get shareholder/UBO details for your counterparties and run the tier-by-tier test.\n\nWhat still depends on your transaction: the ownership chain of your specific counterparties, which OFAC program applies, and your jurisdiction. Full ownership resolution and screening is what TRDR Hub's sanctions tooling is built for if you want to automate it.",
+    "answer": "The short answer: no, plain SDN-list screening will often miss 50%-blocked entities, and that's exactly the trap the 50% rule creates.\n\nHere's the mechanics. Under sanctions.ofac_programs_phase2b OFAC-50PCT-001, any entity that is 50% or more owned by one or more blocked persons (SDNs) is itself treated as blocked, even if that entity's own name never appears on the SDN list. The rule also applies aggregate ownership, so two or more SDNs each holding a stake that together reach 50% triggers the block just as a single 50% owner would.\n\nWhy name screening alone isn't enough:\n\n- Name-match screening (sanctions.sanctions_screening SANC-OFAC-001 for beneficiary, SANC-OFAC-004 for banks, SANC-OFAC-003 for vessels) checks the party's name against the SDN list. A 50%-owned entity that isn't itself listed will pass that check clean.\n- To catch it you need ownership/beneficial-owner data, not just a name hit. Screening the name tells you nothing about who owns the company behind it.\n\nPractically, that means you screen the named parties against the lists, then run a separate ownership analysis to see whether any counterparty is controlled 50%+ by an SDN. Broad coverage across all applicable lists is also expected under sanctions.list_mechanics_phase2b (Consolidated Screening), so confirm your vendor's data includes ownership resolution, not just name lists.\n\nWhat still depends on your transaction: the specific counterparties, their ownership structures, and whether there is a US nexus that pulls OFAC jurisdiction in. If you need actual ownership resolution and screening on named parties, TRDR Hub handles that kind of sanctions screening.",
     "confidence": "medium",
     "routing_tier": "opus",
     "model_used": "anthropic/claude-4.8-opus-20260528",
-    "latency_ms": 19101,
+    "latency_ms": 18938,
     "citations": [
-      "OFAC OFAC-50PCT-002",
-      "OFAC OFAC-SDN-003",
-      "OFAC Article SSI Directives 1/2/4",
-      "OFAC SANCTIONS-LEBANON-COMPLIANCE-PLAYBOOK-HEZBOLLAH-OFAC-SDN-FATF-GREY-LIST-AML-CFT-001",
-      "OFAC SANCTIONS-IRAN-COMPLIANCE-PLAYBOOK-OFAC-IRGC-NSPM-9-MAHAN-AIR-SADERAT-SECONDARY-SANCTIONS-001"
+      "OFAC OFAC-50PCT-001",
+      "OFAC SANC-OFAC-003",
+      "OFAC SANC-OFAC-004",
+      "OFAC Article Consolidated Screening",
+      "OFAC SANC-OFAC-001"
+    ],
+    "citation_rule_ids": [
+      "OFAC-50PCT-001",
+      "SANC-OFAC-003",
+      "SANC-OFAC-004",
+      "OFAC-LIST-CONSOLIDATED",
+      "SANC-OFAC-001"
+    ],
+    "retrieved_rule_ids": [
+      "OFAC-50PCT-001",
+      "SANC-OFAC-003",
+      "SANC-OFAC-004",
+      "OFAC-LIST-CONSOLIDATED",
+      "SANC-OFAC-001"
     ],
     "error": null
   },
@@ -842,17 +1339,31 @@
       "low confidence where a jurisdiction's current threshold isn't in the retrieved rules"
     ],
     "fail_closed": false,
-    "answer": "The FATF Recommendation 16 standard sets a USD 1,000 / EUR 1,000 threshold: above that, full originator and beneficiary information is required; below it, simplified information is permitted [electronic.swift_mx_iso20022_sr2023_nov_2025_cutover_4a_r88, ELECTRONIC-FATF-REC-16-UPDATE-JUN-2024-TRAVEL-RULE-STRUCTURED-ORIGINATOR-BENEFICIARY-VASP-WOLFSBERG-001]. The June 2024 updated Interpretive Note (INR.16) further enhanced the structured-fields requirements for originator and beneficiary data [same source].\n\nThe retrieved rules also reference the US (GENIUS Act), EU (MiCA Reg 2023/1114), and Singapore (DTSP regime) as part of the post-2022 crypto regulatory framework, but they do not specify the national implementation thresholds for each jurisdiction [electronic.trade_finance_dlt_tokenisation_4a, DIGITAL-TRADE-MICA-FSMA-DTSP-VATP-GENIUS-ACT-FATF-TRAVEL-RULE-001]. So I can confirm the FATF baseline, but I cannot confirm from my rules whether the US, EU, or Singapore have set different national thresholds or adopted the FATF standard directly.\n\nWhat still depends on your transaction: whether you're dealing with traditional wire transfers or virtual asset transfers (the Crypto Travel Rule extension), and which jurisdiction's regulator you need to satisfy. Your compliance team should verify the specific national threshold with FinCEN (US), the EBA or national EU regulators, and MAS (Singapore) directly.",
+    "answer": "I can't answer this one from the rules I have. The FATF Recommendation 16 Travel Rule and its implementation thresholds in the US, EU, and Singapore are not in my retrieved rule set. What I pulled back instead covers unrelated topics: 2025 US reciprocal and IEEPA tariffs, IRA Foreign Entity of Concern rules, and OFAC sanctions regulations. None of those speak to funds-transfer or virtual-asset Travel Rule thresholds.\n\nSo rather than guess at numbers, which in a compliance context is exactly the wrong thing to do, here's where you should confirm the current figures directly:\n\n- US: FinCEN implements the Travel Rule under the Bank Secrecy Act. Check FinCEN guidance for the current recordkeeping and transmittal threshold and any proposed changes to it.\n- EU: The Transfer of Funds Regulation (and its recast covering crypto-asset transfers) sets the EU thresholds. Confirm against the current TFR text.\n- Singapore: MAS sets Travel Rule requirements through its AML/CFT notices for financial institutions and digital payment token service providers. Check the relevant MAS notice.\n\nThese three regimes each set their own thresholds and they differ, especially between fiat wire transfers and virtual-asset transfers, so treat them separately.\n\nIf you want automated sanctions and compliance screening as part of a broader workflow, TRDR Hub (trdrhub.com) covers that. For the Travel Rule thresholds specifically, go to the three regulators above for the definitive current numbers.",
     "confidence": "low",
-    "routing_tier": "sonnet",
-    "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 22897,
+    "routing_tier": "opus",
+    "model_used": "anthropic/claude-4.8-opus-20260528",
+    "latency_ms": 18422,
     "citations": [
-      "Swift Mx Iso20022 Sr2023 Nov 2025 Cutover ELECTRONIC-FATF-REC-16-UPDATE-JUN-2024-TRAVEL-RULE-STRUCTURED-ORIGINATOR-BENEFICIARY-VASP-WOLFSBERG-001",
-      "Trade Finance Dlt Tokenisation 4A DIGITAL-TRADE-MICA-FSMA-DTSP-VATP-GENIUS-ACT-FATF-TRAVEL-RULE-001",
-      "Trade Finance Dlt Tokenisation 4A DIGITAL-TRADE-DLT-TOKENISATION-9-STEP-COMPLIANCE-PLAYBOOK-001",
-      "Swift Mx Iso20022 Sr2023 Nov 2025 Cutover ELECTRONIC-TRADE-HOUSE-COMPLIANCE-PLAYBOOK-SWIFT-MX-FATF-REC-16-EU-IP-REG-NEXUS-MBRIDGE-AGORA-9-STEP-001",
-      "Post Trump 2025 Tariff Implementation CUSTOMS-LIBERATION-DAY-2-APRIL-2025-RECIPROCAL-CALCULATION-METHODOLOGY-USTR-NEGOTIATIONS-DE-MINIMIS-800-USD-THRESHOLD-2-MAY-2025-CHINA-HONG-KONG-2-MAY-2025-OTHER-COUNTRIES-LATE-2025-001"
+      "Post Trump 2025 Tariff Implementation CUSTOMS-LIBERATION-DAY-2-APRIL-2025-RECIPROCAL-CALCULATION-METHODOLOGY-USTR-NEGOTIATIONS-DE-MINIMIS-800-USD-THRESHOLD-2-MAY-2025-CHINA-HONG-KONG-2-MAY-2025-OTHER-COUNTRIES-LATE-2025-001",
+      "Usa Ira Dpa Chips Section 232 Buy Clean Post Trump 2025 Climate Unwind ESG-IRA-FEOC-FOREIGN-ENTITY-OF-CONCERN-30D-CLEAN-VEHICLE-TREASURY-FINAL-REG-1-MAY-2024-EFFECTIVE-1-JAN-2025-50-50-LICENSE-CONTROL-TEST-25-PCT-CHINESE-EQUITY-POST-TRUMP-EXPANSION-001",
+      "OFAC ofac-544-wmd#s544-206~r1",
+      "OFAC Art. 515",
+      "Post Trump 2025 Tariff Implementation CUSTOMS-IEEPA-TARIFFS-MEXICO-CANADA-CHINA-FENTANYL-4-FEB-2025-25-PCT-MEXICO-CANADA-10-PCT-CHINA-MARCH-2025-ESCALATION-CHINA-20-PCT-FENTANYL-DEROGATIONS-001"
+    ],
+    "citation_rule_ids": [
+      "CUSTOMS-LIBERATION-DAY-2-APRIL-2025-RECIPROCAL-CALCULATION-METHODOLOGY-USTR-NEGOTIATIONS-DE-MINIMIS-800-USD-THRESHOLD-2-MAY-2025-CHINA-HONG-KONG-2-MAY-2025-OTHER-COUNTRIES-LATE-2025-001",
+      "ESG-IRA-FEOC-FOREIGN-ENTITY-OF-CONCERN-30D-CLEAN-VEHICLE-TREASURY-FINAL-REG-1-MAY-2024-EFFECTIVE-1-JAN-2025-50-50-LICENSE-CONTROL-TEST-25-PCT-CHINESE-EQUITY-POST-TRUMP-EXPANSION-001",
+      "ofac-544-wmd#s544-206~r1",
+      "OFAC-GL-CUBA-TRAVEL-GOV",
+      "CUSTOMS-IEEPA-TARIFFS-MEXICO-CANADA-CHINA-FENTANYL-4-FEB-2025-25-PCT-MEXICO-CANADA-10-PCT-CHINA-MARCH-2025-ESCALATION-CHINA-20-PCT-FENTANYL-DEROGATIONS-001"
+    ],
+    "retrieved_rule_ids": [
+      "CUSTOMS-LIBERATION-DAY-2-APRIL-2025-RECIPROCAL-CALCULATION-METHODOLOGY-USTR-NEGOTIATIONS-DE-MINIMIS-800-USD-THRESHOLD-2-MAY-2025-CHINA-HONG-KONG-2-MAY-2025-OTHER-COUNTRIES-LATE-2025-001",
+      "ESG-IRA-FEOC-FOREIGN-ENTITY-OF-CONCERN-30D-CLEAN-VEHICLE-TREASURY-FINAL-REG-1-MAY-2024-EFFECTIVE-1-JAN-2025-50-50-LICENSE-CONTROL-TEST-25-PCT-CHINESE-EQUITY-POST-TRUMP-EXPANSION-001",
+      "ofac-544-wmd#s544-206~r1",
+      "OFAC-GL-CUBA-TRAVEL-GOV",
+      "CUSTOMS-IEEPA-TARIFFS-MEXICO-CANADA-CHINA-FENTANYL-4-FEB-2025-25-PCT-MEXICO-CANADA-10-PCT-CHINA-MARCH-2025-ESCALATION-CHINA-20-PCT-FENTANYL-DEROGATIONS-001"
     ],
     "error": null
   },
@@ -866,17 +1377,31 @@
       "uses correct terminology (does not call an unresolved-but-valid alert a \"false positive\")"
     ],
     "fail_closed": false,
-    "answer": "This is an AML/KYC screening question, not a trade finance documentary credit question. The rules I have access to cover trade finance instruments like UCP 600, ISBP 821, URDG 758, ISP98, and related ICC practices. None of them address PEP screening, AML disposition procedures, or sanctions list matching workflows.\n\nThat said, here's what I can tell you from general compliance knowledge (not from my retrieved rule set): a name-plus-country PEP match is a low-confidence hit. Standard practice is to treat it as a potential false positive until you can gather additional identifiers such as date of birth, national ID number, or address. You should escalate it to your compliance team for enhanced due diligence rather than clearing or confirming it yourself. Most screening tools assign a risk score based on how many data points match, and a single name-plus-country match typically falls below the threshold for automatic escalation but still requires manual review and documented disposition.\n\nYour internal AML policy and the FATF recommendations for your jurisdiction will dictate the exact steps, timelines, and record-keeping requirements. I'd strongly recommend consulting your compliance officer or MLRO for the specific procedure your institution follows.\n\nWhat still depends on your transaction: your institution's internal AML/KYC policy, the applicable jurisdiction's financial regulator requirements, and the specific screening tool you're using and its confidence-scoring methodology.",
+    "answer": "I have to be honest with you: the rules I retrieved for this query don't actually cover PEP (politically exposed person) match disposition. There's no PEP screening methodology, no name-matching threshold guidance, and no false-positive clearing procedure in the retrieved set. So I can't ground a proper answer here, and I won't invent one.\n\nWhat the retrieved rules do touch, and only loosely, is country context. If your PEP subject sits in a country under comprehensive OFAC sanctions, that changes the whole picture and you should treat it as a hard stop rather than a routine match review [sanctions.sanctions_screening SANC-OFAC-005]. And if the case touches a country with special procedural requirements, it should be escalated rather than dispositioned at your level [jurisdictions.country_footprint_scaling_rules JPROC-FOOT-001].\n\nBeyond that, PEP disposition genuinely belongs to your institution's AML/KYC framework, which is not in the rules I have access to.\n\nGeneral guidance, clearly marked as outside the retrieved rules: a name plus a country is almost never enough to confirm or clear a PEP hit. You typically need secondary identifiers (date of birth, role, entity linkage) before you either clear as a false positive or escalate to enhanced due diligence.\n\nWhat still depends on your transaction: your bank's own PEP policy, the risk rating of the country involved, and whether that country is OFAC-comprehensive.\n\nFor structured screening and match resolution, TRDR Hub (trdrhub.com) offers sanctions and party screening tooling.",
     "confidence": "low",
-    "routing_tier": "sonnet",
-    "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 26375,
+    "routing_tier": "opus",
+    "model_used": "anthropic/claude-4.8-opus-20260528",
+    "latency_ms": 19139,
     "citations": [
-      "ISDGP ISDGP-NONC-005",
-      "Wto Cva Art. 1",
-      "ISDGP ISDGP-NONC-002",
-      "ISP98 ICC-ISP98-RULE5-NOTICE-PRECLUSION-DISPOSITION-TIMELY-DISHONOUR-3-7-BUSINESS-DAYS-001",
-      "UCP 600 Art. 16"
+      "Country Footprint Scaling Rules JPROC-FOOT-001",
+      "OFAC SANC-OFAC-005",
+      "Brpd Countryrisk brpd-countryrisk#5d~r3",
+      "Brpd Countryrisk brpd-countryrisk#5b~r1",
+      "EUDR EUDR-COUNTRY-BENCH-001"
+    ],
+    "citation_rule_ids": [
+      "JPROC-FOOT-001",
+      "SANC-OFAC-005",
+      "brpd-countryrisk#5d~r3",
+      "brpd-countryrisk#5b~r1",
+      "EUDR-COUNTRY-BENCH-001"
+    ],
+    "retrieved_rule_ids": [
+      "JPROC-FOOT-001",
+      "brpd-countryrisk#5d~r3",
+      "brpd-countryrisk#5b~r1",
+      "SANC-OFAC-005",
+      "EUDR-COUNTRY-BENCH-001"
     ],
     "error": null
   },
@@ -890,17 +1415,31 @@
       "product-boundary behavior like \"is this LC compliant?\""
     ],
     "fail_closed": true,
-    "answer": "I can't give you a yes or no on that, because the rules I have access to don't cover cargo insurance policy terms or claims handling. Cargo insurance claims are governed by your specific policy wording (often Institute Cargo Clauses A, B, or C), the underlying facts of the loss, and the insurer's assessment, none of which are in my current rule set.\n\nWhat I can tell you from the rules I do have is how certain maritime situations interact with cargo interests, which may be relevant depending on what happened to your shipment:\n\n- If your cargo was sacrificed in a general average event (e.g., jettison to save the vessel), YAR 2016 Rule B distinguishes between physical sacrifices and expenditures, and the contributory value is assessed at the time and place of discharge. Your insurer would typically cover your GA contribution, but the GA process itself is separate from the insurance claim.\n- If salvage was involved, YAR 2016 Rule VI says salvage remuneration is a GA expenditure, but SCOPIC remuneration is not, which affects how costs are shared among cargo owners.\n- If the carrier is holding your goods under a lien for unpaid freight or GA contributions, Rotterdam Rules Art. 47 requires them to notify you before exercising that lien.\n\nWhat still depends on your transaction: the cause and extent of loss, your policy type and exclusions, whether a GA declaration was filed, and whether the carrier or a third party bears liability. Your insurance broker or claims handler is your best next stop for a coverage decision.",
+    "answer": "I can't tell you definitively whether your claim will be paid, because that depends on your policy terms, the nature of the loss, and your documentation. But the retrieved rules flag one critical gatekeeper you should check right now: insurable interest.\n\nUnder ICC Cargo Clauses (A/B/C) Clause 11, the assured must have an insurable interest in the goods at the time of loss [TRAN-ICC-003]. If you sold on CIF terms, risk passes to the buyer the moment goods are loaded on board at the port of shipment [TRAN-ICC-003]. That means if the loss occurred after loading, the buyer, not you (the seller), holds the insurable interest and must be the one to claim. If you're the seller trying to claim for a post-loading loss, the insurer can validly reject it.\n\nA few other things from the rules worth noting:\n\n- If your Incoterm is CIF, the seller only had to procure minimum ICC(C) cover unless the contract specified broader [INCO-EXEC-INS-001]. If your loss type isn't covered under ICC(C), the claim fails regardless of interest.\n- If your term is CIP, Incoterms 2020 upgraded the default to ICC(A) all-risks, which is far broader [INCO-CIP-001].\n- If your term is something other than CIF or CIP, insurance isn't an automatic seller obligation under Incoterms, so coverage depends entirely on what was separately arranged [INCO-EXEC-INS-003].\n\nWhat still depends on your transaction: your specific Incoterm, who the policy names as assured or loss payee, the exact ICC clause level, when and where the loss occurred, and whether your documentation matches the insurer's claim requirements. If you're remitting a marine insurance claim through Bangladesh, there's also a Bangladesh Bank approval process requiring Form TM and supporting documents [M13-GFET-10-037].",
     "confidence": "low",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 20641,
+    "latency_ms": 27888,
     "citations": [
-      "Transport Rotterdam Rules Additional TRAN-ROTT-010",
-      "Transport York Antwerp 2016 TRAN-YAR-003",
-      "Customs Hs Origin Entry Ftz Drawback Adcvd CUSTOMS-DUTY-DRAWBACK-OPERATIONAL-19-USC-1313-TFTEA-2015-MODERNIZATION-SUBSTITUTION-8-DIGIT-HTS-5-YEAR-ACE-ELECTRONIC-SECTION-232-NOT-ELIGIBLE-SECTION-301-ELIGIBLE-001",
-      "Transport York Antwerp 2016 TRAN-YAR-002",
-      "Customs Kyoto Convention CUST-RKC-003"
+      "Incoterms 2020 INCO-EXEC-INS-001",
+      "Incoterms 2020 INCO-EXEC-INS-003",
+      "Transport Institute Cargo Clauses TRAN-ICC-003",
+      "Incoterms 2020 INCO-CIP-001",
+      "Gfet Vol1 M13-GFET-10-037"
+    ],
+    "citation_rule_ids": [
+      "INCO-EXEC-INS-001",
+      "INCO-EXEC-INS-003",
+      "TRAN-ICC-003",
+      "INCO-CIP-001",
+      "M13-GFET-10-037"
+    ],
+    "retrieved_rule_ids": [
+      "INCO-EXEC-INS-001",
+      "INCO-EXEC-INS-003",
+      "TRAN-ICC-003",
+      "INCO-CIP-001",
+      "M13-GFET-10-037"
     ],
     "error": null
   },
@@ -914,17 +1453,31 @@
       "distinguishes risk transfer from insurance obligation"
     ],
     "fail_closed": false,
-    "answer": "Under Incoterms 2020, the key difference is that CIF requires minimum Institute Cargo Clauses (C) while CIP requires minimum Institute Cargo Clauses (A), i.e., all-risks [incoterms.incoterms2020_phase_misc, INCO-CIP-001]. This was a deliberate change in the 2020 revision: CIP was upgraded from ICC (C) to ICC (A) to give buyers broader protection on multimodal shipments, while CIF stayed at the lower ICC (C) minimum [incoterms.incoterms2020_phase_misc, INCO-CIP-001].\n\nBoth terms require the seller to procure insurance for at least 110% of the contract price, in a transferable form, endorsed to the buyer [transport.top_incoterms2020_multimodal_depth, TOP-INC-002]. The policy must cover the minimum clause level for each term as described above.\n\nA couple of practical points worth noting:\n\n- Under CIF, risk passes to the buyer once goods are loaded on board at the port of shipment, so the buyer holds the insurable interest from that point even though the seller arranged the policy [transport.transport_institute_cargo_clauses, TRAN-ICC-003].\n- If your LC uses a term other than CIF or CIP, an insurance document presented is considered extraneous and will be disregarded under UCP 600 Art 14(g) [crossdoc.lcopilot_crossdoc, CROSSDOC-INCOTERMS-EXTRANEOUS-INSURANCE-001].\n\nWhat still depends on your transaction: If this is under an LC, check Field 46A for any insurance requirements that go beyond the Incoterms minimum, as banks examine against LC terms, not Incoterms defaults.",
+    "answer": "Under Incoterms 2020, the key difference is the level of coverage: CIF requires minimum Institute Cargo Clauses (C), while CIP requires minimum Institute Cargo Clauses (A) \"All Risks.\" This was a notable change in the 2020 revision, upgrading CIP from the previous ICC(C) minimum to ICC(A) (icc_core.top_incoterms2020_letter_rules_v1, Article CIP; transport.top_incoterms2020_multimodal_depth, TOP-INC-002).\n\nBoth terms require the seller to procure insurance at a minimum of 110% of the contract/CIF value, and the policy must be in a transferable form and endorsed to the buyer (transport.top_incoterms2020_multimodal_depth, TOP-INC-002; icc_core.top_incoterms2020_letter_rules_v1, Article CIF).\n\nSo in practical terms: CIF gives the buyer only basic \"named perils\" coverage (ICC(C)), while CIP gives the buyer broad \"all risks\" coverage (ICC(A)). If you're a buyer under CIF and want fuller protection, you'll need to arrange your own top-up insurance. If you're the seller, make sure you're buying the right tier, because under-insuring relative to the Incoterm is a breach of your obligation.\n\nOne important nuance from the rules: under both CIF and CIP, risk passes to the buyer at the point of delivery (loading on board for CIF), so the buyer holds the insurable interest from that point forward, even though the seller arranges the policy (transport.transport_institute_cargo_clauses, TRAN-ICC-003).\n\nWhat still depends on your transaction: If this is under an LC, check Field 46A for the exact insurance document and coverage requirements the LC specifies, because LC terms can override the Incoterm defaults.",
     "confidence": "high",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 22978,
+    "latency_ms": 23501,
     "citations": [
       "Incoterms 2020 TOP-INC-002",
+      "Incoterms 2020 Article CIF",
+      "Incoterms 2020 Article CIP",
       "Transport Institute Cargo Clauses TRAN-ICC-003",
-      "Incoterms 2020 CROSSDOC-INCOTERMS-EXTRANEOUS-INSURANCE-001",
-      "Incoterms 2020 INCO-CIP-001",
-      "Incoterms 2020 INCO-EXEC-INS-003"
+      "Incoterms 2020 CROSSDOC-INCOTERMS-EXTRANEOUS-INSURANCE-001"
+    ],
+    "citation_rule_ids": [
+      "TOP-INC-002",
+      "INCO2020-CIF-002",
+      "INCO2020-CIP-001",
+      "TRAN-ICC-003",
+      "CROSSDOC-INCOTERMS-EXTRANEOUS-INSURANCE-001"
+    ],
+    "retrieved_rule_ids": [
+      "TOP-INC-002",
+      "INCO2020-CIF-002",
+      "INCO2020-CIP-001",
+      "TRAN-ICC-003",
+      "CROSSDOC-INCOTERMS-EXTRANEOUS-INSURANCE-001"
     ],
     "error": null
   },
@@ -938,17 +1491,31 @@
       "counter-intuitive point stated clearly first"
     ],
     "fail_closed": false,
-    "answer": "General average is a maritime principle where all parties in a sea shipment share the cost of any extraordinary sacrifice or expenditure made intentionally to save the whole adventure, ship and cargo together. Under the York-Antwerp Rules 2016 Rule A, a general average act requires something extraordinary and intentional, like the master jettisoning cargo to save the vessel, or diverting to a port of refuge after a fire. It is not about accidental loss; it is about deliberate action taken for the common safety.\n\nThe reason you owe money even though your goods were not damaged is that general average contributions are shared across all cargo interests based on value, not based on whether your specific goods were sacrificed. Under YAR 2016 Rule B, there is a distinction between sacrifices (physical loss or damage, like jettisoned cargo) and expenditures (costs incurred, like port of refuge fees or salvage), but both are pooled and apportioned proportionally among all parties whose property was saved. So if someone else's cargo was thrown overboard to keep the ship afloat, your cargo benefited from that sacrifice, and you contribute to the loss.\n\nUnder YAR 2016 Rule XXII, the shipowner has a maritime lien over your cargo for your GA contribution. You typically must provide a GA bond and an average guarantee from your insurer before your goods are released. The carrier can also refuse delivery if GA contributions remain unpaid, as recognised in Rotterdam Rules Article 47.\n\nWhat still depends on your transaction: the exact amount you owe depends on the average adjuster's final report, the total value of all property involved, and your cargo's proportionate share. Your marine cargo insurer may cover your GA contribution depending on your policy terms.",
+    "answer": "General Average is a centuries-old maritime principle: when a sacrifice or extraordinary expense is made during a voyage to save the ship and cargo from a common peril (like jettisoning containers to stabilize a vessel in a storm, or paying salvage towage), all cargo owners share the loss proportionally, based on the value of their goods. So even if your container arrived untouched, you owe a contribution because your cargo benefited from the sacrifice that saved the entire venture.\n\nThe rules I have access to don't define General Average itself, so that explanation is general maritime knowledge rather than a cited rule. What the rules do cover is the practical aftermath:\n\n- To remit General Average contributions abroad, you'll need the Adjuster's final report plus supporting marine and cargo documents on Form TM, with the authorized dealer verifying consistency across all documents [m13.gfet_vol1, M13-GFET-10-038].\n- If you don't pay your General Average contribution, the carrier can exercise a lien on your goods, meaning they can refuse to release your cargo until the contribution is settled. Before doing so, the carrier must notify the consignee or transport document holder of the amount owed [transport.transport_rotterdam_rules_additional, TRAN-ROTT-010, Art. 47].\n\nIn practice, this means the shipping line will hold your goods at destination until you either pay the GA deposit or provide a GA guarantee (often through your cargo insurer). Your insurer can usually handle this on your behalf if you have all-risks coverage.\n\nWhat still depends on your transaction: whether your cargo insurance policy covers GA contributions, which GA adjustment rules apply (York-Antwerp Rules are most common), and the specific deposit or guarantee amount the carrier is demanding.",
     "confidence": "low",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 16266,
+    "latency_ms": 50256,
     "citations": [
-      "Transport York Antwerp 2016 TRAN-YAR-001",
       "Gfet Vol1 M13-GFET-10-038",
-      "Transport York Antwerp 2016 TRAN-YAR-002",
-      "Transport York Antwerp 2016 TRAN-YAR-005",
-      "Transport Rotterdam Rules Additional TRAN-ROTT-010"
+      "Transport Rotterdam Rules Additional TRAN-ROTT-010",
+      "ISBP 821 Para. J17",
+      "ISBP 821 Para. G20",
+      "ISBP 821 Para. F20"
+    ],
+    "citation_rule_ids": [
+      "M13-GFET-10-038",
+      "TRAN-ROTT-010",
+      "ISBP821-J17",
+      "ISBP821-G20",
+      "ISBP821-F20"
+    ],
+    "retrieved_rule_ids": [
+      "M13-GFET-10-038",
+      "TRAN-ROTT-010",
+      "ISBP821-J17",
+      "ISBP821-G20",
+      "ISBP821-F20"
     ],
     "error": null
   },
@@ -962,17 +1529,31 @@
       "does not give the flat \"packing is always excluded\" answer"
     ],
     "fail_closed": false,
-    "answer": "Yes, the insufficiency-of-packing exclusion applies regardless of who packed the goods. Under the Institute Cargo Clauses, \"insufficient/unsuitable packing\" is a general exclusion under Clause 4 that applies across all three coverage tiers, ICC (A), (B), and (C) [TRAN-ICC-002]. The exclusion is tied to the condition of the packing itself, not to the identity of the packer.\n\nThat said, the retrieved rules I have access to don't explicitly address the scenario where an independent contractor did the packing rather than the insured's own staff. The rule simply lists \"insufficient/unsuitable packing\" as excluded without distinguishing between who performed it. In practice, marine cargo insurers generally apply this exclusion based on whether the packing was adequate for the intended transit, not who did it. But I can't confirm that from the rules in my database, so I'd recommend checking the full wording of Clause 4 in your specific policy and, if it's a live claim, consulting your insurance broker or a marine insurance specialist.\n\nWhat still depends on your transaction: the exact policy wording (some insurers offer endorsements that modify or remove the packing exclusion), whether the contractor was engaged by you or by the seller, and whether you have any contractual recourse against the contractor for negligent packing.",
+    "answer": "I have to be straight with you: the \"insufficiency of packing\" exclusion you're asking about is a cargo insurance concept (it typically comes from Institute Cargo Clauses, which govern when an insurer can deny a claim for badly packed goods and whether that exclusion falls away if a third party did the packing). That is not covered by the rules I have access to here. My retrieved rules deal with packing lists as documents under a letter of credit and with rules of origin for packing materials, not with marine cargo insurance exclusions or who physically packed the goods.\n\nSo I can't tell you whether the exclusion turns on your own staff versus an independent contractor packing the goods. That question lives in your insurance policy wording and the applicable Institute Cargo Clauses, and it can also hinge on whether the packer was acting as your agent. A cargo insurance broker or the underwriter is the right authority to confirm this against your specific policy.\n\nWhat I can help with, if it's useful, is the documentary side: how packing must be described on a packing list so it doesn't conflict with the LC or your other documents (icc_core.lco_isbp821_letter_rules_v1, Article M4 and Article N1). But that is a separate matter from the insurance exclusion you asked about.",
     "confidence": "low",
-    "routing_tier": "sonnet",
-    "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 18691,
+    "routing_tier": "opus",
+    "model_used": "anthropic/claude-4.8-opus-20260528",
+    "latency_ms": 18971,
     "citations": [
-      "Transport Institute Cargo Clauses TRAN-ICC-002",
-      "Cva Advanced 3B CUSTOMS-CVA-COMMISSIONS-001",
-      "Goods Control Indicator Rules EC-GOODS-002",
-      "Transport Institute Cargo Clauses TRAN-ICC-001",
-      "CBAM Art. 27"
+      "ISBP 821 Para. M4",
+      "Incoterms 2020 INCO-EXEC-DOC-004",
+      "ISBP 821 Para. N1",
+      "Tbml Invoice Pricing Anomaly Depth TBML-OVER-003",
+      "Wco Rkc Specific Annexes wco-rkc-specific-annexes#k-1-9-recommended-practice~r1"
+    ],
+    "citation_rule_ids": [
+      "ISBP821-M4",
+      "INCO-EXEC-DOC-004",
+      "ISBP821-N1-VAR02",
+      "TBML-OVER-003",
+      "wco-rkc-specific-annexes#k-1-9-recommended-practice~r1"
+    ],
+    "retrieved_rule_ids": [
+      "ISBP821-M4",
+      "INCO-EXEC-DOC-004",
+      "ISBP821-N1-VAR02",
+      "TBML-OVER-003",
+      "wco-rkc-specific-annexes#k-1-9-recommended-practice~r1"
     ],
     "error": null
   },
@@ -986,16 +1567,31 @@
       "cross-domain (Incoterms × insurance) answered without blurring the two"
     ],
     "fail_closed": true,
-    "answer": "Yes, under FOB the buyer is responsible for insurance during the ocean voyage. Under Incoterms 2020 FOB terms, the seller delivers the goods on board the vessel at the named port, and risk transfers once the goods are on board. From that point forward, the buyer covers freight, import clearance, and insurance [incoterms.incoterms2020_phase_misc, INCO-FOB-001].\n\nThe seller has no obligation to arrange marine insurance under FOB. If the buyer fails to insure and something happens during the voyage, the buyer bears that risk. In practice, many buyers simply don't insure on FOB shipments, which leaves them fully exposed. As a seller, you may want to flag this in your sales contract or proforma invoice so the buyer is aware.\n\nOne important caution: if your cargo is containerised, FOB is not the right Incoterm. Under Incoterms 2020, FOB risk passes at the ship's rail, but container cargo is handed to the carrier at the container yard before loading, creating a risk gap for you as the seller. FCA is the recommended term for containerised shipments [transport.top_incoterms2020_multimodal_depth, TOP-INC-001].\n\nAlso, since the buyer pays freight under FOB, the bill of lading should typically show \"Freight Collect\" [icc_core.top_incoterms2020_letter_rules_v1, Article FOB].\n\nWhat still depends on your transaction: whether the FOB term appears only in your sales contract or also in the LC wording. If it's in the LC, the bank will expect documents consistent with FOB (e.g., freight collect B/L), and any mismatch could trigger a discrepancy.",
+    "answer": "Yes, under FOB the buyer is responsible for insurance during the ocean voyage. Under Incoterms 2020, FOB means the seller delivers on board the vessel at the named port, and risk transfers once the goods are on board. The buyer's obligations include freight, import clearance, and insurance [incoterms.incoterms2020_phase_misc, INCO-FOB-001]. So from the moment the goods cross the ship's rail (or are loaded on board, in practice), the buyer bears the risk and should arrange marine cover.\n\nA couple of practical points worth noting:\n\n- FOB is designed for bulk or breakbulk sea shipments. If you're shipping containerized cargo, Incoterms 2020 explicitly recommends using FCA instead [incoterms.incoterms2020_phase_misc, INCO-FOB-001]. With FCA, risk transfers at the terminal or depot, not on board, which better reflects how containers actually move.\n- The insurance document alignment rule in my database only addresses CIF and CIP, where the seller must procure insurance [incoterms.incoterms_document_alignment_rules, INCO-EXEC-DOC-003]. It does not cover FOB, which confirms that seller-procured insurance is not expected under FOB.\n\nWhat still depends on your transaction:\n- Whether your LC references FOB in its terms. If it does, the LC should not call for an insurance document from you as seller, since insurance is the buyer's responsibility. If the LC nonetheless requires an insurance document, that's a red flag worth querying with the issuing bank before presentation.\n- Whether the destination country has local insurance requirements that override the Incoterm allocation. For example, UAE and Bangladesh both have rules requiring locally sourced insurance for CIF imports, but those apply to CIF, not FOB [country_rules.ae_uae_compliance, AE-INSURANCE-001; country_rules.bd_bangladesh_bank, BD-BB-008]. Still, it's worth checking if the buyer's country has any FOB-specific insurance mandates.",
     "confidence": "medium",
     "routing_tier": "sonnet",
     "model_used": "z-ai/glm-5.2-20260616",
-    "latency_ms": 19807,
+    "latency_ms": 42163,
     "citations": [
       "Incoterms 2020 INCO-FOB-001",
-      "Incoterms 2020 TOP-INC-001",
-      "Incoterms 2020 Article FOB",
-      "Gfet Vol1 M13-GFET-07-032"
+      "Incoterms 2020 INCO-EVID-FOB-001",
+      "Incoterms 2020 INCO-EXEC-DOC-003",
+      "Ae Uae Compliance AE-INSURANCE-001",
+      "Bd Bangladesh Bank BD-BB-008"
+    ],
+    "citation_rule_ids": [
+      "INCO-FOB-001",
+      "INCO-EVID-FOB-001",
+      "INCO-EXEC-DOC-003",
+      "AE-INSURANCE-001",
+      "BD-BB-008"
+    ],
+    "retrieved_rule_ids": [
+      "INCO-FOB-001",
+      "INCO-EVID-FOB-001",
+      "INCO-EXEC-DOC-003",
+      "AE-INSURANCE-001",
+      "BD-BB-008"
     ],
     "error": null
   }
