@@ -71,7 +71,12 @@ class Settings(BaseSettings):
     # OpenRouter-routed generation/classification models (2026-07 LLM swap).
     RULGPT_LLM_MODEL: str = "z-ai/glm-5.2"  # primary — Ripon's pick 2026-07-06 ($0.93/$3.00 per 1M); glm-5 rejected
     RULGPT_LLM_FALLBACKS: str = "deepseek/deepseek-v4-pro,qwen/qwen3.7-plus"  # $0.435/$0.87 and $0.32/$1.28 per 1M
-    RULGPT_CLASSIFIER_LLM_MODEL: str = "z-ai/glm-4.7-flash"  # heuristic-first; LLM assist — $0.06/$0.40 per 1M
+    # Classifier + suggested-followups slot. Switched off z-ai/glm-4.7-flash
+    # 2026-07-08: the smoke test showed it a reasoning model that returns EMPTY /
+    # non-JSON on short structured tasks (0/3 valid classifier JSON) AND was the
+    # most expensive per call. mistral-small-24b-instruct is non-reasoning: 3/3
+    # JSON, ~2.5x faster, ~8x cheaper. Generation stays glm-5.2 (Ripon's pick).
+    RULGPT_CLASSIFIER_LLM_MODEL: str = "mistralai/mistral-small-24b-instruct-2501"  # $0.05/$0.08 per 1M
     # Opus-grade escalation: queries the router flags as high-stakes
     # (sanctions/TBML, 3+ domains, classifier-complex, fail-severity stacks)
     # generate on this model instead of RULGPT_LLM_MODEL — for EVERY tier,
