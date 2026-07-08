@@ -363,3 +363,71 @@ async def test_process_query_stream_no_rules_delegates_refusal():
     finals = [e["result"] for e in events if e["type"] == "final"]
     assert finals[0].answer == NO_RULE_MESSAGE
     assert finals[0].routing_tier == "fallback"
+
+
+# ---------------------------------------------------------------------------
+# Cross-language retrieval: non-English query is translated to English keywords
+# for RulHub search, while the original drives generation.
+# ---------------------------------------------------------------------------
+
+class _RecordingRetriever:
+    def __init__(self):
+        self.seen_query = None
+
+    async def retrieve(self, session, query, classification, top_k=5):
+        self.seen_query = query
+        return [RetrievedRule(
+            rule_id="UCP600-10", rulebook="icc_core.lco_ucp600_letter_rules_v1",
+            reference="Article 10", title="Amendments",
+            excerpt="A credit can neither be amended nor cancelled without agreement.",
+            domain="icc", jurisdiction="global", document_type="lc",
+            similarity_score=0.85, rerank_score=0.85,
+        )]
+
+
+class _FakeLLMResult:
+    def __init__(self, text):
+        self.text = text
+        self.model = "z-ai/glm-4.7-flash"
+        self.prompt_tokens = 10
+        self.completion_tokens = 8
+        self.cost_usd = 0.0
+
+
+class _TranslatingClient:
+    is_available = True
+
+    async def generate_answer(self, prompt, system_prompt, model=None, max_tokens=1200, temperature=0.2):
+        return _FakeLLMResult("UCP 600 amendment credit terms change without consent")
+
+
+class _TranslatingGenerator(_StreamGenerator):
+    """Reuses the streaming fake but exposes _get_llm_client for the xlang step."""
+    def _get_llm_client(self):
+        return _TranslatingClient()
+
+    async def generate(self, query, retrieved_rules, classifier_output, user_tier="anonymous", routing_tier="sonnet"):
+        return {"answer": f"Grounded answer for: {query}", "model_used": "z-ai/glm-5.2",
+                "partial_coverage": False, "routing_tier": routing_tier}
+
+
+@pytest.mark.asyncio
+async def test_non_english_query_is_translated_for_retrieval():
+    retriever = _RecordingRetriever()
+    pipeline = RAGPipeline(classifier=_FakeClassifier(), retriever=retriever, generator=_TranslatingGenerator())
+    turkish = "Akreditif şartları ihracatçının onayı olmadan değiştirilebilir mi?"
+    result = await pipeline.process_query(query=turkish, session=None, language="en")
+    # The retriever saw ENGLISH keywords, not the raw Turkish.
+    assert retriever.seen_query == "UCP 600 amendment credit terms change without consent"
+    # ...but generation ran on the ORIGINAL query (answer stays in-language path).
+    assert turkish in result.answer
+    assert result.citations  # grounded, not a refusal
+
+
+@pytest.mark.asyncio
+async def test_english_query_is_not_translated():
+    retriever = _RecordingRetriever()
+    pipeline = RAGPipeline(classifier=_FakeClassifier(), retriever=retriever, generator=_TranslatingGenerator())
+    english = "Can LC terms be amended without the exporter's consent under UCP 600?"
+    await pipeline.process_query(query=english, session=None, language="en")
+    assert retriever.seen_query == english  # passed through untouched

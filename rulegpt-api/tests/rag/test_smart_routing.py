@@ -8,9 +8,34 @@ from app.config import settings
 from app.services.rag.models import ClassifierOutput, RetrievedRule
 from app.services.rag.pipeline import (
     _confidence_from_rules,
+    _looks_english,
     _pre_generation_confidence,
     select_model,
 )
+
+
+class TestLooksEnglish:
+    """Gate for cross-language retrieval normalization: English queries pass
+    through untouched; non-English ones are flagged for keyword translation."""
+
+    def test_english_queries_pass(self):
+        for q in [
+            "What is the presentation period under UCP 600?",
+            "Is a charter-party bill of lading acceptable?",
+            "How does telex release create delivery risk?",
+            "Which sanctions lists must I screen against?",
+        ]:
+            assert _looks_english(q) is True, q
+
+    def test_non_english_queries_flagged(self):
+        for q in [
+            "Akreditif şartları ihracatçının onayı olmadan değiştirilebilir mi?",  # Turkish
+            "电放会不会造成无单放货的风险？",  # Chinese
+            "¿La tolerancia es sobre el total o sobre el remanente?",  # Spanish
+            "Apa bedanya SKBDN dengan L/C?",  # Indonesian (ASCII, no English markers)
+            "Аккредитив раскрывается когда?",  # Russian
+        ]:
+            assert _looks_english(q) is False, q
 from app.services.rag.generator import _template_answer
 
 

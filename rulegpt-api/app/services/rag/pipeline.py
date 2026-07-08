@@ -29,6 +29,34 @@ RETRIEVAL_UNAVAILABLE_MESSAGE = (
     "your quota — please try again in a few minutes."
 )
 
+# --- Cross-language retrieval ------------------------------------------------
+# RulHub search is English full-text (derive_search_queries tokenizes on
+# [a-z0-9]+). A non-English query — Turkish, Chinese, Spanish, ... — matches
+# ~nothing, so the pipeline fails closed even though the corpus HAS the rule
+# (verified 2026-07-08: identical questions pass in English, fail in-language;
+# Turkish 0/10, Chinese 0/5 cited). We normalize the query to English keywords
+# FOR RETRIEVAL ONLY — the original query still drives generation, so the answer
+# stays in the user's language (system prompt: "Respond in their language").
+# "a"/"an" deliberately excluded — they're common Romance-language words
+# (Spanish/French/Portuguese "a") and would false-positive non-English queries.
+_ENGLISH_MARKERS = frozenset({
+    "the", "is", "are", "of", "for", "and", "what", "how", "does", "do", "can",
+    "could", "under", "with", "if", "this", "that", "not", "which", "must",
+    "should", "would", "will", "when", "where", "who", "you", "we", "from",
+    "about", "whether", "there", "these", "those", "into",
+})
+
+
+def _looks_english(query: str) -> bool:
+    """Cheap heuristic: no non-ASCII letters AND at least one English function
+    word. Biased toward translating when unsure — a false 'non-English' only
+    costs one cheap keyword-normalization call, while a false 'English' silently
+    breaks retrieval."""
+    if any(ord(c) > 127 and c.isalpha() for c in query):
+        return False
+    words = re.findall(r"[a-z']+", query.lower())
+    return any(w in _ENGLISH_MARKERS for w in words)
+
 # ---------------------------------------------------------------------------
 # Smart routing — deterministic complexity classifier (no LLM call)
 # ---------------------------------------------------------------------------
@@ -309,6 +337,49 @@ class RAGPipeline:
             self.retriever = RuleRetriever() if _settings.RETRIEVAL_BACKEND == "local" else get_rulhub_retriever()
         self.generator = generator or AnswerGenerator()
 
+    async def _retrieval_query(self, query: str) -> str:
+        """English query text to search RulHub with. Non-English queries are
+        normalized to English trade-finance keywords via the cheap classifier
+        model; the original query is untouched so generation stays in-language.
+        Any failure (no LLM key, error) falls back to the original query — this
+        can only improve retrieval, never break it."""
+        if _looks_english(query):
+            return query
+        get_client = getattr(self.generator, "_get_llm_client", None)
+        if get_client is None:
+            return query
+        try:
+            client = get_client()
+            if not getattr(client, "is_available", False):
+                return query
+            from app.config import settings as _s
+            res = await client.generate_answer(
+                prompt=(
+                    "Trade-finance question (may be in any language):\n"
+                    f"{query}\n\n"
+                    "Rewrite it as a short ENGLISH search query of the key "
+                    "trade-finance terms only (rulebook names, article numbers, "
+                    "concepts). Output ONLY the keywords, no explanation."
+                ),
+                system_prompt=(
+                    "You normalize trade-finance questions into concise English "
+                    "search keywords for a rules database. Output only English keywords."
+                ),
+                model=_s.RULGPT_CLASSIFIER_LLM_MODEL,
+                max_tokens=60,
+                temperature=0.0,
+            )
+            english = (res.text or "").strip()
+            if english:
+                logging.getLogger("rulegpt.retrieval").info(
+                    "[XLANG] normalized non-English query for retrieval | %r -> %r",
+                    query[:60], english[:60],
+                )
+                return english
+        except Exception:
+            pass
+        return query
+
     async def process_query(self, query: str, session: Any, language: str = "en", user_tier: str = "free") -> QueryResult:
         if not query or not query.strip():
             raise ValueError("Query cannot be empty.")
@@ -386,12 +457,16 @@ class RAGPipeline:
                 stage_latency_ms=stage_latency,
             )
 
+        # Cross-language: search RulHub in English; the original query still
+        # drives generation, so the answer comes back in the user's language.
+        search_query = await self._retrieval_query(query)
+
         # Stage 2: retrieval
         start = time.perf_counter()
         try:
             retrieved_rules = await self.retriever.retrieve(
                 session=session,
-                query=query,
+                query=search_query,
                 classification=classifier_output,
                 top_k=8 if requires_document_breadth(query) else 5,
             )
@@ -566,10 +641,11 @@ class RAGPipeline:
             yield {"type": "final", "result": result}
             return
 
-        # Stage 2: retrieval
+        # Stage 2: retrieval (search in English; generation stays in-language)
+        search_query = await self._retrieval_query(query)
         try:
             retrieved_rules = await self.retriever.retrieve(
-                session=session, query=query, classification=classifier_output,
+                session=session, query=search_query, classification=classifier_output,
                 top_k=8 if requires_document_breadth(query) else 5,
             )
         except RetrievalUnavailableError:
