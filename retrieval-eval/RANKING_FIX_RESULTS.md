@@ -54,3 +54,21 @@ now the blocker: `derive_search_queries` must preserve publication + concept ter
 Your fix is good (controls clean, CBAM up, no regressions). But the F1 headline wins
 (GQ-25/46) won't appear end-to-end until RulGPT fixes `derive_search_queries`. GQ-57 and
 GQ-37 are coverage gaps, not ranking. Multilingual re-run pending.
+
+## Update — RulGPT derive_search_queries fix (commit a667638)
+
+Preserved domain/instrument terms in the query derivation + stopped years
+ranking as publication numbers. F1 re-run vs live RulHub:
+
+| case | after | verdict |
+|---|---|---|
+| GQ-46 CBAM | CBAM-DEFVAL-COMPOSITE/DISPUTE + CBAM-SCOPE/DOWN-STEEL | **FIXED** (was WTO-CVA), conf low→medium |
+| GQ-57 PEP | EINT-PEP-001/002, ENTITY-PEP-001, uk-ofsi-guidance | **FIXED — NOT a coverage gap**. PEP rules exist; query-derivation was sending "disposition potential country". Take GQ-57 off the RulHub content-gap punch-list. |
+| GQ-25 Art 16 | DOCDEX/ISP98/URDG758 (waiver-adjacent) | still fails — genuine lexical≠semantic (query phrased around "waiver"); needs embeddings |
+| GQ-24 | unchanged | same lexical≠semantic; needs embeddings |
+| controls 29/39/47/59 | all held | no regressions |
+
+Net: 2/3 F1 headline cases fixed by sending the right query. GQ-25/GQ-24 are
+the true embedding cases. Confidence-recalibration + citation_label consumption
++ generator source-grounding remain as gated follow-ups (reviewable diff, not
+shipped).
