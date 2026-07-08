@@ -1,0 +1,182 @@
+{
+  "purpose": "Regression seed for the RulHub ranking fix (setweight + de-cameling + ts_rank length-normalization). Built from the 2026-07-08 RulGPT live eval.",
+  "IMPORTANT_caveat": "`actually_cited` is the CITED subset (post display-filter + validation, max 8), NOT the raw retrieved top-k. Re-run each `query` against RulHub /v1/rules/search directly to get the true retrieved rows and validate top-5 placement.",
+  "how_to_use": "For each ranking_case, after the fix, assert `expected_on_point_rule` appears in RulHub search top-5 for `query`. For positive_controls, assert the previously-correct rule STILL appears (no regression). Skip coverage-gap-suspected cases until you confirm the rule exists.",
+  "ranking_cases": [
+    {
+      "id": "GQ-25",
+      "query": "Can the issuing bank wait for the applicant's written waiver before sending its notice of refusal, or must it refuse within five banking days regardless?",
+      "expect_behavior": [
+        "the 5-banking-day refusal deadline is not extended by waiting for the applicant's waiver",
+        "describes the single-notice / hold-or-return mechanics",
+        "Fail if it says waiting for the applicant is acceptable"
+      ],
+      "expected_on_point_rule": "UCP 600 Article 16 (refusal notice — single notice, 5 banking days)",
+      "actually_cited": [
+        "Bbeh Thresh Confidence Threshold Overlays BBEH-THRESH-002",
+        "Cb Wolfsberg Kyc Depth CB-DOLLAR-001",
+        "Brpd Icrrs brpd-icrrs#1.5~r9",
+        "Bbeh Dq Bank Behavior Dq Bridge BBEH-DQ-003"
+      ],
+      "classification": "ranking",
+      "note": "GOLD-STANDARD VALIDATOR. Art. 16 is definitely in the corpus (it surfaced for GQ-23 and GQ-57). Query says 'five banking days' + 'notice of refusal' but retrieval returned bank-KYC/Wolfsberg/BRPD rows. If the ranking fix works, UCP 600 Art. 16 must be in top-5 here."
+    },
+    {
+      "id": "GQ-24",
+      "query": "The LC field 47A requires all documents in English, but our invoice shows an untranslatable Spanish product model name. Is that a discrepancy?",
+      "expect_behavior": [
+        "applies the language-condition + data-consistency standard, not a blanket \"any non-English word is a discrepancy\"",
+        "cites the relevant ISBP 821 area rather than a generic UCP-only answer",
+        "no overclaim in either direction"
+      ],
+      "expected_on_point_rule": "ISBP 821 language-of-documents / data-consistency paragraph(s)",
+      "actually_cited": [
+        "Swift Mt700 MT700-46A-001",
+        "ICC Model Forms Pub. 800B",
+        "UCP 600 ISLAMIC-LC-UCP600-COMPLIANCE-PLAYBOOK-001",
+        "ISP98 Pub. 590"
+      ],
+      "classification": "ranking-likely",
+      "note": "Query names 'field 47A' language condition. Retrieved MT700/Model-Forms/Islamic-LC/ISP98 — off-topic. Verify an ISBP 821 language paragraph exists before treating as pure ranking; likely does."
+    },
+    {
+      "id": "GQ-46",
+      "query": "What's the CBAM default value for BF-BOF steel from India for 2026?",
+      "expect_behavior": [
+        "a specific value tied to CN code + country + period that updates over time — cite the exact current table or decline",
+        "does not invent or use a stale default value",
+        "(Highest fabrication risk in the ESG segment; a wrong value mis-provisions certificates.)"
+      ],
+      "expected_on_point_rule": "CBAM regulation (declarant/default-value rules — m13.cbam_regulation)",
+      "actually_cited": [
+        "Wto Cva Art. 6",
+        "Wto Cva Art. 7",
+        "Wto Cva Art. 1",
+        "Wto Cva Art. 1",
+        "Wto Cva Art. 3"
+      ],
+      "classification": "mixed",
+      "note": "CBAM rules EXIST (retrieved cleanly for GQ-48) but this query wants the specific 2026 BF-BOF default VALUE for India — a data-table value that may not exist as a rule. Ranking should at least surface the CBAM default-value rule into top-5; the exact number is a separate data question."
+    },
+    {
+      "id": "GQ-37",
+      "query": "What's the difference between an HS code, an HTS code, and a Schedule B code?",
+      "expect_behavior": [
+        "clean distinction (HS 6-digit international; HTS national import; Schedule B US export)",
+        "notes that beyond 6 digits codes are jurisdiction-specific",
+        "plain-language, high-volume funnel answer"
+      ],
+      "expected_on_point_rule": "HS/customs nomenclature definition rule (if one exists)",
+      "actually_cited": [
+        "Kazakhstan Trade Customs Regime COUNTRY-KAZAKHSTAN-TARIFF-TAX-REGIME-001",
+        "Jordan Trade Customs Regime COUNTRY-JORDAN-TARIFF-TAX-FTA-001",
+        "ISBP 821 Para. H19",
+        "RCEP RCEP-TARIFF-001",
+        "ISBP 821 Para. D23"
+      ],
+      "classification": "coverage-gap-suspected",
+      "note": "Definitional (HS 6-digit intl / HTS national / Schedule B US export). Retrieved Kazakhstan/Jordan tariff + ISBP paragraphs. VERIFY a definitional nomenclature rule exists at all — if not, ranking won't help; this is a content gap, not a ranking bug."
+    },
+    {
+      "id": "GQ-57",
+      "query": "How should I disposition a potential PEP match where I only have a name and a country?",
+      "expect_behavior": [
+        "explains \"reasonable measures\" and documented threshold/sensitivity practice",
+        "does not hand out a single universal \"require N matching fields\" rule as if prescriptive",
+        "uses correct terminology (does not call an unresolved-but-valid alert a \"false positive\")"
+      ],
+      "expected_on_point_rule": "AML/PEP screening disposition rule (if one exists)",
+      "actually_cited": [
+        "ISDGP ISDGP-NONC-005",
+        "Wto Cva Art. 1",
+        "ISDGP ISDGP-NONC-002",
+        "ISP98 ICC-ISP98-RULE5-NOTICE-PRECLUSION-DISPOSITION-TIMELY-DISHONOUR-3-7-BUSINESS-DAYS-001",
+        "UCP 600 Art. 16"
+      ],
+      "classification": "coverage-gap-suspected",
+      "note": "PEP name+country disposition. Retrieved ISDGP/WTO-CVA/ISP98/UCP 600 — all trade-doc, none AML. VERIFY the corpus has a PEP/EDD disposition rule; likely a gap. Don't measure the ranking fix against this until coverage is confirmed."
+    }
+  ],
+  "positive_controls": [
+    {
+      "id": "GQ-29",
+      "query": "Is a charter-party bill of lading acceptable under my letter of credit?",
+      "expect_behavior": [
+        "cites the specific charter-party B/L article and the on-board-notation requirement",
+        "decisive but grounded in the exact article, not a vibe yes/no",
+        "flags any LC-specific condition that would change the answer"
+      ],
+      "expected_on_point_rule": "UCP 600 Art. 22 (charter-party B/L) + ISBP 821 G-para (on-board)",
+      "actually_cited": [
+        "UCP 600 Art. 22",
+        "UCP 600 Art. 20",
+        "ISBP 821 Para. G1",
+        "UCP 600 Art. 22",
+        "ISBP 821 Para. G1"
+      ],
+      "classification": "must-not-regress",
+      "note": "Was HIGH confidence with correct UCP 600 Art. 22 + ISBP 821 G1 citations."
+    },
+    {
+      "id": "GQ-39",
+      "query": "Can inputs from other RCEP members count toward origin for preferential tariff treatment?",
+      "expect_behavior": [
+        "addresses cumulation specifically and cites the RCEP origin rule",
+        "distinct from the RCEP membership/threshold question (GQ-05) and proof-of-origin question (GQ-20)",
+        "low confidence if the retrieved rules only partially cover cumulation"
+      ],
+      "expected_on_point_rule": "RCEP cumulation / origin rule",
+      "actually_cited": [
+        "RCEP RCEP-CUMUL-001",
+        "RCEP RCEP-ORIGIN-001",
+        "RCEP RCEP-COO-001",
+        "RCEP RCEP-DEMINIMIS-001",
+        "RCEP RCEP-ORIGIN-003"
+      ],
+      "classification": "must-not-regress",
+      "note": "Clean RCEP-CUMUL / RCEP-ORIGIN citations, decisive correct answer."
+    },
+    {
+      "id": "GQ-47",
+      "query": "Am I an operator or a trader under the EUDR?",
+      "expect_behavior": [
+        "explains the operator vs trader distinction reflecting the amended (post-2023) obligations",
+        "cites the EUDR provision; asks for the facts that decide it",
+        "does not answer from the superseded original-text framing"
+      ],
+      "expected_on_point_rule": "EUDR operator-vs-trader rule",
+      "actually_cited": [
+        "EUDR EUDR-OPERATOR-VS-TRADER-DEPTH-001",
+        "EUDR Art. 24",
+        "EUDR EUDR-DERIV-002",
+        "EUDR Art. 31",
+        "EUDR Art. 24"
+      ],
+      "classification": "must-not-regress",
+      "note": "HIGH confidence, clean EUDR citations."
+    },
+    {
+      "id": "GQ-59",
+      "query": "Under Incoterms 2020, what minimum insurance cover must the seller provide under CIP versus CIF?",
+      "expect_behavior": [
+        "reflects the 2020 change: CIP requires ICC(A) (all-risks) while CIF remains ICC(C) — cite the exact Incoterms 2020 clause",
+        "a stale row that treats both as ICC(C) is a Fail",
+        "distinguishes risk transfer from insurance obligation"
+      ],
+      "expected_on_point_rule": "Incoterms 2020 CIP/CIF insurance rule",
+      "actually_cited": [
+        "Incoterms 2020 TOP-INC-002",
+        "Transport Institute Cargo Clauses TRAN-ICC-003",
+        "Incoterms 2020 CROSSDOC-INCOTERMS-EXTRANEOUS-INSURANCE-001",
+        "Incoterms 2020 INCO-CIP-001",
+        "Incoterms 2020 INCO-EXEC-INS-003"
+      ],
+      "classification": "must-not-regress",
+      "note": "Correctly cited the 2020 CIP=ICC(A)/CIF=ICC(C) change — a stale-version trap it passed."
+    }
+  ],
+  "full_eval_files": [
+    "retrieval-eval/eval_results.json (42 English)",
+    "retrieval-eval/eval_ml_results.json (46 multilingual)"
+  ]
+}
