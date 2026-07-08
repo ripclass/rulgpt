@@ -59,6 +59,9 @@ class QueryResponse(BaseModel):
     model_used: str | None = None
     routing_tier: str | None = None
     fallback_reasons: List[str] | None = None
+    # The raw retrieved rule IDs (pre-citation-filter top-k) — useful for
+    # retrieval diagnostics/eval; the `citations` field is the post-filter subset.
+    retrieved_rule_ids: List[str] = Field(default_factory=list)
 
 
 class QuerySuggestion(BaseModel):

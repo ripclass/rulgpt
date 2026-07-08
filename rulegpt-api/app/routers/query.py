@@ -319,6 +319,7 @@ async def process_query_request(
         model_used=query_row.model_used,
         routing_tier=query_row.routing_tier,
         fallback_reasons=(rag or {}).get("fallback_reasons"),
+        retrieved_rule_ids=query_row.retrieved_rule_ids or [],
     )
 
 
@@ -354,6 +355,7 @@ def _response_to_done(resp: QueryResponse) -> dict:
         "model_used": resp.model_used,
         "routing_tier": resp.routing_tier,
         "fallback_reasons": resp.fallback_reasons,
+        "retrieved_rule_ids": resp.retrieved_rule_ids,
     }
 
 
@@ -480,6 +482,7 @@ async def submit_query_stream(
             "model_used": final_result.model_used,
             "routing_tier": final_result.routing_tier,
             "fallback_reasons": final_result.fallback_reasons or None,
+            "retrieved_rule_ids": final_result.retrieved_rule_ids or [],
         })
 
     return StreamingResponse(
