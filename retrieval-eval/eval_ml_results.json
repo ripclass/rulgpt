@@ -5,12 +5,18 @@
     "original": "Akreditif Açıldıktan Sonra Akreditif Şartları İhracatçının Haberi veya Onayı Olmadan Değiştirilebilir mi?",
     "english": "Can LC terms be changed after issuance without the exporter's knowledge or consent?",
     "domain": "Amendments (Art. 10)",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
-    "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 12218,
-    "citations": [],
-    "answer_nonascii": 0,
+    "answer": "Hayır, akreditif şartları ihracatçının (lehdarın) onayı olmadan onu bağlayıcı şekilde değiştirilemez. Bir değişiklik (amendment) lehdar için bağlayıcı hale gelmeden önce lehdarın açıkça rıza göstermesi gerekir. Bu rıza, yazılı iletişim yoluyla verilebileceği gibi, değiştirilmiş akreditife uygun belgeler sunarak da dolaylı olarak (zımni) verilebilir [ISP98 Article 2.06; MT707-BENEFICIARY-CONSENT-001].\n\nÖnemli bir nokta: değişikliğin banka ve lehdar açısından bağlayıcı olması için başvuru sahibinin (alıcının) onayı gerekmez. Yani banka ile lehdar arasındaki ilişkide alıcının onayı şart değildir [ISP98 Article 2.06]. Ancak bu, alıcının kendi bankasıyla olan ilişkisini etkilemez; alıcı kendi başvurusu kapsamında ayrıca yükümlülük altındadır.\n\nPratikte şunu unutmayın: banka bir MT707 mesajı ile değişikliği bildirir, fakat lehdar bu değişikliği kabul edip etmemekte serbesttir. Kabul etmezse, orijinal akreditif şartlarına göre belge sunmaya devam eder. Eğer değiştirilmiş akreditife göre belge sunarsa, bu otomatik olarak kabul anlamına gelir.\n\nWhat still depends on your transaction: Eğer akreditifiniz UCP600 kapsamında ise, yukarıdaki ISP98 ve MT707 kuralları genel prensiple uyumludur ancak UCP600'e atıf yapmadım çünkü eldeki kurallar arasında UCP600 değişiklik maddesi bulunmuyor. UCP600 Article 10'la kesin teyit almanızı öneririm.",
+    "confidence": "medium",
+    "routing_tier": "sonnet",
+    "latency_ms": 70100,
+    "citations": [
+      "ISP98 Art. 2",
+      "Swift Mt700 MT707-BENEFICIARY-CONSENT-001",
+      "ISBP 821 Para. L5",
+      "ISBP 821 Para. C2",
+      "Iso20022 Trade ISO20022-TRAD-024"
+    ],
+    "answer_nonascii": 111,
     "error": null
   },
   {
@@ -19,12 +25,18 @@
     "original": "Teyitli Akreditiflerde Ödeme Garanti mi? Bankamız Ödeme Garantisi Verdiğini Söylüyor.",
     "english": "Is payment guaranteed under a confirmed LC? Our bank says it gives a payment guarantee.",
     "domain": "Confirmation (Art. 8)",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
+    "answer": "Teyitli akreditif (confirmed LC) ile ödeme garantisi (payment guarantee) benzer ama aynı şey değildir. Elinizdeki kurallar arasında teyit bankasının yükümlülüğünü doğrudan düzenleyen bir madde bulunmuyor, bu nedenle aşağıdakiler genel ticari finansman bilgisine dayanmaktadır, retrieved rules dışından gelir.\n\nTeyitli bir akreditifte, teyit bankası (confirming bank) issuing bank'ın yükümlülüğüne ek olarak kendi bağımsız ödeme taahhüdünü verir. Yani complying presentation (kurallara uygun belge sun",
     "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 13193,
-    "citations": [],
-    "answer_nonascii": 0,
+    "routing_tier": "sonnet",
+    "latency_ms": 40197,
+    "citations": [
+      "ISBP 821 Para. K12",
+      "UCP 600 Art. 38",
+      "eUCP 2.1 EUCP21-e2A",
+      "UCP 600 Art. 30",
+      "eUCP 2.1 EUCP21-e2C"
+    ],
+    "answer_nonascii": 38,
     "error": null
   },
   {
@@ -33,12 +45,18 @@
     "original": "Bankam Akreditife Teyit Vermiyor? Ne Yapabilirim?",
     "english": "My bank won't confirm the LC. What can I do?",
     "domain": "Adding/silent confirmation",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
-    "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 10643,
-    "citations": [],
-    "answer_nonascii": 0,
+    "answer": "Teyit (confirmation) eklenmesi bankanın inisiyatifindedir ve UCP 600 kuralları bir bankayı teyit vermeye zorlamaz. Eldeki kurallar arasında, teyiften kaçınma sebepleri veya alternatif çözümler doğrudan ele alınmıyor. Ancak UCP 600 Article 8 uyarınca, bir banka teyit verdiği takdirde, sunulan belgeler compliant (uygun) olduğu sürece ödeme yapma yükümlülüğü altına girer. Yani teyit, bankanın kendi risk değerlendirmesi sonucunda kabul ettiği bir taahhüttür.\n\nPratik olarak şunları deneyebilirsiniz:\n\n- Açan bankadan (issuing bank) akreditifin \"available with any bank\" veya \"available with confirming bank\" şartıyla düzenlenmesini talep edin, böylece teyit için başka bir banka seçme esnekliğiniz olur.\n- Kendi bankanız yerine, açan bankanın korrespondent ilişkisi olan başka bir bankaya teyit talebi iletin. Açan banka genellikle teyit için bir banka önerir.\n- Akreditif şartlarını (vade, tutar, ülke riski) gözden geçirin; bankanın teyit vermekten çekinmesine neden olan unsur bunlardan biri olabilir. Şartları hafifletmek teyit almayı kolaylaştırabilir.\n\nWhat still depends on your transaction: Açan bankanın ve muhatap bankanın ilişkisi, akreditifin tutarı, vadesi, malın cinsi ve ithalatçı ülke riski teyit alıp alamayacağınızı belirler. Bu konuda kesin bilgiyi doğrudan bankanızın trade finance departmanından almanız gerekir.",
+    "confidence": "medium",
+    "routing_tier": "sonnet",
+    "latency_ms": 46591,
+    "citations": [
+      "UCP 600 Art. 8-9",
+      "UCP 600 Art. 38",
+      "UCP 600 Art. 8",
+      "UCP 600 Art. 14",
+      "eUCP 2.1 EUCP21-e2A"
+    ],
+    "answer_nonascii": 80,
     "error": null
   },
   {
@@ -47,12 +65,18 @@
     "original": "İthalatçı, İhracatçı ile Yaşamış Olduğu Anlaşmazlık Neticesinde Akreditif Ödemesini Durdurabilir mi?",
     "english": "Can the importer stop LC payment over a dispute with the exporter?",
     "domain": "Autonomy principle",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
-    "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 11450,
-    "citations": [],
-    "answer_nonascii": 0,
+    "answer": "Hayır, ithalatçı akreditif ödemesini kendi başına durduramaz. Akreditifin temel ilkesi, kredinin altındaki ticari sözleşmeden bağımsız olmasıdır. İthalatçı ile ihracatçı arasındaki uyuşmazlık, bankanın ödeme yükümlülüğünü etkilemez. Banka sadece belgelere bakar ve belgeler akreditif şartlarına uygunsa ödeme yapar.\n\nAncak bu kuralın istisnaları vardır: İthalatçı, mahkemeden ihtiyati tedbir kararı alarak bankanın ödemesini durdurabilir. Bazı yargı bölgelerinde bu mümkündür ancak koşulları çok sıkıdır. Ayrıca, eğer belgelerde gerçek bir diskrepans (uygunsuzluk) varsa, banka zaten ödemeyi reddedebilir ve bu durum ithalatçının uyuşmazlıkla ilgisi olmaksızın gerçekleşir.\n\nEldeki kurallar arasında bu konuyu doğrudan düzenleyen bir madde bulunmuyor. UCP 600 Madde 1 [icc_core.lco_ucp600_letter_rules_v1, Article 1] yalnızca UCP'nin uygulama kapsamını tanımlıyor. Bağımsızlık ilkesi ve dolandırıcılık istisnası gibi konular UCP 600'ün diğer maddelerinde yer alır ancak bu maddeler şu anki kural setimde mevcut değil. Bu nedenle yukarıdaki açıklama genel ticari finans bilgisi olarak değerlendirilmelidir.\n\nWhat still depends on your transaction: Akreditifin belirli şartları (örneğin mahkeme kararıyla ödemenin durdurulabileceğine dair bir madde var mı?), hangi ülke hukukuna tabi olduğunuz ve bankanın kendi politikaları sonucu belirler. Hukuki bir uyuşmazlık söz konusu olduğundan, bir ticaret hukuku avukatına danışmanızı öneririm.",
+    "confidence": "high",
+    "routing_tier": "sonnet",
+    "latency_ms": 38584,
+    "citations": [
+      "UCP 600 Art. 1",
+      "eUCP 2.1 EUCP21-e2B",
+      "eUCP 2.1 EUCP21-e2A",
+      "eUCP 2.1 EUCP21-e2C",
+      "Icc Opinions Merged ICC-R824"
+    ],
+    "answer_nonascii": 116,
     "error": null
   },
   {
@@ -61,12 +85,18 @@
     "original": "Nakliyeci Konşimentoya Clean on Board Kaydı Eklemiyor? Rezerv Gelir mi?",
     "english": "The carrier won't add a \"clean on board\" notation to the B/L. Will it cause a discrepancy?",
     "domain": "Clean/on-board B/L (ISBP)",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
-    "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 10946,
-    "citations": [],
-    "answer_nonascii": 0,
+    "answer": "Evet, büyük ihtimalle rezerv gelir, ama iki konuyu ayırmak lazım: \"on board\" kaydı ve \"clean\" kaydı.\n\nOn board kaydı: UCP 600 Article 20(a)(ii)'ye göre konşimento, malların belirtilen yükleme limanında isimli bir gemiye yüklendiğini göstermelidir. Bu iki şekilde olabilir: (a) önceden basılı \"shipped on board\" ifadesi olan konşimento, veya (b) konşimento üzerine malların gemiye yüklendiği tarihi belirten bir on board notasyonu. Eğer konşimentonuz \"received for shipment\" formatındaysa ve nakliyeci on board notasyonu eklemiyorsa, bu açıkça bir rezilgandır [UCP600-20-DERIVED-001, icc_core.lco_ucp600_letter_rules_v1].\n\nClean kaydı: Erişebildiğim kurallar arasında \"clean on board\" ifadesinin \"clean\" kısmını doğrudan ele alan bir madde bulunmuyor. Genel trade finance bilgisine göre, UCP 600 Article 27 clean transport belgesini düzenler ve konşimentoda mal veya ambalajın kusurlu olduğunu belirten bir kloz varsa \"clean\" değildir. Ancak bu kural retrieved setimde yok, bu yüzden kesin olarak doğrulayamıyorum.\n\nPratik tavsiye: LC'niz Field 46A'da \"Clean on Board\" ifadesini açıkça istiyorsa ve nakliyeci bunu eklemiyorsa, banka rezil eder. Nakliyeciden derhal bu notasyonu eklemesini isteyin. Eğer konşimento önceden basılı \"shipped on board\" ise, ek notasyona gerek olmayabilir ama \"clean\" kelimesi LC'de geçiyorsa yine de eklenmesi en güvenli yoldur.\n\nWhat still depends on your transaction: LC'nin Field 46A'da tam olarak ne istediği, konşimentonun pre-printed \"shipped on board\" olup olmadığı, ve nakliyeci ile imzalama yetkisi olan kişinin kim olduğu.",
+    "confidence": "medium",
+    "routing_tier": "sonnet",
+    "latency_ms": 70505,
+    "citations": [
+      "UCP 600 Art. 20",
+      "Incoterms 2020 TOP-LIAB-009",
+      "UCP 600 Art. 20",
+      "UCP 600 Art. 22",
+      "UCP 600 Art. 20"
+    ],
+    "answer_nonascii": 66,
     "error": null
   },
   {
@@ -75,12 +105,18 @@
     "original": "Akreditif Altında Yüklemeden Önce Peşin Ödeme Almak Mümkün mü?",
     "english": "Is an advance payment before shipment possible under an LC? (red-clause)",
     "domain": "Red-clause LC",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
-    "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 10812,
-    "citations": [],
-    "answer_nonascii": 0,
+    "answer": "Evet, akreditif altında yüklemeden önce peşin ödeme (avans) almak mümkündür, ancak bunu iki ayrı yoldan düşünmek gerekiyor.\n\nBirincisi, ihracat finansmanı tarafı. Bankanızdan yükleme öncesi finansman (pre-shipment) alarak fiilen mal sevkinden önce nakit kullanabilirsiniz. Elinizdeki kurallara göre bunun temel dayanağı, tanınmış ve kredibilitesi olan bir alıcıdan gelen kesin (onaylı) satın alma siparişidir; satıcının bilançosu değil, bu sipariş asıl teminattır (scf.scf_inventory_preshipment_rules SCF-INV-002). İslami bankacılıkta aynı ihtiyaç Bai-Salam yapısıyla karşılanır: banka ihraç edilecek malın bir kısmını peşin ödeyerek satın alır, tahmini kârını fiyattan düşer ve tutarı ihracat bedelinden tahsil eder (m13.bb_islamic_banking M13-ISLB-05-046). Hindistan özelinde, PCFC ile yükleme öncesi döviz kredisi de alınabilir (country_rules.in_rbi_rules IN-RBI-022).\n\nİkincisi, belge/faturaya yansıması. Eğer alıcıdan doğrudan avans aldıysanız, akreditifte belirtilmemiş olsa bile faturada bir avans/iskonto düşümü göstermeniz ISBP 821 C8'e göre uyumsuzluk yaratmaz, bu izin verilen bir kalemdir (icc_core.lco_isbp821_letter_rules_v1 C8).\n\nBir uyarı: yeni veya tanınmayan bir karşı tarafa %100 peşin ödeme, ticari gerekçesi yoksa TBML açısından kırmızı bayrak sayılır (tbml.tbml_fatf_2021_risk_indicators TBML-FATF21-008). Gerekçenizi belgelemeye hazır olun.\n\nElimdeki kurallar akreditif metnindeki peşin ödeme (red clause / green clause) mekaniğinin ayrıntılarını kapsamıyor; bu kısmı doğrulayamıyorum.\n\nŞuna bağlı: bankanız, ülkeniz ve akreditifin peşin ödeme şartı içerip içermediği.",
+    "confidence": "medium",
+    "routing_tier": "opus",
+    "latency_ms": 35547,
+    "citations": [
+      "Bb Islamic Banking M13-ISLB-05-046",
+      "Scf Inventory Preshipment Rules SCF-INV-002",
+      "Tbml Fatf 2021 Risk Indicators TBML-FATF21-008",
+      "In Rbi Rules IN-RBI-022",
+      "ISBP 821 Para. C8"
+    ],
+    "answer_nonascii": 124,
     "error": null
   },
   {
@@ -89,12 +125,18 @@
     "original": "Akreditifli Ödemenin Vesaik Mukabili Ödemeden Farkları Nelerdir?",
     "english": "Differences between LC payment and documentary-collection (cash against documents) payment?",
     "domain": "LC vs URC 522 collection",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
-    "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 9591,
-    "citations": [],
-    "answer_nonascii": 0,
+    "answer": "Akreditifli ödeme (Letter of Credit) ile vesaik mukabili ödeme (Documentary Collection) arasındaki temel farklar şunlardır:\n\nAkreditifte banka ödeme taahhüdü verir. İhracatçı, şartlara uygun vesaik sunduğunda, ithalatçının ödeme yapıp yapmamasından bağımsız olarak bankadan ödeme alır. Banka \"documents, not goods\" preibiyle hareket eder, yani mallara değil belgelere bakar. Akreditifte bankalar, sunulan belgelerin LC şartlarına uygunluğunu sıkı şekilde kontrol eder; örneğin tutar, miktar, menşe gibi bilgiler LC ile çelişmemelidir [ISBP 821 Article A22, Article L7]. Ayrıca LC'de belge dili belirtilmişse, belgelerin o dilde olması gerekir [ISBP 821 Article A21(a)].\n\nVesaik mukabili ödemede ise banka yalnızca vekil (aracı) rolündedir. Banka bir ödeme taahhüdü vermez. İhracatçı, belgeleri banka kanalıyla ithalatçıya gönderur; ithalatçı ödeme yaptığında (D/P) veya ödeme vadini kabul ettiğinde (D/A) belgeler teslim edilir. İthalatçı ödeme yapmazsa, bankanın sorumluluğu yoktur. Risk tamamen ihracatçıdadır.\n\nÖzetle: akreditif banka taahhüdü üzerine kuruludur ve daha güvenlidir ama daha maliyetlidir. Vesaik mukabili ödeme daha az maliyetlidir ama ihracatçı için risk daha yüksektir.\n\nBu karşılaştırma genel ticari finans bilgisi çerçevesinde yapılmıştır. Vesaik mukabili ödemeleri düzenleyen URC 522 kuralları bu sorguda elde edilen belgeler arasında yer almıyor; detaylı URC 522 hükümleri için bankanızın tahsilat departmanına veya ticari finans danışmanınıza başvurman",
+    "confidence": "medium",
+    "routing_tier": "sonnet",
+    "latency_ms": 47876,
+    "citations": [
+      "Pop Urf800 Letter Rules Art. 5",
+      "ISBP 821 Para. A22",
+      "ISBP 821 Para. A21",
+      "ISBP 821 Para. L7",
+      "eUCP 2.1 EUCP21-e6B"
+    ],
+    "answer_nonascii": 107,
     "error": null
   },
   {
@@ -106,7 +148,7 @@
     "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
     "confidence": "low",
     "routing_tier": "fallback",
-    "latency_ms": 18237,
+    "latency_ms": 49691,
     "citations": [],
     "answer_nonascii": 0,
     "error": null
@@ -117,12 +159,18 @@
     "original": "Suriye ve Suudi Arabistan'a vadeli akreditifli ihracat yapan bir firmayız… bankalar teyitli akreditife teyit vermemek için elinden geldiği kadar çabalıyor.",
     "english": "We export on deferred LC to Syria and Saudi; banks try hard NOT to add confirmation.",
     "domain": "Confirmation refusal / sanctions-neighbour",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
+    "answer": "Yaşadığınız durumu anlıyorum, özellikle Suriye gibi yüksek riskli bir varış ülkesinde teyit bulmak gerçekten zor. Ancak dürüst olmak gerekirse, elimdeki kurallar sizin asıl sorunuzun kalbini tam olarak kapsamıyor, o yüzden neyi söyleyebileceğimi net ayırayım.\n\nTeyit mekaniğinin temel noktası: bir akreditifte teyit isteğinin nasıl iletildiği MT700 Field 49 üzerinden belirtilir; amir banka teyit talep edip etmediğini bu alanda gösterir (messaging.swift_mt700 MT700-49-001, ayrıca ISO 20022 tarafında ISO20022-TRAD-020). Yani teyit talimatının doğru şekilde \"MAY ADD\" veya \"CONFIRM\" olarak Field 49'da yer alması, teyit sürecinin ön koşuludur.\n\nAncak bankaların teyit vermekten kaçınmasının asıl nedeni, elimdeki kurallarda kapsanmıyor. Bir bankanın teyit ekleme zorunluluğu yoktur; teyit ticari bir karardır ve banka ülke/yaptırım/kontrpartör riskini kendi iştahına göre değerlendirir. Bu, retrieved kurallarda yer almadığı için genel rehberlik olarak belirtiyorum: özellikle Suriye kaynaklı yaptırım riski, çoğu bankanın teyit iştahını sıfıra indiren faktördür.\n\nWhat still depends on your transaction:\n- Field 49'da amir bankanın gerçekten \"MAY ADD\" mı yoksa \"CONFIRM\" mi belirttiği (bu, teyit bankasının hareket alanını belirler).\n- Amir banka ve varış ülkesinin spesifik yaptırım profili.\n- Teyit talep ettiğiniz bankanın Suriye/Suudi Arabistan risk politikası.\n\nYaptırım tarama ve teyit bankası bulma konusunda pratik destek için TRDR Hub (trdrhub.com) bu tür değerlendirmeleri yapan bir çalışma alanı sunuyor.",
     "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 9400,
-    "citations": [],
-    "answer_nonascii": 0,
+    "routing_tier": "opus",
+    "latency_ms": 39743,
+    "citations": [
+      "Tbml Fatf 2021 Additional Indicators TBML-FATF21-016",
+      "Gfet Vol1 M13-GFET-15-009",
+      "Swift Mt700 MT700-49-001",
+      "Iso20022 Trade ISO20022-TRAD-020",
+      "Scf Inventory Preshipment Rules SCF-INV-002"
+    ],
+    "answer_nonascii": 101,
     "error": null
   },
   {
@@ -131,12 +179,18 @@
     "original": "İran ambargo altında ve hiçbir ülke İranın akreditifini kabul etmiyor — Türk bankaları İran bankalarının akreditifini kabul eder mi?",
     "english": "Iran is under embargo and no country accepts Iran's LC — do Turkish banks accept LCs from Iranian banks?",
     "domain": "Sanctions / embargo routing",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
+    "answer": "Bu soruya net cevap veremem, çünkü elimdeki kurallar Türk bankalarının İran bankası akreditiflerini kabul edip etmeyeceğini doğrudan düzenlemiyor. Türkiye'nin İran'a yönelik ulusal yaptırım ve merkez bankası politikaları, muhabir banka (correspondent banking) ilişkileri ve her bankanın kendi iç uyum politikası bu kararı belirler, ve bunlar elimdeki kural setinde yok. Bu kısmı doğrulamak için ilgili Türk bankasının uyum birimine ve BDDK/TCMB düzenlemelerine başvurmanız gerekir.\n\nYine de elimdeki kurallardan söyleyebileceklerim:\n\n- Yaptırımlar akreditif zincirinin her noktasını etkiler. İhracat kredi kuruluşları ve ticari kredi sigortacıları (Euler Hermes, Coface, Atradius) yaptırımlı ülkelerden alacakları sigortalayamaz, yaptırımlı taraflara ödeme yapılamaz ve bloke edilir [sanctions.specialized_phase2b, Trade Credit Insurance]. Yani bir Türk bankası işlemi teknik olarak kabul etse bile, sigorta/reasürans veya USD muhabir bacağı işlemi durdurabilir.\n\n- Akreditiflerdeki yaptırım şartları konusunda ICC'nin duruşu şu: bankalar uygun ibrazı ödemek zorundadır, ancak yalnızca bağlayıcı yasa (mandatory law) ödemeyi yasakladığında bundan kaçınabilir [icc_opinions_phase2a, TA920rev]. Burada belirleyici olan, Türk hukukunun ve muhabir bankaların tabi olduğu yasaların İran işlemini yasaklayıp yasaklamadığıdır.\n\nİşleminize bağlı kalan hususlar: Hangi Türk bankası, işlem para birimi (özellikle USD ise OFAC riski), muhabir banka zinciri, malın niteliği ve İran bankasının SDN/yaptırım listesinde olup olmadığı.\n\nTam taraf taraması için TRDR Hub yaptırım tarama aracını kullanabilirsiniz.",
     "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 20276,
-    "citations": [],
-    "answer_nonascii": 0,
+    "routing_tier": "opus",
+    "latency_ms": 45260,
+    "citations": [
+      "ISBP 821 Para. B11",
+      "Specialized Phase2B Article Trade Credit Insurance",
+      "UCP 600 Art. 7",
+      "ISBP 821 Para. B12",
+      "UCP 600 Art. 7"
+    ],
+    "answer_nonascii": 114,
     "error": null
   },
   {
@@ -145,12 +199,18 @@
     "original": "¿La tolerancia es sobre el total o sobre la cifra remanente aún no utilizada?",
     "english": "Is the tolerance applied to the total credit amount or only the remaining unused balance?",
     "domain": "Tolerance (Art. 30)",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
+    "answer": "La tolerancia bajo UCP 600 se calcula sobre el monto total del crédito y la cantidad total, no sobre el saldo remanente después de un giro parcial. Es decir, si tu crédito es por USD 100,000 con tolerancia del ±10%, el rango permitido es USD 90,000 a USD 110,000 sobre el total, no sobre lo que quede sin utilizar tras un primer giro.\n\nLas reglas que tengo recuperadas confirman que UCP 600 Artículos 29-32 cubren tolerancias y giros parciales como temas distintos [icc_core.ucp600_examination_remaining_articles_depth_2a_r119, Artículos 29-32], y que la Opinión ICC-R815 aborda cuándo aplica la tolerancia de ±5% en cantidad [opinions.icc_opinions_key, ICC-R815]. También hay una regla sobre preservar el monto residual disponible tras giros parciales [payments.residual_available_amount_rules, RESID-001], pero esa es una regla de motor de pagos, no una regla UCP 600.\n\nLo que las reglas recuperadas no explicitan es el cálculo exacto de tolerancia sobre saldo remanente en escenarios de giros parciales múltiples. Mi guía general, basada en práctica bancaria, es que cada presentación parcial se evalúa contra los límites del crédito total, no contra el saldo. Pero conviene confirmarlo con tu banco negociador para tu caso específico.\n\nWhat still depends on your transaction: si tu LC permite giros parciales, qué tolerancia específica está estipulada en el Campo 39A/39B, y si hay cantidades o montos adicionales con tolerancias distintas.",
     "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 13281,
-    "citations": [],
-    "answer_nonascii": 0,
+    "routing_tier": "sonnet",
+    "latency_ms": 119514,
+    "citations": [
+      "Residual Available Amount Rules RESID-001",
+      "UCP 600 Art. 38",
+      "UCP 600 Art. 29-32",
+      "Icc Opinions Key ICC-R815",
+      "Multiple Partial Demand Rules GOP-MULTI-002"
+    ],
+    "answer_nonascii": 22,
     "error": null
   },
   {
@@ -159,12 +219,18 @@
     "original": "\"BLANCO\" como parte del nombre del producto, no traducible",
     "english": "LC requires English docs; invoice shows an untranslatable Spanish product model name — discrepancy?",
     "domain": "Language condition / ISBP",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
-    "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 10706,
-    "citations": [],
-    "answer_nonascii": 0,
+    "answer": "Si \"BLANCO\" forma parte del nombre propio del producto tal como aparece en el crédito (por ejemplo, un nombre comercial o de marca), debe reproducirse exactamente igual en la factura comercial, sin traducirlo. La factura tiene que corresponder con la descripción de la mercancía del crédito, y \"corresponder\" significa que no puede contradecirla (icc_core.isbp821_delta_doctypes_v1, ISBP821-DELTA-INVOICE-GOODS-001, con base en UCP 600 Art. 18(c)). Traducir \"BLANCO\" por \"WHITE\" u otra forma en la factura crearía una discrepancia respecto a la descripción del LC.\n\nPuntos prácticos:\n\n- En la factura comercial, transcribe el nombre del producto letra por letra como figura en el campo 45A del crédito, incluyendo \"BLANCO\". La factura debe usar la descripción exacta del LC (icc_core.lco_ucp600_letter_rules_v1, Artículo 18).\n- Puedes añadir detalles adicionales (tamaños de embalaje, números de modelo, dimensiones) siempre que no contradigan la descripción del crédito (icc_core.isbp821_delta_doctypes_v1, ISBP821-DELTA-INVOICE-GOODS-001).\n- En otros documentos (por ejemplo, certificado de origen o conocimiento de embarque) basta con una descripción general que no entre en conflicto con el LC, y esa descripción debe ser consistente con la factura (crossdoc.lcopilot_crossdoc, CROSSDOC-COO-LC-3).\n\nLo que aún depende de tu operación: necesito ver el texto exacto del campo 45A del crédito para confirmar cómo aparece \"BLANCO\" y si es parte de un nombre propio o un mero atributo descriptivo. Eso determina la reproducción exacta requerida.",
+    "confidence": "medium",
+    "routing_tier": "opus",
+    "latency_ms": 39668,
+    "citations": [
+      "ISBP 821 ISBP821-DELTA-INVOICE-GOODS-001",
+      "Lcopilot Crossdoc CROSSDOC-INV-LC-3",
+      "Lcopilot Crossdoc CROSSDOC-COO-LC-3",
+      "UCP 600 Art. 18",
+      "Tbml Invoice Pricing Anomaly Depth TBML-OVER-003"
+    ],
+    "answer_nonascii": 22,
     "error": null
   },
   {
@@ -173,12 +239,18 @@
     "original": "Cobro de intereses de demora por retraso en el pago de una carta de crédito",
     "english": "On a deferred credit paid late, may banks charge default interest, and can FX/tax costs be shifted?",
     "domain": "Deferred payment / late payment",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
-    "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 19560,
-    "citations": [],
-    "answer_nonascii": 0,
+    "answer": "El cobro de intereses de demora por retraso en el pago de una carta de crédito es una práctica común en la banca comercial convencional, pero las reglas que tengo disponibles solo cubren parte del tema.\n\nLo que sí puedo confirmarte:\n\n- En el contexto de cartas de crédito islámicas, está prohibido incluir cláusulas de interés convencional (riba) por pago atrasado. En su lugar, se utiliza una estructura Murabaha con un margen fijo, sin interés [ISF-LC-001, islamic.isf_trade_products].\n- La Opinión R887 de la ICC establece que incluir términos de pago adicionales en la factura comercial que no coincidan exactamente con los de la carta de crédito no genera automáticamente una discrepancia, siempre que el lenguaje no entre en conflicto con los términos del crédito [ICC-OP-R887, Art. UCP 600 Art 14, Art 18].\n- En el ámbito de créditos de compradores (buyers' credit) bajo ciertas regulaciones locales, la tasa de interés está limitada al 6% anual [M13-GFET-07-039, m13.gfet_vol1].\n\nLo que no está cubierto en mis reglas: el UCP 600 no regula expresamente el cobro de intereses por demora en un LC convencional. Esto depende normalmente de lo que el LC establezca en sus campos 47A (condiciones adicionales) o de acuerdos entre las partes. Si el LC no contempla una cláusula de intereses por mora, el banco no puede deducirlos unilateralmente.\n\nWhat still depends on your transaction: los términos exactos del LC (especialmente campos 47A/78), la jurisdicción del banco emisor, y si el LC es convencional o islámico. Revisa el texto del crédito con tu banco confirmador o asesor de comercio exterior.",
+    "confidence": "medium",
+    "routing_tier": "sonnet",
+    "latency_ms": 31635,
+    "citations": [
+      "Isf Trade Products ISF-LC-001",
+      "Gfet Vol1 M13-GFET-07-039",
+      "UCP 600 Art. 14",
+      "Gfet Vol1 M13-GFET-15-009",
+      "Uk Ofsi Guidance uk-ofsi-guidance#6.1~r1"
+    ],
+    "answer_nonascii": 26,
     "error": null
   },
   {
@@ -187,12 +259,18 @@
     "original": "Aceptación o rechazo de una modificación a través de una presentación conforme o no conforme con los términos de dicha modificación",
     "english": "Is presenting docs conforming to the original (not the amendment) a rejection of the amendment?",
     "domain": "Amendments (Art. 10(c))",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
-    "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 11903,
-    "citations": [],
-    "answer_nonascii": 0,
+    "answer": "La aceptación de una modificación puede ser expresa o implícita mediante la presentación de documentos. Si el beneficiario presenta documentos que se ajustan claramente a los términos modificados, esa conducta puede respaldar una aceptación inferida de la modificación [ICC-OP-R833, LIFE-AMDINF-001]. Por el contrario, si presenta conforme a los términos originales sin acoger la modificación, eso evidencia rechazo tácito de la misma.\n\nPuntos clave que debes tener presentes:\n\n- El silencio no es aceptación. La falta de respuesta del beneficiario no convierte automáticamente la modificación en operativa [ICC-OP-R833, LIFE-AMDINF-002, ISBP821-DELTA-AMENDMENT-001 citando UCP 600 Art 10(c)]. La recepción de la modificación genera un estado pendiente hasta que la postura del beneficiario se conozca o se infiera operativamente [LIFE-AMD-001].\n- No se pueden elegir términos parciales. La aceptación parcial de una modificación se trata como rechazo de toda la modificación [ISBP821-DELTA-AMENDMENT-001 citando UCP 600 Art 10(e)]. No es posible quedarse solo con los cambios favorables.\n- La presentación alineada con los términos modificados es la forma más clara de aceptación implícita. Si embarcas y presentas documentos que reflejan los nuevos términos, eso respalda una postura de aceptación basada en conducta [LIFE-AMDINF-001].\n\nEn resumen: una presentación conforme a la modificación puede inferir aceptación; una presentación conforme a los términos originales puede inferir rechazo; y el silencio puro nunca equivale a aceptación.\n\nWhat still depends on your transaction: los términos exactos de la modificación, si el crédito está confirmado (el banco confirmador también debe consentir), y las prácticas específicas del banco emisor respecto a cómo interpreta la aceptación por conducta.",
+    "confidence": "medium",
+    "routing_tier": "sonnet",
+    "latency_ms": 27750,
+    "citations": [
+      "Amendment Acceptance Inference Rules LIFE-AMDINF-001",
+      "Lc Amendment Rules LIFE-AMD-001",
+      "Icc Opinions Merged ICC-OP-R833",
+      "ISBP 821 ISBP821-DELTA-AMENDMENT-001",
+      "Amendment Acceptance Inference Rules LIFE-AMDINF-002"
+    ],
+    "answer_nonascii": 41,
     "error": null
   },
   {
@@ -201,18 +279,18 @@
     "original": "Suspensión pago garantía a primer requerimiento pendiente de medida cautelar",
     "english": "Can a bank refuse a first-demand guarantee (URDG 758) under a court order suspending payment?",
     "domain": "Demand guarantee / injunction",
-    "answer": "Las reglas que tengo disponibles no cubren este tema. Los resultados recuperados tratan sobre warrants de metales en LME, oro LBMA y compliance de metales preciosos, nada relacionado con garantías a primer requerimiento ni medidas cautelares.\n\nLo que puedo decirte como orientación general (no basada en las reglas recuperadas, sino en conocimiento general de finanzas de comercio):\n\nBajo los principios de independencia de las garantías a primer requerimiento (reglas tipo URDG 758), el garante debe pagar frente a un requerimiento conforme, sin que lo detengan disputas sobre el contrato subyacente. Sin embargo, en la práctica, si un tribunal emite una medida cautelar ordenando al banco garante suspender el pago, normalmente por presunto fraude manifiesto o abuso evidente, el banco debe acatarla. La excepción de fraude es prácticamente la única que los tribunales reconocen para frenar el pago de una garantía independiente.\n\nAlgunos puntos clave a tener en cuenta:\n\n- La medida cautelar suele ser provisional y reversible. El tribunal puede exigir caución al solicitante para compensar daños si la orden resulta infundada.\n- El banco garante no puede decidir por sí mismo suspender el pago por dudas sobre el contrato base. Necesita la orden judicial o, en algunos regímenes, una orden de la autoridad competente.\n- La jurisdicción del tribunal y la ley aplicable a la garantía son determinantes. Algunos países son más proclives a conceder estas medidas que otros.\n\nWhat still depends on your transaction: la ley que rige la garantía, el foro judicial competente, los motivos invocados para la medida cautelar, y si el garante ya recibió el requerimiento de pago o no. Te recomiendo consultar con un abogado especializado en la jurisdicción correspondiente, porque esto es una cuestión legal, no solo de reglas bancarias.",
-    "confidence": "low",
+    "answer": "La suspensión del pago de una garantía a primer requerimiento por una medida cautelar es un tema que las reglas URDG 758 que tengo disponibles no cubren de forma específica. Lo que sí puedo confirmarte es lo siguiente:\n\nBajo URDG 758 Artículo 4 [GOP-URDG-003, Article 4], una garantía a primer requerimiento es irrevocable desde su emisión, a menos que se indique expresamente lo contrario. Esto significa que el garante no puede suspender unilateralmente el pago. Si la garantía está sujeta a URDG 758 [GOP-URDG-001, Article 1], el principio de independencia (Artículo 5) establece que la garantía es independiente de la relación subyacente, lo que en principio protege al beneficiario frente a intentos del ordenante de bloquear el pago basándose en disputas contractuales.\n\nSin embargo, el problema real aquí es jurisdiccional, no normativo. Una medida cautelar emitida por un tribunal competente puede ordenar al banco garante suspender el pago, y el banco generalmente debe cumplir con una orden judicial válida de su jurisdicción, incluso si ello contradice el principio de independencia de URDG 758. Las reglas ICC no prevalecen sobre el derecho imperativo local.\n\nLas reglas que tengo no cubren: el procedimiento para oponerse a la medida cautelar, los plazos legales para levantarla, ni las diferencias entre jurisdicciones sobre si los tribunales pueden o no bloquear pagos bajo garantías independientes. Esto depende enteramente de la ley aplicable a la garantía y del tribunal que emitió la medida.\n\nWhat still depends on your transaction: la ley aplicable (governing law) de la garantía, la jurisdicción del tribunal que dictó la medida cautelar, y si el banco ha recibido formalmente la orden judicial. Debes consultar urgentemente con un abogado especializado en",
+    "confidence": "medium",
     "routing_tier": "sonnet",
-    "latency_ms": 34960,
+    "latency_ms": 65859,
     "citations": [
-      "Lme Precious Metals Depth 4A COMMODITIES-LME-WARRANT-RUSSIAN-METAL-WARRANT-FRAUD-001",
-      "Exchange Warrants Commodity Finance 4A COMMODITIES-LME-WAREHOUSE-WARRANT-REFORMS-001",
-      "Lme Precious Metals Depth 4A COMMODITIES-LBMA-RGG-STEP5-RUSSIAN-REFINER-SUSPENSIONS-001",
-      "Lme Precious Metals Depth 4A COMMODITIES-LMECLEAR-2022-NICKEL-CRISIS-POST-MORTEM-001",
-      "Lme Precious Metals Depth 4A COMMODITIES-PRECIOUS-METALS-COMPLIANCE-PLAYBOOK-2023-PERTH-MINT-001"
+      "URDG 758 Art. 4-5",
+      "URDG 758 Art. 4",
+      "URDG 758 Art. 1",
+      "URDG 758 Art. 33",
+      "ICC Model Forms Pub. 800A"
     ],
-    "answer_nonascii": 20,
+    "answer_nonascii": 22,
     "error": null
   },
   {
@@ -221,18 +299,18 @@
     "original": "SWIFT, DAP, período para fecha límite de embarque y embarque prematuro",
     "english": "44D shipment period vs early loading under DAP — is early loading a discrepancy?",
     "domain": "Shipment period / Incoterms",
-    "answer": "Las reglas que tengo disponibles no cubren tu consulta. Los resultados recuperados se refieren exclusivamente a la migración de SWIFT MT a MX (ISO 20022) con corte final el 22 de noviembre de 2025, y a temas de pagos transfronterizos como FATF Recomendación 16 y sistemas RTGS. No contienen nada sobre Incoterms DAP, plazos para fecha límite de embarque, ni embarque prematuro bajo UCP 600.\n\nComo orientación general (no basada en las reglas recuperadas): bajo UCP 600, si el crédito no especifica una fecha límite de embarque, no hay restricción al respecto más allá del período de vigencia del crédito. Sobre el embarque prematuro, la práctica bancaria generalmente permite embarcar antes de la fecha de emisión del crédito siempre que los documentos se presenten dentro del período de vigencia y del plazo de presentación aplicable. El Incoterm DAP define la transferencia de riesgo y costos pero no afecta directamente el cumplimiento documental del crédito a menos que esté incorporado en los términos del LC (campo 45A o 46A).\n\nPara una respuesta precisa necesito consultar las reglas de UCP 600 e ISBP 821, que no están en el conjunto recuperado de esta consulta.\n\nWhat still depends on your transaction: si el DAP está en el texto del LC o solo en el contrato de compraventa, si el crédito fija una fecha límite de embarque explícita, y qué dice el campo 44C o 44D del MT700.",
+    "answer": "La fecha límite de embarque (latest shipment date) en un crédito documentario transmitido por SWIFT MT700 va en el campo 44C, y debe ser igual o anterior a la fecha de vencimiento (campo 31D) [messaging.swift_mt700, MT700-EXPIRY-SHIPMENT-001]. Lo mismo aplica en mensajes ISO 20022: la fecha de embarque debe ser on or before la fecha de expiración [messaging.iso20022_trade, ISO20022-TRAD-015].\n\nSobre el embarque prematuro (embarcar antes de la fecha límite), las reglas que tengo no cubren específicamente ese punto. En general, bajo UCP 600 no hay prohibición de embarcar antes del latest shipment date, pero eso es conocimiento general de finanzas de comercio, no está en las reglas recuperadas. Si el crédito no prohíbe embarques anticipados, embarcar antes debería ser aceptable. Sin embargo, conviene revisar el texto exacto del LC, porque algunos créditos restringen el período de embarque con fechas específicas o ventanas.\n\nSobre DAP (Delivered at Place, Incoterms 2020), las reglas recuperadas no abordan Incoterms ni cómo DAP afecta la fecha de embarque. DAP es un término que define la transferencia de riesgo y costos, no las fechas del LC per se. La interacción entre DAP y las fechas depende de cómo esté redactado el crédito.\n\nWhat still depends on your transaction: si el Incoterm DAP está incorporado en el texto del LC (campo 45A) o solo en el contrato de compraventa; si el LC permite embarques anticipados o establece una ventana de fechas; y si hay instrucciones específicas del banco emisor sobre tolerancias de fecha.",
     "confidence": "low",
     "routing_tier": "sonnet",
-    "latency_ms": 52124,
+    "latency_ms": 32113,
     "citations": [
-      "Swift Mx Iso20022 Sr2023 Nov 2025 Cutover ELECTRONIC-TRADE-HOUSE-COMPLIANCE-PLAYBOOK-SWIFT-MX-FATF-REC-16-EU-IP-REG-NEXUS-MBRIDGE-AGORA-9-STEP-001",
-      "Swift Mx Iso20022 Sr2023 Nov 2025 Cutover ELECTRONIC-SWIFT-MX-ISO-20022-SR2023-MT-TO-MX-MIGRATION-NOV-2025-CUTOVER-COEXISTENCE-MAR-2023-001",
-      "Swift Mx Sr2025 Cutover Fatf R16 Eu Ip Bis Nexus ELECTRONIC-SWIFT-MX-SR2025-22-NOV-2025-FINAL-CUTOVER-END-OF-MT-MX-COEXISTENCE-CBPR-PLUS-FINPLUS-MT-CATEGORY-1-2-9-DECOMMISSIONED-001",
-      "Digital Trade Followup 4A DIGITAL-TRADE-ISO-20022-SWIFT-MX-SR2023-FATF-REC-16-PROJECT-NEXUS-MBRIDGE-001",
-      "Swift Mx Sr2025 Cutover Fatf R16 Eu Ip Bis Nexus ELECTRONIC-RTGS-DOMESTIC-HIGH-VALUE-PAYMENT-SYSTEMS-ISO-20022-MIGRATION-T2-FEDWIRE-14-JUL-2025-CHAPS-CHIPS-HVPS-PLUS-HARMONISATION-001"
+      "Iso20022 Trade ISO20022-TRAD-015",
+      "Swift Mt700 MT700-EXPIRY-SHIPMENT-001",
+      "Lc Amendment Subtypes LIFE-AMD2-003",
+      "UCP 600 Art. 38",
+      "UCP 600 Art. 6"
     ],
-    "answer_nonascii": 25,
+    "answer_nonascii": 21,
     "error": null
   },
   {
@@ -241,14 +319,18 @@
     "original": "¿Detallar en la factura quién asume el THC puede ser discrepancia?",
     "english": "Under a CFR credit, is an invoice line \"THC destination EUR 260\" a discrepancy?",
     "domain": "Invoice charges / Incoterms",
-    "answer": "Sí, puede ser discrepancia, pero depende de cómo esté redactado el crédito y qué exija exactamente. Te explico desde la práctica bancaria.\n\nBajo UCP 600 Artículo 18(c), la descripción de las mercancías en la factura debe corresponder con la del crédito, pero la factura puede incluir datos adicionales que no contradigan los términos del LC. Si el crédito no menciona nada sobre THC y tú agregas una línea indicando quién las asume, eso normalmente se considera información adicional permitida. El problema surge cuando el Incoterms del crédito ya define quién asume esos costos (por ejemplo, CIF o CFR implica que el vendedor cubre flete hasta destino, pero no necesariamente THC del puerto de destino), y tu factura dice algo que contradice o crea ambigüedad sobre esa asignación. Ahí el banco puede levantar discrepancia por conflicto aparente con los términos del crédito.\n\nLo que recomiendo: Si el crédito no pide desglose de THC, lo más seguro es no incluirlo. Si necesitas incluirlo por requisitos fiscales o comerciales, asegúrate de que sea consistente con el Incoterms declarado en el LC.\n\nNota: Las reglas que recuperé de mi base de datos no cubren este tema específicamente (solo tengo una regla sobre facturación electrónica Peppol/ViDA). Esta respuesta se basa en conocimiento general de UCP 600 e ISBP 821. Para una opinión definitiva sobre tu caso, revisa el texto exacto de tu Field 45A y 46A con tu banco asesor.\n\nWhat still depends on your transaction: el texto exacto del crédito (Fields 45A, 46A), el Incoterms declarado, y si el banco emisor tiene políticas internas más estrictas sobre desgloses de costos en factura.",
-    "confidence": "low",
-    "routing_tier": "sonnet",
-    "latency_ms": 16639,
+    "answer": "Detallar en la factura quién asume el THC (Terminal Handling Charges) normalmente no genera discrepancia por sí mismo, siempre que ese dato no contradiga los términos del crédito. Es información adicional, y la factura puede incluir datos extra mientras no entren en conflicto con la LC.\n\nAhora bien, tengo que ser honesto sobre el alcance: las reglas que tengo aquí no cubren específicamente el tratamiento del THC ni de cargos accesorios en la factura comercial. Lo que sí puedo decirte con base en las reglas disponibles:\n\n- Si la LC exige un dato concreto en la factura y este difiere, ahí sí hay discrepancia. Es el principio que ilustra DOCDEX-309: un elemento solo se vuelve discrepancia si el crédito lo requiere expresamente y luego no coincide. Aplicado a tu caso: si tu LC pide que se detalle el THC o el reparto de gastos de una forma determinada, y tu factura dice otra cosa, eso sería discrepancia. Si la LC no dice nada al respecto, detallarlo es simplemente información adicional.\n- Cuidado con el importe: si al incluir el THC el total facturado o el precio no cuadra con lo que el crédito autoriza o con otros documentos, ahí sí puede haber problema. El principio de coherencia entre documentos aparece en TBML-OVER-003.\n\nLo que aún depende de tu transacción: qué dice exactamente el campo 46A / 45A de tu LC sobre el precio, los Incoterms pactados, y si el crédito exige o no un desglose de cargos. Sin ese texto no puedo confirmarlo al 100%.\n\nSi quieres una validación completa del cruce factura vs LC, TRDR Hub (trdrhub.com) hace ese chequeo documento por documento.",
+    "confidence": "medium",
+    "routing_tier": "opus",
+    "latency_ms": 33934,
     "citations": [
-      "Digital Trade Depth 4A DIGITAL-TRADE-EINVOICING-PEPPOL-VIDA-001"
+      "ICC DOCDEX DOCDEX-309",
+      "Tbml Invoice Pricing Anomaly Depth TBML-OVER-003",
+      "UCP 600 Art. 18",
+      "UCP 600 Art. 18",
+      "Tbml Repeated Discrepancy Pattern Rules TBML-DISC-001"
     ],
-    "answer_nonascii": 34,
+    "answer_nonascii": 21,
     "error": null
   },
   {
@@ -257,15 +339,18 @@
     "original": "Archivo de documentos sin localizador de operación",
     "english": "Docs arrived by courier with no LC reference; months later applicant claims them — must the bank honour?",
     "domain": "Presentation identification",
-    "answer": "Las reglas que tengo disponibles no cubren específicamente el archivo de documentos sin un localizador o número de referencia de operación. Esto es más bien una cuestión de procedimiento interno del banco o del operador de comercio, no algo regulado por las publicaciones de la ICC.\n\nLo que sí puedo decirte desde conocimiento general de trade finance (no respaldado por las reglas recuperadas): en la práctica bancaria, todo conjunto documental presentado bajo un crédito documental o cobranza debe vincularse a una referencia única, ya sea el número de LC, el número de remesa, o un identificador interno del banco. Archivar documentos sin localizador dificulta la trazabilidad, la auditoría y cualquier reclamación posterior. Si estás en España, la normativa AML de SEPBLAC requiere reportes de trade finance, y sin un localizador de operación sería prácticamente imposible cumplir con esos reportes de manera trazable [country_rules.depth_phase2c_r2, COUNTRY-ES-002]. Además, si los documentos incluyen un DUA para aduanas (AEAT), ese DUA mismo genera un número de referencia que debería servir como localizador mínimo.\n\nEn el contexto de facturación electrónica, redes como Peppol requieren identificadores estructurados de emisor y receptor, lo que implica que cada transacción queda vinculada a referencias identificables [electronic.digital_trade_depth_4a, DIGITAL-TRADE-EINVOICING-PEPPOL-VIDA-001].\n\nWhat still depends on your transaction: el contexto exacto importa. ¿Es archivo físico o digital? ¿Es para cumplimiento bancario, aduanero, o interno de la empresa? ¿En qué jurisdicción específica? Cada uno puede tener requisitos distintos de retención y trazabilidad.",
+    "answer": "Archivar documentos sin un localizador de operación es aceptable siempre que puedas recuperarlos de forma fiable cuando se necesiten. Lo esencial no es dónde ni cómo los guardas, sino que exista un procedimiento que permita reproducirlos y localizarlos sin demora indebida (m13.bfiu-aml-banks #7.9~r2). Es decir, no estás obligado a conservar cada documento en la sucursal: un archivo central o el almacenamiento electrónico son válidos, pero el mecanismo de búsqueda y recuperación tiene que ser sólido.\n\nUn par de puntos concretos que sí están cubiertos por las reglas que manejo:\n\n- Fiabilidad del sistema, no del localizador: aunque no uses un identificador de operación, tus políticas de manejo documental deben estar bien documentadas y comunicadas al personal correspondiente, sobre todo si trabajas con tecnología de alto volumen de transacciones (m13.dos_rmg_2018 M13-RMG-04-015).\n- Retención mínima: los documentos de comercio (LC, BL, facturas, certificados) y los registros de debida diligencia deben conservarse al menos 5 años desde la finalización de la operación (tbml TBML-RECORD-001). Para clientes ocasionales o walk-in, también 5 años desde la fecha de la transacción (m13.bfiu-aml-banks #7.3~r1).\n\nLo que sí te recomiendo: aunque no haya un localizador formal, define algún criterio de indexación (fecha, contraparte, tipo de documento) para cumplir el estándar de recuperación \"sin demora indebida\".\n\nWhat still depends on your transaction: la jurisdicción exacta que te aplica y si eres un banco o un exportador cambian el marco regulatorio de referencia; las reglas que tengo son principalmente de Bangladesh (BFIU) más el estándar TBML/FATF general.",
     "confidence": "low",
-    "routing_tier": "sonnet",
-    "latency_ms": 36828,
+    "routing_tier": "opus",
+    "latency_ms": 57815,
     "citations": [
-      "Depth Phase2C R2 COUNTRY-ES-002",
-      "Digital Trade Depth 4A DIGITAL-TRADE-EINVOICING-PEPPOL-VIDA-001"
+      "Bfiu Aml Banks bfiu-aml-banks#7.9~r2",
+      "Dos Rmg 2018 M13-RMG-04-015",
+      "Tbml Str Sar Sector Specific Depth TBML-RECORD-001",
+      "Bfiu Aml Banks bfiu-aml-banks#7.3~r1",
+      "Brpd Agent Banking brpd-agent-banking#16~r9"
     ],
-    "answer_nonascii": 33,
+    "answer_nonascii": 30,
     "error": null
   },
   {
@@ -274,12 +359,18 @@
     "original": "\"电放\"会有无单放货的风险吗？",
     "english": "Does \"telex release\" carry a risk of delivery without documents?",
     "domain": "Telex release / misdelivery",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
+    "answer": "电放本身和\"无单放货\"是两个不同的概念，但确实存在关联风险，需要区分来看。\n\n电放（Telex Release） 是托运人主动将正本提单交回承运人（或根本不要求签发正本），由承运人通知目的港代理凭收货人身份放货。这是一种经授权的流程，本身不等于无单放货。无单放货 通常指承运人在未收回正本提单、也未获得托运人明确指示的情况下，擅自将货物放给提货人，这属于违约甚至侵权行为。\n\n所以，电放的风险不在于\"无单放货\"本身，而在于：\n\n- 信用证项下：如果 LC 要求提交正本提单（UCP 600 Article 20 涵盖的海运提单），电放意味着没有正本提单可以交单，银行会拒付。电放和信用证在大多数情况下是不兼容的。\n- 货权控制风险：电放后，收货人无需正本提单即可提货，托运人在收到货款之前就丧失了对货物的物权控制。如果买方未付款，你将没有单据作为筹码。\n- 承运人操作风险：偶尔会出现承运人代理在电放指令尚未确认时就放货的情况，这就变成了事实上的无单放货。\n\n我检索到的规则（UCP 600 Article 20、Article 22、ICC-TA890、URDTT eBL 条款、ICC-R814）均未专门涉及电放这一操作模式。以上关于电放机制和风险的分析属于一般贸易实务知识，非直接引自上述规则。\n\nWhat still depends on your transaction: 你是在信用证项下还是托收/赊销项下出货？付款方式是什么？承运人是谁？这些因素决定了电放对你风险的大小。",
     "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 8747,
-    "citations": [],
-    "answer_nonascii": 0,
+    "routing_tier": "sonnet",
+    "latency_ms": 37376,
+    "citations": [
+      "UCP 600 Art. 20",
+      "Icc Opinions Key ICC-TA890",
+      "Lco Urdtt Letter Rules Article EBL",
+      "UCP 600 Art. 22",
+      "Icc Opinions Merged ICC-R814"
+    ],
+    "answer_nonascii": 487,
     "error": null
   },
   {
@@ -288,12 +379,18 @@
     "original": "电放提单的操作过程，要注意哪些问题？",
     "english": "In the telex-release B/L process, what issues need watching?",
     "domain": "Telex release procedure",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
+    "answer": "电放提单（Telex Release）是海运实务中常见的操作，但我需要先说明：我目前检索到的规则库中没有专门针对电放提单操作的条款。检索到的规则主要涉及UCP600第20条（提单一般要求）、URDTT电子提单条款以及ICC Opinion TA890（eUCP下可接受的电子提单平台），这些都不等同于电放提单。以下内容属于一般贸易实务指引，非来自检索规则。\n\n电放的核心风险点：\n\n- 信用证场景下基本不可用。 UCP600第20条要求提交正本提单，电放提单本质上是无正本放货，银行无法据此交单议付。如果信用证要求提单，电放会导致不符点。\n- 货权风险。 电放后收货人无需正本提单即可提货，发货人失去对货物的控制。务必在收到全额付款后再申请电放。\n- 与电子提单（eBL）的区别。 电放不是电子提单。URDTT Article EBL和ICC TA890讨论的是功能等同于纸质提单的电子提单平台，而电放是承运人在目的港凭电讯通知放货，两者法律性质不同。\n\nWhat still depends on your transaction: 是否涉及信用证、买方信用状况、承运人对电放的具体流程要求，以及目的港海关是否接受电放提单作为清关文件。如果涉及LC交单，建议与开证行确认是否接受电放安排。",
     "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 11275,
-    "citations": [],
-    "answer_nonascii": 0,
+    "routing_tier": "sonnet",
+    "latency_ms": 23420,
+    "citations": [
+      "UCP 600 Art. 20",
+      "Lco Urdtt Letter Rules Article EBL",
+      "Gfet Vol1 M13-GFET-07-047",
+      "UCP 600 Art. 20",
+      "Icc Opinions Merged ICC-TA890"
+    ],
+    "answer_nonascii": 402,
     "error": null
   },
   {
@@ -302,12 +399,18 @@
     "original": "外商无需提单即可提货？提单电放，该给谁？",
     "english": "A foreign buyer can collect cargo without a B/L? Telex release — who should it go to?",
     "domain": "Telex release / title",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
-    "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 19216,
-    "citations": [],
-    "answer_nonascii": 0,
+    "answer": "提单电放和\"无单放货\"属于海运实务和承运人法律关系范畴，我手头的ICC规则（UCP 600第20条提单规则、第22条租船提单规则、URDTT电子提单要求等）主要规范信用证下银行如何审核提单，并不直接涵盖电放操作和无单放货问题。以下是基于一般贸易实务的说明，非来自上述规则：\n\n电放（Telex Release）：船公司在装货港收回正本提单后，电告卸货港代理凭身份放货，不再需要正本提单。电放提单上通常标注\"Surrendered\"或\"Telex Release\"。电放指示一般由托运人（Shipper）向船公司提出，船公司确认后通知卸货港代理。收货人凭身份证明提货，无需正本提单。\n\n无单放货的风险：如果信用证要求提交正本提单（Field 46A要求全套正本B/L），而实际做了电放，银行在审单时会发现没有正本提单可交，构成不符点。UCP 600第20条要求提单必须看似由承运人或其代理人出具并签署，电放提单能否满足这一要求取决于具体格式和银行判断。\n\nWhat still depends on your transaction: 是否有信用证在途、LC Field 46A对提单的具体要求、船公司的电放流程、目的港法律对无单放货的规定。如果涉及LC付款，强烈建议在电放前与开证行和交单行确认。",
+    "confidence": "medium",
+    "routing_tier": "sonnet",
+    "latency_ms": 51829,
+    "citations": [
+      "UCP 600 Art. 20",
+      "Lco Urdtt Letter Rules Article EBL",
+      "UCP 600 Art. 20",
+      "ICC DOCDEX DOCDEX-312",
+      "UCP 600 Art. 22"
+    ],
+    "answer_nonascii": 398,
     "error": null
   },
   {
@@ -316,12 +419,18 @@
     "original": "信用证软条款有哪些？如何防范？",
     "english": "What are LC \"soft clauses\" (软条款) and how do I guard against them?",
     "domain": "Non-documentary/soft clauses (Art. 14(h))",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
+    "answer": "信用证软条款（soft clauses）是指信用证中那些使受益人无法独立控制交单条件的条款，实质上让开证申请人掌握了付款的主动权。我检索到的规则中没有专门针对软条款的系统性规定，以下内容属于一般贸易融资实务知识，请结合你的具体信用证条款判断。\n\n常见的软条款类型包括：\n\n- 检验条款：要求提交由申请人指定人员签字的检验证书，而该签字样本不在银行控制范围内。\n- 装运条款：装运日期、港口或船名需由申请人另行通知，受益人无法自主安排。\n- 制裁条款：ICC Banking Commission Opinion TA920rev 明确指出，引用\"包括但不限于\"多个司法管辖区和\"间接\"风险的制裁条款会破坏信用证的不可撤销跟单性质，赋予开证行超出法定要求的自由裁量权 [ICC-OP-TA920REV, UCP 600 Art 7(a), 7(b), 16(b)]。这类条款本质上也是一种软条款。\n- 付款条件挂钩条款：如\"收到申请人付款后付款\"或\"货物清关后付款\"，直接违反UCP 600的独立付款原则。\n\n防范建议：审证时逐条核对46A、47A、48等字段，发现任何依赖申请人行为或第三方非银行机构配合的条件，立即要求修改信用证。如果修改不可行，至少要求申请人提供签字样本或预授权文件交存银行。\n\nWhat still depends on your transaction: 具体软条款的风险程度取决于信用证的实际措辞、开证行所在国惯例以及申请人信用状况。如果你有具体的信用证条款需要分析，可以提供条款内容，我可以更有针对性地帮你判断。",
     "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 11308,
-    "citations": [],
-    "answer_nonascii": 0,
+    "routing_tier": "sonnet",
+    "latency_ms": 37338,
+    "citations": [
+      "Brpd Rbca M13-RBCA-04-009",
+      "Brpd Rbca M13-RBCA-05-036",
+      "Bcbs205 Capital Treatment Depth BCBS205-CAP-004",
+      "Isf Trade Products ISF-LC-001",
+      "UCP 600 Art. 7"
+    ],
+    "answer_nonascii": 487,
     "error": null
   },
   {
@@ -330,12 +439,18 @@
     "original": "无单放货，承运人要承担什么责任？",
     "english": "Delivery without an original B/L — what liability does the carrier bear?",
     "domain": "无单放货 / misdelivery",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
-    "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 13726,
-    "citations": [],
-    "answer_nonascii": 0,
+    "answer": "无单放货是一个海事法律问题，我检索到的规则库主要涵盖信用证项下提单的审核标准（如UCP600 Article 20和22关于提单的要求），并不涉及承运人在无单放货情况下的法律责任。以下是基于一般贸易实务经验的说明，不构成法律意见。\n\n无单放货指承运人在未收回正本提单的情况下将货物放行给提货人。在大多数法域下，提单是物权凭证，承运人有义务凭正本提单放货。如果承运人违反这一义务，通常面临以下风险：\n\n- 违约责任：承运人对正本提单持有人（通常是卖方或其银行）构成违约，可能需赔偿货款损失。\n- 侵权责任：在某些法域，无单放货也被认定为对提单持有人物权的侵害。\n- 信用证项下的连锁影响：如果交易采用信用证，卖方通常通过控制正本提单来保障收款。无单放货会使提单失去控货功能，买方可能在未付款的情况下提货，卖方钱货两空。\n\n具体责任范围和赔偿标准取决于适用的法律（如中国《海商法》、英国普通法等）以及提单条款本身。这超出了我能从规则库中给出的范围，建议咨询海事律师获取明确的法律意见。\n\nWhat still depends on your transaction: 适用法律（提单上载明的管辖条款）、提单类型（记名提单还是指示提单）、无单放货是否经过货方同意、以及实际损失金额。",
+    "confidence": "medium",
+    "routing_tier": "sonnet",
+    "latency_ms": 44556,
+    "citations": [
+      "UCP 600 Art. 20",
+      "UCP 600 Art. 22",
+      "UCP 600 Art. 20",
+      "Top Ebl Carrier Liability Depth TOP-EBL-001",
+      "Icc Opinions Key ICC-R814"
+    ],
+    "answer_nonascii": 463,
     "error": null
   },
   {
@@ -344,18 +459,18 @@
     "original": "Mở LC tại ngân hàng nhằm mục đích gì?",
     "english": "What is the purpose of opening an L/C at a bank?",
     "domain": "LC basics",
-    "answer": "Mở LC (thư tín dụng) tại ngân hàng chủ yếu nhằm hai mục đích cốt lõi: bảo đảm thanh toán cho nhà xuất khẩu và bảo vệ nhà nhập khẩu khỏi rủi ro không nhận được hàng. Ngân hàng phát hành LC cam kết thanh toán cho người thụ hưởng nếu bộ chứng từ trình bày tuân thủ đúng điều khoản LC, thay vì phụ thuộc vào thiện chí của người mua. Điều này giảm rủi ro tín dụng thương mại giữa hai bên không quen biết hoặc ở các quốc gia khác nhau.\n\nVề phạm vi áp dụng, LC có nhiều dạng phục vụ mục đích khác nhau. Theo ISP98 Article 1.01, standby LC bao gồm các loại performance, financial, và direct pay, cho thấy LC không chỉ dùng để thanh toán hàng hóa mà còn làm công cụ bảo lãnh thực hiện hợp đồng hoặc bảo đảm nghĩa vụ tài chính.\n\nNgoài ra, LC còn giúp tiếp cận tài trợ thương mại, vì nhà xuất khẩu có thể chiết khấu bộ chứng từ với ngân hàng trước khi đến hạn thanh toán.\n\nPhần giải thích trên về mục đích chung của LC dựa trên kiến thức thương mại phổ thông, vì các quy tắc truy xuất được không trực tiếp định nghĩa mục đích mở LC. Nếu bạn cần hướng dẫn cụ thể về loại LC phù hợp cho giao dịch của mình, hãy cho biết thêm chi tiết về loại hàng hóa, đối tác và điều kiện thanh toán mong muốn.",
+    "answer": "Mở LC (Letter of Credit) tại ngân hàng nhằm mục đích chính là bảo đảm thanh toán cho giao dịch thương mại quốc tế. Cụ thể, LC là cam kết bằng văn bản của ngân hàng phát hành (issuing bank) rằng sẽ thanh toán cho người thụ hưởng (beneficiary, thường là nhà xuất khẩu) nếu người đó xuất trình được bộ chứng từ hợp lệ, đúng theo các điều khoản ghi trong LC.\n\nCác mục đích chính bao gồm:\n\n- Bảo vệ nhà xuất khẩu: Ngân hàng thay mặt nhà nhập khẩu cam kết thanh toán, nên nhà xuất khẩu không phải phụ thuộc vào thiện chí hay khả năng tài chính của người mua. Nếu chứng từ hợp lệ, ngân hàng phải thanh toán.\n- Bảo vệ nhà nhập khẩu: Tiền chỉ được chuyển cho nhà xuất khẩu khi bộ chứng từ đáp ứng đúng các điều kiện đã thỏa thuận (ví dụ: vận tải đơn, hóa đơn, chứng nhận xuất xứ, v.v.). Nhà nhập khẩu kiểm soát được rủi ro hàng không đúng yêu cầu.\n- Tạo cơ sở tài chính: LC có thể dùng làm tài sản thế chấp để nhà xuất khẩu vay vốn sản xuất hoặc đóng gói hàng (back-to-back LC, packing credit).\n\nLưu ý: Các quy tắc tôi truy xuất được cho câu hỏi này chủ yếu liên quan đến chi tiết kỹ thuật khi xét duyệt chứng từ (như ISBP 821 E3 về forwarder B/L, ISBP 821 A11 về hối phiếu phải có ngày phát hành, URR 725 về quy trình hoàn tiền giữa các ngân hàng), chứ không trực tiếp giải thích mục đích tổng quát của LC. Phần giải thích trên đây là kiến thức chung về trade finance, không trích từ một quy tắc cụ thể trong bộ dữ liệu tôi có.\n\nWhat still depends on your transaction: Mục đích cụ thể khi mở LC còn phụ thuộc vào loại LC (irrevocable, confirmed, transferable, back-to-back, v.v.), điều khoản thương mại giữa hai bên, và yêu cầu của ngân hàng phát hành tại quốc gia của bạn.",
     "confidence": "low",
     "routing_tier": "sonnet",
-    "latency_ms": 24709,
+    "latency_ms": 56723,
     "citations": [
-      "ISP98 Art. 1",
-      "ISBP 821 Para. B18",
-      "ISBP 821 Para. E14",
-      "ISBP 821 Para. A6",
-      "ISBP 821 Para. D18"
+      "UCP 600 Art. 14",
+      "URR 725 Art. 6",
+      "URR 725 Art. 6",
+      "ISBP 821 Para. E3",
+      "ISBP 821 Para. A11"
     ],
-    "answer_nonascii": 231,
+    "answer_nonascii": 304,
     "error": null
   },
   {
@@ -364,18 +479,18 @@
     "original": "Thủ tục mở LC",
     "english": "Procedures for opening an L/C",
     "domain": "LC issuance",
-    "answer": "Thủ tục mở LC (Letter of Credit) là quy trình mà người nhập khẩu (người yêu cầu) yêu cầu ngân hàng phát hành LC cho người xuất khẩu (người thụ hưởng). Các quy tắc tôi có trong hệ thống chủ yếu liên quan đến môi trường tài chính thương mại tại Thái Lan, Incoterms, và các FTA, không có quy tắc cụ thể về quy trình mở LC. Vì vậy, phần dưới đây là hướng dẫn chung dựa trên kiến thức tài chính thương mại tổng quát, không trích dẫn từ cơ sở dữ liệu quy tắc.\n\nCác bước cơ bản:\n\n- Ký hợp đồng ngoại thương: Hai bên thỏa thuận điều khoản thanh toán bằng LC, bao gồm loại LC, thời hạn hiệu lực, chứng từ yêu cầu, và Incoterm. Lưu ý rằng Incoterm chọn cần phù hợp với chuỗi chứng từ ngân hàng và hải quan (incoterms.incoterms_country_practicality_th, INCO-TH-003).\n- Nộp hồ sơ tại ngân hàng: Người nhập khẩu nộp đơn yêu cầu mở LC kèm hợp đồng, giấy phép nhập khẩu (nếu có), và chứng minh tài chính. Ngân hàng kiểm tra hồ sơ và phát hành LC qua SWIFT MT700.\n- Ngân hàng thông báo LC: Ngân hàng của người xuất khẩu nhận và thông báo LC cho người thụ hưởng.\n- Xuất trình chứng từ: Người xuất khẩu giao hàng và xuất trình chứng từ theo đúng điều khoản LC. Ngân hàng kiểm tra chứng từ theo UCP 600.\n\nNếu giao dịch liên quan đến Thái Lan, cần lưu ý quy định ngoại hối của BOT: xuất khẩu thu hồi ngoại tệ trên 200.000 USD phải hoàn trả trong 360 ngày, báo cáo qua hệ thống BOT FEDA (country.asean_depth_ph_vn_id_th_2c, Article BOT FEDA Regulations).\n\nWhat still depends on your transaction: loại LC (irrevocable/confirmed/transferable), ngân hàng phát hành, quốc gia đối tác, hàng hóa, và các điều khoản cụ thể trong LC. Bạn có thể chia sẻ thêm chi tiết để tôi tư vấn chính xác hơn.",
+    "answer": "Thủ tục mở LC (Letter of Credit) về mặt nguyên tắc bao gồm các bước cơ bản sau đây. Lưu ý: các quy tắc tôi truy xuất được không bao quát trực tiếp quy trình mở LC thông thường, nên phần dưới đây là hướng dẫn chung dựa trên thực hành trade finance phổ biến, không trích từ một điều luật cụ thể trong hệ thống.\n\nCác bước chính:\n- Ký hợp đồng ngoại thương: Thỏa thuận điều khoản thanh toán bằng LC, bao gồm loại LC (irrevocable, confirmed/unconfirmed, sight/usance), ngân hàng phát hành, thời gian giao hàng, chứng từ yêu cầu.\n- Nộp hồ sơ xin mở LC tại ngân hàng: Gồm đơn xin mở LC, hợp đồng thương mại, hồ sơ doanh nghiệp, và các giấy tờ liên quan (giấy phép nhập khẩu nếu ngành hàng yêu cầu).\n- Ngân hàng thẩm định và phát hành LC: Ngân hàng kiểm tra hồ sơ, hạn mức tín dụng, và phát hành LC qua SWIFT (thường là MT700) cho ngân hàng thông báo (advising bank) ở nước người thụ hưởng.\n\nMột số quy tắc liên quan từ hệ thống: nếu giao dịch có yếu tố forfaiting, bản sao LC, sửa đổi, và bằng chứng trình chứng từ hợp lệ phải được cung cấp [URF800 Article 5]. Nếu LC theo cấu trúc Hồi giáo, ngân hàng có thể dùng Wakalah, Murabaha, hoặc Musharakah tùy nhu cầu tài trợ [Islamic Shariah-compliant documentary credit rule]. Ngoài ra, ngân hàng sẽ áp dụng thủ tục định danh khách hàng theo yêu cầu AML trước khi thiết lập quan hệ [bfiu-aml-cmi#5.2~r5].\n\nWhat still depends on your transaction: quốc gia, ngân hàng phát hành, loại hàng hóa, loại LC, và quy định nội bộ của ngân hàng. Bạn nên liên hệ trực tiếp phòng trade finance tại ngân hàng để nhận checklist hồ sơ chính xác.",
     "confidence": "low",
     "routing_tier": "sonnet",
-    "latency_ms": 23123,
+    "latency_ms": 29410,
     "citations": [
-      "Incoterms 2020 INCO-TH-003",
-      "RCEP Article RCEP Annex 3A",
-      "Incoterms 2020 INCO-TH-004",
-      "Asean Depth Ph Vn Id Th 2C Article BOT FEDA Regulations",
-      "Incoterms 2020 INCO-TH-001"
+      "Bfiu Aml Cmi bfiu-aml-cmi#5.2~r5",
+      "Gfet Vol1 M13-GFET-14-002",
+      "Pop Urf800 Letter Rules Art. 5",
+      "Brpd Crm brpd-crm#1.5~r36",
+      "Islamic Trade Instruments Shariah Governance ISLAMIC-SHARIAH-COMPLIANT-DOCUMENTARY-CREDIT-WAKALAH-MURABAHA-MUSHARAKAH-LC-001"
     ],
-    "answer_nonascii": 279,
+    "answer_nonascii": 256,
     "error": null
   },
   {
@@ -384,14 +499,18 @@
     "original": "Thủ tục thanh toán bằng L/C nhập khẩu",
     "english": "Payment procedures using an import L/C",
     "domain": "Import LC ops",
-    "answer": "Thủ tục thanh toán L/C nhập khẩu là một quy trình gồm nhiều bước, nhưng unfortunately, các quy tắc tôi có trong cơ sở dữ liệu hiện tại không bao gồm chi tiết thủ tục L/C nhập khẩu cụ thể cho Việt Nam. Quy tắc được truy xuất chỉ đề cập đến bối cảnh chính trị và thương mại quốc tế của Việt Nam (country.indonesia_vietnam_thailand_philippines_malaysia_asean_post_2024_2c_r94), bao gồm các hiệp định như EVFTA và RCEP, chứ không phải quy trình vận hành L/C.\n\nTuy nhiên, dưới góc độ kiến thức chung về trade finance (không từ quy tắc được truy xuất), thủ tục L/C nhập khẩu cơ bản gồm:\n\n- Mở L/C (Issuance): Nhập khẩu nộp đơn xin mở L/C tại ngân hàng, kèm hợp đồng thương mại, giấy phép nhập khẩu (nếu hàng thuộc danh mục kiểm soát), và ký quỹ theo quy định của ngân hàng.\n- Thông báo L/C (Advising): Ngân hàng xuất khẩu nhận L/C từ ngân hàng mở, kiểm tra tính xác thực, rồi thông báo cho nhà xuất khẩu.\n- Xuất trình chứng từ (Presentation): Nhà xuất khẩu giao hàng và xuất trình bộ chứng từ hợp lệ cho ngân hàng xác nhận trong thời hạn quy định.\n- Kiểm tra chứng từ (Examination): Ngân hàng kiểm tra chứng từ theo UCP 600 và điều khoản L/C, thường trong 5 ngày làm việc ngân hàng.\n- Thanh toán (Payment): Nếu chứng từ hợp lệ, ngân hàng mở thanh toán cho nhà xuất khẩu và ghi nợ cho nhà nhập khẩu.\n\nWhat still depends on your transaction: Loại L/C (at sight, deferred, usance), ngân hàng mở, loại hàng hóa, và các yêu cầu cụ thể trong Field 46A của L/C. Bạn nên tham khảo trực tiếp ngân hàng thương mại nơi mở L/C để biết quy định nội bộ chính xác.",
-    "confidence": "low",
+    "answer": "Câu hỏi của bạn rất rộng, \"thủ tục thanh toán bằng L/C nhập khẩu\" bao gồm nhiều bước từ khi mở L/C đến khi thanh toán. Các quy tắc tôi có trong tay chỉ bao phủ một số điểm cụ thể, không phải toàn bộ quy trình. Dưới đây là những gì tôi có thể nói chắc chắn:\n\nNếu bạn nhập khẩu theo L/C trả chậm (deferred payment LC) để tận dụng tín dụng nhà cung cấp ngắn hạn, bạn cần tuân thủ các hướng dẫn tại Para 33, Chapter 7 (Import) theo quy định M13-GFET-15-009. Đây là yêu cầu cụ thể đối với hình thức này.\n\nVề chứng từ, một số điểm thực hành ngân hàng quan trọng:\n\n- Hóa đơn thương mại có thể ghi thêm điều khoản thanh toán mà không nhất thiết phải khớp hoàn toàn với L/C, miễn là không mâu thuẫn với L/C (ICC Opinion R887, UCP 600 Art 14, Art 18).\n- Hóa đơn có thể ghi khoản khấu trừ như thanh toán trước, chiết khấu mà L/C không yêu cầu, và điều này không bị coi là bất hợp lệ (ISBP 821 C8).\n- Tuyên bố về cước phí trên vận đơn không cần giống hệt L/C, chỉ cần không mâu thuẫn. Ví dụ L/C yêu cầu \"freight payable at destination\" thì ghi \"freight collect\" được chấp nhận (ISBP 821 D30 cho vận đơn đa phương thức, H25 cho vận đơn hàng không).\n\nPhần quy trình tổng thể (mở L/C, thông báo, xuất trình chứng từ, kiểm tra, thanh toán từ chối) tôi không có quy tắc cụ thể trong cơ sở dữ liệu này. Bạn nên tham khảo trực tiếp ngân hàng phát hành L/C của mình để biết quy trình chi tiết theo UCP 600.\n\nWhat still depends on your transaction: loại L/C (at sight, deferred, usance), ngân hàng phát hành, quốc gia xuất khẩu, và danh mục chứng từ yêu cầu trong Field 46A.",
+    "confidence": "medium",
     "routing_tier": "sonnet",
-    "latency_ms": 27836,
+    "latency_ms": 39149,
     "citations": [
-      "Indonesia Vietnam Thailand Philippines Malaysia Asean Post 2024 COUNTRY-VIETNAM-TO-LAM-GENERAL-SECRETARY-POST-TRONG-DEATH-19-JULY-2024-4-PILLAR-FOREIGN-POLICY-BAMBOO-DIPLOMACY-VSIP-IRA-FEOC-LIBERATION-DAY-46-PCT-PAUSED-SAMSUNG-FOXCONN-NVIDIA-001"
+      "Gfet Vol1 M13-GFET-15-009",
+      "UCP 600 Art. 14",
+      "ISBP 821 Para. D30",
+      "ISBP 821 Para. H25",
+      "ISBP 821 Para. C8"
     ],
-    "answer_nonascii": 244,
+    "answer_nonascii": 256,
     "error": null
   },
   {
@@ -400,18 +519,18 @@
     "original": "Thanh toán LC, TT là gì",
     "english": "What are L/C and T/T payment?",
     "domain": "LC vs TT",
-    "answer": "LC (Letter of Credit) và TT (Telegraphic Transfer) là hai phương thức thanh toán quốc tế phổ biến nhất trong thương mại.\n\nLC (Tín dụng thư): Ngân hàng phát hành cam kết thanh toán cho người bán (beneficiary) nếu người bán xuất trình bộ chứng từ hợp lệ, đúng theo các điều khoản ghi trong LC. LC được điều chỉnh bởi UCP 600 và ISBP 821. Người mua an tâm hơn vì ngân hàng chỉ trả tiền khi chứng từ đáp ứng đúng yêu cầu. Người bán cũng an tâm hơn vì có cam kết thanh toán từ ngân hàng, không phụ thuộc vào thiện chí của người mua. Trong thực tế, LC được truyền qua SWIFT bằng tin nhắn MT700 [electronic.swift_mx_sr2025_cutover_fatf_r16_eu_ip_bis_nexus_4a_r110].\n\nTT (Chuyển tiền bằng điện): Là chuyển tiền quốc tế qua hệ thống SWIFT, đơn giản hơn LC nhiều. Người mua tự chuyển tiền cho người bán theo thỏa thuận thương mại, không cần ngân hàng kiểm tra chứng từ. Thường dùng theo dạng T/T in advance (trả trước) hoặc T/T against documents (trả tiền khi nhận chứng từ). Rủi ro cao hơn LC vì không có cam kết thanh toán từ ngân hàng, chỉ phụ thuộc vào bên mua.\n\nTóm lại: LC an toàn hơn nhưng phức tạp và tốn kém; TT nhanh, đơn giản nhưng rủi ro hơn. Lựa chọn nào phụ thuộc vào mức độ tin tưởng giữa hai bên và giá trị giao dịch.\n\nCác quy tắc tôi truy xuất được chủ yếu nói về LC theo chuẩn Islamic (Shari'ah) và hệ thống nhắn tin SWIFT, không có định nghĩa cơ bản về LC và TT. Nội dung trên là hướng dẫn chung từ kiến thức tài chính thương mại tổng quát.",
-    "confidence": "low",
+    "answer": "LC (Letter of Credit) và TT (Telegraphic Transfer) là hai phương thức thanh toán quốc tế phổ biến, nhưng bản chất rất khác nhau.\n\nLC (Tín dụng thư): Ngân hàng phát hành cam kết thanh toán cho người hưởng lợi (thường là nhà xuất khẩu) nếu họ xuất trình bộ chứng từ hợp lệ theo đúng điều khoản LC. Ngân hàng xử lý chứng từ, không phải hàng hóa. Quyền thanh toán trong LC có thể được chứng minh bằng các công cụ như hối phiếu, lệnh phiếu, hoặc cam kết thanh toán trả chậm, tùy cấu trúc LC (URF800, Article 2). Lợi thế lớn nhất của LC là bảo vệ cả hai bên: nhà nhập khẩu chỉ trả tiền khi chứng từ đúng, nhà xuất khẩu được ngân hàng cam kết trả.\n\nTT (Chuyển tiền bằng điện): Là chuyển tiền trực tiếp từ tài khoản người mua sang tài khoản người bán qua hệ thống SWIFT. Đơn giản, nhanh, chi phí thấp, nhưng không có cam kết từ ngân hàng như LC. Rủi ro nằm ở bên nào trả tiền trước: nếu TT trước (advance), nhà nhập khẩu rủi ro; nếu TT sau (after shipment), nhà xuất khẩu rủi ro.\n\nMột lưu ý thực tế: trong LC, nếu hóa đơn thương mại ghi điều khoản thanh toán khác với LC, điều đó không tự động tạo bất hợp lệ trừ khi nội dung đó xung đột với LC (ICC Opinion R887, UCP 600 Art 14, Art 18).\n\nPhần định nghĩa LC và TT ở trên là kiến thức thương mại chung, không nằm trong bộ luật truy xuất được. Chỉ phần tham chiếu Opinion R887 là có căn cứ trực tiếp.\n\nWhat still depends on your transaction: bạn đang ở vai trò nào (nhà xuất khẩu hay nhập khẩu), giá trị giao dịch, và mức độ tin tưởng giữa hai bên sẽ quyết định LC hay TT phù hợp hơn.",
+    "confidence": "medium",
     "routing_tier": "sonnet",
-    "latency_ms": 80383,
+    "latency_ms": 22047,
     "citations": [
-      "Isf Trade Products ISF-LC-001",
-      "Islamic Trade Instruments Shariah Governance ISLAMIC-SHARIAH-COMPLIANT-DOCUMENTARY-CREDIT-WAKALAH-MURABAHA-MUSHARAKAH-LC-001",
-      "Swift Mx Sr2025 Cutover Fatf R16 Eu Ip Bis Nexus ELECTRONIC-ISO-20022-TRADE-FINANCE-MT-CATEGORY-7-DOCUMENTARY-CREDITS-GUARANTEES-REMAIN-ON-FIN-NOT-IN-NOV-2025-CUTOVER-SEPARATE-MIGRATION-TRACK-001",
-      "Usa Eu Asia Me Post 2024 Basel Iii Endgame Credit Suisse Ubs Svb Correspondent Sanctions BP-TRADE-FINANCE-CORRESPONDENT-BANKING-DE-RISKING-FATF-WOLFSBERG-FORBES-2024-FCI-ITFA-WEF-TRADE-FINANCE-GAP-2-5TRN-2024-DOCUMENTARY-CREDIT-MT700-SWIFT-MX-SR2025-CBPR-PLUS-001",
-      "Indonesia Vietnam Thailand Philippines Malaysia Asean Post 2024 COUNTRY-VIETNAM-TO-LAM-GENERAL-SECRETARY-POST-TRONG-DEATH-19-JULY-2024-4-PILLAR-FOREIGN-POLICY-BAMBOO-DIPLOMACY-VSIP-IRA-FEOC-LIBERATION-DAY-46-PCT-PAUSED-SAMSUNG-FOXCONN-NVIDIA-001"
+      "Pop Urf800 Letter Rules Art. 2",
+      "URBPO 750 Art. 2",
+      "UCP 600 Art. 14",
+      "ISBP 821 Para. D30",
+      "ISBP 821 Para. H25"
     ],
-    "answer_nonascii": 239,
+    "answer_nonascii": 265,
     "error": null
   },
   {
@@ -420,18 +539,18 @@
     "original": "Bản chất của thanh toán bằng LC",
     "english": "The essential nature of payment by L/C",
     "domain": "LC concept",
-    "answer": "Bản chất của thanh toán bằng LC (Letter of Credit) là một cam kết thanh toán có điều kiện từ ngân hàng phát hành: ngân hàng thay mặt người nhập khẩu cam kết trả tiền cho người xuất khẩu nếu người xuất khẩu xuất trình được bộ chứng từ hợp lệ, đúng theo các điều khoản ghi trong LC.\n\nCác nguyên tắc cốt lõi (dựa trên kiến thức chung về UCP 600, không nằm trong các quy tắc được truy xuất cho câu hỏi này):\n\n- Độc lập: LC là một giao dịch riêng biệt với hợp đồng thương mại. Ngân hàng chỉ làm việc với chứng từ, không quan tâm đến hàng hóa hay tranh chấp giữa hai bên.\n- Có điều kiện: Tiền chỉ được trả khi bộ chứng từ tuân thủ đúng LC. Nếu có bất hợp lệ, ngân hàng có quyền từ chối thanh toán.\n- Ngân hàng là bên trả tiền chính: Khác với chuyển tiền (T/T) hay nhờ thu (D/P, D/A), trong LC, ngân hàng phát hành đứng ra cam kết trả, giúp người xuất khẩu giảm rủi ro không được thanh toán.\n\nCác quy tắc được truy xuất chủ yếu đề cập đến LC theo Hồi giáo (Shari'ah-compliant), tin nhắn SWIFT MT700, và bối cảnh ngân hàng tương ứng, không trực tiếp giải thích bản chất chung của LC. Nếu bạn cần đi sâu vào một khía cạnh cụ thể (ví dụ: quy trình mở LC, cách kiểm tra chứng từ, hoặc phân biệt LC at sight vs usance), cho tôi biết để hướng dẫn chi tiết hơn.",
-    "confidence": "low",
+    "answer": "Bản chất thanh toán bằng LC (Letter of Credit) là một cam kết độc lập của ngân hàng phát hành: ngân hàng trả tiền cho người thụ hưởng khi người thụ hưởng xuất trình bộ chứng từ phù hợp với các điều khoản của tín dụng thư, không phụ thuộc vào hợp đồng thương mại gốc hay hàng hóa thực tế. Đây là nguyên tắc \"ngân hàng giao dịch bằng chứng từ, không giao dịch bằng hàng hóa\" (UCP 600 quy định nguyên tắc này, nhưng bài viết cụ thể về điều này không nằm trong bộ luật tôi đang truy xuất).\n\nTuy nhiên, các quy tắc tôi có trong hệ thống chỉ đề cập đến một số khía cạnh liên quan, không định nghĩa trực tiếp bản chất LC:\n\n- Tính độc lập và chứng từ: Quy tắc URF 800 (Article 5) nói rằng khi yêu cầu thanh toán phát sinh từ LC, phải nộp bản sao LC, các tu chỉnh, và bằng chứng trình bộ chứng từ phù hợp (compliant presentation). Điều này phản ánh nguyên tắc LC xoay quanh việc trình chứng từ hợp lệ, không phải việc giao hàng thực tế.\n- Hóa đơn và điều kiện thanh toán: ICC Opinion R887 (UCP 600 Art 14, Art 18) xác nhận hóa đơn là chứng từ thể hiện giá trị hàng hóa; việc người thụ hưởng thêm điều khoản thanh toán vào hóa đơn không tự động tạo bất hợp lệ trừ khi nó xung đột với LC.\n\nPhần định nghĩa cốt lõi về \"bản chất LC\" (độc lập, không thể hủy ngang, ngân hàng cam kết trả tiền) thuộc UCP 600 Articles 2-5, không nằm trong bộ luật tôi đang truy xuất. Nếu bạn cần giải thích chi tiết hơn về nguyên tắc độc lập hay trách nhiệm của các bên, tôi khuyên nên tham khảo trực tiếp UCP 600 hoặc hỏi lại với câu hỏi cụ thể hơn.",
+    "confidence": "medium",
     "routing_tier": "sonnet",
-    "latency_ms": 24040,
+    "latency_ms": 36060,
     "citations": [
+      "Pop Urf800 Letter Rules Art. 5",
       "Isf Trade Products ISF-LC-001",
-      "Islamic Trade Instruments Shariah Governance ISLAMIC-SHARIAH-COMPLIANT-DOCUMENTARY-CREDIT-WAKALAH-MURABAHA-MUSHARAKAH-LC-001",
-      "Usa Eu Asia Me Post 2024 Basel Iii Endgame Credit Suisse Ubs Svb Correspondent Sanctions BP-TRADE-FINANCE-CORRESPONDENT-BANKING-DE-RISKING-FATF-WOLFSBERG-FORBES-2024-FCI-ITFA-WEF-TRADE-FINANCE-GAP-2-5TRN-2024-DOCUMENTARY-CREDIT-MT700-SWIFT-MX-SR2025-CBPR-PLUS-001",
-      "Swift Mx Sr2025 Cutover Fatf R16 Eu Ip Bis Nexus ELECTRONIC-ISO-20022-TRADE-FINANCE-MT-CATEGORY-7-DOCUMENTARY-CREDITS-GUARANTEES-REMAIN-ON-FIN-NOT-IN-NOV-2025-CUTOVER-SEPARATE-MIGRATION-TRACK-001",
-      "Croatia Trade Customs Regime COUNTRY-CROATIA-TRADE-FINANCE-001"
+      "UCP 600 Art. 14",
+      "ISBP 821 Para. D30",
+      "ISBP 821 Para. H25"
     ],
-    "answer_nonascii": 230,
+    "answer_nonascii": 282,
     "error": null
   },
   {
@@ -440,18 +559,18 @@
     "original": "Giúp tôi tìm hiểu về L/c chuyển nhượng",
     "english": "Help me understand transferable L/C",
     "domain": "Transferable LC (Art. 38)",
-    "answer": "Thưa bạn, L/C chuyển nhượng (Transferable Credit) cho phép người thụ hưởng thứ nhất chuyển một phần hoặc toàn bộ giá trị L/C cho người thụ hưởng thứ hai, thường dùng khi người trung gian (trader) không có vốn riêng để thanh toán cho nhà cung cấp thực tế.\n\nCác quy tắc cốt lõi nằm tại UCP 600 Điều 38, nhưng tôi cần lưu ý: bộ luật được truy xuất cho câu hỏi này không bao gồm UCP 600, nên phần dưới đây là hướng dẫn chung dựa trên kiến thức thương mại quốc tế, không trích xuất từ cơ sở dữ liệu quy tắc.\n\nĐiểm quan trọng nhất bạn cần nắm:\n\n- L/C phải ghi rõ \"transferable\" thì mới chuyển nhượng được. Nếu không có chữ này, không thể chuyển.\n- Chỉ chuyển nhượng được một lần. Người thụ hưởng thứ hai không thể chuyển tiếp cho người thứ ba.\n- L/C chuyển nhượng giữ nguyên các điều kiện gốc, ngoại trừ: số tiền, đơn giá, ngày hết hạn, thời hạn giao chứng từ, và tên người yêu cầu mở L/C (người thụ hưởng thứ nhất có thể thay thế tên mình vào).\n- Người thụ hưởng thứ nhất có quyền thay thế hóa đơn và hối phiếu của mình vào chỗ hóa đơn của người thụ hưởng thứ hai để chênh lệch (lợi nhuận của trader).\n- Ngân hàng chuyển nhượng phải được chỉ định rõ trong L/C.\n\nWhat still depends on your transaction: Ngân hàng phát hành có thể có chính sách nội bộ khắt khe hơn UCP 600. Bạn cần kiểm tra kỹ Field 40A (loại L/C) và Field 41A/41D (ngân hàng được chỉ định) trên MT700 để xác định L/C có chuyển nhượng được không và ngân hàng nào thực hiện việc chuyển nhượng.\n\nNếu bạn cần tra cứu chi tiết từng điều khoản UCP 600 Điều 38 hoặc đối chiếu với L",
-    "confidence": "low",
+    "answer": "L/C chuyển nhượng (transferable credit) là loại L/C cho phép người thụ hưởng thứ nhất (first beneficiary) chuyển quyền sử dụng toàn bộ hoặc một phần L/C cho một hoặc nhiều người thụ hưởng thứ hai (second beneficiary). Quy định cốt lõi nằm tại UCP 600 Article 38.\n\nMột số điểm quan trọng bạn cần nắm:\n\n- L/C phải ghi rõ \"transferable\": Ngân hàng phát hành phải chỉ định rõ L/C là chuyển nhượng thì mới có thể chuyển nhượng được [UCP600 Art 38(b), lco_ucp600_letter_rules_v1]. Nếu L/C không ghi, thì không chuyển nhượng.\n\n- Ngân hàng chuyển nhượng không bắt buộc phải thực hiện: Ngân hàng được yêu cầu chuyển nhượng chỉ thực hiện trong phạm vi và cách thức mà họ đồng ý [UCP600 Art 38, lco_ucp600_letter_rules_v1].\n\n- L/C chuyển nhượng phải \"mirror\" L/C gốc, ngoại trừ một số thay đổi được phép: giảm số tiền, giảm đơn giá, rút ngắn ngày hết hạn, tăng tỷ lệ bảo hiểm, và thay tên người thụ hưởng thứ nhất vào chỗ người yêu cầu mở L/C [UCP600 Art 38, lco_ucp600_letter_rules_v1].\n\n- Chuyển nhượng một phần (partial transfer): Có thể chuyển cho nhiều second beneficiary, trừ khi L/C cấm. Tổng các lần chuyển không vượt quá giá trị L/C [UCP600 Art 38(d), lco_ucp600_letter_rules_v1].\n\n- Không chuyển tiếp cho bên thứ ba: Second beneficiary không thể chuyển L/C cho người khác, chỉ có thể chuyển ngược lại cho first beneficiary [UCP600 Art 38(j), lco_ucp600_letter_rules_v1].\n\nWhat still depends on your transaction: Bạn đang ở vai trò nào (first hay second beneficiary)? L/C của bạn đã ghi \"transferable\" chưa? Ngân hàng nào là transferring bank? Những yếu tố này sẽ quyết định quyền và giới hạn cụ thể áp dụng cho trường hợp của bạn.",
+    "confidence": "medium",
     "routing_tier": "sonnet",
-    "latency_ms": 85907,
+    "latency_ms": 34634,
     "citations": [
-      "Centam Carib Depth Pa Cr Gt 2C Article BNM FEA Rules 2013",
-      "Indonesia Vietnam Thailand Philippines Malaysia Asean Post 2024 COUNTRY-VIETNAM-TO-LAM-GENERAL-SECRETARY-POST-TRONG-DEATH-19-JULY-2024-4-PILLAR-FOREIGN-POLICY-BAMBOO-DIPLOMACY-VSIP-IRA-FEOC-LIBERATION-DAY-46-PCT-PAUSED-SAMSUNG-FOXCONN-NVIDIA-001",
-      "Maritime Shipping Followup 4A COMMODITIES-MARITIME-LNG-AS-MARINE-FUEL-METHANE-SLIP-EU-ETS-2026-CH4-N2O-BIO-LNG-E-LNG-001",
-      "EUDR COUNTRY-BRAZIL-TRADE-HOUSE-COMPLIANCE-PLAYBOOK-EU-MERCOSUR-COP30-BRICS-9-STEP-EUDR-CBAM-IFRS-S1-S2-001",
-      "Brazil Lula Third Term Eu Mercosur Cop30 Brics COUNTRY-BRAZIL-EU-MERCOSUR-AGREEMENT-SIGNED-6-DEC-2024-MONTEVIDEO-25-YEARS-NEGOTIATION-RATIFICATION-2026-001"
+      "UCP 600 Art. 38",
+      "UCP 600 Art. 33-39",
+      "UCP 600 Art. 38",
+      "ISBP 821 Para. K12",
+      "UCP 600 Art. 38"
     ],
-    "answer_nonascii": 303,
+    "answer_nonascii": 232,
     "error": null
   },
   {
@@ -460,14 +579,18 @@
     "original": "Phương thức thanh toán ttr",
     "english": "The TTR (telegraphic transfer reimbursement) payment method",
     "domain": "TTR",
-    "answer": "TTR (Telegraphic Transfer Reimbursement) là phương thức thanh toán quốc tế khá phổ biến, nhưng các quy tắc trong cơ sở dữ liệu của tôi không đề cập cụ thể đến phương thức này. Tôi sẽ chia sẻ dựa trên kiến thức chung về tài chính thương mại, bạn nên xác nhận lại với ngân hàng hoặc cố vấn thương mại của mình.\n\nTTR về cơ bản là một dạng thanh toán bằng điện chuyển tiền (TT) mà trong đó người mua (nhập khẩu) chuyển tiền trực tiếp cho người bán (xuất khẩu) qua hệ thống điện báo/SWIFT, thường là sau khi hàng được giao hoặc theo thỏa thuận trong hợp đồng. Điểm khác biệt chính so với L/C là TTR không có cam kết thanh toán từ ngân hàng phát hành, mà phụ thuộc hoàn toàn vào thiện chí và khả năng thanh toán của người mua.\n\n- Rủi ro cho xuất khẩu: cao hơn nhiều so với L/C, vì không có ngân hàng đứng ra bảo lãnh thanh toán. Nếu người mua không trả tiền, bạn không có đệm bảo vệ từ ngân hàng.\n- Thực hành phổ biến: thường dùng khi hai bên đã có quan hệ tin tưởng, hoặc giá trị giao dịch nhỏ, hoặc đi kèm bảo lãnh thanh toán (payment guarantee) từ ngân hàng của người mua.\n\nPhần được xác nhận bởi quy tắc: không có, vì các quy tắc truy xuất được chỉ liên quan đến bối cảnh chính trị và chính sách đối ngoại của Việt Nam.\n\nPhần không được bao phủ: mọi chi tiết kỹ thuật về quy trình TTR, trách nhiệm ngân hàng, và quy định cụ thể của Ngân hàng Nhà nước Việt Nam đối với thanh toán quốc tế.\n\nWhat still depends on your transaction: điều khoản cụ thể trong hợp đồng, loại tiền tệ, ngân hàng phục vụ, và việc bạn là xuất khẩu hay nhập khẩu sẽ quyết định mức độ rủi ro và các bước cần thực hiện.",
-    "confidence": "low",
+    "answer": "TTR (Telegraphic Transfer Reimbursement) là phương thức thanh toán trong đó ngân hàng của người mua gửi lệnh thanh toán qua SWIFT (thường là MT103 hoặc MT202) cho ngân hàng của người bán, yêu cầu ngân hàng người bán chuyển tiền cho người bán. Đây về bản chất là một dạng chuyển tiền điện (wire transfer), không phải LC hay nhờ thu.\n\nCác quy tắc tôi có trong hệ thống không bao phủ trực tiếp TTR. Các rule được truy xuất chỉ liên quan đến reimbursement trong bối cảnh standby letter of credit (ISP98 Rule 6.05 và 6.14) và reimbursement authorization trong cấu trúc đa ngân hàng (REIMBAUTH-001), không phải TTR thương mại thông thường.\n\nTừ kiến thức tài chính thương mại chung (không từ rule được truy xuất), cần lưu ý:\n\n- TTR là thanh toán phi chứng từ: ngân hàng không kiểm tra chứng từ như LC. Rủi ro nằm hoàn toàn giữa người mua và người bán.\n- Người bán không có bảo đảm thanh toán từ ngân hàng phát hành như trong LC. Nếu người mua không chỉ thị thanh toán, người bán không có đòi quyền pháp lý đối với ngân hàng.\n- Thường dùng khi hai bên đã có quan hệ tin tưởng hoặc giao hàng nhỏ, lặp lại.\n\nWhat still depends on your transaction: điều khoản cụ thể trong hợp đồng mua bán, đồng tiền thanh toán, ngân hàng trung gian, và quy định ngoại hối của quốc gia bạn sẽ quyết định chi tiết thực tế của TTR.",
+    "confidence": "medium",
     "routing_tier": "sonnet",
-    "latency_ms": 147908,
+    "latency_ms": 31627,
     "citations": [
-      "Indonesia Vietnam Thailand Philippines Malaysia Asean Post 2024 COUNTRY-VIETNAM-TO-LAM-GENERAL-SECRETARY-POST-TRONG-DEATH-19-JULY-2024-4-PILLAR-FOREIGN-POLICY-BAMBOO-DIPLOMACY-VSIP-IRA-FEOC-LIBERATION-DAY-46-PCT-PAUSED-SAMSUNG-FOXCONN-NVIDIA-001"
+      "ISP98 Art. 6",
+      "ISP98 Art. 6",
+      "Reimbursement Authorization Rules REIMBAUTH-001",
+      "Lco Urdtt Letter Rules Art. 6",
+      "ISP98 ICC-ISP98-RULE6-9-TRANSFER-ASSIGNMENT-CANCELLATION-REIMBURSEMENT-TIMING-EVERGREEN-001"
     ],
-    "answer_nonascii": 305,
+    "answer_nonascii": 210,
     "error": null
   },
   {
@@ -476,14 +599,18 @@
     "original": "UPAS L/C là gì? Có nên dùng cho nhập khẩu?",
     "english": "What is UPAS L/C? Should I use it for imports?",
     "domain": "UPAS L/C (usance payable at sight)",
-    "answer": "UPAS L/C (Usance Payable at Sight) là một dạng thư tín dụng trả chậm nhưng người thụ hưởng (exporter) lại được thanh toán ngay khi xuất trình bộ chứng từ hợp lệ. Cách hoạt động: ngân hàng phát hành L/C chấp nhận thanh toán theo kỳ hạn usance (ví dụ 90/180 ngày), nhưng sẽ chiết khấu và thanh toán ngay cho exporter. Người nhập khẩu (applicant) vẫn được trả chậm theo kỳ hạn đó, và ngân hàng tài trợ khoản chênh lệch lãi suất.\n\nCó nên dùng cho nhập khẩu? Điều phụ thuộc vào tình huống cụ thể của bạn:\n\n- Ưu điểm: Bạn (nhà nhập khẩu) được kéo dài thời gian thanh toán, cải thiện dòng tiền, trong khi exporter vẫn nhận tiền ngay nên không phản đối. Đây là công cụ tài trợ thương mại phổ biến, đặc biệt khi mua hàng từ châu Á.\n- Nhược điểm: Bạn phải chịu chi phí tài trợ (lãi suất + phí ngân hàng), thường cao hơn L/C at sight thông thường. L/C phải quy định rõ điều khoản UPAS, và ngân hàng phát hành phải đồng ý tài trợ.\n\nLưu ý quan trọng: Các quy tắc trong cơ sở dữ liệu của tôi không đề cập cụ thể đến UPAS L/C. Thông tin trên là hướng dẫn chung dựa trên kiến thức tài chính thương mại tổng quát. Bạn nên tham khảo trực tiếp ngân hàng phát hành L/C (như MUFG, SMFG, Mizuho, DBS, OCBC, UOB, SBI, HDFC, ICICI hoặc các ngân hàng Úc Big 4 được liệt kê trong hồ sơ ngân hàng châu Á) để biết chính xác điều khoản, phí và điều kiện tài trợ UPAS mà họ áp dụng.\n\nWhat still depends on your transaction: ngân hàng phát hành cụ thể, hạn mức tín dụng của bạn, loại hàng hóa, quốc gia xuất khẩu, và kỳ hạn usance bạn muốn áp dụng.",
-    "confidence": "low",
+    "answer": "UPAS L/C (Usance Payable at Sight) là một loại tín dụng thư usance mà ngân hàng phát hành thanh toán ngay cho người xuất khẩu (beneficiary) khi bộ chứng từ hợp lệ được trình, nhưng người nhập khẩu (applicant) chỉ phải trả tiền cho ngân hàng vào ngày đáo hạn usance (ví dụ 90, 180, 360 ngày). Nói cách khác, ngân hàng tài trợ tín dụng thương mại cho nhà nhập khẩu, còn nhà xuất khẩu vẫn nhận tiền ngay.\n\nCó nên dùng cho nhập khẩu không?\n\nUPAS mang lại lợi ích rõ ràng: nhà nhập khẩu có thêm thời gian thanh toán (cải thiện dòng tiền), nhà xuất khẩu vẫn được trả tại sight nên không phải chờ. Tuy nhiên, cần lưu ý các giới hạn usance theo quy định từng quốc gia:\n\n- Ấn Độ: usance tối đa 180 ngày từ ngày giao hàng cho hàng hóa thông thường; hàng vốn có thể kéo dài đến 36 tháng với phê duyệt RBI [country_rules.in_india_rbi_exim_2026, CNTRY-IN-002]; [country_rules.in_rbi_rules, IN-RBI-007].\n- Bangladesh: usance không quá 180 ngày cho đa số mặt hàng, kéo dài hơn cần phê duyệt Bangladesh Bank [country_rules.bd_bangladesh_bank, BD-BB-011].\n- Trung Quốc: usance thường lên đến 360 ngày, quá thời hạn này có thể cần phê duyệt thêm [country_rules.cn_safe_china, CN-LC-003].\n\nNgân hàng được phép chiết khấu/mua các khoản usance bill đã chấp nhận, qua đó cấp tín dụng cho nhà nhập khẩu [m13.gfet_vol1, M13-GFET-16-010].\n\nLưu ý thực tế: UPAS thường có chi phí tài trợ (lãi suất, phí) do ngân hàng ứng tiền trước. Bạn cần so sánh chi phí này với lợi ích dòng tiền để quyết định. Ngoài ra, quy định ngoại hối từng nước có thể hạn chế usance period hoặc yêu cầu phê duyệt nếu vượt ngưỡng.\n\nWhat still depends on your transaction: quốc gia nhập khẩu của bạn, loại hàng hóa (hàng thông thường hay hàng vốn), thời gian usance mong muốn, và chính sách nội bộ của ngân hàng phát hành.",
+    "confidence": "medium",
     "routing_tier": "sonnet",
-    "latency_ms": 24475,
+    "latency_ms": 38514,
     "citations": [
-      "Usa Eu Asia Me Post 2024 Basel Iii Endgame Credit Suisse Ubs Svb Correspondent Sanctions BP-ASIA-GSIB-JAPAN-MUFG-SMFG-MIZUHO-KOREA-KB-SHINHAN-HANA-SINGAPORE-DBS-OCBC-UOB-HONG-KONG-HKMA-INDIA-SBI-HDFC-ICICI-AUSTRALIA-BIG-4-CBA-NAB-WBC-ANZ-001"
+      "Bd Bangladesh Bank BD-BB-011",
+      "Cn Safe China CN-LC-003",
+      "In Rbi Rules IN-RBI-007",
+      "Gfet Vol1 M13-GFET-16-010",
+      "In India Rbi Exim 2026 CNTRY-IN-002"
     ],
-    "answer_nonascii": 278,
+    "answer_nonascii": 272,
     "error": null
   },
   {
@@ -492,18 +619,18 @@
     "original": "Xử lý bộ chứng từ bất hợp lệ trong thanh toán L/C theo UCP 600",
     "english": "Handling a discrepant document set under an L/C per UCP 600",
     "domain": "Discrepancy handling",
-    "answer": "Khi ngân hàng phát hành phát hiện chứng từ bất hợp lệ, quy trình xử lý theo UCP 600 như sau:\n\nNgân hàng có tối đa 5 ngày làm việc kể từ ngày nhận bộ chứng từ để kiểm tra và quyết định bộ chứng từ có hợp lệ hay không (UCP 600 Art 14(b)). Đây là thời hạn tối đa, không rút ngắn dù L/C hết hạn trong khoảng thời gian đó.\n\nNếu ngân hàng phát hành xác định có bất hợp lệ, họ phải gửi thông báo từ chối theo đúng yêu cầu của UCP 600 Art 16(c), trong đó phải ghi rõ từng điểm bất hợp lệ cụ thể và cho biết cách xử lý chứng từ (giữ lại chờ chỉ đạo, hoặc trả lại, v.v.). Nếu ngân hàng không gửi thông báo từ chối đúng hạn 5 ngày làm việc, hoặc thông báo thiếu các yêu cầu bắt buộc của Art 16(c) (như không ghi rõ điểm bất hợp lệ, hoặc không nêu cách xử lý), ngân hàng sẽ bị \"preclusion\", tức là mất quyền tuyên bố chứng từ bất hợp lệ. Hậu quả là bộ chứng từ bất hợp lệ được coi như hợp lệ, và ngân hàng phải thanh toán (ISBP 821, preclusion guidance + UCP 600 Art 16(c)(d)(f)).\n\nVề phía người thụ hưởng, khi nhận được thông báo từ chối, bạn có thể: sửa chứng từ nếu còn thời hạn trình, yêu cầu người mở L/C chấp nhận bất hợp lệ (waiver), hoặc tranh luận nếu điểm bất hợp lệ không chính xác.\n\nWhat still depends on your transaction: Các quy tắc tôi có chỉ bao gồm thời hạn kiểm tra (Art 14(b)) và cơ chế preclusion (Art 16). Các chi tiết cụ thể về cách thức gửi thông báo từ chối, quyền waiver của applicant, và quy trình sửa chứng từ nằm trong các điều khoản khác của UCP 600 Art 16 mà cơ sở dữ liệu hiện tại không truy xuất đầy đủ. Bạn nên đối chiếu trực tiếp với L/C và ngân hàng thông báo để xác định các bước tiếp theo.",
-    "confidence": "low",
+    "answer": "Khi ngân hàng phát hành (issuing bank) kiểm tra bộ chứng từ và phát hiện bất hợp lệ (discrepancy), nguyên tắc kiểm tra được dựa trên tiêu chuẩn \"không mâu thuẫn\" chứ không yêu cầu \"giống hệt nhau\". Cụ thể, theo UCP 600 Art 14(d) [icc_core.lco_ucp600_letter_rules_v1, Article 14], dữ liệu giữa các chứng từ không cần identical nhưng không được xung đột với nhau hoặc với L/C. Ví dụ, mô tả hàng hóa trên vận đơn có thể dùng thuật ngữ chung như \"general cargo\" hoặc \"machinery\" mà không cần ghi lại đầy đủ như trên hóa đơn, miễn là không trái với L/C, theo UCP 600 Art 14(l) [icc_core.lco_ucp600_letter_rules_v1, Article 14].\n\nMột số điểm thực hành quan trọng:\n\n- Mỗi chứng từ quy định trong L/C phải có ít nhất một bản gốc, và ngân hàng chấp nhận bất kỳ tài liệu nào có dấu hiệu chữ ký, con dấu, hoặc nhãn gốc của người phát hành, theo UCP 600 Art 17 [icc_core.ucp600_examination_remaining_articles_depth_2a_r119].\n- Vận đơn không được ghi hàng xếp trên boong (on deck), nhưng clause \"có thể xếp trên boong\" thì được chấp nhận, theo UCP 600 Art 26 [icc_core.ucp600_examination_remaining_articles_depth_2a_r119].\n\nTuy nhiên, quy trình xử lý bất hợp lệ cụ thể, bao gồm thời hạn gửi thông báo từ chối (refusal notice) và quyền của người thụ hưởng, được governed bởi UCP 600 Article 16, và quy tắc này không nằm trong dữ liệu tôi đang truy xuất được. Bạn nên tham khảo trực tiếp Article 16 để biết ngân hàng phải làm gì khi phát hiện discrepancy: thông báo cho presenting bank trong vòng 5 ngày làm việc, nêu rõ từng bất hợp lệ, và quyết định giữ hay trả chứng từ. Nếu cần kiểm tra toàn bộ bộ chứng từ thực tế, bạn có thể dùng TRDR Hub (trdrhub.com) để tự động hóa việc này.\n\nWhat still depends on your transaction: nội dung cụ thể của discrepancy mà ngân hàng raised, điều khoản Field 46A trong L/C, và chính sách nội bộ của issuing bank.",
+    "confidence": "medium",
     "routing_tier": "sonnet",
-    "latency_ms": 117725,
+    "latency_ms": 36542,
     "citations": [
-      "UCP 600 Art. 1-3",
-      "ISBP 821 ISBP821-DELTA-UCP-PRECLUSION-001",
-      "ICC Model Forms Pub. 800B",
-      "eUCP 2.1 EUCP21-e2A",
+      "UCP 600 Art. 14",
+      "UCP 600 Art. 17-18",
+      "UCP 600 Art. 26-28",
+      "ISBP 821 Para. A6",
       "UCP 600 Art. 14"
     ],
-    "answer_nonascii": 307,
+    "answer_nonascii": 267,
     "error": null
   },
   {
@@ -512,16 +639,16 @@
     "original": "Apa itu Letter of credit?",
     "english": "What is a Letter of Credit?",
     "domain": "LC basics",
-    "answer": "Letter of Credit (L/C) adalah instrumen pembayaran yang diterbitkan oleh bank atas permintaan importer (applicant), di mana bank berjanji untuk membayar exporter (beneficiary) sejumlah uang tertentu, asalkan exporter dapat menyerahkan dokumen-dokumen yang sesuai dengan syarat-syarat L/C dalam waktu yang ditentukan. Intinya, bank menggantikan risiko pembeli dengan risiko bank, sehingga exporter merasa lebih aman bahwa pembayaran akan diterima.\n\nBeberapa hal penting yang perlu dipahami:\n\n- L/C berlaku berdasarkan aturan internasional, yang paling umum adalah UCP 600. Aturan ini mengatur bagaimana bank memeriksa dokumen dan kapan pembayaran harus dilakukan.\n- Ada berbagai jenis L/C, termasuk standby letter of credit yang berfungsi lebih sebagai jaminan daripada mekanisme pembayaran langsung (ISP98, Article 1.01).\n- Bank hanya berurusan dengan dokumen, bukan dengan barang fisik. Artinya, selama dokumen sesuai dengan L/C, bank wajib membayar, bahkan jika ada masalah dengan barangnya.\n\nCatatan: Aturan yang saya miliki saat ini mencakup aspek-aspek teknis tertentu seperti pemeriksaan dokumen (ISBP 821) dan presentasi elektronik (eUCP 2.1), tetapi tidak berisi definisi dasar L/C. Penjelasan di atas adalah panduan umum dari pengetahuan trade finance. Untuk detail lengkap definisi dan prinsip L/C, UCP 600 Articles 2 dan 3 adalah rujukan utamanya.",
-    "confidence": "low",
+    "answer": "Letter of Credit (LC), atau dalam bahasa Indonesia sering disebut Surat Kredit Dokumenter, adalah instrumen pembayaran yang diterbitkan oleh bank atas permintaan importir (applicant), di mana bank berjanji untuk membayar eksportir (beneficiary) sejumlah tertentu asalkan eksportir menyerahkan dokumen yang sesuai dengan syarat-syarat yang tercantum di dalam LC tersebut. Intinya, bank menggantikan risiko pembayaran dari importir dengan janji pembayaran dari bank itu sendiri.\n\nLC diatur terutama oleh UCP 600 (Uniform Customs and Practice for Documentary Credits) dari ICC. Dalam praktiknya, ISBP 821 menjadi panduan standar perbankan untuk pemeriksaan dokumen. Ada juga jenis khusus seperti standby LC, yang bisa tunduk pada UCP 600 atau ISP98 sebagai ruleset tersendiri [ISBP821-DELTA-STANDBY-ISBP-001].\n\nBeberapa hal penting yang perlu dipahami:\n- Bank memeriksa dokumen, bukan barang. Yang penting adalah dokumen sesuai dengan LC, bukan apakah barangnya bagus atau tidak.\n- Dokumen seperti packing list dan sertifikat harus diterbitkan oleh pihak yang disebutkan dalam LC [ISBP 821 Article M2, Article Q3].\n- Data dalam dokumen tidak boleh bertentangan dengan syarat LC [ISBP 821 Article P3].\n- Jika klaim pembayaran timbul dari LC, maka salinan LC beserta amandemennya dan bukti presentasi yang sesuai harus diserahkan [URF 800 Article 5].\n\nCatatan: definisi dasar LC di atas merupakan pengetahuan umum trade finance, bukan dari aturan yang saya ambil secara spesifik. Aturan yang saya miliki mencakup aspek-aspek tertentu seperti pemeriksaan dokumen dan standby LC, tetapi tidak memberikan definisi formal LC secara keseluruhan. Untuk pemahaman lengkap, UCP 600 adalah sumber utama yang harus dirujuk.",
+    "confidence": "medium",
     "routing_tier": "sonnet",
-    "latency_ms": 33160,
+    "latency_ms": 54120,
     "citations": [
-      "ISP98 Art. 1",
-      "eUCP 2.1 EUCP21-e6G",
-      "ISBP 821 Para. E14",
-      "ISBP 821 Para. B18",
-      "ISBP 821 Para. A6"
+      "ISBP 821 ISBP821-DELTA-STANDBY-ISBP-001",
+      "Pop Urf800 Letter Rules Art. 5",
+      "ISBP 821 Para. M2",
+      "ISBP 821 Para. Q3",
+      "ISBP 821 Para. P3"
     ],
     "answer_nonascii": 0,
     "error": null
@@ -532,16 +659,16 @@
     "original": "Apa perbedaan letter of credit dengan bank garansi?",
     "english": "What is the difference between a letter of credit and a bank guarantee?",
     "domain": "LC vs guarantee",
-    "answer": "Perbedaan utamanya: Letter of Credit (LC) adalah instrumen pembayaran, sedangkan Bank Guarantee (BG) adalah instrumen jaminan.\n\nDengan LC, bank issuing berkewajiban membayar kepada beneficiary (exporter) asalkan dokumen yang dipresentasikan sesuai dengan syarat LC. Bank memeriksa dokumen semata-mata berdasarkan tampilan dokumen, bukan barang atau kontrak, dan memiliki maksimum 5 hari kerja perbankan untuk menentukan apakah presentasi compliant atau tidak [UCP 600 Article 14, ICC-UCP600-ART14-STANDARD-FOR-EXAMINATION-OF-DOCUMENTS-001]. LC bisa tersedia dengan sight payment, deferred payment, acceptance, atau negotiation [UCP 600 Article 6, ICC-UCP600-ART6-7-AVAILABILITY-EXPIRY-PLACE-ISSUING-BANK-UNDERTAKING-001]. Intinya: LC aktif saat transaksi berjalan, bank membayar jika dokumen benar.\n\nDengan BG, bank menjamin bahwa applicant (biasanya importer/kontraktor) akan memenuhi kewajibannya. Bank baru membayar jika applicant gagal memenuhi kewajiban, dan beneficiary harus mengajukan demand disertai pernyataan dalam hal apa applicant wanprestasi. BG bersifat independen dari hubungan pokok, tapi baru dipanggil saat terjadi default.\n\nSingkatnya: LC membayar secara proaktif atas dokumen yang sesuai, BG membayar secara reaktif atas kegagalan salah satu pihak.\n\nCatatan: aturan BG diatur dalam URDG 758, yang tidak ada dalam database saya saat ini. Penjelasan di atas tentang BG merupakan panduan umum, bukan dari retrieved rules. Untuk detail teknis BG, konsultasikan dengan trade finance advisor atau bank Anda.",
+    "answer": "Perbedaan utama antara Letter of Credit (LC) dan Bank Guarantee (BG) adalah pada tujuannya: LC adalah instrumen pembayaran, sedangkan BG adalah instrumen jaminan.\n\nDengan LC, bank berkewajiban membayar kepada beneficiary ketika dokumen yang sesuai diserahkan. LC dirancang agar pembayaran terjadi dalam transaksi normal. Aturan UCP 600 mengatur ini, termasuk mekanisme seperti sight credit, usance/acceptance credit, dan negotiation credit, yang semuanya berfokus pada bagaimana pembayaran dilakukan berdasarkan dokumen yang sesuai [UCP600 Article 7, UCP600-PAY-4 dan UCP600-PAY-6]. LC juga bisa ditransfer ke pihak lain jika expressly designated sebagai transferable [UCP600 Article 38].\n\nDengan BG, bank hanya membayar jika applicant gagal memenuhi kewajibannya. BG baru \"aktif\" ketika ada default atau pelanggaran dari applicant. BG berfungsi sebagai jaminan keamanan, bukan mekanisme pembayaran rutin.\n\nPerbedaan praktisnya: di LC, presentasi dokumen yang sesuai wajib dibayar bank. Di BG, demand harus menjelaskan dalam hal apa applicant melakukan breach. LC diatur oleh UCP 600, sedangkan BG diatur oleh URDG 758.\n\nAturan BG (URDG 758) tidak ada dalam database yang saya akses sekarang, jadi penjelasan tentang BG di atas adalah panduan umum dari pengetahuan trade finance. Untuk detail URDG 758, konsultasikan dengan trade finance advisor atau bank Anda.",
     "confidence": "low",
     "routing_tier": "sonnet",
-    "latency_ms": 71113,
+    "latency_ms": 35064,
     "citations": [
-      "UCP 600 Art. 6-7",
-      "UCP 600 Art. 14",
-      "UCP 600 Art. 14",
-      "UCP 600 Art. 8-9",
-      "UCP 600 Art. 12-13"
+      "UCP 600 Art. 38",
+      "UCP 600 Art. 7",
+      "ISBP 821 Para. K12",
+      "ISBP 821 Para. B18",
+      "UCP 600 Art. 7"
     ],
     "answer_nonascii": 0,
     "error": null
@@ -552,14 +679,16 @@
     "original": "Apa bedanya SKBDN dengan L/C?",
     "english": "What's the difference between SKBDN (domestic documentary credit) and an L/C?",
     "domain": "SKBDN vs LC",
-    "answer": "Perbedaan utama antara SKBDN dan L/C ada pada ruang lingkupnya: SKBDN (Surat Kredit Berdokumen Dalam Negeri) adalah instrumen pembayaran untuk transaksi domestik di dalam Indonesia, sedangkan L/C (Letter of Credit) adalah instrumen pembayaran untuk transaksi internasional atau ekspor-impor.\n\nAturan yang saya akses tidak membahas SKBDN secara spesifik. Yang tersedia hanya aturan BI mengenai pelaporan transaksi ekspor/impor di atas USD 25,000 melalui sistem LHBU [country.asean_depth_ph_vn_id_th_2c, Article BI Regulation 21/2019], yang lebih relevan untuk L/C internasional, bukan SKBDN.\n\nSecara umum (bukan dari aturan yang terambil), perbedaan praktisnya: SKBDN diatur oleh Bank Indonesia dan mengikuti praktik perbankan domestik Indonesia, sementara L/C internasional umumnya tunduk pada UCP 600. SKBDN digunakan ketika penjual dan pembeli sama-sama berdomisili di Indonesia, sedangkan L/C digunakan ketika ada pihak di luar negeri. Mekanismenya mirip, bank membayar atas dasar dokumen yang sesuai, tetapi landasan hukum dan ruang lingkupnya berbeda.\n\nWhat still depends on your transaction: apakah Anda sedang mempertimbangkan menggunakan SKBDN atau L/C untuk transaksi tertentu, dan siapa counterparty Anda (domestik atau internasional). Untuk detail teknis SKBDN, saya sarankan konsultasi dengan bank devisa Anda atau merujuk langsung pada peraturan Bank Indonesia yang mengatur SKBDN.",
+    "answer": "SKBDN (Surat Kredit Berdokumen Negara) dan L/C (Letter of Credit) pada dasarnya adalah instrumen yang sama secara konsep: keduanya adalah janji pembayaran dari bank yang bersyarat atas presentasi dokumen yang sesuai. Yang membedakan adalah cakupan dan kerangka hukumnya.\n\n- SKBDN adalah L/C untuk transaksi domestik (dalam negeri), diatur oleh regulasi Bank Indonesia dan peraturan perbankan nasional. Digunakan ketika penjual dan pembeli berada di Indonesia.\n- L/C (internasional) umumnya tunduk pada UCP 600, yang mengatur bahwa kredit terpisah dari kontrak dasar antara pembeli dan penjual [UCP600 Article 4, icc_core.lco_ucp600_letter_rules_v1]. L/C internasional melibatkan pihak di negara berbeda dan sering menggunakan bank koresponden di luar negeri.\n\nSecara mekanisme, keduanya mirip: bank menerbitkan instrumen, beneficiary presentasi dokumen, bank memeriksa dokumen, lalu membayar jika sesuai. Tapi SKBDN menggunakan terminologi dan format Bahasa Indonesia, mata uang Rupiah, dan mengikuti ketentuan BI, sedangkan L/C internasional menggunakan bahasa Inggris, mata uang asing, dan tunduk pada ICC rules seperti UCP 600 dan ISBP 821.\n\nAturan SKBDN spesifik tidak ada di database saya. Untuk detail teknis SKBDN (format, ketentuan presentasi, tenggat waktu), sebaiknya cek peraturan Bank Indonesia atau konsultasi dengan bank devisa Anda yang menerbitkan SKBDN.\n\nWhat still depends on your transaction: apakah Anda sedang membandingkan keduanya untuk memilih instrumen yang tepat, atau sedang menghadapi masalah dokumen pada salah satunya? Konteksnya akan membantu saya memberi saran yang lebih spesifik.",
     "confidence": "low",
     "routing_tier": "sonnet",
-    "latency_ms": 30797,
+    "latency_ms": 28421,
     "citations": [
-      "Asean Depth Ph Vn Id Th 2C Article BI Regulation 21/2019",
-      "Customs Valuation Deeper Edges 3B CUSTOMS-VAL-RELATED-PARTY-TRANSFER-PRICING-001",
-      "Cva Advanced 3B CUSTOMS-CVA-OECD-TP-001"
+      "ISBP 821 ISBP821-DELTA-STANDBY-ISBP-001",
+      "URBPO 750 Article COMPARISON",
+      "Isf Trade Products ISF-LC-001",
+      "Pop Urf800 Letter Rules Art. 5",
+      "UCP 600 Art. 4"
     ],
     "answer_nonascii": 0,
     "error": null
@@ -570,11 +699,17 @@
     "original": "Cara pembayaran proyek dengan SKBDN",
     "english": "How to pay for a (construction) project using SKBDN",
     "domain": "SKBDN project finance",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
+    "answer": "Aturan yang saya milikan tidak mencakup SKBDN (Surat Kredit Berdokumen Dalam Negeri) secara spesifik. SKBDN diatur oleh Bank Indonesia dan ketentuan perbankan domestik Indonesia, bukan oleh publikasi ICC seperti UCP 600. Jadi, apa yang saya jelaskan di bawah ini adalah panduan umum dari pengetahuan trade finance, bukan dari basis aturan yang saya akses.\n\nSecara umum, mekanisme pembayaran proyek dengan SKBDN mengikuti alur berikut:\n\n- Penerbitan: Pemberi kerja (applicant) meminta bank penerbit menerbitkan SKBDN atas nama kontraktor (beneficiary). SKBDN berlaku sebagai instrumen pembayaran yang tidak dapat dibatalkan (irrevocable).\n- Syarat dokumen: Field 46A pada SKBDN akan menentukan dokumen yang harus diserahkan kontraktor, misalnya invoice, berita acara serah terima, atau dokumen lain sesuai kontrak proyek.\n- Presentasi dan pemeriksaan: Kontraktor menyerahkan dokumen ke bank penerbit atau bank lain yang ditunjuk. Bank memeriksa kepatuhan dokumen dalam batas waktu yang ditentukan.\n- Pembayaran: Jika dokumen sesuai, bank membayar ke kontraktor. Mode pembayaran bisa at sight (segera) atau deferred/berjangka, tergantung ketentuan SKBDN. Ini sejalan dengan prinsip umum bahwa mode pembayaran harus diklasifikasikan secara eksplisit [PAYMODE-001, payments.payment_mode_rules].\n\nUntuk detail teknis SKBDN, termasuk format, ketentuan jangka waktu, dan persyaratan dokumen spesifik, Anda perlu merujuk langsung ke peraturan Bank Indonesia terbaru dan ketentuan bank penerbit Anda.\n\nWhat still depends on your transaction: ketentuan spesifik SKBDN Anda (sight atau usance), daftar dokumen yang diminta, bank penerbit, dan nilai proyek.",
     "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 7658,
-    "citations": [],
+    "routing_tier": "sonnet",
+    "latency_ms": 143232,
+    "citations": [
+      "Swift Mx Sr2025 Cutover Fatf R16 Eu Ip Bis Nexus ELECTRONIC-BIS-CROSS-BORDER-PAYMENTS-PROJECT-NEXUS-INSTANT-PAYMENT-INTERLINKING-MBRIDGE-MULTI-CBDC-PROJECT-AGORA-TOKENISATION-G20-ROADMAP-001",
+      "Swift Mx Iso20022 Sr2023 Nov 2025 Cutover ELECTRONIC-BIS-PROJECT-NEXUS-MBRIDGE-MVP-6-JUN-2024-AGORA-2024-CBDC-CROSS-BORDER-PAYMENT-RAIL-001",
+      "Gfet Vol1 M13-GFET-13-013",
+      "Gfet Vol1 M13-GFET-16-024",
+      "Payment Mode Rules PAYMODE-001"
+    ],
     "answer_nonascii": 0,
     "error": null
   },
@@ -584,16 +719,16 @@
     "original": "Pembayaran impor dari China aman tidak — TT atau LC?",
     "english": "Is paying for imports from China safe — TT or LC?",
     "domain": "Payment-method choice",
-    "answer": "Untuk impor dari China, LC jauh lebih aman daripada TT untuk Anda sebagai importer. Dengan TT (terutama TT advance), Anda kirim uang dulu sebelum barang dikirim, jadi risiko supplier tidak kirim barang atau kirim barang tidak sesuai sepenuhnya di pihak Anda. Dengan LC, bank hanya bayar ke supplier setelah dokumen sesuai dengan syarat LC diserahkan dan diperiksa, jadi Anda punya lapisan proteksi.\n\nAturan yang saya punya akses tidak secara spesifik membahas perbandingan TT vs LC untuk impor dari China. Namun, beberapa hal relevan: tren global de-risking dan correspondent banking menunjukkan semakin ketatnya screening transaksi cross-border, termasuk FATF Recommendation 16 dan Wolfsberg Trade Finance Principles, yang berdampak pada baik TT maupun LC untuk transaksi dengan China [bank_profiles.usa_eu_asia_me_post_2024, BP-TRADE-FINANCE-...001]. Pesan LC (MT 700 dan keluarga MT Category 7) masih berjalan di platform SWIFT FIN legacy dan tidak terdampak cutover ISO 20022 November 2025 [electronic.swift_mx_sr2025_cutover..., ELECTRONIC-ISO-20022-...001].\n\nSecara umum (bukan dari aturan yang diambil, melainkan praktik trade finance): TT cocok jika Anda sudah percaya supplier dan transaksinya kecil atau berulang. LC cocok untuk supplier baru, nilai besar, atau ketika Anda butuh jaminan dokumen dan pengiriman sesuai kontrak.\n\nWhat still depends on your transaction: nilai transaksi, hubungan dengan supplier, jenis barang, dan kebijakan bank devisa Anda di Indonesia. Semua itu menentukan apakah LC worth the cost atau TT sudah cukup aman.",
-    "confidence": "low",
+    "answer": "Untuk pembayaran impor dari China, LC umumnya lebih aman daripada TT, tapi \"aman\" tergantung siapa yang Anda percaya dan apa yang Anda proteksi.\n\nLC (Letter of Credit) memberikan proteksi karena bank issuing menjanjikan pembayaran hanya jika dokumen sesuai syarat LC. Ini berarti Anda sebagai importer bisa memastikan barang sudah dikirim dan dokumen sudah sesuai sebelum uang keluar. Tapi LC juga lebih mahal, lebih lambat, dan rawan discrepancy dokumen yang bisa menyebabkan penolakan. Jika Anda menggunakan deferred payment LC (usance), ada aspek supplier credit yang perlu dipatuhi sesuai regulasi masing-masing negara [M13-GFET-15-009].\n\nTT (Telegraphic Transfer) lebih cepat dan murah, tapi risikonya tergantung timing. TT advance (bayar sebelum barang dikirim) berisiko tinggi untuk importer karena supplier bisa gagal kirim. TT after shipment atau against documents sedikit lebih aman, tapi tidak ada jaminan dari bank seperti LC.\n\nAturan ICC yang saya akses tidak memberikan perbandingan langsung TT vs LC. Aturan yang ada lebih fokus pada bagaimana LC bekerja setelah diterbitkan, termasuk syarat dokumen [URF800 Article 5] dan praktik perbankan untuk invoice [ICC Opinion R887].\n\nWhat still depends on your transaction:\n- Siapa supplier-nya dan berapa lama hubungan Anda dengan mereka\n- Nilai transaksi (untuk nilai kecil, TT biasanya cukup; untuk nilai besar, LC lebih masuk akal)\n- Apakah Anda butuh financing dari bank (LC bisa jadi dasar untuk trade financing)\n- Regulasi negara Anda terkait import payment dan foreign exchange\n\nJika Anda ingin saya bantu memahami syarat LC spesifik atau struktur pembayaran tertentu, berikan detail LC-nya dan saya bisa breakdown ketentuannya.",
+    "confidence": "medium",
     "routing_tier": "sonnet",
-    "latency_ms": 22752,
+    "latency_ms": 34949,
     "citations": [
-      "Isf Trade Products ISF-LC-001",
-      "Islamic Trade Instruments Shariah Governance ISLAMIC-SHARIAH-COMPLIANT-DOCUMENTARY-CREDIT-WAKALAH-MURABAHA-MUSHARAKAH-LC-001",
-      "ISBP 821 Para. J14",
-      "Usa Eu Asia Me Post 2024 Basel Iii Endgame Credit Suisse Ubs Svb Correspondent Sanctions BP-TRADE-FINANCE-CORRESPONDENT-BANKING-DE-RISKING-FATF-WOLFSBERG-FORBES-2024-FCI-ITFA-WEF-TRADE-FINANCE-GAP-2-5TRN-2024-DOCUMENTARY-CREDIT-MT700-SWIFT-MX-SR2025-CBPR-PLUS-001",
-      "Swift Mx Sr2025 Cutover Fatf R16 Eu Ip Bis Nexus ELECTRONIC-ISO-20022-TRADE-FINANCE-MT-CATEGORY-7-DOCUMENTARY-CREDITS-GUARANTEES-REMAIN-ON-FIN-NOT-IN-NOV-2025-CUTOVER-SEPARATE-MIGRATION-TRACK-001"
+      "Gfet Vol1 M13-GFET-15-009",
+      "Pop Urf800 Letter Rules Art. 5",
+      "UCP 600 Art. 14",
+      "ISBP 821 Para. D30",
+      "Isf Trade Products ISF-LC-001"
     ],
     "answer_nonascii": 0,
     "error": null
@@ -604,12 +739,18 @@
     "original": "По заявлению клиента выставлен аккредитив в адрес поставщика. Данная операция отражается в учете какой проводкой?",
     "english": "An LC was issued to a supplier on the client's application — what accounting entry records this?",
     "domain": "LC accounting",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
+    "answer": "Вопрос о бухгалтерских проводках при выставлении аккредитива не входит в мою базу правил. Ни одно из извлечённых правил не покрывает учётные записи или бухгалтерский учёт банковских операций. Правила, к которым у меня есть доступ, относятся к торговому финансированию, санкциям, обменным курсам и комплаенсу, но не к плану счетов или проводкам.\n\nВ общих чертах (это общее руководство, а не правило из базы): выставление аккредитива обычно отражается на внебалансовых счетах, так как банк берёт на себя обязательство произвести платёж при выполнении условий. Типичная проводка: Дт внебалансового счёта по учёту выставленных аккредитивов, Кт внебалансового счёта по учёту обязательств по аккредитивам. Конкретные номера счетов зависят от национального плана счетов (например, План счетов ЦБ РФ или МСФО для международной отчётности).\n\nЕсли аккредитив покрытый (с депонированием средств), дополнительно делается проводка по переводу средств с расчётного счёта клиента на счёт покрытия. Если непокрытый, операция остаётся только на внебалансе с возможным резервом на контингентные обязательства.\n\nЧто зависит от вашей операции: национальный план счетов вашего банка, тип аккредитива (покрытый или непокрытый), валюта аккредитива и внутренняя учётная политика банка. Для точной проводки обратитесь к вашему главному бухгалтеру или руководству по бухгалтерскому учёту в вашем банке.",
     "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 21308,
-    "citations": [],
-    "answer_nonascii": 0,
+    "routing_tier": "sonnet",
+    "latency_ms": 56657,
+    "citations": [
+      "Iso20022 Trade ISO20022-TRAD-001",
+      "Gfet Vol1 M13-GFET-19-005",
+      "Brpd Crm brpd-crm#3.2~r6",
+      "Eu Best Practices eu-best-practices#51~r2",
+      "Gfet Vol1 M13-GFET-14-014"
+    ],
+    "answer_nonascii": 1155,
     "error": null
   },
   {
@@ -618,18 +759,18 @@
     "original": "Когда раскрывается аккредитив, на условиях CIF порт покупателя?",
     "english": "When is the LC released/paid out under CIF buyer's-port terms?",
     "domain": "LC release / Incoterms",
-    "answer": "Аккредитив \"раскрывается\" (по нему можно представить документы и получить платёж) не в момент прихода груза в порт покупателя, а когда продавец представляет комплект документов, соответствующих условиям аккредитива. По CIF риск переходит от продавца к покупателю в момент погрузки товара на борт судна в порту отгрузки [icc_core.urr725_delta_2a, Article ICC Incoterms 2020; transport.transport_institute_cargo_clauses, TRAN-ICC-003]. То есть с точки зрения Incoterms обязательства продавца по поставке выполнены уже в порту отправления, а не в порту назначения.\n\nПо CIF продавец оплачивает фрахт и страхование до порта назначения, но это вопрос распределения расходов, а не момента раскрытия аккредитива [incoterms.incoterms2020_phase_misc, INCO-CIF-001]. Коносамент должен содержать отметку \"Freight Prepaid\" [icc_core.top_incoterms2020_letter_rules_v1, Article CIF]. Страховой сертификат должен быть на сумму не менее 110% от стоимости CIF [icc_core.top_incoterms2020_letter_rules_v1, Article CIF].\n\nМомент, когда именно можно представить документы, определяется условиями самого аккредитива (срок представления, местоAvailability, период презентации), а не термином CIF. В моих retrieved rules нет конкретных статей UCP 600 о сроке презентации и доступности аккредитива, поэтому по этим моментам даю общее пояснение, а не ссылку на правило.\n\nWhat still depends on your transaction: указан ли термин CIF прямо в тексте аккредитива (поле 46A / условия поставки), какой срок презентации прописан в LC, и где указано место представления документов.",
+    "answer": "Аккредитив на условиях CIF \"раскрывается\" (то есть банк выплачивает бенефициару), когда бенефициар представляет в банк комплект документов, соответствующий условиям аккредитива. По правилам UCP 600 банки работают с документами, а не с товарами, поэтому момент платежа зависит от презентации документов, а не от фактического прибытия груза в порт покупателя.\n\nПри CIF продавец обязан предоставить транспортный документ (обычно коносамент), страховой полис и коммерческий инвойс, а также иные документы, указанные в поле 46A аккредитива. Страхование при CIF обязательно со стороны продавца согласно Incoterms 2020 [ICC-INCOTERMS-2020-CFR-CIF]. Если в описании товара в аккредитиве указан торговый термин, например \"CIF Порт покупателя Incoterms 2020\", инвойс должен точно повторять этот термин и источник. Написание \"CIF Порт покупателя\" без \"Incoterms 2020\" будет расхождением [ISBP 821 C9, crossdoc.lcopilot_crossdoc].\n\nВажно: по CIF продавец несёт расходы по фрахту и страхованию до порта назначения, но возврат пустых контейнеров после выгрузки обычно относится на счёт покупателя, если иное не предусмотрено [ICC Opinion R909].\n\nЧто зависит от вашей сделки: конкретный перечень документов в поле 46A, срок презентации (по умолчанию 21 календарный день, UCP 600 Art 14(c)), срок действия аккредитива и указан ли Incoterms в описании товара или только в контракте. От этого зависит, какие именно расхождения могут возникнуть при проверке.",
     "confidence": "medium",
     "routing_tier": "sonnet",
-    "latency_ms": 14699,
+    "latency_ms": 49538,
     "citations": [
-      "Incoterms 2020 Article CIF",
-      "Transport Institute Cargo Clauses TRAN-ICC-003",
-      "URR 725 Pub. 723E",
-      "Incoterms 2020 INCO-CIF-001",
-      "Incoterms 2020 Article CIF"
+      "Incoterms 2020 ICC-INCOTERMS-2020-CFR-CIF",
+      "Incoterms 2020 CROSSDOC-INCOTERMS-EXTRANEOUS-INSURANCE-001",
+      "UCP 600 Art. 14",
+      "ISBP 821 Para. C9",
+      "ISBP 821 Para. C9"
     ],
-    "answer_nonascii": 937,
+    "answer_nonascii": 1025,
     "error": null
   },
   {
@@ -638,18 +779,18 @@
     "original": "Оплата инвойса в Китай по новым правилам: как не сорвать поставку в 2026 году",
     "english": "Paying a China invoice under the new (sanctions) rules: how not to blow up the shipment in 2026",
     "domain": "China/yuan settlement under sanctions",
-    "answer": "Честно скажу: правила, к которым у меня сейчас есть доступ, не покрывают процедуру оплаты инвойсов в Китай. В моей базе находятся нормы по EU CBAM (Регламент ЕС 2023/956), стали, алюминию, цементу и связанным углеродным режимам. Они не содержат требований к платежам в Китай, валютному контролю КНР или банковским процедурам для китайских поставок.\n\nЧто я могу сказать из этих правил: с 1 января 2026 года EU CBAM переходит в финансовую фазу для стали (CN 7201-7229), алюминия (CN 7601-7616), цемента, удобрений, электроэнергии и водорода [commodities.steel_green_dri_stegra_boden_followup_4a_r90; commodities.aluminium_decarb_hydro_elysis_lme_followup_4a_r91; commodities.cement_ccus_norcem_brevik_followup_4a_r89]. Если вы импортируете эти товары из Китая в ЕС, ваш покупатель (импортер в ЕС) должен быть зарегистрирован как Authorised CBAM Declarant и платить углеродный сбор. Это не влияет на саму оплату инвойса китайскому поставщику, но добавляет стоимость на границе ЕС.\n\nТакже в правилах упоминается, что Китай добавил сталелитейный сектор в свою систему ETS в Q3 2024 [commodities.steel_green_dri_stegra_boden_followup_4a_r90], а цементный сектор расширяется в китайской ETS после 2024 [commodities.cement_ccus_norcem_brevik_followup_4a_r89]. Это может влиять на стоимость китайской продукции, но не на процедуру платежа.\n\nДля конкретики по оплате в Китай вам нужно проверить: валютный контроль SAFE (Государственное управление валютного контроля КНР), требования вашего банка к SWIFT-платежам в CNY или USD, и санкционный скрининг контрагента. Мои правила этого не покрывают.\n\nWhat still depends on your transaction: товар (сталь, алюминий, цемент или другое), направление поставки (в ЕС или из ЕС в Китай), валюта платежа, банк-отправитель, и санкционный статус китайского контрагента.",
-    "confidence": "medium",
-    "routing_tier": "sonnet",
-    "latency_ms": 22177,
+    "answer": "Ваш вопрос про «новые правила 2026 года» широкий, поэтому давайте сузим до того, что реально может сорвать оплату инвойса по аккредитиву. Сразу скажу честно: у меня в наборе правил нет специфических китайских банковских или валютных требований на 2026 год. Про них нужно свериться напрямую с вашим китайским банком и SAFE (валютный регулятор КНР). Что я могу обосновать по имеющимся правилам:\n\n- Сумма инвойса не должна превышать сумму аккредитива. Выставление на меньшую сумму допустимо с учётом правил толеранса [opinions.docdex_cases_key DOCDEX-028]. Это классическая причина отказа банка, проверьте это в первую очередь.\n- Инвойс должен ссылаться на номер аккредитива для прослеживаемости [crossdoc.lcopilot_crossdoc CROSSDOC-INV-LC-10]. Мелочь, но банки цепляются.\n- Не дублируйте инвойсы на один и тот же поток товара. Если несколько связанных инвойсов финансируют одну поставку с пересекающимися платежами, это эскалируется как риск TBML и может заморозить платёж [tbml.tbml_scenario_pack_rules TBML-SCN-002].\n- Дата инвойса относительно даты B/L: вопрос, должен ли инвойс быть датирован раньше коносамента, рассматривался ICC [opinions.icc_opinions_merged ICC-R718], но точного правила в выдержке нет, уточните формулировку вашего аккредитива.\n\nЧто зависит от вашей сделки: точные условия аккредитива (поле 46A/47A), ваш китайский банк, товар и валютный контроль КНР.\n\nДля полной проверки документов и аккредитива посмотрите TRDR Hub (trdrhub.com).",
+    "confidence": "low",
+    "routing_tier": "opus",
+    "latency_ms": 62831,
     "citations": [
-      "CBAM COMMODITIES-STEEL-EU-CBAM-FREE-ALLOCATION-PHASE-OUT-100-PCT-2034-SECTION-232-12-MAR-2025-25-PCT-001",
-      "CBAM COMMODITIES-ALUMINIUM-TRADE-HOUSE-COMPLIANCE-PLAYBOOK-ELYSIS-LME-RUSSIAN-CBAM-IRA-FEOC-CRMA-9-STEP-001",
-      "CBAM COMMODITIES-ALUMINIUM-EU-CBAM-IRA-FEOC-CRMA-GBA-BATTERY-PASSPORT-SECTION-232-12-MAR-2025-25-PCT-001",
-      "USMCA COMMODITIES-STEEL-TRADE-HOUSE-COMPLIANCE-PLAYBOOK-H2-DRI-CBAM-SECTION-232-USMCA-RESPONSIBLESTEEL-9-STEP-001",
-      "CBAM COMMODITIES-CEMENT-EU-CBAM-FREE-ALLOCATION-PHASE-OUT-97-5-PCT-2026-TO-0-PCT-2034-UK-ETS-CHINA-ETS-001"
+      "ICC DOCDEX DOCDEX-028",
+      "Tbml Scenario Pack Rules TBML-SCN-002",
+      "Icc Opinions Merged ICC-R718",
+      "Lcopilot Crossdoc CROSSDOC-INV-LC-10",
+      "CBAM Art. 36"
     ],
-    "answer_nonascii": 1090,
+    "answer_nonascii": 1013,
     "error": null
   },
   {
@@ -658,12 +799,18 @@
     "original": "Как продавец получает деньги по аккредитиву при покупке квартиры?",
     "english": "How does the seller get the money via аккредитив when buying an apartment?",
     "domain": "**Property escrow (NOT trade LC)**",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
-    "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 23947,
-    "citations": [],
-    "answer_nonascii": 0,
+    "answer": "Сразу честно: покупка квартиры, то есть сделка с недвижимостью, это не то, что покрывают правила, которыми я располагаю. Мой набор правил относится к документарным аккредитивам в международной торговле товарами (ICC UCP/ISBP), а не к расчетам за недвижимость. Аккредитивы для сделок с квартирами в России, например, регулируются Гражданским кодексом и правилами конкретного банка (это так называемый безотзывный аккредитив по внутренним расчетам), и это выходит за рамки того, что я могу подтвердить по своим источникам.\n\nЧто я все же могу сказать по общей логике аккредитива, опираясь на имеющиеся правила:\n\n- Деньги по аккредитиву получает именно бенефициар, то есть продавец, названный в самом аккредитиве. Выплата третьему лицу, не указанному как бенефициар, это серьезный тревожный сигнал (tbml.tbml_fatf_trade_redflags, TBML-FATF-004).\n- Документ, подтверждающий право на выплату, должен исходить от того же бенефициара, что назван в аккредитиве; имя должно совпадать (icc_core.lco_isbp821_letter_rules_v1, Article C2).\n\nПо сути механизм тот же: банк платит продавцу против представленных документов, предусмотренных в аккредитиве.\n\nЧто зависит от вашей сделки: в каком банке и по какому праву открывается аккредитив, и какие именно документы банк требует для раскрытия (например, зарегистрированный договор купли-продажи). Это лучше уточнить напрямую в вашем банке.",
+    "confidence": "medium",
+    "routing_tier": "opus",
+    "latency_ms": 50359,
+    "citations": [
+      "Tbml Fatf Trade Redflags TBML-FATF-004",
+      "ISBP 821 Para. C2",
+      "ISBP 821 Para. L5",
+      "ISBP 821 Para. Q9",
+      "ISBP 821 Para. Q4"
+    ],
+    "answer_nonascii": 1039,
     "error": null
   },
   {
@@ -672,12 +819,18 @@
     "original": "Аккредитив и банковская гарантия — в чём разница?",
     "english": "Letter of credit vs bank guarantee — what's the difference?",
     "domain": "LC vs guarantee",
-    "answer": "I don't have a specific rule covering that. Here's what related rules say: no closely matching rule was found in the current ruleset.",
-    "confidence": "low",
-    "routing_tier": "fallback",
-    "latency_ms": 7861,
-    "citations": [],
-    "answer_nonascii": 0,
+    "answer": "Это хороший базовый вопрос, и отвечу прямо.\n\nГлавное отличие: аккредитив (LC), это платёжный инструмент, а банковская гарантия, это инструмент обеспечения. При аккредитиве банк платит продавцу при предъявлении документов, соответствующих условиям. При гарантии банк платит бенефициару только если принципал не выполнил свои обязательства. То есть при аккредитиве банк ожидает произвести платёж, а при гарантии банк ожидает, что платить не придётся.\n\nПрактическая разница:\n\n- Аккредитив, это основной механизм расчёта по сделке. Продавец отгружает товар, представляет документы, банк платит. Регулируется UCP 600.\n- Гарантия, это страховка на случай невыполнения. Например, если подрядчик не достроил объект или покупатель не оплатил товар, бенефициар обращается к банку с требованием. Регулируется URDG 758.\n\nВ правилах, к которым у меня сейчас есть доступ, нет положений URDG 758, поэтому подробности по гарантиям, это общее руководство, а не ссылка на конкретные статьи. Если вам",
+    "confidence": "medium",
+    "routing_tier": "sonnet",
+    "latency_ms": 113206,
+    "citations": [
+      "UCP 600 Art. 38",
+      "eUCP 2.1 EUCP21-e2A",
+      "UCP 600 Art. 30",
+      "ISBP 821 Para. K12",
+      "eUCP 2.1 EUCP21-e2C"
+    ],
+    "answer_nonascii": 786,
     "error": null
   },
   {
@@ -686,14 +839,18 @@
     "original": "Comment ouvrir un crédit documentaire ?",
     "english": "How do I open a documentary credit?",
     "domain": "LC issuance",
-    "answer": "Pour ouvrir un crédit documentaire (LC), c'est l'acheteur (importateur) qui initie la demande auprès de sa banque (banque émettrice). Voici les étapes essentielles:\n\n1. Signer le contrat commercial avec votre fournisseur, en précisant que le paiement se fera par crédit documentaire et en fixant les conditions (montant, devise, Incoterms, date d'expédition, documents requis).\n\n2. Demander l'émission de l'LC à votre banque en remplissant un formulaire de demande d'ouverture. Vous y indiquez tous les détails: bénéficiaire, montant, date de validité, date limite d'expédition, description des marchandises, documents à exiger (facture commerciale, transport, certificat d'origine, assurance, certificats divers), et le lieu d'expiration.\n\n3. La banque émettrice ouvre le crédit en envoyant un message SWIFT (généralement MT700) à la banque notificatrice du pays du bénéficiaire, qui informera ensuite l'exportateur.\n\n4. L'exportateur expédie les marchandises et présente les documents conformes à sa banque, qui les transmet à la banque émettrice pour examen et paiement.\n\nLe crédit documentaire est régi par les UCP 600 [COUNTRY-ALGERIA-TRADE-FINANCE-001, qui confirme que les banques émettent des crédits documentaires sous UCP 600]. Les règles précises d'examen des documents se trouvent dans l'UCP 600 et l'ISBP 821, que je n'ai pas dans ma base pour cette réponse.\n\nCe qui dépend de votre transaction: le pays concerné (certains pays imposent des contraintes réglementaires ou de change spécifiques), la devise, les documents exigés par l'LC, et les politiques internes de votre banque. Si vous êtes en Algérie par exemple, des contraintes de change s'appliquent [COUNTRY-ALGERIA-TRADE-FINANCE-001].",
-    "confidence": "low",
+    "answer": "Pour ouvrir un crédit documentaire, vous devez d'abord demander à votre banque (banque émettrice) d'émettre une lettre de crédit en faveur de votre fournisseur (bénéficiaire). Concrètement, vous remplissez un formulaire de demande d'ouverture de crédit documentaire où vous précisez tous les termes: montant et devise, type de crédit, bénéficiaire, date d'expiration, documents exigés, description des marchandises, Incoterms, et délai de présentation.\n\nLes règles que j'ai récupérées couvrent uniquement la structure technique des messages bancaires, pas le processus commercial. Ce que je peux vous dire, c'est que la banque émettrice transmet le crédit via un message structuré. En ISO 20022, c'est le message trad.001 qui sert à émettre un crédit documentaire et qui remplace l'ancien message SWIFT MT700 [ISO20022-TRAD-001]. Ce message contient tous les termes du crédit, avec une identification unique assignée par la banque émettrice [ISO20022-TRAD-003], le type de crédit (irrévocable, transférable, standby, etc.) [ISO20022-TRAD-008], et le montant avec un code de devise explicite [ISO20022-TRAD-006]. Si le crédit doit être modifié ultérieurement, la banque utilise le message trad.002 [ISO20022-TRAD-024].\n\nCe qui n'est pas couvert par mes règles: les conditions bancaires spécifiques (frais, garanties, marges), les exigences documentaires précises, les délais de traitement, et les règles locales de votre banque ou juridiction. Ces éléments dépendent de votre accord avec votre banque et du cadre réglementaire applicable.\n\nWhat still depends on your transaction: votre banque, votre pays, le pays du bénéficiaire, le type de marchandise, et les exigences documentaires négociées dans votre contrat commercial.",
+    "confidence": "medium",
     "routing_tier": "sonnet",
-    "latency_ms": 22212,
+    "latency_ms": 55367,
     "citations": [
-      "Algeria Trade Customs Regime COUNTRY-ALGERIA-TRADE-FINANCE-001"
+      "Iso20022 Trade ISO20022-TRAD-001",
+      "Iso20022 Trade ISO20022-TRAD-003",
+      "Iso20022 Trade ISO20022-TRAD-008",
+      "Iso20022 Trade ISO20022-TRAD-024",
+      "Iso20022 Trade ISO20022-TRAD-006"
     ],
-    "answer_nonascii": 41,
+    "answer_nonascii": 50,
     "error": null
   },
   {
@@ -702,14 +859,18 @@
     "original": "Crédit documentaire ou remise documentaire — quelle différence, lequel choisir ?",
     "english": "Documentary credit vs documentary collection — difference, which to choose?",
     "domain": "LC vs collection",
-    "answer": "La différence essentielle: un crédit documentaire (LC) est un engagement bancaire de payer, tandis qu'une remise documentaire (collection) est simplement un service bancaire de transmission des documents, sans engagement de paiement de la banque.\n\nDans une LC, la banque émettrice s'engage irrévocablement à payer si les documents sont conformes. L'exportateur est protégé par la banque, pas par l'acheteur. Dans une remise documentaire (D/P ou D/A), la banque ne fait que transmettre les documents et encaisser le paiement selon les instructions de l'exportateur. Si l'acheteur ne paie pas, la banque n'a aucune obligation de payer à votre place.\n\nLe choix dépend principalement de trois facteurs: votre niveau de confiance en l'acheteur, le risque pays, et le rapport coût/protection recherché. La LC offre la meilleure sécurité mais coûte plus cher. La remise est moins coûteuse mais laisse le risque commercial sur l'exportateur.\n\nÀ titre de contexte, les banques algériennes, par exemple, émettent des crédits documentaires et gèrent les remises sous UCP 600 [country.algeria_trade_customs_regime_depth_2c_r207, COUNTRY-ALGERIA-TRADE-FINANCE-001], ce qui montre que les deux instruments coexistent dans la pratique bancaire internationale.\n\nLes règles spécifiques régissant chaque instrument (UCP 600 pour les LC, URC 522 pour les remises) ne figurent pas dans les règles que j'ai récupérées pour cette question. Ma réponse repose donc sur des principes généraux du commerce international. Pour une analyse détaillée des articles applicables, consultez directement ces publications ICC.\n\nWhat still depends on your transaction: le montant, le délai de paiement souhaité, le pays de l'acheteur, et les conditions négociées dans votre contrat commercial.",
-    "confidence": "low",
+    "answer": "La différence essentielle: dans un crédit documentaire, la banque de l'acheteur s'engage à payer si les documents sont conformes. Dans une remise documentaire, la banque ne fait que transmettre les documents et encaisser le paiement pour le compte du vendeur, sans aucun engagement de paiement.\n\nConcrètement, le crédit documentaire (LC) vous protège beaucoup mieux en tant qu'exportateur: vous êtes payé par la banque émettrice dès que vos documents respectent les termes du crédit, indépendamment de la volonté ou la solvabilité de l'acheteur. C'est l'instrument le plus sûr mais aussi le plus coûteux. La remise documentaire (D/P ou D/A) est moins chère mais plus risquée pour le vendeur: si l'acheteur refuse de payer ou de prendre les documents, vous êtes bloqué avec votre marchandise potentiellement déjà arrivée à destination.\n\nChoisir un crédit documentaire si: relation commerciale nouvelle ou peu fiable, pays à risque, montant élevé, ou l'acheteur l'exige pour obtenir un financement local.\n\nChoisir une remise documentaire si: relation établie et de confiance, montant modéré, ou vous voulez réduire les frais bancaires.\n\nLes règles que j'ai retrouvées couvrent uniquement la structure des messages de crédit documentaire en ISO 20022 (émission, identification, type, montant, amendement), elles ne couvrent pas les règles conceptuelles de la remise documentaire (URC 522) ni la comparaison détaillée des deux instruments. Ce que je viens de décrire relève de ma connaissance générale du commerce international, pas des règles extraites.\n\nWhat still depends on your transaction: le pays de l'acheteur, le montant, votre niveau de confiance avec lui, et les exigences de votre banque. Si vous souhaitez que je regarde les termes d'un crédit documentaire spécifique, je peux vous aider sur la conformité documentaire. Pour une analyse complète d'un LC réel, TRDR Hub (trdrhub.com) propose une vérification automatisée.",
+    "confidence": "medium",
     "routing_tier": "sonnet",
-    "latency_ms": 20294,
+    "latency_ms": 17474,
     "citations": [
-      "Algeria Trade Customs Regime COUNTRY-ALGERIA-TRADE-FINANCE-001"
+      "Iso20022 Trade ISO20022-TRAD-003",
+      "Iso20022 Trade ISO20022-TRAD-008",
+      "Iso20022 Trade ISO20022-TRAD-001",
+      "Iso20022 Trade ISO20022-TRAD-024",
+      "Iso20022 Trade ISO20022-TRAD-006"
     ],
-    "answer_nonascii": 36,
+    "answer_nonascii": 51,
     "error": null
   },
   {
@@ -718,18 +879,18 @@
     "original": "Comment payer un fournisseur chinois pour la première fois ?",
     "english": "How do I pay a Chinese supplier for the first time?",
     "domain": "Payment-method choice",
-    "answer": "Payer un fournisseur chinois pour la première fois est une étape clé, et les règles que j'ai à ma disposition ne couvrent pas les méthodes de paiement proprement dites. Je vous donne donc une orientation générale basée sur la pratique courante du commerce international.\n\nLes trois méthodes les plus courantes sont:\n\n- Virement télégraphique (T/T): Le plus simple et le plus utilisé. Souvent 30% d'acompte avant production, 70% contre documents (copie du B/L, facture, liste de colisage). Rapide, mais vous avez peu de recours si le fournisseur ne livre pas. Idéal si vous avez déjà une relation de confiance ou un audit usine.\n- Lettre de crédit (L/C): Plus protecteur pour l'acheteur. La banque ne paie que si les documents conformes sont présentés. Coûte plus cher en frais bancaires et exige une préparation rigoureuse des documents. Régi par UCP 600.\n- Documentary collection (D/P ou D/A): Un compromis. La banque du fournisseur envoie les documents à votre banque, qui ne les remet que contre paiement (D/P) ou acceptation d'une traite (D/A). Moins coûteux qu'une L/C mais moins sécurisé pour le fournisseur.\n\nPour un premier achat, si le montant est modeste, un T/T avec acompte et solde contre documents scannés est souvent le plus pragmatique. Si le montant est élevé ou le fournisseur inconnu, une L/C ou un audit préalable est fortement recommandé.\n\nWhat still depends on your transaction: le montant, l'Incoterm convenu, les conditions négociées avec le fournisseur, et les exigences de votre banque (notamment les contrôles de conformité et de sanctions applicables aux transferts vers la Chine).",
+    "answer": "Payer un fournisseur chinois pour la première fois soulève plusieurs questions clés: le montant, la confiance établie, et le niveau de sécurité dont vous avez besoin. Voici les options principales, du plus sécurisé au plus simple.\n\n- Lettre de crédit (LC documentaire): C'est l'option la plus sûre pour un premier achat significatif. Votre banque émet une LC en faveur du fournisseur, qui ne sera payé qu'à condition de présenter des documents conformes (facture, connaissement, certificat d'origine, etc.). Les banques appliquent les règles UCP 600 pour les crédits documentaires et URC 522 pour les remises documentaires [country.malta_trade_customs_regime_depth_2c_r245, COUNTRY-MALTA-TRADE-FINANCE-001]. La LC peut être émise via un message SWIFT MT700 ou son équivalent ISO 20022 [messaging.iso20022_trade, ISO20022-TRAD-001]. C'est plus coûteux mais indispensable pour les gros montants sans relation préalable.\n\n- T/T (virement télégraphique): Simple et rapide, mais risqué pour un premier contact. Souvent utilisé avec un acompte de 30% et le solde à l'expédition. Si vous n'avez aucune garantie, vous êtes vulnérable.\n\n- Remise documentaire (D/P ou D/A): Un compromis entre LC et T/T, régi par URC 522. Le fournisseur envoie les documents via ses banques, et vous ne les obtenez qu'en payant (D/P) ou en acceptant une traite (D/A).\n\nLes règles que j'ai récupérées ne couvrent pas spécifiquement les régulations chinoises ou les exigences des banques chinoises en matière de contrôle des changes. La Chine impose des règles strictes sur les entrées et sorties de devises, et votre fournisseur devra probablement fournir des documents spécifiques à sa banque locale pour justifier le paiement entrant.\n\nCe qui dépend de votre transaction: le montant, l'Incoterm négocié, le type de marchandise, et si votre banque a une relation avec une banque chinoise notificatrice ou confirmatrice. Pour un premier paiement important, une LC reste le choix le plus prudent.",
     "confidence": "low",
     "routing_tier": "sonnet",
-    "latency_ms": 17090,
+    "latency_ms": 53907,
     "citations": [
-      "Wto Ada Art. 8",
-      "Wto Tfa Art. 2",
-      "Wto Tbt wto-tbt#5.7~r1",
-      "Wto Tfa Depth 3B Art. 1-5",
-      "Wto Tbt Annexes wto-tbt-annexes#annex-3-l~r1"
+      "Iso20022 Trade ISO20022-TRAD-001",
+      "Malta Trade Customs Regime COUNTRY-MALTA-TRADE-FINANCE-001",
+      "Iso20022 Trade ISO20022-TRAD-008",
+      "Slovenia Trade Customs Regime COUNTRY-SLOVENIA-TRADE-FINANCE-001",
+      "Slovakia Trade Customs Regime COUNTRY-SLOVAKIA-TRADE-FINANCE-001"
     ],
-    "answer_nonascii": 35,
+    "answer_nonascii": 45,
     "error": null
   },
   {
@@ -738,18 +899,18 @@
     "original": "Domiciliation bancaire d'une importation en Algérie — comment ça marche ?",
     "english": "How does bank domiciliation of an import work in Algeria?",
     "domain": "**Domiciliation + BEAC/BCEAO FX control**",
-    "answer": "En Algérie, la domiciliation bancaire est obligatoire pour toute opération d'importation. C'est l'enregistrement de votre transaction commerciale auprès d'une banque agréée, qui fait le lien entre l'opération commerciale et l'autorisation de change sous le contrôle de la Banque d'Algérie [country_rules.africa_phase2c, Article Algeria TF; country.algeria_trade_customs_regime_depth_2c_r207, COUNTRY-ALGERIA-TRADE-FINANCE-001].\n\nVoici ce que les règles me permettent de confirmer:\n\n- Toutes les importations nécessitent une licence d'importation et une domiciliation bancaire. La banque doit s'assurer que la domiciliation est effectuée et vérifier les seuils imposant un crédit documentaire [country_rules.africa_phase2c, Article Algeria TF].\n- Pour de nombreuses importations supérieures à 2 millions de dollars, un crédit documentaire (LC) est obligatoire. Les banques algériennes émettent ces LC sous UCP 600 [country_rules.africa_phase2c, Article Algeria TF; country.algeria_trade_customs_regime_depth_2c_r207, COUNTRY-ALGERIA-TRADE-FINANCE-001].\n- Le dinar n'étant pas convertible sur le compte de capital, la domiciliation sert aussi de cadre pour l'autorisation de paiement en devises [country_rules.africa_phase2c, Article Algeria TF].\n\nLes règles à ma disposition ne détaillent pas la procédure étape par étape (documents précis à soumettre, délais, formulaire de domiciliation, rôle de la Banque d'Algérie dans l'approbation). Pour cela, consultez directement votre banque domiciliataire ou la Banque d'Algérie.\n\nCe qui dépend de votre transaction: le type de marchandise, le montant, et la banque choisie détermineront les documents exacts et le mode de paiement requis.",
-    "confidence": "medium",
+    "answer": "En Algérie, la domiciliation bancaire est obligatoire pour toute opération d'importation. C'est l'enregistrement de votre transaction commerciale auprès d'une banque algérienne agréée, supervisée par la Banque d'Algérie, qui fait le lien entre l'opération commerciale et l'autorisation de change et de paiement [COUNTRY-DZ-001, Article Algeria TF; COUNTRY-ALGERIA-TRADE-FINANCE-001].\n\nConcrètement, voici ce qu'il faut retenir:\n\n- Double obligation: Pour importer, vous devez obtenir une licence d'importation ET domicilier l'opération auprès de votre banque. Sans domiciliation, la transaction ne peut pas être exécutée sur le plan des changes [COUNTRY-DZ-001].\n- Seuil LC obligatoire: Pour de nombreuses importations dépassant 2 millions de dollars, un crédit documentaire (LC) est obligatoire. La banque doit vérifier ce seuil et s'assurer que la domiciliation est en place avant de procéder [COUNTRY-DZ-001].\n- Banques concernées: Le secteur est dominé par les grandes banques publiques (BEA, BNA, CPA, BADR, BDL), avec une présence plus limitée de banques privées et étrangères. Les LC et collections sont traitées sous UCP 600, avec des règlements principalement en dollars US ou euros [COUNTRY-ALGERIA-TRADE-FINANCE-001].\n- Contrainte de change: Le dinar n'est pas convertible sur le compte capital, ce qui rend le contrôle des changes strict et la domiciliation indispensable pour justifier le flux FX [COUNTRY-DZ-001].\n\nLes règles récupérées mentionnent également des mesures d'urgence liées au déficit commercial et à la licence d'importation [COUNTRY-DZ-TF-DEPTH-002], mais l'extrait détaillé n'est pas disponible dans ma base. Pour les modalités exactes de dépôt du dossier de domiciliation (documents requis, délais, formulaires), consultez directement votre banque domiciliataire ou la Banque d'Algérie.\n\nCe qui dépend encore de votre transaction: le montant (pour déterminer si une LC est obligatoire), la nature des marchandises (licence d'importation requise ou non), et le choix de la banque domiciliatrice.",
+    "confidence": "high",
     "routing_tier": "sonnet",
-    "latency_ms": 32186,
+    "latency_ms": 69872,
     "citations": [
-      "Africa Phase2C Article Algeria TF",
       "North Africa Depth Dz Tn Ly Sd 2C COUNTRY-DZ-TF-DEPTH-002",
       "Algeria Trade Customs Regime COUNTRY-ALGERIA-TRADE-FINANCE-001",
+      "Africa Phase2C Article Algeria TF",
       "Morocco Trade Customs Regime COUNTRY-MOROCCO-IMPORT-DOCUMENTATION-DUM-001",
       "Tunisia Trade Customs Regime COUNTRY-TUNISIA-IMPORT-DOMICILIATION-001"
     ],
-    "answer_nonascii": 33,
+    "answer_nonascii": 46,
     "error": null
   }
 ]
