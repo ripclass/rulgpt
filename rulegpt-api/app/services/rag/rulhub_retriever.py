@@ -56,7 +56,39 @@ _DOMAIN_TERMS = {
     "complying", "examination", "article", "paragraph", "field", "clause",
     "draft", "drafts", "goods", "freight", "port", "loading", "discharge",
     "inspection", "cumulation", "preferential", "tbml", "aml",
+    # 2026-07-08: concept vocabulary the F1 eval proved was missing — without
+    # these, the on-point word ranks below rarity-picked junk (GQ-25 sent
+    # "applicant waiver regardless", dropping "refusal"; GQ-46 sent
+    # "2026 default value", dropping "cbam"/"steel").
+    # NB: deliberately NOT adding ubiquitous LC words ("issuing", "bank") — they
+    # appear in almost every LC query, don't discriminate, and would crowd the
+    # top-3 out of the on-point term (they pushed "refusal" out of GQ-25).
+    "refusal", "refuse", "dishonour", "dishonor", "notice", "banking",
+    "reimbursing", "reimbursement", "telex", "surrender",
+    "consignee", "endorsement", "redclause", "revocable", "irrevocable",
+    # customs / classification / valuation
+    "hs", "hts", "classification", "classify", "nomenclature", "schedule",
+    "valuation", "assist", "assists", "drawback", "deminimis", "quota",
+    "antidumping", "countervailing", "adcvd", "ftz", "binding", "ruling",
+    # export controls
+    "eccn", "ear99", "ear", "itar", "entity", "blocked", "ccl", "reexport",
+    "wassenaar", "deemed", "dualuse",
+    # sanctions / AML
+    "pep", "disposition", "screening", "match", "sdn", "ownership", "ofsi",
+    "wolfsberg", "mlro", "kyc", "cdd", "edd", "travel",
+    # ESG
+    "cbam", "eudr", "csrd", "sfdr", "taxonomy", "emissions", "declarant",
+    "geolocation", "deforestation", "steel", "aluminium", "aluminum", "cement",
+    "timber", "cocoa", "esg", "carbon",
+    # FTA
+    "rvc", "psr", "originating", "wholly", "substantial", "transformation",
 }
+
+# Only genuine ICC publication numbers anchor a search — NOT years like 2026
+# (which used to rank above "cbam"/"steel" as a bogus "publication number").
+_PUBLICATION_NUMBERS = frozenset({
+    "600", "500", "745", "821", "758", "522", "725", "750", "590", "681", "270",
+})
 
 
 def _content_tokens(query: str) -> list[str]:
@@ -76,7 +108,7 @@ def _ranked_terms(content: list[str]) -> list[str]:
     """Domain-lexicon terms first (query order), then 3-4 digit publication
     numbers (600/758/821…), then remaining tokens longest-first."""
     domain = [t for t in content if t in _DOMAIN_TERMS]
-    numbers = [t for t in content if t.isdigit() and 3 <= len(t) <= 4 and t not in domain]
+    numbers = [t for t in content if t in _PUBLICATION_NUMBERS and t not in domain]
     rest = sorted((t for t in content if t not in domain and t not in numbers),
                   key=len, reverse=True)
     return domain + numbers + rest
