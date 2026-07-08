@@ -343,14 +343,17 @@ class RAGPipeline:
         model; the original query is untouched so generation stays in-language.
         Any failure (no LLM key, error) falls back to the original query — this
         can only improve retrieval, never break it."""
+        _log = logging.getLogger("rulegpt.retrieval")
         if _looks_english(query):
             return query
         get_client = getattr(self.generator, "_get_llm_client", None)
         if get_client is None:
+            _log.warning("[XLANG] no llm client on generator; using raw query")
             return query
         try:
             client = get_client()
             if not getattr(client, "is_available", False):
+                _log.warning("[XLANG] llm client not available; using raw query")
                 return query
             from app.config import settings as _s
             res = await client.generate_answer(
@@ -370,14 +373,13 @@ class RAGPipeline:
                 temperature=0.0,
             )
             english = (res.text or "").strip()
+            # WARNING so it survives prod's log level (INFO is filtered out).
+            _log.warning("[XLANG] %r -> %r (model=%s)", query[:60], english[:80], res.model)
             if english:
-                logging.getLogger("rulegpt.retrieval").info(
-                    "[XLANG] normalized non-English query for retrieval | %r -> %r",
-                    query[:60], english[:60],
-                )
                 return english
-        except Exception:
-            pass
+        except Exception as exc:
+            _log.warning("[XLANG] translation failed (%s: %s); using raw query",
+                         type(exc).__name__, str(exc)[:200])
         return query
 
     async def process_query(self, query: str, session: Any, language: str = "en", user_tier: str = "free") -> QueryResult:
