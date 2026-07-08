@@ -368,8 +368,13 @@ class RAGPipeline:
                     "You normalize trade-finance questions into concise English "
                     "search keywords for a rules database. Output only English keywords."
                 ),
-                model=_s.RULGPT_CLASSIFIER_LLM_MODEL,
-                max_tokens=60,
+                # Use the primary model, not the flash classifier: glm-4.7-flash
+                # returned EMPTY content here (spends its token budget on internal
+                # reasoning), and because that's a *successful* response the
+                # fallback chain never advances — so retrieval silently fell back
+                # to the raw non-English query. glm-5.2 reliably returns content.
+                model=_s.RULGPT_LLM_MODEL,
+                max_tokens=120,
                 temperature=0.0,
             )
             english = (res.text or "").strip()
