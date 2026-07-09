@@ -314,3 +314,15 @@ class TestTemplateAnswer:
         result = _template_answer("What does this say?", rules)
         assert "This applies when:" not in result["answer"]
         assert "hard requirement" not in result["answer"]
+
+
+def test_hit_rank_reads_score_from_extra_and_variants():
+    """normalize_rule buries the relevance score in `extra`; _hit_rank must find
+    it there (lexical uses 'rank'; hybrid may use other names) or confidence
+    tanks to LOW because rank reads 0."""
+    from app.services.rag.rulhub_retriever import _hit_rank
+    assert _hit_rank({"extra": {"rank": 0.9}}) == 0.9
+    assert _hit_rank({"extra": {"relevance_score": 0.8}}) == 0.8
+    assert _hit_rank({"extra": {"hybrid_score": 0.7}}) == 0.7
+    assert _hit_rank({"rank": 0.6}) == 0.6           # top-level still works
+    assert _hit_rank({"extra": {}}) == 0.0           # nothing → 0

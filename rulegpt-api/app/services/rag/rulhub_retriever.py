@@ -91,6 +91,27 @@ _PUBLICATION_NUMBERS = frozenset({
 })
 
 
+# The per-hit relevance score. normalize_rule() buries any unrecognized field
+# in `extra`, so read from there too, and tolerate the field-name variants
+# RulHub's hybrid search may use (lexical uses "rank").
+_SCORE_FIELDS = ("rank", "score", "relevance_score", "hybrid_score", "rrf_score",
+                 "_score", "relevance", "similarity", "fused_score", "search_score")
+
+
+def _hit_rank(raw: dict) -> float:
+    extra = raw.get("extra") or {}
+    for field in _SCORE_FIELDS:
+        value = raw.get(field)
+        if value is None:
+            value = extra.get(field)
+        if value is not None:
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                continue
+    return 0.0
+
+
 def _content_tokens(query: str) -> list[str]:
     """Expanded, stopword-free tokens in query order (deduped)."""
     tokens = re.findall(r"[a-z0-9]+", query.lower())
@@ -215,7 +236,7 @@ class RulHubRetriever:
                 rid = rule.get("rule_id") or rule.get("id")
                 if not rid:
                     continue
-                rank = float(raw.get("rank") or raw.get("score") or 0.0)
+                rank = _hit_rank(raw)
                 if rid not in rows or rank > rows[rid][1]:
                     rows[rid] = (rule, rank)
 
