@@ -92,10 +92,13 @@ _PUBLICATION_NUMBERS = frozenset({
 
 
 # The per-hit relevance score. normalize_rule() buries any unrecognized field
-# in `extra`, so read from there too, and tolerate the field-name variants
-# RulHub's hybrid search may use (lexical uses "rank").
-_SCORE_FIELDS = ("rank", "score", "relevance_score", "hybrid_score", "rrf_score",
-                 "_score", "relevance", "similarity", "fused_score", "search_score")
+# in `extra`, so read from there too. RulHub confirmed the field to use:
+# `rank_normalized` — float [0,1], blend-friendly (min-max fused RRF in hybrid,
+# normalized ts_rank in lexical). NB: `rank` is the RAW ts_rank and is NULL for
+# ANN-only hits in hybrid, so it must NOT be keyed off — hence rank_normalized
+# first. The rest are tolerated fallbacks.
+_SCORE_FIELDS = ("rank_normalized", "rank", "score", "relevance_score",
+                 "hybrid_score", "rrf_score", "_score", "relevance", "similarity")
 
 
 def _hit_rank(raw: dict) -> float:
