@@ -338,3 +338,24 @@ async def test_get_stats_swallows_errors() -> None:
     client = make_client(handler)
     assert await client.get_stats() is None
 
+
+
+@pytest.mark.asyncio
+async def test_search_mode_hybrid_is_sent() -> None:
+    captured: dict = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured.update(json.loads(request.content))
+        return httpx.Response(200, json={
+            "query": "q", "results": [], "page": 1, "per_page": 10,
+            "corpus_stats": {"active": 1, "superseded": 0, "total": 1, "matched": 0, "include_superseded": False},
+            "schema_version": "v1.0.0",
+        })
+
+    client = make_client(handler)
+    await client.search_rules("Can the bank wait for a waiver before refusing?", search_mode="hybrid")
+    assert captured["search_mode"] == "hybrid"
+    # sanity: without search_mode it must NOT be sent (contract is additionalProperties:false)
+    captured.clear()
+    await client.search_rules("transhipment")
+    assert "search_mode" not in captured

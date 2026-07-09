@@ -254,6 +254,7 @@ class RulHubClient:
         filters: Mapping[str, Any] | None = None,
         limit: int = 10,
         allow_fallback: bool = True,
+        search_mode: str | None = None,
     ) -> list[dict[str, Any]]:
         """Semantic search via RulHub POST /v1/rules/search.
 
@@ -270,6 +271,9 @@ class RulHubClient:
             return []
 
         body: dict[str, Any] = {"query": query.strip(), "per_page": min(max(1, limit), 100)}
+        if search_mode:
+            # Opt-in hybrid (FTS + vector) search; RulHub whitelisted this key.
+            body["search_mode"] = search_mode
         if filters:
             for key in _SEARCH_FILTER_KEYS:
                 value = filters.get(key)

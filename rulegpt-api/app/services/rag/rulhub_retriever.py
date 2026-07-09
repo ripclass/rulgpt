@@ -206,41 +206,72 @@ class RulHubRetriever:
         filters = dict(_DOMAIN_FILTERS.get(classification.domain, {}))
         if classification.jurisdiction and classification.jurisdiction != "global":
             filters["jurisdiction"] = classification.jurisdiction
-        for i, q in enumerate(derive_search_queries(query, classification)):
-            for f in ([filters, {}] if (i == 0 and filters) else [{}]):
+
+        hybrid = (get_settings().RULGPT_SEARCH_MODE or "lexical").strip().lower() == "hybrid"
+
+        def _collect(results):
+            for raw in results:
+                rule = normalize_rule(raw)
+                rid = rule.get("rule_id") or rule.get("id")
+                if not rid:
+                    continue
+                rank = float(raw.get("rank") or raw.get("score") or 0.0)
+                if rid not in rows or rank > rows[rid][1]:
+                    rows[rid] = (rule, rank)
+
+        # Hybrid (semantic) first: embeddings want the FULL question, not the
+        # keyword-stripped ladder variants. RulHub fuses FTS + vector server-side.
+        if hybrid:
+            for f in ([filters, {}] if filters else [{}]):
                 attempts += 1
                 try:
-                    results = await self.client.search_rules(q, filters=f or None,
-                                                             limit=top_k * 2, allow_fallback=False)
+                    results = await self.client.search_rules(
+                        query, filters=f or None, limit=top_k * 2,
+                        allow_fallback=False, search_mode="hybrid",
+                    )
                 except (RulHubClientError, httpx.HTTPError) as exc:
-                    status_code = getattr(exc, "status_code", None)
-                    if status_code is not None and 400 <= status_code < 500:
-                        # 4xx means the request itself is malformed against the RulHub
-                        # contract — a persistent bug, not a transient outage. Flag it
-                        # distinctly so it doesn't read as "RulHub is just down" in logs.
-                        logger.warning(
-                            "RulHub search returned %s for query=%r filters=%r — "
-                            "likely a request-contract violation, not an outage",
-                            status_code, q, f or None,
-                        )
-                    errors.append(exc); continue
-                for raw in results:
-                    rule = normalize_rule(raw)
-                    rid = rule.get("rule_id") or rule.get("id")
-                    if not rid: continue
-                    rank = float(raw.get("rank") or 0.0)
-                    if rid not in rows or rank > rows[rid][1]:
-                        rows[rid] = (rule, rank)
+                    errors.append(exc)
+                    continue
+                _collect(results)
                 if rows and len(rows) >= top_k * 2:
                     break
-            if rows and len(rows) >= top_k * 2:
-                break
+
+        # Lexical relaxation ladder — the mode when hybrid is off, and the
+        # fallback when hybrid returns nothing.
+        if not rows:
+            for i, q in enumerate(derive_search_queries(query, classification)):
+                for f in ([filters, {}] if (i == 0 and filters) else [{}]):
+                    attempts += 1
+                    try:
+                        results = await self.client.search_rules(q, filters=f or None,
+                                                                 limit=top_k * 2, allow_fallback=False)
+                    except (RulHubClientError, httpx.HTTPError) as exc:
+                        status_code = getattr(exc, "status_code", None)
+                        if status_code is not None and 400 <= status_code < 500:
+                            # 4xx means the request itself is malformed against the RulHub
+                            # contract — a persistent bug, not a transient outage. Flag it
+                            # distinctly so it doesn't read as "RulHub is just down" in logs.
+                            logger.warning(
+                                "RulHub search returned %s for query=%r filters=%r — "
+                                "likely a request-contract violation, not an outage",
+                                status_code, q, f or None,
+                            )
+                        errors.append(exc); continue
+                    _collect(results)
+                    if rows and len(rows) >= top_k * 2:
+                        break
+                if rows and len(rows) >= top_k * 2:
+                    break
         if not rows and errors and len(errors) == attempts:
             raise RetrievalUnavailableError(str(errors[-1]))
         if not rows:
             return []
-        candidates = self._score(query, rows)
-        candidates = await self._maybe_embed_rerank(query, candidates)
+        # Trust RulHub's fused rank on hybrid — don't re-blend lexical overlap
+        # (that would penalize the exact semantic-without-lexical matches hybrid
+        # exists to find) or re-embed (RulHub already did).
+        candidates = self._score(query, rows, trust_rank=hybrid)
+        if not hybrid:
+            candidates = await self._maybe_embed_rerank(query, candidates)
         selected = sorted(candidates, key=lambda r: r.rerank_score, reverse=True)[: top_k * 2]
         await self._hydrate(selected)
         selected = await self._inject_anchors(query, classification, selected)
@@ -257,7 +288,7 @@ class RulHubRetriever:
             top_k,
         )
 
-    def _score(self, query: str, rows: dict) -> List[RetrievedRule]:
+    def _score(self, query: str, rows: dict, trust_rank: bool = False) -> List[RetrievedRule]:
         if not rows:
             return []
         max_rank = max((rank for _, rank in rows.values()), default=0.0)
@@ -268,8 +299,14 @@ class RulHubRetriever:
             title = str(rule.get("title") or rid)
             article = rule.get("article")
             reference = f"Article {article}" if article else rid
-            lexical = _lexical_overlap(query, f"{title} {text[:300]}")
-            rerank = (similarity * 0.7) + (lexical * 0.3)
+            if trust_rank:
+                # Hybrid: RulHub already fused FTS + vector; a lexical re-blend
+                # would demote pure-semantic matches. Preserve its rank order.
+                lexical = 0.0
+                rerank = similarity
+            else:
+                lexical = _lexical_overlap(query, f"{title} {text[:300]}")
+                rerank = (similarity * 0.7) + (lexical * 0.3)
             candidates.append(
                 RetrievedRule(
                     rule_id=rid,

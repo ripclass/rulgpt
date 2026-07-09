@@ -100,6 +100,11 @@ class Settings(BaseSettings):
 
     RULHUB_API_URL: str = "https://api.rulhub.com"
     RULHUB_API_KEY: str | None = None
+    # "hybrid" = send the raw question to RulHub's FTS+vector search (bridges
+    # semantic≠lexical queries like GQ-25 "waiver..." → UCP 600 Art 16). "lexical"
+    # = the keyword-relaxation ladder. Hybrid falls back to the lexical ladder if
+    # RulHub returns nothing. Code default stays lexical (safe); flip via env.
+    RULGPT_SEARCH_MODE: str = "lexical"
     RULEGPT_LOCAL_RULES_ROOT: str | None = None
 
     RETRIEVAL_BACKEND: str = "rulhub"          # "rulhub" | "local" (rollback switch)

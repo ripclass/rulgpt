@@ -48,6 +48,8 @@ services:
       # is already "rulhub".
       - key: RETRIEVAL_BACKEND
         value: local
+      - key: RULGPT_SEARCH_MODE
+        value: hybrid
       - key: RULGPT_RETRIEVAL_CACHE_TTL
         value: "1800"
       - key: RULGPT_RERANK_EMBEDDINGS
