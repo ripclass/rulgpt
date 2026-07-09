@@ -42,3 +42,37 @@ domain filtering so hybrid alone stops over-matching.
 
 State: RULGPT_SEARCH_MODE flag-gated, prod = lexical. Confidence fix + the
 derive_search_queries fix (GQ-46/57) shipped and live.
+
+## Hardened-hybrid validation (2026-07-09, post RulHub hardening pass)
+
+Determinism check: each case run 3× via /api/query, top-5 compared.
+
+| case | determinism | top-1 | verdict |
+|---|---|---|---|
+| **GQ-25** | STABLE (3/3 identical) | `UCP600-16A` | **PASS** — Art 16 #1, HIGH conf, stable ✅ |
+| GQ-24 | STABLE | UCP600-BTB/18/28 | improved (invoice-relevant) ✅ |
+| GQ-57 | STABLE | SANC-TECH-PEP-SCREEN | good ✅ |
+| GQ-29/39/59 controls | STABLE | correct | held ✅ |
+| **GQ-47** | STABLE | `EU-MOLDOVA-DESTAB` | **FAIL** — still EU-*sanctions*, HIGH conf (confidently wrong) ❌ |
+| GQ-46 | STABLE | cdp steel-value + WTO-CVA | still drifts off CBAM-DEFVAL ❌ |
+
+**Determinism: FIXED** (all stable — the embed fail-open + ANN tie-break worked).
+**GQ-25: SOLVED + stable** — the semantic win holds.
+
+**Remaining: the ANN weight is STILL too high for lexically-precise queries.**
+GQ-47 ("operator or trader under the EUDR") and GQ-46 (CBAM steel default) both
+have the lexically-exact rule (EUDR-OPERATOR-VS-TRADER / CBAM-DEFVAL) recalled by
+your OR-FTS arm, but the 2× ANN weight lets semantically-plausible rules
+(EU-sanctions / steel-value-chain) out-fuse them.
+
+**Recommendation — lower the ANN weight another notch.** Key reason it's safe:
+the FTS OR-arm on the RAW query already recalls the right rules for the *semantic*
+wins too (GQ-25's raw query contains "refusal" → FTS finds Art 16; the vector arm
+reinforces). So a lower ANN weight should fix GQ-47/GQ-46 WITHOUT losing GQ-25 —
+both arms support the semantic wins, only the lexically-precise cases need FTS to
+win the fuse. Re-validate GQ-47→EUDR + GQ-25→Art16-stable with the determinism
+harness. If a single weight can't thread both, RulGPT-side lexical+hybrid fusion
+is the fallback.
+
+State: RULGPT_SEARCH_MODE flag-gated, prod=lexical. Ready to flip + re-validate
+after the next ANN-weight tune.
